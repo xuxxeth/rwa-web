@@ -1,4 +1,3 @@
-import './App.css'
 import { BrowserRouter, useRoutes } from 'react-router-dom'
 import routes from './routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -9,7 +8,6 @@ function RoutesWrapper() {
 }
 
 function App() {
-
   return (
     <ErrorBoundary fallback={<h2>页面加载失败，请重试</h2>}>
       <Suspense fallback={<div>加载中...</div>}>
@@ -18,6 +16,7 @@ function App() {
         </BrowserRouter>
       </Suspense>
     </ErrorBoundary>
+    
   );
 }
 
