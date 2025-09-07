@@ -6,6 +6,9 @@ body {
 }
 
 @layer utilities {
+  .text-80 {
+    color: rgba(255, 255, 255, 0.8);
+  }
   .shadow-1 {
     background:
     linear-gradient(
@@ -39,6 +42,18 @@ body {
     left: 50%;
     transform: translate(-50%, 20%);
   }
+  .circle-bg2 {
+    width: 895px;
+    height: 895px;
+    border-radius: 50%;
+    background: radial-gradient(
+      50% 50% at 50% 50%, 
+      #1B255E 0%,       
+      rgba(27, 37, 94, 0) 100% 
+    );
+    backdrop-filter: blur(200px); 
+  }
+
   .scale-quarter {
     transform: scale(0.25); /* 1/4 = 缩小4倍 */
     transform-origin: center; /* 缩放中心点，可改为 top left 等 */
@@ -74,4 +89,13 @@ body {
     left: 331px;
     top: 672px;
   }
+
+  .drop-shadow {
+    filter: drop-shadow(0 0 35px rgba(157, 255, 58, 0.5));
+  }
+  .box-shadow {
+    box-shadow: 0 0 35px 0 rgba(157, 255, 58, 0.5);
+  }
+
+
 }

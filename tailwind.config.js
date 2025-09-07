@@ -11,6 +11,9 @@ export default {
         md: '768px',   // 中屏
         xl: '1440px',  // 超大屏
       },
+      dropShadow: {
+        'glow-green': '0 0 35px rgba(157, 255, 58, 0.5)',
+      },
     },
   },
   plugins: [],
