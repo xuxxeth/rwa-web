@@ -1,5 +1,6 @@
 {
-  "welcome": "欢迎使用 React + Vite + i18n",
-  "home": "首页",
-  "about": "关于"
+  "Homepage": "首頁",
+  "Pro Trade": "專業交易",
+  "Convert": "兌換",
+  "Assets": "資產"
 }

@@ -1,5 +1,14 @@
 {
-  "welcome": "Welcome to React + Vite + i18n",
-  "home": "Home",
-  "about": "About"
+  "Homepage": "Homepage",
+  "Pro Trade": "Pro Trade",
+  "Convert": "Convert",
+  "Assets": "Assets",
+  "pageError": "Page loading failed, please try again",
+  "Loading": "Loading",
+  "Connect Wallet": "Connect Wallet",
+  "Total USDT Balance": "Total USDT Balance",
+  "My Assets": "My Assets",
+  "ID Verification": "ID Verification",
+  "Disconnect": "Disconnect",
+  "Back": "Back"
 }

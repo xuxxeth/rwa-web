@@ -1,13 +1,14 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Divide } from "../divide";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function ConnectButton() {
-
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="h-[38px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[100px] cursor-pointer">
-          Connect Wallet
+          {t('Connect Wallet')}
         </div>
       </DropdownMenuTrigger>
        <DropdownMenuContent align="end" 
@@ -29,21 +30,21 @@ export function ConnectButton() {
                 <img src="./images/tokens/usdt.png" className="w-5 h-5" alt="" />
                 <span className="text-[18px] font-semibold ml-2">100.00</span>
               </div>
-              <div className="text-[#6C86AD] text-sm leading-6">Total USDT Balance</div>
+              <div className="text-[#6C86AD] text-sm leading-6">{t('Total USDT Balance')}</div>
             </div>
             <div className="flex items-center py-3 cursor-pointer">
               <img src="./images/icons/assets.png" className="w-[14px] h-[14px]" alt="" />
-              <span className="text-[14px] font-semibold ml-2">My Assets</span>
+              <span className="text-[14px] font-semibold ml-2">{t('My Assets')}</span>
             </div>
             <div className="flex items-center py-3 cursor-pointer">
               <img src="./images/icons/user-check.png" className="w-[14px] h-[14px]" alt="" />
-              <span className="text-[14px] font-semibold ml-2">ID Verification</span>
+              <span className="text-[14px] font-semibold ml-2">{t('ID Verification')}</span>
             </div>
           </div>
           <Divide className="mt-[14px]" />
           <div className=" flex items-center justify-center py-3 cursor-pointer">
             <img src="./images/icons/disconnect.png" className="w-[14px] h-[14px]" alt="" />
-            <div className="ml-2 text-sm font-semibold">Disconnect</div>
+            <div className="ml-2 text-sm font-semibold">{t('Disconnect')}</div>
           </div>
         </div>
         
