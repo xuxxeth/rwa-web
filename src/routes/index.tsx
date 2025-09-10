@@ -5,7 +5,6 @@ import { lazy, type ReactElement } from "react";
 const Home = lazy(() => import("../views/home"));
 const About = lazy(() => import("../views/about"));
 const KLine = lazy(() => import("../views/kline"));
-const KLineDemo = lazy(() => import("../views/kline-demo"));
 const KLineAAPL = lazy(() => import("../views/kline-aapl"));
 const NotFound = lazy(() => import("../views/not-found"));
 
@@ -29,10 +28,6 @@ const routes: RouteConfig[] = [
   {
     path: "/about",
     element: <About />,
-  },
-  {
-    path: "/kline-demo",
-    element: <KLineDemo />,
   },
   {
     path: "/kline-aapl",
