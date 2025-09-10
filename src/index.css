@@ -24,6 +24,12 @@
   font-style: normal;
 }
 @font-face {
+  font-family: 'Poppins-SemiBold';
+  src: url('./fonts/Poppins-SemiBold.ttf');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
   font-family: 'Poppins-Bold';
   src: url('./fonts/Poppins-Bold.ttf');
   font-weight: 700;
@@ -41,6 +47,10 @@
 .font-medium {
   font-family: 'Poppins-Medium', sans-serif;
   font-weight: 500;
+}
+.font-semibold {
+  font-family: 'Poppins-SemiBold', sans-serif;
+  font-weight: 600;
 }
 .font-bold {
   font-family: 'Poppins-Bold', sans-serif;

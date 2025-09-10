@@ -47,7 +47,7 @@ export function SubMenus() {
     >
       <DropdownMenuTrigger asChild>
         <div className=" flex items-center">
-          <button className=" ml-4 cursor-pointer">
+          <button className="cursor-pointer">
             <img src="./images/icons/menu.png" className="w-10 h-10" alt="" />
           </button>
         </div>
