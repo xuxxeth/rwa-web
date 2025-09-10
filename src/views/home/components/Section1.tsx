@@ -29,7 +29,7 @@ export function Section1() {
         <div className=" relative z-50">
           <div className="text-[45px] font-medium text-center mt-[218px]">Empowering the Convergence of </div>
           <div className="flex justify-center mt-2">
-            <div className="text-[70px] leading-[70px] font-medium text-center w-[800px] ">Traditional Finance and On-Chain Innovation</div>
+            <div className="text-[70px] leading-[70px] font-medium text-center w-[900px] ">Traditional Finance and On-Chain Innovation</div>
           </div>
           <div className="flex justify-center mt-8">
             <div className="text-[18px] leading-[26px] text-center w-[680px] ">Our platform unites traditional finance with blockchain innovation, enabling tokenized assets and on-chain trading to transform capital markets—making them more efficient, transparent, and accessible.</div>

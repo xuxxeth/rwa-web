@@ -4,6 +4,9 @@ import { lazy, type ReactElement } from "react";
 // 懒加载页面
 const Home = lazy(() => import("../views/home"));
 const About = lazy(() => import("../views/about"));
+const KLine = lazy(() => import("../views/kline"));
+const KLineDemo = lazy(() => import("../views/kline-demo"));
+const KLineAAPL = lazy(() => import("../views/kline-aapl"));
 const NotFound = lazy(() => import("../views/not-found"));
 
 // 路由配置类型
@@ -20,8 +23,20 @@ const routes: RouteConfig[] = [
     element: <Home />,
   },
   {
+    path: "/kline",
+    element: <KLine />,
+  },
+  {
     path: "/about",
     element: <About />,
+  },
+  {
+    path: "/kline-demo",
+    element: <KLineDemo />,
+  },
+  {
+    path: "/kline-aapl",
+    element: <KLineAAPL />,
   },
   {
     path: "*", // 兜底路由
