@@ -2,15 +2,29 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { Divide } from "../divide";
 import { useTranslation } from "@/hooks/useTranslation";
 import { shortenAddress } from "@/utils";
-import { useWeb3Active } from "@/hooks/useWeb3Active";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { useEffect } from "react";
+import storage from "@/utils/storage";
+import { CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
 
 
 export function ConnectButton() {
   const { t } = useTranslation();
-  const { wallets, account, handleConnect, handleDisConnect } = useWeb3Active()
+  const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
 
   // 默认执行一次连接钱包操作
-  
+  useEffect(() => {
+    if (wallets.length > 0) {
+      const walletUUID = storage.getItem(WALLET_UUID)
+      const connectorType = storage.getItem(CONNECTOR_TYPE)
+      if (walletUUID && connectorType) {
+        const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
+        if (wallet) {
+          handleConnect(connectorType, wallet)
+        }
+      }
+    }
+  }, [wallets, handleConnect])
 
   return (
     <>

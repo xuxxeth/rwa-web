@@ -1,16 +1,14 @@
 import {
   WalletProvider as Provider,
-  bsc, 
-  xLayer,
   xLayerTestnet,
   bscTestnet,
-  
+  defaultChains
 } from 'ca-common-web'
 
 export const WalletProvider = Provider
 
 export function useChains() {
-  return [bsc, xLayer]
+  return defaultChains
 }
 
 export function useTestnetChains() {
