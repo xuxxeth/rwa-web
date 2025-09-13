@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { getDataFeed, tagSession } from "./datafeed";
 import { type ChartingLibraryWidgetOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
@@ -22,7 +22,6 @@ function drawOverlay(chart, session, start, end, low, high) {
 export const TVChartContainer = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
-  const [isLoading, setIsLoading] = useState(true)
   
   useEffect(() => {
     if (!chartContainerRef.current) {
@@ -64,7 +63,6 @@ export const TVChartContainer = () => {
     if (window.TradingView?.widget) {
       tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
       tvWidgetRef.current?.onChartReady(function () {
-          setIsLoading(false);
           // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
           // priceScale?.setAutoScale(true)
 
