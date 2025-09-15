@@ -1,4 +1,4 @@
-import { BrowserRouter, useRoutes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, useRoutes } from 'react-router-dom'
 import routes from './routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Suspense, useEffect } from 'react';
