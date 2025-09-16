@@ -10,5 +10,9 @@
   "My Assets": "My Assets",
   "ID Verification": "ID Verification",
   "Disconnect": "Disconnect",
-  "Back": "Back"
+  "Back": "Back",
+  "market": "Market",
+  "limit": "Limit",
+  "You Pay": "You Pay",
+  "You Receive": "You Receive"
 }

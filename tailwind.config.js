@@ -14,6 +14,9 @@ export default {
       dropShadow: {
         'glow-green': '0 0 35px rgba(157, 255, 58, 0.5)',
       },
+      fontFamily: {
+        sans: ["Poppins", "sans-serif"], // 全局默认字体
+      },
     },
   },
   plugins: [require("tw-animate-css")]
