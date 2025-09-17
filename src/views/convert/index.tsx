@@ -5,6 +5,8 @@ import { LazyImage } from "@/components/image/LazyImage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ConverBody } from "./components/ConvetBody";
+import { InvestBody } from "./components/InvestBody";
+import { XFooter } from "@/components/footer";
 
 function Convert() {
   const { t } = useTranslation()
@@ -50,14 +52,15 @@ function Convert() {
               </BoxCard>
             </div>
             <div className="flex-1">
-              <BoxCard className="min-h-[982px] rounded-[32px] p-8">
-
+              <BoxCard className="min-h-[600px] rounded-[32px] p-8">
+                <InvestBody />
               </BoxCard>
             </div>
           </div>
         </div>
 
       </MainLayout>
+      <XFooter />
     </>
     
   )
