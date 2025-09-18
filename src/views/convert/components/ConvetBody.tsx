@@ -12,10 +12,12 @@ export function ConverBody() {
   const [disabled, setDisabled] = useState(false)
   const [connected, setConnected] = useState(false)
 
+
   return (
     <div className="mt-4">
       <CurrencyInputPanel 
         label={t('You Pay')}
+        
       />
       <SwitchArrow />
       <CurrencyInputPanel

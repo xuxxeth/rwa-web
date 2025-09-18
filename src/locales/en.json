@@ -22,5 +22,10 @@
   "Estimated Received": "Estimated Received",
   "Reference Exchange Rate": "Reference Exchange Rate",
   "Estimated Network Fee": "Estimated Network Fee",
-  "FAQ": "FAQ"
+  "FAQ": "FAQ",
+  "MarketPreInfo": "Currently in U.S. stock {Pre-Market} session. Only limit orders for whole tokens are supported.",
+  "MarketAfterInfo": "Currently in U.S. stock {After-Hours} session. Only limit orders for whole tokens are supported.",
+  "MarketCloseInfo": "Currently in U.S. stock {Closed} session. Only limit orders for whole tokens are supported. Orders will be submitted in the next Pre-Market session.",
+  "MarketLockInfo": "Trading for this stock is currently halted. Order placement is not supported at the moment.",
+  "Market open in": "Market open in"
 }

@@ -1,0 +1,67 @@
+import { memo, useId, useMemo, useState } from "react"
+import { CheckBox } from "../check-box"
+import { LazyImage } from "../image/LazyImage"
+
+type TokenProps = {
+  name: string,
+  symbol: string,
+  icon: string,
+  balance: string
+}
+
+const TokenItem = memo(
+  ({ token }: {token: TokenProps}) => {
+    return (
+      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2">
+        <div className="flex items-center gap-x-2">
+          <LazyImage src={token.icon} className="w-10 h-10" />
+          <div>
+            <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>
+            <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.name}</div>
+          </div>
+        </div>
+        <div className=" text-right">
+          <div className=" text-[16px] font-medium leading-[24px]">{token.balance}</div>
+          <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{token.balance}</div>
+        </div>
+      </div>
+    )
+  }
+)
+
+
+const TokenList = memo(
+  () => {
+    const tokenList: TokenProps[] = [
+      {name: 'Tether USD', symbol: 'USDT', icon: '/images/tokens/usdt.png', balance: '100.3'},
+      {name: 'USD coin', symbol: 'USDC', icon: '/images/tokens/usdc.png', balance: '100.3'},
+      {name: 'BNB', symbol: 'BNB', icon: '/images/tokens/bnb.png', balance: '0'},
+      {name: 'OKB', symbol: 'OKB', icon: '/images/tokens/okb.png', balance: '0'},
+    ]
+    const _id = useId()
+
+    const [filterHolding, setFilterHolding] = useState(false)
+    const filterTokens = useMemo(() => {
+      return filterHolding ? tokenList.filter(token => Number(token.balance) > 0) : tokenList
+    }, [tokenList, filterHolding])
+    return (
+      <div className="w-[300px]">
+        <div className=" flex items-center">
+          <CheckBox onChange={setFilterHolding} />
+          <span className=" text-[12px] font-normal ml-1">Holdings Only</span>
+        </div>
+        <div className="mt-2">
+          <div className=" flex items-center justify-between text-[12px] font-normal">
+            <div>Name</div>
+            <div>Balance</div>
+          </div>
+          {
+            filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token}  />)
+          }
+        </div>
+      </div>
+    )
+  }
+)
+
+export { TokenList }

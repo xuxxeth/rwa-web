@@ -6,6 +6,7 @@ import storage from './utils/storage';
 import { useTranslation } from './hooks/useTranslation';
 
 import { WalletProvider, useChains } from '@/hooks/useCaCommon'
+import { Toaster } from './components/ui/sonner';
 
 function RoutesWrapper() {
   return useRoutes(routes);
@@ -27,6 +28,7 @@ function App() {
           <BrowserRouter >
             <RoutesWrapper />
           </BrowserRouter>
+          <Toaster position='top-center' />
         </Suspense>
       </ErrorBoundary>
     </WalletProvider>
