@@ -2,6 +2,7 @@ import { ConnectButton } from "@/components/button/ConnectButton";
 import { MenusItem } from "./MenuItem";
 import { SubMenus } from "../button/SubMenus";
 import { useTranslation } from "@/hooks/useTranslation";
+import { SwitchButton } from "../button/SwitchChainButton";
 
 export function Menus() {
   const { t } = useTranslation();
@@ -16,7 +17,8 @@ export function Menus() {
           <MenusItem title={t('Assets')} />
         </div>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-x-2">
+        <SwitchButton />
         <ConnectButton />
         <SubMenus />
       </div>

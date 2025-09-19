@@ -1,5 +1,9 @@
 import type { ChartingLibraryFeatureset } from "@/lib/charting_library/charting_library";
 
+export const CONNECTOR_TYPE = 'CONNECTOR_TYPE';
+export const WALLET_UUID = 'WALLET_UUID';
+
+
 const RED = "#FF6767";
 const GREEN = "#47D0A5";
 export const DEFAULT_PERIOD = "4h";

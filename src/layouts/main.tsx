@@ -6,7 +6,7 @@ export function MainLayout({
 }) {
 
   return (
-    <div className=' xl:max-w-[1440px] mx-auto'>
+    <div className=' xl:max-w-[1440px] mx-auto font-normal'>
       {children}
     </div>
   )

@@ -6,6 +6,7 @@ const datafeed = {
       supported_resolutions: ["1", "5", "15", "30", "60", "D"]
     }), 0);
   },
+  // @ts-ignore
   resolveSymbol: (symbolName: any, onSymbolResolvedCallback: (arg0: { name: string; ticker: string; type: string; session: string; timezone: string; minmov: number; pricescale: number; has_intraday: boolean; supported_resolutions: string[]; }) => void) => {
     setTimeout(() => onSymbolResolvedCallback({
       name: "AAPL",

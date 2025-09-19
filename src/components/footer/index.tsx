@@ -3,7 +3,7 @@ import { MainLayout } from "@/layouts/main";
 export function XFooter() {
   return (
     <MainLayout>
-      <div className="flex justify-between items-center border-t border-[rgba(255,255,255,0.1)] pt-[46px] mt-[130px] pb-[130px] px-5">
+      <div className="flex justify-between items-center border-t border-[rgba(255,255,255,0.1)] pt-[46px] mt-[130px] pb-[130px] px-5 font-normal">
         <div>
           <img src="./images/logo_text.png" className="w-[182px]" alt="" />
           <div className=" text-base text-80 mt-[76px]">@ 2025 Cyber Alpha. All rights reserved.</div>

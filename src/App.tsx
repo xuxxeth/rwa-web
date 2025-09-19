@@ -1,9 +1,12 @@
-import { BrowserRouter, useRoutes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, useRoutes } from 'react-router-dom'
 import routes from './routes';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Suspense, useEffect } from 'react';
 import storage from './utils/storage';
 import { useTranslation } from './hooks/useTranslation';
+
+import { WalletProvider, useChains } from '@/hooks/useCaCommon'
+import { Toaster } from './components/ui/sonner';
 
 function RoutesWrapper() {
   return useRoutes(routes);
@@ -11,19 +14,24 @@ function RoutesWrapper() {
 
 function App() {
   const { t, i18n } = useTranslation();
+  const chains = useChains()
+
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
     i18n.changeLanguage(lng)
   }, [i18n])
+
   return (
-    <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>
-      <Suspense fallback={<div>{t('Loading')}...</div>}>
-        <BrowserRouter >
-          <RoutesWrapper />
-        </BrowserRouter>
-      </Suspense>
-    </ErrorBoundary>
-    
+    <WalletProvider config={{ chains: chains, defaultChainId: chains[0].id }}>
+      <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>
+        <Suspense fallback={<div>{t('Loading')}...</div>}>
+          <BrowserRouter >
+            <RoutesWrapper />
+          </BrowserRouter>
+          <Toaster position='top-center' />
+        </Suspense>
+      </ErrorBoundary>
+    </WalletProvider>
   );
 }
 

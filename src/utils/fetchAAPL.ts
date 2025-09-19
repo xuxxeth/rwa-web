@@ -1,7 +1,9 @@
 // utils/fetchAAPL.js
 export async function fetchAAPL() {
+  // @ts-ignore
   const apiToken = "68c0cc1ad9c4c8.14613388"; // 去 EODHD 或 StockData.org 申请
   const now = Math.floor(Date.now() / 1000);
+   // @ts-ignore
   const fiveDaysAgo = now - 5 * 24 * 60 * 60;
 
   const url = `/libraries/aapl_mock2.json`;

@@ -1,34 +1,103 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
+import { cn } from "@/utils";
+import { useChains } from "@/hooks/useCaCommon";
+import storage from "@/utils/storage";
+import { getChainIconById } from "@/utils/chains";
+import type { ChainId } from "@/config/chainIcons";
 
-export function SwitchChainButton() {
+export function ChainItem({
+  title,
+  selected,
+  chainId,
+  onClick
+}: {
+  title?: string;
+  selected?: boolean;
+  chainId?: number;
+  onClick?: () => void
+}) {
+  return (
+    <div 
+      onClick={() => onClick && onClick()}
+      className={cn(
+      "flex items-center justify-between py-4 cursor-pointer font-semibold",
+      selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
+    )}>
+      <div className="flex items-center">
+        <img src={getChainIconById(String(chainId))} className="w-6 mr-2" alt="" />
+        <span className="text-[14px]">{title}</span>
+      </div>
+      
+      {
+        selected && <img src="./images/icons/selected.png" className="w-3" alt="" />
+      }
+    </div>
+  )
+}
+
+
+export function SwitchButton() {
+  
+  const chains = useChains()
+  const [open, setOpen] = useState(false)
+
+  const [selected, setSelected] = useState<typeof chains[0] | null>(null)
+
+  useEffect(() => {
+    const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
+    setSelected(chains.find(chain => chain.id === _chainId) || chains[0])
+  }, [])
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen)
+      }}
+    >
       <DropdownMenuTrigger asChild>
-        <div className="h-[38px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[100px] cursor-pointer">
-          Connect Wallet
-        </div>
+        {
+          selected ? 
+          <div className="h-[48px] flex items-center p-2 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white">
+            <img src={getChainIconById(String(selected.id))} className="w-6 mr-2" alt="" />
+            <span>{selected.name}</span>
+            <img src="./images/icons/down.png" className={cn(
+              "w-3 ml-4 mr-2 transition-all",
+              open ? ' rotate-180' : ''
+            )} alt="" />
+          </div> : null
+        }
+        
       </DropdownMenuTrigger>
-       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem>
-          <div className="flex items-center space-x-2">
-            <span className="w-3 h-3 rounded-full bg-green-500"></span>
-            <span>在线</span>
+       <DropdownMenuContent align="end" 
+          className="bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2"
+       >
+        <div 
+          className="bg-[#131823] rounded-[8px] pt-4 text-white"
+          style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
+        >
+          <div className=" px-4">
+            {
+              chains.map((chain) => {
+                return (
+                  <ChainItem 
+                    key={chain.id} 
+                    title={chain.name} 
+                    selected={selected?.id === chain.id} 
+                    chainId={chain.id}
+                    onClick={() => {
+                      setOpen(false)
+                      setSelected(chain)
+                    }}
+                  />
+                )
+              })
+            }
           </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <div className="flex items-center space-x-2">
-            <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-            <span>离开</span>
-          </div>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem>
-          <div className="flex items-center space-x-2">
-            <span className="w-3 h-3 rounded-full bg-red-500"></span>
-            <span>忙碌</span>
-          </div>
-        </DropdownMenuItem>
+          
+        </div>
+        
       </DropdownMenuContent>
       
     </DropdownMenu>

@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import { type ChartingLibraryWidgetOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import datafeed from "./datafeed";
@@ -6,7 +6,6 @@ import datafeed from "./datafeed";
 export const TVChartContainer = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
-  const [isLoading, setIsLoading] = useState(true)
   
   useEffect(() => {
     if (!chartContainerRef.current) {
@@ -15,7 +14,6 @@ export const TVChartContainer = () => {
     if (tvWidgetRef.current) {
         tvWidgetRef.current.remove();
     }
-
 
     const elem = chartContainerRef.current;
     const widgetOptions: ChartingLibraryWidgetOptions = {
@@ -46,7 +44,6 @@ export const TVChartContainer = () => {
 
       tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
       tvWidgetRef.current?.onChartReady(function () {
-          setIsLoading(false);
           // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
           // priceScale?.setAutoScale(true)
       });

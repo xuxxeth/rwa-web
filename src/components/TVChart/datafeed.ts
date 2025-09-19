@@ -11,8 +11,8 @@ import chartTable from './chartTable2.json'
 
 export function tagSession(item: any) {
   const date = new Date(item.time * 1000);
-  const hour = date.getUTCHours();
-  const minute = date.getUTCMinutes();
+  const _hour = date.getUTCHours();
+  const _minute = date.getUTCMinutes();
 
   // 转换到美东时区 (UTC-4 / -5)
   const nyTime = new Date(date.toLocaleString("en-US", { timeZone: "US/Eastern" }));
@@ -40,8 +40,8 @@ const getChartTable = (data: any) => {
 }
 
 const lastBarsCache = new Map<string, Bar>();
-const minPrice: Number = 0;
-const maxPrice: Number = 0;
+const _minPrice: Number = 0;
+const _maxPrice: Number = 0;
 // DatafeedConfiguration implementation
 const configurationData: DatafeedConfiguration = {
   // Represents the resolutions for bars supported by your datafeed
@@ -180,7 +180,7 @@ export function getDataFeed({
       //   pairIndex,
       // );
     },
-
+    // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
       // unsubscribeFromStream(subscriberUID);
     },
