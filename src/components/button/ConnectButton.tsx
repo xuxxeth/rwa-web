@@ -30,7 +30,7 @@ export function ConnectButton() {
     <>
       {
         !account ? 
-          <div className="h-[38px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[100px] cursor-pointer"
+          <div className="h-[340px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[100px] cursor-pointer"
             onClick={() => {
               handleConnect('inject', wallets[0])
             }}
@@ -39,7 +39,7 @@ export function ConnectButton() {
           </div> : 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="h-[48px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white"
+              <div className="h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white"
                 onClick={() => {
                 }}
               >
