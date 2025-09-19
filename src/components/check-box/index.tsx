@@ -11,7 +11,7 @@ const CheckBox = memo(
     const [check, setCheck] = useState(checked)
 
     return (
-      <button className=" cursor-pointer"
+      <button className=" cursor-pointer outline-none"
         onClick={() => {
           setCheck(!check)
           onChange && onChange(!check)

@@ -9,7 +9,7 @@ import { XFooter } from "@/components/footer";
 
 function Home() {
   return (
-    <div>
+    <div className=" font-normal">
       <Menus />
       <Section1 />
       <Section2 />

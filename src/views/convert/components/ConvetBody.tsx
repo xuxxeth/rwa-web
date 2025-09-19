@@ -6,12 +6,13 @@ import { useState } from "react";
 import { EstimatedInfo } from "./EstimatedInfo";
 import { cn } from "@/lib/utils";
 import { FAQ } from "./FAQ";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 
 export function ConverBody() {
   const { t } = useTranslation()
   const [disabled, setDisabled] = useState(false)
-  const [connected, setConnected] = useState(false)
-
+  const { account } = useActiveWeb3()
 
   return (
     <div className="mt-4">
@@ -25,15 +26,19 @@ export function ConverBody() {
         label={t('You Receive')}
       />
       <EstimatedInfo />
-      <Button className={cn(
-        "w-full mt-8",
-        !connected ? ' bg-white text-black' : ''
-      )}
-        disabled={disabled}
-      >
-        { connected ? disabled ? 'Not enough USDT' : 'Buy' : 'Connect wallet' }
-        
-      </Button>
+
+      {
+        !account ? <ConnectButtonText /> :
+        <Button className={cn(
+          "w-full mt-8",
+        )}
+          disabled={disabled}
+        >
+          { disabled ? 'Not enough USDT' : 'Buy' }
+          
+        </Button>
+      }
+      
       <FAQ />
     </div>
   )

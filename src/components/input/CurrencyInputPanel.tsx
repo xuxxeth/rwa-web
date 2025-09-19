@@ -1,10 +1,11 @@
-import { useTranslation } from "@/hooks/useTranslation";
+
 import { cn } from "@/lib/utils";
 import { CurrencyInput } from "./CurrencyInput";
 import { memo, useCallback } from "react";
 
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { TokenList } from "../token-list";
+import { CTokenList } from "../ctoken-list";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -13,10 +14,17 @@ type CurrencyInputPanelProps = {
 }
 
 const CurrencyInputPanel = memo(
-  ({mode, label}: CurrencyInputPanelProps) => {
+  ({mode = 'in', label}: CurrencyInputPanelProps) => {
     const tokenDialog = useShowDialog()
+    const cTokenDialog = useShowDialog()
+
     const handleCurrencyClick = useCallback(async () => {
-      tokenDialog.setOpen(true)
+      if (mode === 'in') {
+        tokenDialog.setOpen(true)
+      } else {
+        cTokenDialog.setOpen(true)
+      }
+      
     }, [mode])
 
     return (
@@ -50,6 +58,16 @@ const CurrencyInputPanel = memo(
         > 
           <div>
             <TokenList />
+          </div>
+        </DialogController>
+        <DialogController
+          topFixed
+          title="Select a token"
+          open={cTokenDialog.open}
+          openChange={cTokenDialog.setOpen}
+        > 
+          <div>
+            <CTokenList />
           </div>
         </DialogController>
       </div>
