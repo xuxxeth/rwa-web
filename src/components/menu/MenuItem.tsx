@@ -4,11 +4,13 @@ import { cn } from "../../utils";
 export type MenusItemPros = {
   title: string;
   active?: boolean
+  onClick?: () => void
 }
 
 export function MenusItem({
   title,
-  active = false
+  active = false,
+  onClick
 }: MenusItemPros) {
   const [hover ,setHover] = useState(false)
 
@@ -19,7 +21,11 @@ export function MenusItem({
       className={cn(
       " text-base text-white cursor-pointer h-10 flex flex-col items-center pt-1",
       active ? " font-bold" : ""
-    )}>
+    )}
+      onClick={() => {
+        onClick && onClick()
+      }}
+    >
       {title}
       {
         (active || hover) && <div className="w-full h-[4px] bg-[#9CFF3A] mt-1"></div>

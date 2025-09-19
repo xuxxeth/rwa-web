@@ -1,11 +1,11 @@
 
 import { cn } from "@/lib/utils";
 import { CurrencyInput } from "./CurrencyInput";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
-import { TokenList } from "../token-list";
-import { CTokenList } from "../ctoken-list";
+import { TokenList, tokenList } from "../token-list";
+import { CTokenList, tokenList as ctokenList } from "../ctoken-list";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -27,6 +27,8 @@ const CurrencyInputPanel = memo(
       
     }, [mode])
 
+    const [inputToken, setInputToken] = useState(tokenList[0])
+    const [outputToken, setOutputToken] = useState(ctokenList[0])
     return (
       <div className={cn(
         "bg-[#06070A] p-4 rounded-[16px] border border-[#06070A]",
@@ -34,20 +36,22 @@ const CurrencyInputPanel = memo(
       )}>
         <div className="text-[#6C86AD] text-base font-light mb-[10px]">{label || ''}</div>
         <CurrencyInput 
+          disabled={mode === 'out'}
           onCurrencyClick={handleCurrencyClick}
+          selectedToken={mode === 'in' ? inputToken : outputToken}
         />
         {
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Balance: 1,000 USDT</div>
+              <div>Balance: {inputToken.balance} {inputToken.symbol}</div>
             </div>
         }
         {
           mode === 'out' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Holdings: 0</div>
+              <div>Holdings: {outputToken.balance}</div>
             </div>
         }
         <DialogController
@@ -57,7 +61,12 @@ const CurrencyInputPanel = memo(
           openChange={tokenDialog.setOpen}
         > 
           <div>
-            <TokenList />
+            <TokenList
+              onClick={(token) => {
+                tokenDialog.hide()
+                setInputToken(token)
+              }}
+            />
           </div>
         </DialogController>
         <DialogController
@@ -67,7 +76,12 @@ const CurrencyInputPanel = memo(
           openChange={cTokenDialog.setOpen}
         > 
           <div>
-            <CTokenList />
+            <CTokenList 
+              onClick={(token) => {
+                cTokenDialog.hide()
+                setOutputToken(token)
+              }}
+            />
           </div>
         </DialogController>
       </div>

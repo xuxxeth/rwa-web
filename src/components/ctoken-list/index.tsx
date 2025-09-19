@@ -5,7 +5,7 @@ import { LazyImage } from "../image/LazyImage"
 import { SortButton } from "../sort-button"
 import { cn } from "@/lib/utils"
 
-type CTokenProps = {
+export type CTokenProps = {
   stock: string,
   rwa: string,
   icon: string,
@@ -18,7 +18,7 @@ type CTokenProps = {
 
 const CTokenItem = memo(
 
-  ({ token }: {token: CTokenProps}) => {
+  ({ token, onClick }: {token: CTokenProps, onClick?: (token: CTokenProps) => void}) => {
     const { t } = useTranslation()
     const marketInfo = useMemo(() => {
       const state = token.state
@@ -62,7 +62,11 @@ const CTokenItem = memo(
 
 
     return (
-      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2">
+      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
+        onClick={() => {
+          onClick && onClick(token)
+        }}
+      >
         <div className="flex items-center gap-x-2 w-1/3">
           <LazyImage src={token.icon} className="w-10 h-10" />
           <div>
@@ -95,23 +99,24 @@ const CTokenItem = memo(
   }
 )
 
+export const tokenList: CTokenProps[] = [
+    {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
+    {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
+    {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
+    {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
+    {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
+    {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
+    {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
+    {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
+    {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
+    {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
+    {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
+    {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
+  ]
 
 const CTokenList = memo(
-  () => {
-    const tokenList: CTokenProps[] = [
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-    ]
+  ({ onClick }: { onClick?: (token: CTokenProps) => void}) => {
+
     const _id = useId()
 
     const [filterHolding, setFilterHolding] = useState(false)
@@ -131,7 +136,7 @@ const CTokenList = memo(
             <div className="w-1/3 text-right">Holdings</div>
           </div>
           {
-            filterTokens.slice(0, 6).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token}  />)
+            filterTokens.slice(0, 6).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
           }
         </div>
       </div>

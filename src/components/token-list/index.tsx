@@ -2,7 +2,7 @@ import { memo, useId, useMemo, useState } from "react"
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 
-type TokenProps = {
+export type TokenProps = {
   name: string,
   symbol: string,
   icon: string,
@@ -10,9 +10,13 @@ type TokenProps = {
 }
 
 const TokenItem = memo(
-  ({ token }: {token: TokenProps}) => {
+  ({ token, onClick }: {token: TokenProps, onClick?: (token: TokenProps) => void}) => {
     return (
-      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2">
+      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
+        onClick={() => {
+          onClick && onClick(token)
+        }}
+      >
         <div className="flex items-center gap-x-2">
           <LazyImage src={token.icon} className="w-10 h-10" />
           <div>
@@ -28,16 +32,18 @@ const TokenItem = memo(
     )
   }
 )
-
+export const tokenList: TokenProps[] = [
+  {name: 'Tether USD', symbol: 'USDT', icon: '/images/tokens/usdt.png', balance: '100.3'},
+  {name: 'USD coin', symbol: 'USDC', icon: '/images/tokens/usdc.png', balance: '100.3'},
+  {name: 'BNB', symbol: 'BNB', icon: '/images/tokens/bnb.png', balance: '0'},
+  {name: 'OKB', symbol: 'OKB', icon: '/images/tokens/okb.png', balance: '0'},
+]
 
 const TokenList = memo(
-  () => {
-    const tokenList: TokenProps[] = [
-      {name: 'Tether USD', symbol: 'USDT', icon: '/images/tokens/usdt.png', balance: '100.3'},
-      {name: 'USD coin', symbol: 'USDC', icon: '/images/tokens/usdc.png', balance: '100.3'},
-      {name: 'BNB', symbol: 'BNB', icon: '/images/tokens/bnb.png', balance: '0'},
-      {name: 'OKB', symbol: 'OKB', icon: '/images/tokens/okb.png', balance: '0'},
-    ]
+  ({
+    onClick
+  }: { onClick?: (token: TokenProps) => void}) => {
+
     const _id = useId()
 
     const [filterHolding, setFilterHolding] = useState(false)
@@ -56,7 +62,7 @@ const TokenList = memo(
             <div>Balance</div>
           </div>
           {
-            filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token}  />)
+            filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token} onClick={onClick}  />)
           }
         </div>
       </div>
