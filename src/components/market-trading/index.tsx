@@ -39,12 +39,12 @@ const MarketTrading = memo(
     }, [state])
 
     return (
-      <BoxCard className="rounded-2xl">
+      <BoxCard className="rounded-[4px] h-[48px] py-0 flex items-center justify-center">
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">
-            <LazyImage src={marketInfo.icon} className="w-8" />
+            <LazyImage src={marketInfo.icon} className="w-6" />
           </div>
-          <div className=" font-semibold text-[16px]">{marketInfo.info}</div>
+          <div className=" font-medium text-[14px]">{marketInfo.info}</div>
         </div>
         {
           state === 'lock' && 

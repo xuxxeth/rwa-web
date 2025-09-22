@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { getDataFeed, tagSession } from "./datafeed";
-import { type ChartingLibraryWidgetOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
+import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import chartTable from './chartTable2.json'
 // @ts-ignore
@@ -55,10 +55,21 @@ export const TVChartContainer = () => {
       overrides: chartOverrides,
       interval: "1D" as ResolutionString,
       studies_overrides: {
-        "volume.volume.color.0": "rgba(255, 0, 0, 0.5)",  // 下跌柱颜色
-        "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
-        "volume.volume.transparency": 30,                 // 透明度
-      }
+        // "volume.volume.color.0": "rgba(255, 0, 0, 0.5)",  // 下跌柱颜色
+        // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
+        // "volume.volume.transparency": 30,       
+        "paneProperties.background": "#0d0d0d",
+        "paneProperties.vertGridProperties.color": "#222",
+        "paneProperties.horzGridProperties.color": "#222",
+        "scalesProperties.textColor": "#AAA",
+        "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+        "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+        "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+        "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+        "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+        "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",          // 透明度
+      },
+
     };
     if (window.TradingView?.widget) {
       tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
@@ -67,66 +78,23 @@ export const TVChartContainer = () => {
           // priceScale?.setAutoScale(true)
 
         const chart = tvWidgetRef.current?.activeChart();
-        // 添加成交量指标
-        chart?.createStudy("Volume", false, false);
-        
-        // // 用 overlay 高亮盘前/盘后
-        // chartTable.table.forEach(d => {
-        //   const session = tagSession(d);
-        //   if (session !== "regular") {
-        //     chart?.createMultipointShape(
-        //       [
-        //         { time: d.time, price: d.low },
-        //         { time: d.time + 60, price: d.high }
-        //       ],
-        //       {
-        //         shape: "rectangle",
-        //         // @ts-ignore
-        //         color: session === "pre" ? "rgba(0,0,255,0.1)" : "rgba(128,0,128,0.1)",
-        //         disableSelection: true,
-        //         disableSave: true
-        //       }
-        //     );
-        //   }
-        // });
-        // ✅ 合并连续的盘前/盘后时间段并画 overlay
-        let currentSession = null;
-        let sessionStart = null;
-        let sessionEnd = null;
-        const mockData = chartTable.table
-        for (let i = 0; i < mockData.length; i++) {
-          const d = mockData[i];
-          const session = tagSession(d);
-          if (session !== "regular") {
-            if (!currentSession) {
-              // 开始新 session
-              currentSession = session;
-              sessionStart = d.time;
-              sessionEnd = d.time;
-            } else if (session === currentSession) {
-              // 继续当前 session
-              sessionEnd = d.time;
-            } else {
-              // session 变化，先画上一个
-              drawOverlay(chart, currentSession, sessionStart, sessionEnd, d.low, d.high);
-              // 开始新的 session
-              currentSession = session;
-              sessionStart = d.time;
-              sessionEnd = d.time;
-            }
-          } else {
-            // regular 出现，结束之前的 session
-            if (currentSession) {
-              drawOverlay(chart, currentSession, sessionStart, sessionEnd, d.low, d.high);
-              currentSession = null;
-            }
-          }
-        }
-        // 收尾
-        if (currentSession) {
-          drawOverlay(chart, currentSession, sessionStart, sessionEnd, mockData[mockData.length - 1].low, mockData[mockData.length - 1].high);
-        }
+        if (chart) {
+          // 添加成交量指标
+          chart?.createStudy("Volume", false, false);
+          
+          // MA5
+          chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })
+            .then(id => {
+              id && console.log(chart.getStudyById(id))
+            });
 
+          // MA10
+          chart.createStudy("Moving Average", false, false, { length: 10 }, { "plot.color.0": "#FF6D01" });
+
+          // MA30
+          chart.createStudy("Moving Average", false, false, { length: 30 }, { "plot.color.0": "rgba(0,128,0,0.5)" });
+        }
+        
       });
     }
     

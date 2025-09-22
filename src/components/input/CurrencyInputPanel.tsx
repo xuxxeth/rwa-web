@@ -10,11 +10,14 @@ import { CTokenList, tokenList as ctokenList } from "../ctoken-list";
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
   label?: string
+  placeholder?: string
+  value?: string
   onCurrencyClick?: () => void
+  onUserInput?: (value: string) => void
 }
 
 const CurrencyInputPanel = memo(
-  ({mode = 'in', label}: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, onUserInput }: CurrencyInputPanelProps) => {
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
 
@@ -27,8 +30,8 @@ const CurrencyInputPanel = memo(
       
     }, [mode])
 
-    const [inputToken, setInputToken] = useState(tokenList[0])
-    const [outputToken, setOutputToken] = useState(ctokenList[0])
+    const [inputToken, setInputToken] = useState(ctokenList[0])
+    const [outputToken, setOutputToken] = useState(tokenList[0])
     return (
       <div className={cn(
         "bg-[#06070A] p-4 rounded-[16px] border border-[#06070A]",
@@ -36,7 +39,11 @@ const CurrencyInputPanel = memo(
       )}>
         <div className="text-[#6C86AD] text-base font-light mb-[10px]">{label || ''}</div>
         <CurrencyInput 
+          value={value}
+          placeholder={placeholder}
           disabled={mode === 'out'}
+          mode={mode}
+          onUserInput={onUserInput}
           onCurrencyClick={handleCurrencyClick}
           selectedToken={mode === 'in' ? inputToken : outputToken}
         />
@@ -44,14 +51,14 @@ const CurrencyInputPanel = memo(
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Balance: {inputToken.balance} {inputToken.symbol}</div>
+              <div>Avbl: {inputToken.balance} {inputToken.stock}</div>
             </div>
         }
         {
           mode === 'out' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Holdings: {outputToken.balance}</div>
+              <div>Avbl: {outputToken.balance}</div>
             </div>
         }
         <DialogController
@@ -61,9 +68,10 @@ const CurrencyInputPanel = memo(
           openChange={tokenDialog.setOpen}
         > 
           <div>
-            <TokenList
+            
+            <CTokenList 
               onClick={(token) => {
-                tokenDialog.hide()
+                cTokenDialog.hide()
                 setInputToken(token)
               }}
             />
@@ -76,9 +84,9 @@ const CurrencyInputPanel = memo(
           openChange={cTokenDialog.setOpen}
         > 
           <div>
-            <CTokenList 
+            <TokenList
               onClick={(token) => {
-                cTokenDialog.hide()
+                tokenDialog.hide()
                 setOutputToken(token)
               }}
             />

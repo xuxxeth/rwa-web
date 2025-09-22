@@ -55,12 +55,13 @@ export const disabledFeatures: ChartingLibraryFeatureset[] = [
   "header_compare",
   "display_market_status",
   "show_interval_dialog_on_key_press",
-  "header_symbol_search",
+  // "header_symbol_search",
   "header_quick_search",
   "popup_hints",
   // "use_localstorage_for_settings",
   // "right_bar_stays_on_scroll",
   // "symbol_info",
+  "hide_left_toolbar_by_default"
 ];
 export const enabledFeatures: ChartingLibraryFeatureset[] = [
   "side_toolbar_in_fullscreen_mode",
@@ -71,4 +72,6 @@ export const enabledFeatures: ChartingLibraryFeatureset[] = [
   "study_symbol_ticker_description",
   "study_overlay_compare_legend_option",
   "go_to_date",
+  "header_symbol_search", 
+  "timeframes_toolbar"
 ];
