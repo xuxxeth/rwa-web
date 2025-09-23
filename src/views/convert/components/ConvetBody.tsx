@@ -105,7 +105,7 @@ export function ConverBody() {
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}
         >
-          { disabled ? 'Enter an amount' : buying ? 'Buying' : 'Buy' }
+          { disabled ? t('Enter an amount') : buying ? 'Buying' : t('Buy') + ' APPLc' }
           
         </Button>
       }

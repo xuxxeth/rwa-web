@@ -42,7 +42,7 @@ const ConvertTabs = memo(
     const [selected, setSelected] = useState('buy')
 
     return (
-      <div className=" flex items-center w-full h-[48px] bg-[#131823]">
+      <div className=" flex items-center w-full h-[48px] bg-[#131823] rounded-[16px]">
         {
           tabs.map(tab => (<ConvertTabItem key={tab.key} tab={tab} selected={selected === tab.key} onClick={tab => {
             setSelected(tab.key)

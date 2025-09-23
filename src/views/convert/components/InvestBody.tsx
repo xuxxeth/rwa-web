@@ -14,11 +14,11 @@ export function InvestBody() {
 
   return (
     <div className=" flex flex-col items-center">
-      <div className="w-[562px] text-[28px] font-bold text-center">
-        {t('Institutional grade investment experience')}
+      <div className="w-[562px] text-[28px] font-medium text-center">
+        {t('Institutional-Grade Trading Experience')}
       </div>
-      <div className="w-[562px] mt-4 text-[16px] text-[rgba(255,255,255,0.8)] text-center">
-        {t('Rapid execution and tight spreads')}
+      <div className="w-[562px] mt-4 text-[16px] text-[rgba(255,255,255,0.8)] text-center font-normal">
+        {t('Fast execution')}
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4 w-full">
         {

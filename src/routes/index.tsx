@@ -8,6 +8,7 @@ const About = lazy(() => import("../views/about"));
 const KLine = lazy(() => import("../views/kline"));
 const KLineAAPL = lazy(() => import("../views/kline-aapl"));
 const NotFound = lazy(() => import("../views/not-found"));
+const Components = lazy(() => import("../views/components"));
 
 // 路由配置类型
 export interface RouteConfig {
@@ -33,6 +34,10 @@ const routes: RouteConfig[] = [
   {
     path: "/about",
     element: <About />,
+  },
+  {
+    path: "/com",
+    element: <Components />,
   },
   {
     path: "/kline-aapl",

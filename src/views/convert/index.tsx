@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { MarketTrading } from "@/components/market-trading";
 import { ConvertTabs } from "./components/ConvertTabs";
 import { FAQ } from "./components/FAQ";
+import { KlineSwitch } from "./components/KlineSwitch";
 
 function Convert() {
   const { t } = useTranslation()
@@ -35,7 +36,7 @@ function Convert() {
               <BoxCard className="min-h-[448px] rounded-[32px]">
                 <ConvertTabs />
                 <div className="flex items-center justify-between mt-5">
-                  <div className="text-[24px] font-medium">Limit</div>
+                  <div className="text-[24px] font-medium">{t('limit')}</div>
                   <div className="flex items-center gap-x-5">
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
                       onClick={() => {
@@ -44,18 +45,7 @@ function Convert() {
                     >
                       <LazyImage src="/images/convert/history.png" className="w-9 h-9 cursor-pointer" />
                     </button>
-                    <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
-                      onClick={() => {
-                        toastSuccess({
-                          title: 'The notification content',
-                          btnText: 'Button',
-                          onClick: () => {
-                          }
-                        })
-                      }}
-                    >
-                      <LazyImage src="/images/convert/kline.png" className="w-9 h-9 cursor-pointer" />
-                    </button>
+                    <KlineSwitch />
                   </div>
                 </div>
                 <ConverBody />
