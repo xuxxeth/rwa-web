@@ -21,13 +21,11 @@ function RoutesWrapper() {
 
 function App() {
   const { t, i18n } = useTranslation();
-  const chains = useChains()
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
     i18n.changeLanguage(lng)
   }, [i18n])
-
   return (
     <WalletProvider config={{ chains: [bscTestnet, xLayerTestnet], defaultChainId: bscTestnet.id }}>
       <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>

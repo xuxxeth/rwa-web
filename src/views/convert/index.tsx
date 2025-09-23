@@ -29,7 +29,7 @@ function Convert() {
       <Menus />
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
-          <MarketTrading state="close" />
+          <MarketTrading state="open" />
           <div className="pt-5 flex gap-x-5">
             <div className="w-[691px] shrink-0">
               <BoxCard className="min-h-[448px] rounded-[32px]">

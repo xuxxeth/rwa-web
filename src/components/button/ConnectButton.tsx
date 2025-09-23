@@ -3,7 +3,7 @@ import { Divide } from "../divide";
 import { useTranslation } from "@/hooks/useTranslation";
 import { shortenAddress } from "@/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import storage from "@/utils/storage";
 import { CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
 import { cn } from "@/lib/utils";
@@ -51,14 +51,16 @@ export function ConnectButton() {
   const chainId = useChainId()
   const [open, setOpen] = useState(false)
   const [currentWallet, setCurrentWallet] = useState<any>({})
+  const hasConnected = useRef<boolean>(false)
   // 默认执行一次连接钱包操作
   useEffect(() => {
-    if (wallets.length > 0 && !account) {
+    if (wallets.length > 0 && !account && !hasConnected.current) {
       const walletUUID = storage.getItem(WALLET_UUID)
       const connectorType = storage.getItem(CONNECTOR_TYPE)
       if (walletUUID && connectorType) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
         if (wallet) {
+          hasConnected.current = true
           setCurrentWallet(wallet)
           handleConnect(connectorType, wallet)
         }
@@ -157,9 +159,7 @@ export function ConnectButton() {
                         setOpen(false)
                         // @ts-ignore
                         const chainId = parseInt(wallet.provider.chainId, 16)
-                        console.log(chains)
                         const chain = chains.find(chain => Number(chain.id) === chainId)
-                        console.log(chain)
                         if (chain) {
                           await handleConnect('inject', wallet)
                           setCurrentWallet(wallet)

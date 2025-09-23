@@ -1,3 +1,4 @@
+import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
 import { memo, useState } from "react"
 
@@ -35,7 +36,9 @@ const ConvertTabItem = memo(
 
 const ConvertTabs = memo(
   ({ onChange }: ConvertTabsProps) => {
-    const tabs: TabItemProps[] = [{key: 'buy', label: 'Buy'}, {key: 'sell', label: 'Sell'}]
+    const { t } = useTranslation()
+    
+    const tabs: TabItemProps[] = [{key: 'buy', label: t('Buy')}, {key: 'sell', label: t('Sell')}]
     const [selected, setSelected] = useState('buy')
 
     return (

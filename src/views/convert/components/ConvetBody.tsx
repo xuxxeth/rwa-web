@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { useTrading } from "ca-common-web";
+import { useChains, useTrading } from "ca-common-web";
 import { parseAmount } from "@/utils";
 
 const token = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
-const spender = '0x7e688A997E5DF68dF6242BD0d2d9351A4BfBcDe9'
+const spender = '0xE39D6363b446016d8a17da2416c1f8C651e6FB3E'
 
 export function ConverBody() {
   const { t } = useTranslation()
@@ -20,8 +20,9 @@ export function ConverBody() {
   const [limitPrice, setLimitPrice] = useState('0')
   const [quantity, setQuantity] = useState('0')
   const [orderValue, setOrderValue] = useState('0')
-  const { placeOrder, approvalState } = useTrading(token, spender, BigInt(orderValue) * 10n ** 6n)
-
+  const { placeOrder, approvalState, contract } = useTrading(token, spender, BigInt(orderValue) * 10n ** 6n)
+  const chains = useChains()
+  console.log('approvalState: ', approvalState)
 
   const hanleInputPrice = useCallback(async (value: string) => {
     setLimitPrice(value)
@@ -66,7 +67,7 @@ export function ConverBody() {
     if (result?.data?.transactionHash) {
       setTxHistory([...txHistory, result?.data?.transactionHash])
     }
-  }, [placeOrder, limitPrice, quantity, orderValue, txHistory])
+  }, [limitPrice, quantity, orderValue, txHistory])
 
   return (
     <div className="mt-4">

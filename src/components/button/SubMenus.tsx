@@ -1,5 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/hooks/useTranslation";
+import { languages } from "@/i18n";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
 import { lazy, useState } from "react";
@@ -35,6 +36,7 @@ export function SubMenus() {
     i18n.changeLanguage(lng);
   };
   const [currentSub, setCurrentSub] = useState(0)
+  
   return (
     <DropdownMenu
       onOpenChange={(isOpen) => {
@@ -65,8 +67,8 @@ export function SubMenus() {
               <div className="flex items-center justify-between py-4 cursor-pointer"
                 onClick={() => setCurrentSub(1)}
               >
-                <span className="text-[14px] font-semibold">Language</span>
-                <span className="text-[14px] text-[#6C86AD]">English &gt;</span>
+                <span className="text-[14px] font-semibold">{t('Language')}</span>
+                <span className="text-[14px] text-[#6C86AD]">{languages[i18n.language]} &gt;</span>
               </div>
             </div>
           }
