@@ -13,7 +13,7 @@ import { FAQ } from "./components/FAQ";
 import { KlineSwitch } from "./components/KlineSwitch";
 import { KlineBody } from "./components/Klinebody";
 
-function Convert() {
+function LiteTrade() {
   const { t } = useTranslation()
 
   const [action, setAction] = useState('buy')
@@ -65,4 +65,4 @@ function Convert() {
   )
 }
 
-export default Convert
+export default LiteTrade

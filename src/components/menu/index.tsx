@@ -19,11 +19,11 @@ export function Menus() {
               router.push('/')
             }}
           />
-          <MenusItem title={t('Pro Trade')} />
-          <MenusItem title={t('Convert')}
-            active={router.location.pathname === '/convert'} 
+          <MenusItem title={t('Markets')} />
+          <MenusItem title={t('Lite Trade')}
+            active={router.location.pathname === '/lite-trade'} 
             onClick={() => {
-              router.push('/convert')
+              router.push('/lite-trade')
             }}
           />
           <MenusItem title={t('Assets')} />
