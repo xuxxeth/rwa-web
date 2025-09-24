@@ -13,7 +13,13 @@ import { parseAmount } from "@/utils";
 const token = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
 const spender = '0xE39D6363b446016d8a17da2416c1f8C651e6FB3E'
 
-export function ConverBody() {
+type ConverBodyProps = {
+  action?: string
+}
+
+export function ConverBody({
+  action = 'buy'
+}: ConverBodyProps) {
   const { t } = useTranslation()
   const { account } = useActiveWeb3()
 
@@ -22,7 +28,6 @@ export function ConverBody() {
   const [orderValue, setOrderValue] = useState('0')
   const { placeOrder, approvalState, contract } = useTrading(token, spender, BigInt(orderValue) * 10n ** 6n)
   const chains = useChains()
-  console.log('approvalState: ', approvalState)
 
   const hanleInputPrice = useCallback(async (value: string) => {
     setLimitPrice(value)
@@ -69,6 +74,9 @@ export function ConverBody() {
     }
   }, [limitPrice, quantity, orderValue, txHistory])
 
+  const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
+  const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
+
   return (
     <div className="mt-4">
       <CurrencyInputPanel 
@@ -99,13 +107,13 @@ export function ConverBody() {
       
       {
         !account ? <ConnectButtonText /> :
-        <Button className={cn(
+        <Button variant={buttonVariant} className={cn(
           "w-full mt-8",
         )}
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}
         >
-          { disabled ? t('Enter an amount') : buying ? 'Buying' : t('Buy') + ' APPLc' }
+          { disabled ? t('Enter an amount') : buying ? 'Buying' : buttonText + ' APPLc' }
           
         </Button>
       }

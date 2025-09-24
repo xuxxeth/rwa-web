@@ -25,9 +25,11 @@ const chartStyleOverrides = [
 }, {});
 
 export const chartOverrides = {
-  "paneProperties.background": "#111114",
-  "paneProperties.backgroundGradientStartColor": "#111114",
-  "paneProperties.backgroundGradientEndColor": "#111114",
+  "paneProperties.background": "#0d1117",
+  "scalesProperties.backgroundColor": "#0d1117",
+  "scalesProperties.priceScale.precision": 4,
+  "paneProperties.backgroundGradientStartColor": "#06070A",
+  "paneProperties.backgroundGradientEndColor": "#06070A",
   "paneProperties.backgroundType": "solid",
   "paneProperties.vertGridProperties.color": "rgba(35, 38, 59, 1)",
   "paneProperties.vertGridProperties.style": 2,
@@ -36,9 +38,15 @@ export const chartOverrides = {
   "mainSeriesProperties.priceLineColor": "#3a3e5e",
   "scalesProperties.textColor": "#9494A8",
   "scalesProperties.lineColor": "#111114",
-  "scalesProperties.fontSize": 14,
+  "scalesProperties.fontSize": 12,
   "priceScaleSelectionStrategyName": "right",
   "scalesProperties.showSymbolLabels": true,
+  "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+  "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+  "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",          // 透明度
 
   ...chartStyleOverrides,
 };

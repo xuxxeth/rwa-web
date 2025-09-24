@@ -37,14 +37,7 @@ export function tagSession(item: any) {
 
 
 const getChartTable = (data: any) => {
-  // @ts-ignore
-  if (window.initBar && data.from !== 'getMarks') {
-    return {
-      table: []
-    }
-  }
-  // @ts-ignore
-  window.initBar = true
+  
   return chartTable
 }
 
@@ -65,6 +58,10 @@ const configurationData: DatafeedConfiguration = {
   ] as ResolutionString[],
 
 };
+
+let lastRequestTime = 0;
+const requestInterval = 1500; // 设置请求时间间隔，单位：毫秒
+let hasLoadedInitialData = false;
 
 export function getDataFeed({
   pairIndex,
@@ -99,7 +96,7 @@ export function getDataFeed({
         "session": "0400-2000",
         "timezone": "America/New_York",
         minmov: 1,
-        pricescale: 1000000000,
+        pricescale: 10000,
         exchange: "",
         has_intraday: true,
         visible_plots_set: 'ohlc',
@@ -133,7 +130,18 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      console.log('get bar')      
+      const currentTime = Date.now();
+      // 防止过于频繁的请求
+      // if (currentTime - lastRequestTime < requestInterval) {
+      //   console.log("请求过于频繁，跳过本次请求");
+      //   return;
+      // }
+      // 更新最后请求时间
+      lastRequestTime = currentTime;
+      if (initialLoadComplete) {
+        return
+      }
+      console.log('get bar: ')      
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {

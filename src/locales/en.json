@@ -7,6 +7,7 @@
   "pageError": "Page loading failed, please try again",
   "Loading": "Loading",
   "Connect Wallet": "Connect Wallet",
+  "Detected": "Detected",
   "Total USDT Balance": "Total USDT Balance",
   "My Assets": "My Assets",
   "ID Verification": "ID Verification",
@@ -44,6 +45,9 @@
   "Insufficient  USDT": "Insufficient  USDT",
   "Rate": "Rate",
   "Network Fee": "Network Fee",
-  "Expires in": "Expires in"
+  "Expires in": "Expires in",
+  "Enter Pro Trading": "Enter Pro Trading",
+  "About": "About",
+  "Read more": "Read more"
 
 }

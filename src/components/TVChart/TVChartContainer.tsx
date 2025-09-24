@@ -2,22 +2,6 @@ import { useEffect, useRef } from "react";
 import { getDataFeed, tagSession } from "./datafeed";
 import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
-import chartTable from './chartTable2.json'
-// @ts-ignore
-function drawOverlay(chart, session, start, end, low, high) {
-  chart.createMultipointShape(
-    [
-      { time: start, price: low },
-      { time: end + 60, price: high }
-    ],
-    {
-      shape: "rectangle",
-      color: session === "pre" ? "rgba(0,0,255,0.9)" : "rgba(128,0,128,0.9)",
-      disableSelection: true,
-      disableSave: true
-    }
-  );
-}
 
 export const TVChartContainer = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
@@ -57,17 +41,7 @@ export const TVChartContainer = () => {
       studies_overrides: {
         // "volume.volume.color.0": "rgba(255, 0, 0, 0.5)",  // 下跌柱颜色
         // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
-        // "volume.volume.transparency": 30,       
-        "paneProperties.background": "#0d0d0d",
-        "paneProperties.vertGridProperties.color": "#222",
-        "paneProperties.horzGridProperties.color": "#222",
-        "scalesProperties.textColor": "#AAA",
-        "mainSeriesProperties.candleStyle.upColor": "#26a69a",
-        "mainSeriesProperties.candleStyle.downColor": "#ef5350",
-        "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
-        "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
-        "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
-        "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",          // 透明度
+        // "volume.volume.transparency": 30,   
       },
 
     };
@@ -80,7 +54,14 @@ export const TVChartContainer = () => {
         const chart = tvWidgetRef.current?.activeChart();
         if (chart) {
           // 添加成交量指标
-          chart?.createStudy("Volume", false, false);
+          chart?.createStudy("Volume", false, false).then((studyId) => {
+            const panes = chart.getPanes();
+            if (panes.length > 1) {
+              // 默认第 0 个 pane 是主图，第 1 个就是 Volume
+              const volumePane = panes[1];
+              volumePane.setHeight(100); // 单位是像素，高度随你调
+            }
+          });
           
           // MA5
           chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })
@@ -102,6 +83,8 @@ export const TVChartContainer = () => {
     return () => {
       if (tvWidgetRef.current) {
         tvWidgetRef.current.remove();
+        // @ts-ignore
+        window.initBar = true
       }
     };
   }, []);

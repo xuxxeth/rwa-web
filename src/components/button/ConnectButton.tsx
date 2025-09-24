@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { bscTestnet, useChainId, useChains, xLayerTestnet } from "@/hooks/useCaCommon";
 import { useToast } from "@/hooks/useToast";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
+import { LazyImage } from "../image/LazyImage";
 
 export function WalletItem({
   wallet,
@@ -20,21 +21,23 @@ export function WalletItem({
   selected?: boolean;
   onClick?: () => void
 }) {
+  const { t } = useTranslation();
+
   return (
     <div 
       onClick={() => onClick && onClick()}
       className={cn(
-      "flex items-center justify-between py-4 cursor-pointer font-semibold",
-      selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
+      "flex items-center justify-between py-4 cursor-pointer font-semibold text-[#FFFFFF] hover:bg-[#10141C] rounded-[8px] p-4",
     )}>
       <div className="flex items-center">
-        {wallet.info.icon && <img src={wallet.info.icon} className="w-6 mr-2" alt="" />}
-        <span className="text-[14px]">{wallet.info.name}</span>
+        {wallet.info.icon && <img src={wallet.info.icon} className="w-[40px] h-[40px] mr-4" alt="" />}
+        <span className="text-[16px] font-semibold">{wallet.info.name}</span>
       </div>
-      
-      {
-        selected && <img src="./images/icons/selected.png" className="w-3" alt="" />
-      }
+        
+      <div className=" flex items-center gap-x-2">
+        <span className=" font-normal text-[#6C86AD] text-[14px]">{t('Detected')}</span>
+        <LazyImage src="/images/icons/arrow-right.png" className="w-[7px]" />
+      </div>
     </div>
   )
 }
@@ -141,12 +144,12 @@ export function ConnectButton() {
       
       <DialogController
           topFixed
-          title="Select a wallet"
+          title="Connect wallet"
           open={walletDialog.open}
           openChange={walletDialog.setOpen}
         > 
           <div 
-            className="rounded-[8px] pt-4 text-white"
+            className="rounded-[8px] pt-4 text-white w-[450px]"
           >
             <div className=" px-4">
               {
