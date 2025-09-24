@@ -25,9 +25,11 @@ const chartStyleOverrides = [
 }, {});
 
 export const chartOverrides = {
-  "paneProperties.background": "#111114",
-  "paneProperties.backgroundGradientStartColor": "#111114",
-  "paneProperties.backgroundGradientEndColor": "#111114",
+  "paneProperties.background": "#0d1117",
+  "scalesProperties.backgroundColor": "#0d1117",
+  "scalesProperties.priceScale.precision": 4,
+  "paneProperties.backgroundGradientStartColor": "#06070A",
+  "paneProperties.backgroundGradientEndColor": "#06070A",
   "paneProperties.backgroundType": "solid",
   "paneProperties.vertGridProperties.color": "rgba(35, 38, 59, 1)",
   "paneProperties.vertGridProperties.style": 2,
@@ -36,9 +38,15 @@ export const chartOverrides = {
   "mainSeriesProperties.priceLineColor": "#3a3e5e",
   "scalesProperties.textColor": "#9494A8",
   "scalesProperties.lineColor": "#111114",
-  "scalesProperties.fontSize": 14,
+  "scalesProperties.fontSize": 12,
   "priceScaleSelectionStrategyName": "right",
   "scalesProperties.showSymbolLabels": true,
+  "mainSeriesProperties.candleStyle.upColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.downColor": "#ef5350",
+  "mainSeriesProperties.candleStyle.borderUpColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.borderDownColor": "#ef5350",
+  "mainSeriesProperties.candleStyle.wickUpColor": "#26a69a",
+  "mainSeriesProperties.candleStyle.wickDownColor": "#ef5350",          // 透明度
 
   ...chartStyleOverrides,
 };
@@ -55,12 +63,13 @@ export const disabledFeatures: ChartingLibraryFeatureset[] = [
   "header_compare",
   "display_market_status",
   "show_interval_dialog_on_key_press",
-  "header_symbol_search",
+  // "header_symbol_search",
   "header_quick_search",
   "popup_hints",
   // "use_localstorage_for_settings",
   // "right_bar_stays_on_scroll",
   // "symbol_info",
+  "hide_left_toolbar_by_default"
 ];
 export const enabledFeatures: ChartingLibraryFeatureset[] = [
   "side_toolbar_in_fullscreen_mode",
@@ -71,4 +80,6 @@ export const enabledFeatures: ChartingLibraryFeatureset[] = [
   "study_symbol_ticker_description",
   "study_overlay_compare_legend_option",
   "go_to_date",
+  "header_symbol_search", 
+  "timeframes_toolbar"
 ];

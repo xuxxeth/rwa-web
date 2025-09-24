@@ -3,47 +3,93 @@ import { Divide } from "../divide";
 import { useTranslation } from "@/hooks/useTranslation";
 import { shortenAddress } from "@/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import storage from "@/utils/storage";
 import { CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
+import { cn } from "@/lib/utils";
+import { bscTestnet, useChainId, useChains, xLayerTestnet } from "@/hooks/useCaCommon";
+import { useToast } from "@/hooks/useToast";
+import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
+import { LazyImage } from "../image/LazyImage";
+
+export function WalletItem({
+  wallet,
+  selected,
+  onClick
+}: {
+  wallet: any;
+  selected?: boolean;
+  onClick?: () => void
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div 
+      onClick={() => onClick && onClick()}
+      className={cn(
+      "flex items-center justify-between py-4 cursor-pointer font-semibold text-[#FFFFFF] hover:bg-[#10141C] rounded-[8px] p-4",
+    )}>
+      <div className="flex items-center">
+        {wallet.info.icon && <img src={wallet.info.icon} className="w-[40px] h-[40px] mr-4" alt="" />}
+        <span className="text-[16px] font-semibold">{wallet.info.name}</span>
+      </div>
+        
+      <div className=" flex items-center gap-x-2">
+        <span className=" font-normal text-[#6C86AD] text-[14px]">{t('Detected')}</span>
+        <LazyImage src="/images/icons/arrow-right.png" className="w-[7px]" />
+      </div>
+    </div>
+  )
+}
+
 
 
 export function ConnectButton() {
   const { t } = useTranslation();
+  const { toastSuccess, toastError } = useToast()
   const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
-
+  const chains = [bscTestnet, xLayerTestnet]
+  const walletDialog = useShowDialog()
+  // const chains = useChains()
+  const chainId = useChainId()
+  const [open, setOpen] = useState(false)
+  const [currentWallet, setCurrentWallet] = useState<any>({})
+  const hasConnected = useRef<boolean>(false)
   // 默认执行一次连接钱包操作
   useEffect(() => {
-    if (wallets.length > 0) {
+    if (wallets.length > 0 && !account && !hasConnected.current) {
       const walletUUID = storage.getItem(WALLET_UUID)
       const connectorType = storage.getItem(CONNECTOR_TYPE)
       if (walletUUID && connectorType) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
         if (wallet) {
+          hasConnected.current = true
+          setCurrentWallet(wallet)
           handleConnect(connectorType, wallet)
         }
       }
     }
-  }, [wallets, handleConnect])
+  }, [wallets, chains, account, handleConnect])
 
   return (
     <>
       {
         !account ? 
-          <div className="h-[38px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[100px] cursor-pointer"
+          <div className="h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer"
             onClick={() => {
-              handleConnect('inject', wallets[0])
+              walletDialog.show()
             }}
           >
             {account || t('Connect Wallet')}
-          </div> : 
+          </div>
+           : 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="h-[48px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white"
+              <div className="h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white"
                 onClick={() => {
                 }}
               >
-                {wallets[0].info.icon && <img src={wallets[0].info.icon} className="w-6 mr-2" alt="" />}
+                {currentWallet?.info?.icon && <img src={currentWallet?.info?.icon} className="w-6 mr-2" alt="" />}
                 <div className="w-full h-full bg-[rgba(255,255,255,0.1)] rounded-[6px] px-2 flex items-center justify-center">
                   {shortenAddress(account)}
                 </div>
@@ -96,7 +142,46 @@ export function ConnectButton() {
           </DropdownMenu>
       }
       
-      
+      <DialogController
+          topFixed
+          title="Connect wallet"
+          open={walletDialog.open}
+          openChange={walletDialog.setOpen}
+        > 
+          <div 
+            className="rounded-[8px] pt-4 text-white w-[450px]"
+          >
+            <div className=" px-4">
+              {
+                wallets.map((wallet) => {
+                  return (
+                    <WalletItem 
+                      key={wallet.info.uuid} 
+                      wallet={wallet}
+                      onClick={async () => {
+                        setOpen(false)
+                        // @ts-ignore
+                        const chainId = parseInt(wallet.provider.chainId, 16)
+                        const chain = chains.find(chain => Number(chain.id) === chainId)
+                        if (chain) {
+                          await handleConnect('inject', wallet)
+                          setCurrentWallet(wallet)
+                          walletDialog.hide()
+                        } else {
+                          toastError({title: 'Please switch your wallet to the bsc smart test chain'})
+                        }
+                        
+                        // 
+
+                      }}
+                    />
+                  )
+                })
+              }
+            </div>
+            
+          </div>
+      </DialogController>
     </>
   )
 }

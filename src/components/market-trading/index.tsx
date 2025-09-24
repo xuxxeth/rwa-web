@@ -3,7 +3,7 @@ import { BoxCard } from "../BoxCard";
 import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
 
-type stateProps = 'pre' | 'after' | 'close' | 'lock'
+type stateProps = 'pre' | 'after' | 'close' | 'lock' | 'open'
 
 type MarketTradingProps = {
   state?: stateProps
@@ -32,6 +32,10 @@ const MarketTrading = memo(
         _icon = '/images/icons/market/market_lock.png'
         _info = t('MarketLockInfo')
       }
+      if (state === 'open') {
+        _icon = '/images/icons/market/market_open.png'
+        _info = t('MarketOpenInfo')
+      }
       return {
         icon: _icon,
         info: _info
@@ -39,23 +43,23 @@ const MarketTrading = memo(
     }, [state])
 
     return (
-      <BoxCard className="rounded-2xl">
+      <BoxCard className="rounded-[4px] h-[48px] py-0 flex items-center justify-center">
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">
-            <LazyImage src={marketInfo.icon} className="w-8" />
+            <LazyImage src={marketInfo.icon} className="w-6" />
           </div>
-          <div className=" font-semibold text-[16px]">{marketInfo.info}</div>
+          <div className=" font-medium text-[14px]">{marketInfo.info}</div>
         </div>
         {
-          state === 'lock' && 
-            <div className="flex justify-center mt-2">
-              <div className="flex items-center gap-x-2">
-                <span className="text-[#00DF80] font-normal text-[14px]">{t('Market open in')}</span>
-                <div className="bg-[rgba(0,223,128,0.04)] w-[126px] h-[44px] flex items-center justify-center font-medium text-[24px] text-[#00DF80] rounded-[8px]">
-                  15:27:06
-                </div>
-              </div>
-            </div>
+          // state === 'lock' && 
+          //   <div className="flex justify-center mt-2">
+          //     <div className="flex items-center gap-x-2">
+          //       <span className="text-[#00DF80] font-normal text-[14px]">{t('Market open in')}</span>
+          //       <div className="bg-[rgba(0,223,128,0.04)] w-[126px] h-[44px] flex items-center justify-center font-medium text-[24px] text-[#00DF80] rounded-[8px]">
+          //         15:27:06
+          //       </div>
+          //     </div>
+          //   </div>
         }
         
       </BoxCard>

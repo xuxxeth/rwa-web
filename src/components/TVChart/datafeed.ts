@@ -9,6 +9,15 @@ import type {
 
 import chartTable from './chartTable2.json'
 
+function addRandomVolume(bar: { time: number; open: number; high: number; low: number; close: number }) {
+  const volatility = bar.high - bar.low // 波动范围
+  const base = 1000                     // 最小成交量
+  const multiplier = volatility * 50000 // 波动越大，基准越大
+  const volume = Math.floor(base + Math.random() * multiplier)
+
+  return { ...bar, volume }
+}
+
 export function tagSession(item: any) {
   const date = new Date(item.time * 1000);
   const _hour = date.getUTCHours();
@@ -28,14 +37,7 @@ export function tagSession(item: any) {
 
 
 const getChartTable = (data: any) => {
-  // @ts-ignore
-  if (window.initBar && data.from !== 'getMarks') {
-    return {
-      table: []
-    }
-  }
-  // @ts-ignore
-  window.initBar = true
+  
   return chartTable
 }
 
@@ -56,6 +58,10 @@ const configurationData: DatafeedConfiguration = {
   ] as ResolutionString[],
 
 };
+
+let lastRequestTime = 0;
+const requestInterval = 1500; // 设置请求时间间隔，单位：毫秒
+let hasLoadedInitialData = false;
 
 export function getDataFeed({
   pairIndex,
@@ -90,7 +96,7 @@ export function getDataFeed({
         "session": "0400-2000",
         "timezone": "America/New_York",
         minmov: 1,
-        pricescale: 1000000000,
+        pricescale: 10000,
         exchange: "",
         has_intraday: true,
         visible_plots_set: 'ohlc',
@@ -124,7 +130,18 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      console.log('get bar')      
+      const currentTime = Date.now();
+      // 防止过于频繁的请求
+      // if (currentTime - lastRequestTime < requestInterval) {
+      //   console.log("请求过于频繁，跳过本次请求");
+      //   return;
+      // }
+      // 更新最后请求时间
+      lastRequestTime = currentTime;
+      if (initialLoadComplete) {
+        return
+      }
+      console.log('get bar: ')      
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
@@ -142,15 +159,15 @@ export function getDataFeed({
           return;
         }
 
-        let bars = chartTable.table.map((bar: { time: number; }) => ({
+        let bars = chartTable.table.map((bar: any) => ({
           ...bar,
+          volume: addRandomVolume(bar).volume,
           time: bar.time * 1000, // Convert from seconds to milliseconds
         }));
 
         if (firstDataRequest) {
           lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
         }
-
         onHistoryCallback(bars, { noData: false });
 
         if (!initialLoadComplete) {

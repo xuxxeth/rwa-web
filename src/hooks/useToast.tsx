@@ -27,7 +27,7 @@ export function useToast() {
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <LazyImage src={type === 'error' ? '/images/icons/toast/error.png' : '/images/icons/toast/success.png'} className='w-6 h-6' />
             <div className='break-words'>
-              <div className=" font-normal text-[16px]">{title}{title}</div>
+              <div className=" font-normal text-[16px]">{title}</div>
             </div>
           </div>
           <div className='flex items-center gap-3 shrink-0'>

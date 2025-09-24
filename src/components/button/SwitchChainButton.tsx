@@ -4,7 +4,6 @@ import { cn } from "@/utils";
 import { useChains } from "@/hooks/useCaCommon";
 import storage from "@/utils/storage";
 import { getChainIconById } from "@/utils/chains";
-import type { ChainId } from "@/config/chainIcons";
 
 export function ChainItem({
   title,
@@ -56,10 +55,13 @@ export function SwitchButton() {
         setOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild
+      >
         {
           selected ? 
-          <div className="h-[48px] flex items-center p-2 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white">
+          <div className="h-[40px] flex items-center p-2 bg-[rgba(255,255,255,0.04)] text-sm font-semibold rounded-[8px] cursor-pointer text-white"
+            
+          >
             <img src={getChainIconById(String(selected.id))} className="w-6 mr-2" alt="" />
             <span>{selected.name}</span>
             <img src="./images/icons/down.png" className={cn(
@@ -70,7 +72,7 @@ export function SwitchButton() {
         }
         
       </DropdownMenuTrigger>
-       <DropdownMenuContent align="end" 
+      <DropdownMenuContent align="end" 
           className="bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2"
        >
         <div 

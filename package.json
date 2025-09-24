@@ -1,14 +1,15 @@
 {
   "name": "ca-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.10",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build:test": "tsc -b && vite build",
     "build:prod": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "http-server ./dist -p 8080 -P http://localhost:8080?"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -16,6 +17,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@tailwindcss/vite": "^4.1.13",
+    "bignumber.js": "^9.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "i18next": "^25.5.1",
@@ -37,7 +39,7 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
-    "ca-common-web": "^0.1.6",
+    "ca-common-web": "^0.1.12",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
