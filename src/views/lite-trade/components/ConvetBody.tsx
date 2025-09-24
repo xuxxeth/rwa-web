@@ -72,7 +72,7 @@ export function ConverBody({
     if (result?.data?.transactionHash) {
       setTxHistory([...txHistory, result?.data?.transactionHash])
     }
-  }, [limitPrice, quantity, orderValue, txHistory])
+  }, [limitPrice, quantity, orderValue, txHistory, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])

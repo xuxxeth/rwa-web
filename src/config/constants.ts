@@ -2,6 +2,7 @@ import type { ChartingLibraryFeatureset } from "@/lib/charting_library/charting_
 
 export const CONNECTOR_TYPE = 'CONNECTOR_TYPE';
 export const WALLET_UUID = 'WALLET_UUID';
+export const LATEST_WALLET_UUID = 'LATEST_WALLET_UUID';
 
 
 const RED = "#FF6767";

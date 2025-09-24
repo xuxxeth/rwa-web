@@ -3,7 +3,7 @@ import { useAccount, useChainId, useConnect, useDisconnect, useWallets } from "@
 import { useCallback } from "react";
 import type { ConnectorType, DiscoveredWallet } from '@/hooks/useCaCommon';
 import storage from "@/utils/storage";
-import { CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
+import { CONNECTOR_TYPE, LATEST_WALLET_UUID, WALLET_UUID } from "@/config/constants";
 
 export function useActiveWeb3() {
   const wallets = useWallets()
@@ -15,6 +15,7 @@ export function useActiveWeb3() {
   const handleConnect = useCallback((type: string, wallet: DiscoveredWallet) => {
     storage.setItem(CONNECTOR_TYPE, type)
     storage.setItem(WALLET_UUID, wallet.info.name)
+    storage.setItem(LATEST_WALLET_UUID, wallet.info.name)
     connect(type as ConnectorType, wallet)
   }, [])
   const handleDisConnect = useCallback(() => {
