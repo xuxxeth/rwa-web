@@ -7,11 +7,10 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { useChains, useTrading } from "ca-common-web";
+import { useTrading } from "ca-common-web";
 import { parseAmount } from "@/utils";
 
 const token = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
-const spender = '0xE39D6363b446016d8a17da2416c1f8C651e6FB3E'
 
 type ConverBodyProps = {
   action?: string
@@ -28,8 +27,9 @@ export function ConverBody({
   const [limitPrice, setLimitPrice] = useState('0')
   const [quantity, setQuantity] = useState('0')
   const [orderValue, setOrderValue] = useState('0')
-  const { placeOrder, approvalState, contract } = useTrading(token, spender, BigInt(orderValue) * 10n ** 6n)
-  console.log('approvalState: ', approvalState)
+  const { placeOrder, approvalState, allowance } = useTrading(token, BigInt(parseAmount(orderValue)) )
+  console.log('approvalState: ', approvalState, allowance)
+  console.log('orderValue: ', parseAmount(orderValue))
   const hanleInputPrice = useCallback(async (value: string) => {
     setLimitPrice(value)
   }, [])
@@ -67,16 +67,20 @@ export function ConverBody({
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params)
+    const result = await placeOrder(params, {})
     setBuying(false)
     console.log(result)
-    if (result?.data?.transactionHash) {
-      setTxHistory([...txHistory, result?.data?.transactionHash])
-    }
+    // @ts-ignore
+    // if (result?.data?.transactionHash) {
+    //   // @ts-ignore
+    //   setTxHistory([...txHistory, result?.data?.transactionHash])
+    // }
   }, [limitPrice, quantity, orderValue, txHistory, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
+
+  console.log(txHistory)
 
   return (
     <div className="mt-4">
