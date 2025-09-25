@@ -19,7 +19,12 @@ export function Menus() {
               router.push('/')
             }}
           />
-          <MenusItem title={t('Markets')} />
+          <MenusItem title={t('Markets')} 
+            active={router.location.pathname === '/markets'} 
+            onClick={() => {
+              router.push('/markets')
+            }}
+          />
           <MenusItem title={t('Lite Trade')}
             active={router.location.pathname === '/lite-trade'} 
             onClick={() => {

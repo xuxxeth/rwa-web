@@ -14,6 +14,7 @@ type ConvertTabItemProps = {
 
 type ConvertTabsProps = {
   onChange?: (tab: TabItemProps) => void
+  from?: string
 }
 
 
@@ -38,22 +39,27 @@ const ConvertTabItem = memo(
 )
 
 const ConvertTabs = memo(
-  ({ onChange }: ConvertTabsProps) => {
+  ({ onChange, from }: ConvertTabsProps) => {
     const { t } = useTranslation()
     
     const tabs: TabItemProps[] = [{key: 'buy', label: t('Buy')}, {key: 'sell', label: t('Sell')}]
     const [selected, setSelected] = useState('buy')
     return (
-      <div className=" flex items-center w-full h-[48px] bg-[#131823] rounded-[16px]">
+      <div className={cn(
+        " flex items-center w-full  bg-[#131823] ",
+        from === "markets" ? "h-[40px] rounded-[4px]" : "h-[48px] rounded-[16px]"
+      )}>
         <div 
           onClick={() => {
             setSelected('buy')
             onChange && onChange(tabs[0])
           } }
           className={cn(
-          "flex-1 flex items-center justify-center h-[44px] rounded-[8px] cursor-pointer font-medium text-[16px]",
+          "flex-1 flex items-center justify-center  cursor-pointer font-medium text-[16px]",
           {
             'bg-[#21C95E] text-black': selected === 'buy',
+            'h-[44px] rounded-[8px]': from !== 'markets',
+            'h-[36px] rounded-[4px]': from === 'markets',
           }
         )}>
           { t('Buy') }
@@ -67,6 +73,8 @@ const ConvertTabs = memo(
           "flex-1 flex items-center justify-center h-[44px] rounded-[8px] cursor-pointer font-medium text-[16px]",
           {
             'bg-[#FF593C] text-black': selected === 'sell',
+            'h-[44px] rounded-[8px]': from !== 'markets',
+            'h-[36px] rounded-[4px]': from === 'markets',
           }
         )}>
           { t('Sell') }

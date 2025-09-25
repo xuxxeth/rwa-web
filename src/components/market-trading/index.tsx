@@ -2,15 +2,17 @@ import { memo, useMemo } from "react";
 import { BoxCard } from "../BoxCard";
 import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
+import { cn } from "@/lib/utils";
 
 type stateProps = 'pre' | 'after' | 'close' | 'lock' | 'open'
 
 type MarketTradingProps = {
   state?: stateProps
+  align?: string
 }
 
 const MarketTrading = memo(
-  ({ state = 'pre' }: MarketTradingProps) => {
+  ({ state = 'pre', align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
     
     const marketInfo = useMemo(() => {
@@ -43,7 +45,10 @@ const MarketTrading = memo(
     }, [state])
 
     return (
-      <BoxCard className="rounded-[4px] h-[48px] py-0 flex items-center justify-center">
+      <BoxCard className={cn(
+        "rounded-[4px] h-[48px] py-0 flex items-center ",
+        align === 'left' ? 'justify-start' : 'justify-center'
+      )}>
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">
             <LazyImage src={marketInfo.icon} className="w-6" />

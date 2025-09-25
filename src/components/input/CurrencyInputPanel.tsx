@@ -9,6 +9,7 @@ import { CTokenList, tokenList as ctokenList } from "../ctoken-list";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
+  from?: string
   label?: string
   placeholder?: string
   value?: string
@@ -17,7 +18,7 @@ type CurrencyInputPanelProps = {
 }
 
 const CurrencyInputPanel = memo(
-  ({ mode = 'in', label, placeholder, value, onUserInput }: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, onUserInput, from }: CurrencyInputPanelProps) => {
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
 
@@ -37,11 +38,15 @@ const CurrencyInputPanel = memo(
         "bg-[#06070A] p-4 rounded-[16px] border border-[#06070A]",
         mode === "out" ? "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0)]" : ""
       )}>
-        <div className="text-[#6C86AD] text-base font-light mb-[10px]">{label || ''}</div>
+        <div className={cn(
+          "text-[#6C86AD] font-light mb-[10px]",
+          from === 'markets' ? 'text-[14px]' : 'text-[16px]'
+        )}>{label || ''}</div>
         <CurrencyInput 
           value={value}
           placeholder={placeholder}
           disabled={mode === 'out'}
+          from={from}
           mode={mode}
           onUserInput={onUserInput}
           onCurrencyClick={handleCurrencyClick}

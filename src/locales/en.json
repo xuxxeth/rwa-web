@@ -48,6 +48,19 @@
   "Expires in": "Expires in",
   "Enter Pro Trading": "Enter Pro Trading",
   "About": "About",
-  "Read more": "Read more"
+  "Read more": "Read more",
+  "Statistics": "Statistics",
+  "Mkt Cap": "Mkt Cap",
+  "Total Share": "Total Share",
+  "Circ. Shares": "Circ. Shares",
+  "Circ. Cap": "Circ. Cap",
+  "P/E (TTM)": "P/E (TTM)",
+  "P/E (Static)": "P/E (Static)",
+  "P/B": "P/B",
+  "Profile": "Profile",
+  "Company name": "Company name",
+  "Listing date": "Listing date",
+  "Chairman": "Chairman",
+  "Industry": "Industry"
 
 }

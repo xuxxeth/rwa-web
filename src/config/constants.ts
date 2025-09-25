@@ -26,8 +26,8 @@ const chartStyleOverrides = [
 }, {});
 
 export const chartOverrides = {
-  "paneProperties.background": "#0d1117",
-  "scalesProperties.backgroundColor": "#0d1117",
+  "paneProperties.background": "#06070A",
+  "scalesProperties.backgroundColor": "#06070A",
   "scalesProperties.priceScale.precision": 4,
   "paneProperties.backgroundGradientStartColor": "#06070A",
   "paneProperties.backgroundGradientEndColor": "#06070A",
