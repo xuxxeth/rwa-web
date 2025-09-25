@@ -29,7 +29,7 @@ export function ChainItem({
       </div>
       
       {
-        selected && <img src="./images/icons/selected.png" className="w-3" alt="" />
+        selected && <img src="/images/icons/selected.png" className="w-3" alt="" />
       }
     </div>
   )
@@ -64,7 +64,7 @@ export function SwitchButton() {
           >
             <img src={getChainIconById(String(selected.id))} className="w-6 mr-2" alt="" />
             <span>{selected.name}</span>
-            <img src="./images/icons/down.png" className={cn(
+            <img src="/images/icons/down.png" className={cn(
               "w-3 ml-4 mr-2 transition-all",
               open ? ' rotate-180' : ''
             )} alt="" />

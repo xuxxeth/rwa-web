@@ -23,7 +23,7 @@ export function LanguageItem({
     )}>
       <span className="text-[14px]">{title}</span>
       {
-        selected && <img src="./images/icons/selected.png" className="w-3" alt="" />
+        selected && <img src="/images/icons/selected.png" className="w-3" alt="" />
       }
     </div>
   )
@@ -50,7 +50,7 @@ export function SubMenus() {
       <DropdownMenuTrigger asChild>
         <div className=" flex items-center">
           <button className="cursor-pointer">
-            <img src="./images/icons/menu.png" className="w-10 h-10" alt="" />
+            <img src="/images/icons/menu.png" className="w-10 h-10" alt="" />
           </button>
         </div>
       </DropdownMenuTrigger>
