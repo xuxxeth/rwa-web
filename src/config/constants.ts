@@ -4,6 +4,8 @@ export const CONNECTOR_TYPE = 'CONNECTOR_TYPE';
 export const WALLET_UUID = 'WALLET_UUID';
 export const LATEST_WALLET_UUID = 'LATEST_WALLET_UUID';
 
+export const REQUEST_TIMEOUT = 60000
+
 
 const RED = "#FF6767";
 const GREEN = "#47D0A5";
