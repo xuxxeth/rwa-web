@@ -70,7 +70,9 @@ export function ConverBody({
     const result = await placeOrder(params)
     setBuying(false)
     console.log(result)
+    // @ts-ignore
     if (result?.data?.transactionHash) {
+      // @ts-ignore
       setTxHistory([...txHistory, result?.data?.transactionHash])
     }
   }, [limitPrice, quantity, orderValue, txHistory, placeOrder])
