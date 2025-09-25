@@ -1,6 +1,6 @@
 // src/router/routes.tsx
 import { lazy, type ReactElement } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 // 懒加载页面
 const Home = lazy(() => import("../views/home"));
@@ -14,13 +14,14 @@ const Components = lazy(() => import("../views/components"));
 
 // Markets children routes
 const MarketTrading = lazy(() => import("../views/markets/MarketTrading"));
-const MarketData = lazy(() => import("../views/markets/marketData"));
+const MarketQuotes = lazy(() => import("../views/markets/MarketQuotes"));
 
 // 路由配置类型
 export interface RouteConfig {
-  path: string;
+  path?: string;
   element: ReactElement;
   children?: RouteConfig[];
+  index?: boolean;
 }
 
 // 路由表
@@ -31,15 +32,15 @@ const routes: RouteConfig[] = [
   },
   {
     path: "/markets",
-    element: (
-      <Markets>
-        <Outlet />
-      </Markets>
-    ),
+    element: <Markets />,
     children: [
       {
-        path: "data",
-        element: <MarketData />,
+        index: true,
+        element: <Navigate to="quotes" replace />,
+      },
+      {
+        path: "quotes",
+        element: <MarketQuotes />,
       },
       {
         path: "trading",
