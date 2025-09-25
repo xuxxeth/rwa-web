@@ -3,21 +3,21 @@ import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
 import { LazyImage } from "@/components/image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
-import { ConverBody } from "./components/ConvetBody";
-import { InvestBody } from "./components/InvestBody";
+import { ConverBody } from "../../components/markets/ConvetBody";
+import { InvestBody } from "../../components/markets/InvestBody";
 import { XFooter } from "@/components/footer";
 import { useEffect, useState } from "react";
 import { MarketTrading } from "@/components/market-trading";
-import { ConvertTabs } from "./components/ConvertTabs";
-import { FAQ } from "./components/FAQ";
-import { KlineSwitch } from "./components/KlineSwitch";
-import { KlineBody } from "./components/Klinebody";
+import { ConvertTabs } from "../../components/markets/ConvertTabs";
+import { FAQ } from "../../components/markets/FAQ";
+import { KlineSwitch } from "../../components/markets/KlineSwitch";
+import { KlineBody } from "../../components/markets/Klinebody";
 
 function LiteTrade() {
   const { t } = useTranslation()
 
   const [action, setAction] = useState('buy')
-  const [showKline, setShowKline] = useState(false)
+  const [showKline, setShowKline] = useState(true)
 
   return (
     <>

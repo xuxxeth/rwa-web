@@ -2,7 +2,10 @@ import { SmallButton } from "@/components/button/SmallButton"
 import { LazyImage } from "@/components/image/LazyImage"
 import { TradingChart } from "@/components/TVChart/TradingChart"
 import { useTranslation } from "@/hooks/useTranslation"
+import { cn } from "@/lib/utils"
 import { memo } from "react"
+import { Statistics } from "./Statistics"
+import { Profile } from "./Profile"
 
 const StockInfo = memo(
   () => {
@@ -28,23 +31,8 @@ const StockInfo = memo(
     )
   }
 )
-const About = memo(
-  () => {
-    const { t } = useTranslation()
-    return (
-      <div className=" text-white mt-6">
-        <div className="text-[18px] font-medium ">{t('About')}</div>
-        <div className=" text-[14px] font-normal leading-[24px] relative">
-          Amazon.com, Inc. engages in the provision of online retail shopping services. It operates through the following business segments: North America, International, and Amazon Web Services (AWS). The North America segment includes retail sales of consumer products and subscriptions through International, and Amazon Internat North Internatio...
-          <div className="text-[#1A85FF] text-[16px] absolute bottom-0 right-0 cursor-pointer">{t('Read more')}</div>
-        </div>
-        <div className="h-[200px]">
 
-        </div>
-      </div>
-    )
-  }
-)
+
 
 const KlineBody = memo(
   () => {
@@ -56,7 +44,8 @@ const KlineBody = memo(
         <div className="mt-4">
           <TradingChart />
         </div>
-        <About />
+        <Statistics />
+        <Profile />
       </div>
     )
   }

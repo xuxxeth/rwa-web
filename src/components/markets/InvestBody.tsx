@@ -1,5 +1,5 @@
 import { useTranslation } from "@/hooks/useTranslation"
-import { RwaItem } from "./RwaItem"
+import { RwaItem } from "../../views/lite-trade/components/RwaItem"
 import { useId } from "react"
 
 export function InvestBody() {

@@ -2,7 +2,7 @@ import { CurrencyInputPanel } from "@/components/input/CurrencyInputPanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EstimatedInfo } from "./EstimatedInfo";
+import { EstimatedInfo } from "../../views/lite-trade/components/EstimatedInfo";
 import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
@@ -15,10 +15,12 @@ const spender = '0xE39D6363b446016d8a17da2416c1f8C651e6FB3E'
 
 type ConverBodyProps = {
   action?: string
+  from?: string
 }
 
 export function ConverBody({
-  action = 'buy'
+  action = 'buy',
+  from
 }: ConverBodyProps) {
   const { t } = useTranslation()
   const { account } = useActiveWeb3()
@@ -27,8 +29,7 @@ export function ConverBody({
   const [quantity, setQuantity] = useState('0')
   const [orderValue, setOrderValue] = useState('0')
   const { placeOrder, approvalState, contract } = useTrading(token, spender, BigInt(orderValue) * 10n ** 6n)
-  const chains = useChains()
-
+  console.log('approvalState: ', approvalState)
   const hanleInputPrice = useCallback(async (value: string) => {
     setLimitPrice(value)
   }, [])
@@ -72,26 +73,29 @@ export function ConverBody({
     if (result?.data?.transactionHash) {
       setTxHistory([...txHistory, result?.data?.transactionHash])
     }
-  }, [limitPrice, quantity, orderValue, txHistory])
+  }, [limitPrice, quantity, orderValue, txHistory, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
 
   return (
     <div className="mt-4">
-      <CurrencyInputPanel 
+      <CurrencyInputPanel
+        from={from}
         mode="price"
         label={t('Limit price')}
         onUserInput={hanleInputPrice}
       />
       <div className="h-2"></div>
       <CurrencyInputPanel 
+        from={from}
         label={t('Quantity')}
         placeholder={t('Whole shares only')}
         onUserInput={hanleInputQuantity}
       />
       <div className="h-2"></div>
       <CurrencyInputPanel
+        from={from}
         mode="out"
         label={t('Order Value')}
         value={orderValue}
@@ -109,6 +113,7 @@ export function ConverBody({
         !account ? <ConnectButtonText /> :
         <Button variant={buttonVariant} className={cn(
           "w-full mt-8",
+          from === 'markets' ? 'h-[52px]' : ''
         )}
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}

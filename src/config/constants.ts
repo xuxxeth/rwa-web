@@ -2,6 +2,7 @@ import type { ChartingLibraryFeatureset } from "@/lib/charting_library/charting_
 
 export const CONNECTOR_TYPE = 'CONNECTOR_TYPE';
 export const WALLET_UUID = 'WALLET_UUID';
+export const LATEST_WALLET_UUID = 'LATEST_WALLET_UUID';
 
 
 const RED = "#FF6767";
@@ -25,8 +26,8 @@ const chartStyleOverrides = [
 }, {});
 
 export const chartOverrides = {
-  "paneProperties.background": "#0d1117",
-  "scalesProperties.backgroundColor": "#0d1117",
+  "paneProperties.background": "#06070A",
+  "scalesProperties.backgroundColor": "#06070A",
   "scalesProperties.priceScale.precision": 4,
   "paneProperties.backgroundGradientStartColor": "#06070A",
   "paneProperties.backgroundGradientEndColor": "#06070A",

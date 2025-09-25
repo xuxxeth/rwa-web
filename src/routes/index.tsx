@@ -4,6 +4,7 @@ import { lazy, type ReactElement } from "react";
 // 懒加载页面
 const Home = lazy(() => import("../views/home"));
 const LiteTrade = lazy(() => import("../views/lite-trade"));
+const Markets = lazy(() => import("../views/markets"));
 const About = lazy(() => import("../views/about"));
 const KLine = lazy(() => import("../views/kline"));
 const KLineAAPL = lazy(() => import("../views/kline-aapl"));
@@ -22,6 +23,10 @@ const routes: RouteConfig[] = [
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/markets",
+    element: <Markets />,
   },
   {
     path: "/lite-trade",

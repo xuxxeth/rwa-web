@@ -34,7 +34,7 @@ export const TVChartContainer = () => {
       user_id: "public_user_id",
       fullscreen: false,
       autosize: true,
-      // custom_css_url: "/tradingview-chart.css",
+      // custom_css_url: "/libraries/charting_library/tradingview-chart.css",
       timezone:"Asia/Hong_Kong",
       overrides: chartOverrides,
       interval: "1D" as ResolutionString,
