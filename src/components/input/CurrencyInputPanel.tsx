@@ -76,7 +76,7 @@ const CurrencyInputPanel = memo(
             
             <CTokenList 
               onClick={(token) => {
-                cTokenDialog.hide()
+                tokenDialog.hide()
                 setInputToken(token)
               }}
             />
@@ -91,7 +91,7 @@ const CurrencyInputPanel = memo(
           <div>
             <TokenList
               onClick={(token) => {
-                tokenDialog.hide()
+                cTokenDialog.hide()
                 setOutputToken(token)
               }}
             />

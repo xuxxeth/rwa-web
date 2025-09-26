@@ -40,7 +40,6 @@ export function DialogController({
   open: boolean
   openChange: (open: boolean) => void
 }) {
-
   return (
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(

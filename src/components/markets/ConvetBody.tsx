@@ -10,7 +10,8 @@ import BigNumber from "bignumber.js";
 import { useTrading } from "ca-common-web";
 import { parseAmount } from "@/utils";
 
-const token = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
+const usdtToken = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
+const applcToken = '0xE6d44C1f14D98AEf73c822d0319751701D54D4cc'
 
 type ConverBodyProps = {
   action?: string
@@ -27,7 +28,9 @@ export function ConverBody({
   const [limitPrice, setLimitPrice] = useState('0')
   const [quantity, setQuantity] = useState('0')
   const [orderValue, setOrderValue] = useState('0')
-  const { placeOrder, approvalState, allowance } = useTrading(token, BigInt(parseAmount(orderValue)) )
+  const paymentToken = useMemo(() => action === 'buy' ? usdtToken : usdtToken, [action])
+
+  const { placeOrder, approvalState, allowance } = useTrading(usdtToken, BigInt(parseAmount(orderValue)) )
   console.log('approvalState: ', approvalState, allowance)
   console.log('orderValue: ', parseAmount(orderValue))
   const hanleInputPrice = useCallback(async (value: string) => {
@@ -55,10 +58,10 @@ export function ConverBody({
     const params = {
       stockId: '1',
       tradeType: '0',
-      side: '0',
+      side: action === 'buy' ? '0' : '1',
       tif: '1',
       sessionType: '0',
-      paymentToken: '0xbeD5856646F1faBDFc565F47f8Ea18685466B745', // address
+      paymentToken: usdtToken, // address
       validDate: '10', // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
       amount: parseAmount(orderValue), // 10 usdt
@@ -71,16 +74,14 @@ export function ConverBody({
     setBuying(false)
     console.log(result)
     // @ts-ignore
-    // if (result?.data?.transactionHash) {
-    //   // @ts-ignore
-    //   setTxHistory([...txHistory, result?.data?.transactionHash])
-    // }
-  }, [limitPrice, quantity, orderValue, txHistory, placeOrder])
+    if (result?.data?.transactionHash) {
+      // @ts-ignore
+      setTxHistory([...txHistory, result?.data?.transactionHash?.hash || result?.data?.transactionHash])
+    }
+  }, [limitPrice, quantity, orderValue, txHistory, action, paymentToken, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
-
-  console.log(txHistory)
 
   return (
     <div className="mt-4">

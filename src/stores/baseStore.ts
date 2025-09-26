@@ -11,6 +11,7 @@ export const baseStore = create<BaseStore>()(
       getChains: async () => {
         const res = await baseApi.getChains()
         console.log(res)
+        return res
       }
     }),
     {

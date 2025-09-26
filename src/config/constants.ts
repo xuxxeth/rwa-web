@@ -6,6 +6,35 @@ export const LATEST_WALLET_UUID = 'LATEST_WALLET_UUID';
 
 export const REQUEST_TIMEOUT = 60000
 
+export const SessionType = {
+  DEFAULT: 0,
+  PRE_MARKET: 1,
+  AFTER_HOURS: 2,
+  DARK_POOL: 3,
+  PRE_MARKET_AND_AFTER_HOURS: 4
+}
+
+export const NetworkFeeType = {
+  NATIVE: 0,
+  STABLE: 1
+}
+
+export const TradeType = {
+  LIMIT: 0,
+  MARKET: 1
+}
+
+export const Side = {
+  BUYLIMIT: 0,
+  SELL: 1
+}
+
+export const Tif = {
+  DAY: 0,
+  GTD: 1,
+  GTC: 2,
+}
+
 
 const RED = "#FF6767";
 const GREEN = "#47D0A5";
