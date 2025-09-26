@@ -28,9 +28,9 @@ export function ConverBody({
   const [limitPrice, setLimitPrice] = useState('0')
   const [quantity, setQuantity] = useState('0')
   const [orderValue, setOrderValue] = useState('0')
-  const paymentToken = useMemo(() => action === 'buy' ? usdtToken : usdtToken, [action])
+  const paymentToken = useMemo(() => action === 'buy' ? usdtToken : applcToken, [action])
 
-  const { placeOrder, approvalState, allowance } = useTrading(usdtToken, BigInt(parseAmount(orderValue)) )
+  const { placeOrder, approvalState, allowance } = useTrading(paymentToken, BigInt("999999999999999999999999999999"))
   console.log('approvalState: ', approvalState, allowance)
   console.log('orderValue: ', parseAmount(orderValue))
   const hanleInputPrice = useCallback(async (value: string) => {
