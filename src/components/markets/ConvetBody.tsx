@@ -12,6 +12,7 @@ import { parseAmount } from "@/utils";
 
 const usdtToken = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
 const applcToken = '0xE6d44C1f14D98AEf73c822d0319751701D54D4cc'
+const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
 type ConverBodyProps = {
   action?: string
@@ -30,7 +31,7 @@ export function ConverBody({
   const [orderValue, setOrderValue] = useState('0')
   const paymentToken = useMemo(() => action === 'buy' ? usdtToken : applcToken, [action])
 
-  const { placeOrder, approvalState, allowance } = useTrading(paymentToken, BigInt("999999999999999999999999999999"))
+  const { placeOrder, approvalState, allowance } = useTrading(paymentToken, trading, BigInt(parseAmount(orderValue)))
   console.log('approvalState: ', approvalState, allowance)
   console.log('orderValue: ', parseAmount(orderValue))
   const hanleInputPrice = useCallback(async (value: string) => {
