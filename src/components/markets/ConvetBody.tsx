@@ -65,7 +65,7 @@ export function ConverBody({
       paymentToken: usdtToken, // address
       validDate: '10', // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
-      amount: parseAmount(orderValue), // 10 usdt
+      amount: '0', // 10 usdt
       price: parseAmount(limitPrice),   // 1 usdt
       size: parseAmount(quantity)    // 10
     }
@@ -94,6 +94,7 @@ export function ConverBody({
       />
       <div className="h-2"></div>
       <CurrencyInputPanel 
+        regex="^\d*$"
         from={from}
         label={t('Quantity')}
         placeholder={t('Whole shares only')}
@@ -124,7 +125,7 @@ export function ConverBody({
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}
         >
-          { disabled ? t('Enter an amount') : buying ? 'Buying' : buttonText + ' APPLc' }
+          { disabled ? t('Enter an amount') : buying ? (action === 'buy' ? 'Buying' : 'Selling') : (buttonText + ' APPLc') }
           
         </Button>
       }

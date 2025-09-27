@@ -3,14 +3,18 @@ import { Input } from "../ui/input"
 import { escapeRegExp } from "@/utils"
 import { cn } from "@/lib/utils"
 
-const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`)
+// const inputRegex = RegExp("^\\d*$");
+
+// const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,2}$`)
 
 type NumberInputProps = {
   disabled?: boolean
   value: string | number
-  onInput: (input: string) => void
   placeholder?: string
   className?: string
+  regex?: string
+  onInput: (input: string) => void
+
 }
 
 const NumberInput = memo(
@@ -19,8 +23,10 @@ const NumberInput = memo(
     value,
     disabled,
     placeholder,
+    regex = `^\\d*(?:\\\\[.])?\\d{0,2}$`,
     onInput
   }: NumberInputProps) => {
+  const inputRegex = RegExp(regex)
   const enforcer = (nextUserInput: string) => {
     if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
       onInput(nextUserInput)
