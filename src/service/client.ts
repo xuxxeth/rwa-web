@@ -98,7 +98,8 @@ const client = {
       })
     } catch (error) {
       console.log(error)
-      return null
+      throw error
+      // return null
     }
     
   },

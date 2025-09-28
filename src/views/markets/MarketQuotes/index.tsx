@@ -21,9 +21,10 @@ import Pagination from "@/components/pagination";
 import { type MarketQuoteResponse, type MarketQuote } from "./types";
 import type { AxiosError } from "axios";
 import MarketQuoteError from "./error";
+import { bscTestnet } from '@/hooks/useCaCommon'
 
 function useMarketQuote() {
-  const chainId = useChainId();
+  const chainId = useChainId() || bscTestnet.id;
 
   const { data, isPending, status, isError, error } = useQuery<
     MarketQuoteResponse,
@@ -31,7 +32,7 @@ function useMarketQuote() {
     MarketQuoteResponse
   >({
     queryKey: ["marketQuotes", chainId],
-    queryFn: () => baseApi.getRWAs(chainId),
+    queryFn: () => baseApi.getRWAs<MarketQuoteResponse>(chainId),
     enabled: chainId !== null,
   });
 
