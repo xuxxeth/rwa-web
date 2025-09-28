@@ -16,14 +16,6 @@ const Components = lazy(() => import("../views/components"));
 const MarketTrading = lazy(() => import("../views/markets/MarketTrading"));
 const MarketQuotes = lazy(() => import("../views/markets/MarketQuotes"));
 
-// 路由配置类型
-export interface RouteConfig {
-  path?: string;
-  element: ReactElement;
-  children?: RouteConfig[];
-  index?: boolean;
-}
-
 // 路由表
 const routes: RouteObject[] = [
   {
