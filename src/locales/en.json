@@ -61,6 +61,20 @@
   "Company name": "Company name",
   "Listing date": "Listing date",
   "Chairman": "Chairman",
-  "Industry": "Industry"
+  "Industry": "Industry",
 
+  "marketQuotes": {
+    "name": "NAME",
+    "token": "TOKEN",
+    "price": "PRICE",
+    "change": "CHANGE(%)",
+    "marketCap": "MARKET CAP",
+    "dailyHigh": "DAILY HIGH",
+    "quickBuy": "QUICK BUY",
+    "quoteInfo": "*Cyberalpha提供的股票代币不包含分红/投票权",
+    "networkError": {
+      "title": "Network seems disconnected.",
+      "desc": "Please check your connection."
+    }
+  }
 }

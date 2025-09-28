@@ -23,7 +23,7 @@ interface RequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: RequestInterceptors<T>
 }
 
-export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
+export const PATH_URL = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE
 
 const abortControllerMap: Map<string, AbortController> = new Map()
 
@@ -32,10 +32,10 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL
 })
 
-axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
+axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
-  const url = res.url || ''
-  res.signal = controller.signal
+  const url = req.url || ''
+  req.signal = controller.signal
   abortControllerMap.set(
     url,
     controller
@@ -43,10 +43,10 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
 
   const token = localStorage.getItem('Authorization')
   const chainId = localStorage.getItem('D11-Chain-Id')
-  res.headers.set('Authorization', token)
-  res.headers.set('D11-Chain-Id', chainId)
+  req.headers.set('Authorization', token)
+  req.headers.set('D11-Chain-Id', chainId)
   
-  return res
+  return req
 })
 
 axiosInstance.interceptors.response.use(
