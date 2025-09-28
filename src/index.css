@@ -77,6 +77,23 @@ body {
   .text-80 {
     color: rgba(255, 255, 255, 0.8);
   }
+
+  .text-60 {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .stock-rise {
+    color: rgba(80, 227, 194, 1)
+  }
+
+  .stock-fall {
+    color: rgba(227, 80, 122, 1);
+  }
+
+  .stock-even {
+    color: rgba(161, 161, 161, 1);
+  }
+
   .shadow-1 {
     background:
     linear-gradient(
@@ -167,7 +184,6 @@ body {
   .bg-second {
     background-color: rgba(255, 255, 255, 0.04);
   }
-
 }
 
 @theme inline {
