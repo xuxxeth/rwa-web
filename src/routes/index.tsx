@@ -1,6 +1,6 @@
 // src/router/routes.tsx
 import { lazy, type ReactElement } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, type RouteObject } from "react-router-dom";
 
 // 懒加载页面
 const Home = lazy(() => import("../views/home"));
@@ -25,7 +25,7 @@ export interface RouteConfig {
 }
 
 // 路由表
-const routes: RouteConfig[] = [
+const routes: RouteObject[] = [
   {
     path: "/",
     element: <Home />,

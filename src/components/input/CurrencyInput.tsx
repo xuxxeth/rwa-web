@@ -12,6 +12,7 @@ type CurrencyInputProps = {
   value?: string
   placeholder?: string
   from?: string
+  regex?: string
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
 }
@@ -24,6 +25,7 @@ const CurrencyInput = memo(
     placeholder, 
     value,
     from,
+    regex,
     onCurrencyClick,
     onUserInput
   }: CurrencyInputProps) => {
@@ -41,6 +43,7 @@ const CurrencyInput = memo(
           placeholder={placeholder}
           disabled={disabled}
           value={inputValue} 
+          regex={regex}
           onInput={input => {
             setInputValue(input)
             onUserInput && onUserInput(input)

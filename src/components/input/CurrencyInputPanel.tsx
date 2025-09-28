@@ -13,12 +13,13 @@ type CurrencyInputPanelProps = {
   label?: string
   placeholder?: string
   value?: string
+  regex?: string
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
 }
 
 const CurrencyInputPanel = memo(
-  ({ mode = 'in', label, placeholder, value, onUserInput, from }: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, from, regex, onUserInput }: CurrencyInputPanelProps) => {
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
 
@@ -48,6 +49,7 @@ const CurrencyInputPanel = memo(
           disabled={mode === 'out'}
           from={from}
           mode={mode}
+          regex={regex}
           onUserInput={onUserInput}
           onCurrencyClick={handleCurrencyClick}
           selectedToken={mode === 'in' ? inputToken : outputToken}
@@ -76,7 +78,7 @@ const CurrencyInputPanel = memo(
             
             <CTokenList 
               onClick={(token) => {
-                cTokenDialog.hide()
+                tokenDialog.hide()
                 setInputToken(token)
               }}
             />
@@ -91,7 +93,7 @@ const CurrencyInputPanel = memo(
           <div>
             <TokenList
               onClick={(token) => {
-                tokenDialog.hide()
+                cTokenDialog.hide()
                 setOutputToken(token)
               }}
             />
