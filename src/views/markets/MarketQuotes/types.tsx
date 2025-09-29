@@ -5,8 +5,8 @@ type MarketQuote = {
   price: string;
   icon: string | null;
   change: string;
-  marketcap: string;
-  dailyhigh: string;
+  marketCap: string;
+  dailyHigh: string;
 };
 
 type Change = 0 | 1 | -1;

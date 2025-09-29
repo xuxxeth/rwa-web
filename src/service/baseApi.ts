@@ -17,5 +17,5 @@ export const baseApi = {
   getMarket: () => client.get<IMarket>('/v1/base/market'),
   getMarketState: () => client.get<IMarketState>('/v1/base/market/state'),
 
-  getRWAs: <T>(chainId: number) => client.get<T>(`/v1/quote/markets`),
+  getRWAs: <T>(chainId: number) => client.get<T>(`/v1/base/quote/markets`),
 };

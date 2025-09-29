@@ -1,5 +1,6 @@
 import { REQUEST_TIMEOUT } from '@/config/constants'
 import axios from 'axios'
+import { bscTestnet } from '@/hooks/useCaCommon'
 
 import type {
   InternalAxiosRequestConfig,
@@ -48,9 +49,11 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   )
 
   const token = localStorage.getItem('Authorization')
-  const chainId = localStorage.getItem('D11-Chain-Id')
+  const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
   req.headers.set('Authorization', token)
-  req.headers.set('D11-Chain-Id', chainId)
+  // req.headers.set('D11-Chain-Id', chainId)
+  // 接口用的 header 字段是 chainId
+  req.headers.set('chainId', chainId)
   
   return req
 })

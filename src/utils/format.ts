@@ -2,33 +2,28 @@ export function textPrefix(text: string, prefix: string) {
   return `${prefix}${text}`;
 }
 
-export type Change = 0 | 1 | -1;
-// 将一个字符串或者数字转换为 1, -1, 0
-export function strOrNumToSign(val: string | number): Change {
-  const numValue = typeof val === "string" ? parseFloat(val) : val;
-
-  // 处理无效数值
-  if (isNaN(numValue)) {
-    return 0;
-  }
-
-  const rawSign = Math.sign(numValue);
-
-  return Object.is(rawSign, -0) ? 0 : rawSign > 0 ? 1 : rawSign < 0 ? -1 : 0;
-}
-
-// 格式化百分比，保留两位小数
-export function formatPercentage(value: string | number): string {
+export function toFixed(value: number | string, precision = 2): string {
   const num = typeof value === "string" ? parseFloat(value) : value;
 
   if (isNaN(num)) {
-    return "0.00%";
+    return `${(0).toFixed(precision)}`;
   }
 
-  // 处理边界值
-  const fixedValue = (num * 100).toFixed(2);
+  return num.toFixed(precision);
+}
 
-  return `${fixedValue}%`;
+// 格式化百分比，保留两位小数
+export function formatPercentage(
+  value: string | number,
+  precision = 2
+): string {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+
+  if (isNaN(num)) {
+    return `${toFixed(0, precision)}%`;
+  }
+
+  return `${toFixed(num * 100, precision)}%`;
 }
 
 const units = [
@@ -73,4 +68,19 @@ export function formatLargeNumber(
   });
 
   return `${formatter.format(convertedValue)}${matchedUnit.unit}`;
+}
+
+export type Change = 0 | 1 | -1;
+// 将一个字符串或者数字转换为 1, -1, 0
+export function strOrNumToSign(val: string | number): Change {
+  const numValue = typeof val === "string" ? parseFloat(val) : val;
+
+  // 处理无效数值
+  if (isNaN(numValue)) {
+    return 0;
+  }
+
+  const rawSign = Math.sign(numValue);
+
+  return Object.is(rawSign, -0) ? 0 : rawSign > 0 ? 1 : rawSign < 0 ? -1 : 0;
 }
