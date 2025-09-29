@@ -97,9 +97,9 @@ const client = {
     abortControllerMap.clear()
   },
    // ✅ 单独方法封装
-  get: <T = any>(url: string, params?: any, config?: RequestConfig) => {
+  get: async <T = any>(url: string, params?: any, config?: RequestConfig) => {
     try {
-      return client.request<ApiResponse<T>>({
+      return await client.request<T>({
         url,
         method: 'GET',
         params,
@@ -113,9 +113,9 @@ const client = {
     
   },
 
-  post: <T = any>(url: string, data?: any, config?: RequestConfig) => {
+  post: async <T = any>(url: string, data?: any, config?: RequestConfig) => {
     try {
-      return client.request<ApiResponse<T>>({
+      return await client.request<T>({
         url,
         method: 'POST',
         data,
@@ -127,9 +127,9 @@ const client = {
     }
   },
 
-  put: <T = any>(url: string, data?: any, config?: RequestConfig) => {
+  put: async <T = any>(url: string, data?: any, config?: RequestConfig) => {
     try {
-      return client.request<ApiResponse<T>>({
+      return await client.request<T>({
         url,
         method: 'PUT',
         data,

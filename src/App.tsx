@@ -5,7 +5,8 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Suspense, useEffect } from "react";
 import storage from "./utils/storage";
 import { useTranslation } from "./hooks/useTranslation";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import queryClient from "./queryClient";
 
 import {
   WalletProvider,
@@ -15,14 +16,6 @@ import {
 } from "@/hooks/useCaCommon";
 import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 2,
-    },
-  },
-});
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -42,11 +35,12 @@ function App() {
     i18n.changeLanguage(lng);
   }, [i18n]);
 
+
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
   }, [])
-
+  
   return (
     <WalletProvider
       config={{
