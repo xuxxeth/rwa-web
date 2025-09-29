@@ -14,14 +14,16 @@ import {
   strOrNumToSign,
   formatPercentage,
   formatLargeNumber,
+  toFixed,
   type Change,
 } from "@/utils";
 import BuyButton from "@/components/button/BuyButton";
+import TradingHaltBtn from "@/components/button/TradingHaltBtn";
 import Pagination from "@/components/pagination";
 import { type MarketQuoteResponse, type MarketQuote } from "./types";
 import type { AxiosError } from "axios";
 import MarketQuoteError from "./error";
-import { bscTestnet } from '@/hooks/useCaCommon'
+import { bscTestnet } from "@/hooks/useCaCommon";
 
 function useMarketQuote() {
   const chainId = useChainId() || bscTestnet.id;
@@ -114,10 +116,10 @@ export default function MarketQuotes() {
     sort
   );
 
-  if (isPending) {
-    // TODO: 加载中状态
-    return null;
-  }
+  // if (isPending) {
+  //   // TODO: 加载中状态
+  //   return null;
+  // }
 
   if (isError) {
     return <MarketQuoteError />;
@@ -284,7 +286,7 @@ const MarketQuotesList = [
     sortable: true,
     render: (item: MarketQuote) => (
       <TextCellWithColor
-        text={textPrefix(item.price, "$")}
+        text={textPrefix(toFixed(item.price), "$")}
         change={strOrNumToSign(item.change)}
         withIcon={false}
       />
@@ -318,7 +320,7 @@ const MarketQuotesList = [
     key: "dailyHigh",
     sortable: true,
     render: (item: MarketQuote) => (
-      <TextCell text={textPrefix(item.dailyHigh, "$")} />
+      <TextCell text={textPrefix(toFixed(item.dailyHigh), "$")} />
     ),
     sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
       advancedSort(a.dailyHigh, b.dailyHigh, order),
@@ -327,5 +329,6 @@ const MarketQuotesList = [
     key: "quickBuy",
     sortable: false,
     render: () => <BuyButton to={"/markets/trading"} />,
+    // render: () => <TradingHaltBtn />,
   },
 ];

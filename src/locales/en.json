@@ -71,6 +71,7 @@
     "marketCap": "MARKET CAP",
     "dailyHigh": "DAILY HIGH",
     "quickBuy": "QUICK BUY",
+    "tradingHalt": "TRADING HALT",
     "quoteInfo": "*Cyberalpha提供的股票代币不包含分红/投票权",
     "networkError": {
       "title": "Network seems disconnected.",
