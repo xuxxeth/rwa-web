@@ -12,12 +12,20 @@ import { ConvertTabs } from "../../components/markets/ConvertTabs";
 import { FAQ } from "../../components/markets/FAQ";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
+import { useBaseStore } from "@/stores/baseStore";
 
 function LiteTrade() {
   const { t } = useTranslation()
-
+  const baseStore = useBaseStore()
   const [action, setAction] = useState('buy')
-  const [showKline, setShowKline] = useState(true)
+  const [showKline, setShowKline] = useState(false)
+
+  useEffect(() => {
+    baseStore.getTokens()
+    baseStore.getBaseRwas()
+    baseStore.getStocks()
+    baseStore.getMarket()
+  }, [])
 
   return (
     <>

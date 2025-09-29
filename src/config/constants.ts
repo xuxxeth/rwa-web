@@ -35,6 +35,10 @@ export const Tif = {
   GTC: 2,
 }
 
+export const RESPONSE_CODE = {
+  SUCCESS: 9200
+}
+
 
 const RED = "#FF6767";
 const GREEN = "#47D0A5";

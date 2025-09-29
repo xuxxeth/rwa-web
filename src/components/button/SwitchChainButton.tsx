@@ -1,9 +1,10 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { cn } from "@/utils";
 import { useChains } from "@/hooks/useCaCommon";
 import storage from "@/utils/storage";
 import { getChainIconById } from "@/utils/chains";
+import { useBaseStore } from "@/stores/baseStore";
 
 export function ChainItem({
   title,
@@ -37,16 +38,19 @@ export function ChainItem({
 
 
 export function SwitchButton() {
-  
-  const chains = useChains()
+  const baseStore = useBaseStore()
+  const chains = useMemo(() => baseStore.chainList, [baseStore.chainList])
   const [open, setOpen] = useState(false)
 
   const [selected, setSelected] = useState<typeof chains[0] | null>(null)
 
   useEffect(() => {
-    const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
-    setSelected(chains.find(chain => chain.id === _chainId) || chains[0])
-  }, [])
+    if (chains[0]) {
+      const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
+      setSelected(chains.find(chain => chain.id === _chainId) || chains[0])
+    }
+    
+  }, [chains])
 
   return (
     <DropdownMenu

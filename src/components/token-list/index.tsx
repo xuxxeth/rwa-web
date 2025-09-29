@@ -1,6 +1,8 @@
 import { memo, useId, useMemo, useState } from "react"
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
+import { useTokens } from "@/hooks/useTokens"
+import type { IToken } from "@/service/types"
 
 export type TokenProps = {
   name: string,
@@ -10,7 +12,7 @@ export type TokenProps = {
 }
 
 const TokenItem = memo(
-  ({ token, onClick }: {token: TokenProps, onClick?: (token: TokenProps) => void}) => {
+  ({ token, onClick }: {token: IToken, onClick?: (token: IToken) => void}) => {
     return (
       <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
         onClick={() => {
@@ -42,8 +44,8 @@ export const tokenList: TokenProps[] = [
 const TokenList = memo(
   ({
     onClick
-  }: { onClick?: (token: TokenProps) => void}) => {
-
+  }: { onClick?: (token: IToken) => void}) => {
+    const tokenList = useTokens()
     const _id = useId()
 
     const [filterHolding, setFilterHolding] = useState(false)

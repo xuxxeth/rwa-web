@@ -23,6 +23,12 @@ interface RequestInterceptors<T> {
 interface RequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: RequestInterceptors<T>
 }
+// 通用接口响应结构
+export interface ApiResponse<T> {
+  code: number
+  data: T
+  message: string | null
+}
 
 export const PATH_URL = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE
 
@@ -93,7 +99,7 @@ const client = {
    // ✅ 单独方法封装
   get: <T = any>(url: string, params?: any, config?: RequestConfig) => {
     try {
-      return client.request<T>({
+      return client.request<ApiResponse<T>>({
         url,
         method: 'GET',
         params,
@@ -109,7 +115,7 @@ const client = {
 
   post: <T = any>(url: string, data?: any, config?: RequestConfig) => {
     try {
-      return client.request<T>({
+      return client.request<ApiResponse<T>>({
         url,
         method: 'POST',
         data,
@@ -123,7 +129,7 @@ const client = {
 
   put: <T = any>(url: string, data?: any, config?: RequestConfig) => {
     try {
-      return client.request<T>({
+      return client.request<ApiResponse<T>>({
         url,
         method: 'PUT',
         data,
