@@ -309,19 +309,19 @@ const MarketQuotesList = [
     key: "marketCap",
     sortable: true,
     render: (item: MarketQuote) => (
-      <TextCell text={textPrefix(formatLargeNumber(item.marketcap), "$")} />
+      <TextCell text={textPrefix(formatLargeNumber(item.marketCap), "$")} />
     ),
     sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
-      advancedSort(a.marketcap, b.marketcap, order),
+      advancedSort(a.marketCap, b.marketCap, order),
   },
   {
     key: "dailyHigh",
     sortable: true,
     render: (item: MarketQuote) => (
-      <TextCell text={textPrefix(item.dailyhigh, "$")} />
+      <TextCell text={textPrefix(item.dailyHigh, "$")} />
     ),
     sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
-      advancedSort(a.dailyhigh, b.dailyhigh, order),
+      advancedSort(a.dailyHigh, b.dailyHigh, order),
   },
   {
     key: "quickBuy",
