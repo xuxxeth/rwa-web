@@ -14,6 +14,7 @@ import {
   xLayerTestnet,
 } from "@/hooks/useCaCommon";
 import { Toaster } from "./components/ui/sonner";
+import { useBaseStore } from "./stores/baseStore";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,11 +36,17 @@ function RoutesWrapper() {
 
 function App() {
   const { t, i18n } = useTranslation();
-
+  const baseStore = useBaseStore()
   useEffect(() => {
     const lng = storage.getItem("CA_LANGUAGE") || "en";
     i18n.changeLanguage(lng);
   }, [i18n]);
+
+  // 获取通用基础信息
+  useEffect(() => {
+    baseStore.getChains()
+  }, [])
+
   return (
     <WalletProvider
       config={{
