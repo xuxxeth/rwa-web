@@ -116,10 +116,10 @@ export default function MarketQuotes() {
     sort
   );
 
-  // if (isPending) {
-  //   // TODO: 加载中状态
-  //   return null;
-  // }
+  // TODO: 增加 loading 态
+  if (isPending) {
+    return "loading...";
+  }
 
   if (isError) {
     return <MarketQuoteError />;
