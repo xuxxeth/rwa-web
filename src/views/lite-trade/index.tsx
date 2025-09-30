@@ -21,8 +21,8 @@ function LiteTrade() {
   const [showKline, setShowKline] = useState(false)
 
   useEffect(() => {
-    baseStore.getTokens()
-    baseStore.getBaseRwas()
+    // baseStore.getTokens()
+    // baseStore.getBaseRwas()
     baseStore.getStocks()
     baseStore.getMarket()
   }, [])

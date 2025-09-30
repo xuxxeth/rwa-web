@@ -30,10 +30,11 @@ export interface IToken {
   "decimals": number,
   "precision": number,
   "state": number,    // 状态：0-下架，1-上架
-  "balance"?: number
+  "balance"?: string,
+  "origin"?: string
 }
 // RWA基础信息
-export interface IRwas {
+export interface IRwa {
   "stockId": number,
   "chainId": number,
   "address": string,
@@ -48,7 +49,9 @@ export interface IRwas {
   "tokens": string[],
   "precision": number,
   "state": number,
-  "weight": number
+  "weight": number,
+  "balance"?: string,
+  "origin"?: string
 }
 
 // 市场信息

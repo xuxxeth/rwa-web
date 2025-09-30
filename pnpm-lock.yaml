@@ -94,8 +94,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.1(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))
       ca-common-web:
-        specifier: ^0.1.22
-        version: 0.1.22(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))(zod@3.22.4)
+        specifier: ^0.1.24
+        version: 0.1.24(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))(zod@3.22.4)
       eslint:
         specifier: ^9.33.0
         version: 9.34.0(jiti@2.5.1)
@@ -1567,8 +1567,8 @@ packages:
     peerDependencies:
       esbuild: '>=0.17'
 
-  ca-common-web@0.1.22:
-    resolution: {integrity: sha512-HtqiRyKP2OYntNsw5ESoaI+6IpjgMOszeHDtXsK247aN6eMIN0FH4i/Wt/UxsEN9MQXT4ACSISw823BAekTBQg==}
+  ca-common-web@0.1.24:
+    resolution: {integrity: sha512-xVVeFYPsBpXfjKL+soEE6wwP13IVK02noWrqAx42KGjGH8+md+WtFqfGyjAebSEBKqADclRi2oP5qqs61ooimw==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -5257,7 +5257,7 @@ snapshots:
       esbuild: 0.25.9
       load-tsconfig: 0.2.5
 
-  ca-common-web@0.1.22(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))(zod@3.22.4):
+  ca-common-web@0.1.24(@types/react@19.1.12)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))(zod@3.22.4):
     dependencies:
       '@reown/appkit': 1.8.6(@types/react@19.1.12)(react@19.1.1)(typescript@5.8.3)(zod@3.22.4)
       '@tailwindcss/vite': 4.1.13(vite@7.1.4(@types/node@24.3.1)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(yaml@2.8.1))
