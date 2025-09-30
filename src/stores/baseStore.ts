@@ -4,6 +4,7 @@ import type { BaseStore } from './types'
 import { baseApi } from '@/service/baseApi'
 import { RESPONSE_CODE } from '@/config/constants'
 import { marketDefault, marketStateDefault } from './defaultData'
+import type { IRwa, IToken } from '@/service/types'
 
 
 export const useBaseStore = create<BaseStore>()(
@@ -23,10 +24,18 @@ export const useBaseStore = create<BaseStore>()(
         }
         return res
       },
+      setTokens: (tokenList: IToken[]) => {
+        set({tokenList: tokenList})
+      },
+      setRwas: (rwaList: IRwa[]) => {
+        set({rwaList: rwaList})
+      },
       getTokens: async (chainId?: number) => {
         const res = await baseApi.getTokens(chainId)
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({tokenList: res.data || []})
+          // 先处理balances
+          const _tokenList = (res.data || []).map(token => ({...token, balance: '0'}))
+          set({tokenList: _tokenList})
         }
         return res
       },

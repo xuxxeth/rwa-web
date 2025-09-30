@@ -29,3 +29,13 @@ export function parseAmount(
     .integerValue(BigNumber.ROUND_DOWN) // 转整数，避免小数
     .toFixed(0); // 输出字符串
 }
+
+export function formatAmount(
+  value: string | number | bigint,
+  decimals: number = 6,
+  precision: number = decimals
+): string {
+  return new BigNumber(value.toString())
+    .dividedBy(new BigNumber(10).pow(decimals)) // 除以 10^decimals
+    .toFixed(precision, BigNumber.ROUND_DOWN) // 保留指定小数位
+}

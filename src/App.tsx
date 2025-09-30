@@ -5,17 +5,11 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Suspense, useEffect } from "react";
 import storage from "./utils/storage";
 import { useTranslation } from "./hooks/useTranslation";
-import { QueryClientProvider } from "@tanstack/react-query";
-import queryClient from "./queryClient";
 
-import {
-  WalletProvider,
-  useChains,
-  bscTestnet,
-  xLayerTestnet,
-} from "@/hooks/useCaCommon";
 import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
+import { useTokenBalances } from "./hooks/useTokenBalances";
+import { useRwaBalances } from "./hooks/useRwaBalances";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -24,6 +18,7 @@ BigNumber.config({
 });
 
 function RoutesWrapper() {
+  
   return useRoutes(routes);
 }
 
@@ -35,30 +30,25 @@ function App() {
     i18n.changeLanguage(lng);
   }, [i18n]);
 
-
+  // 获取余额信息
+  useTokenBalances()
+  // 获取Rwa余额
+  useRwaBalances()
+  
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
   }, [])
   
   return (
-    <WalletProvider
-      config={{
-        chains: [bscTestnet, xLayerTestnet],
-        defaultChainId: bscTestnet.id,
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>
-          <Suspense fallback={<div>{t("Loading")}...</div>}>
-            <BrowserRouter>
-              <RoutesWrapper />
-            </BrowserRouter>
-            <Toaster position="top-center" />
-          </Suspense>
-        </ErrorBoundary>
-      </QueryClientProvider>
-    </WalletProvider>
+    <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>
+      <Suspense fallback={<div>{t("Loading")}...</div>}>
+        <BrowserRouter>
+          <RoutesWrapper />
+        </BrowserRouter>
+        <Toaster position="top-center" />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
