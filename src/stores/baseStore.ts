@@ -4,12 +4,13 @@ import type { BaseStore } from './types'
 import { baseApi } from '@/service/baseApi'
 import { RESPONSE_CODE } from '@/config/constants'
 import { marketDefault, marketStateDefault } from './defaultData'
-import type { IRwa, IToken } from '@/service/types'
-
+import type { IRwas, IToken } from '@/service/types'
 
 export const useBaseStore = create<BaseStore>()(
   persist(
     (set, get) => ({
+      lastChainId: null,
+      lastInitTime: 0,
       count: 0,
       chainList: [],
       tokenList: [],
@@ -18,11 +19,11 @@ export const useBaseStore = create<BaseStore>()(
       marketInfo: marketDefault,
       marketState: marketStateDefault,
       getChains: async () => {
-        const res = await baseApi.getChains()
+        const res = await baseApi.getChains();
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({chainList: res.data || []})
+          set({ chainList: res.data || [] });
         }
-        return res
+        return res;
       },
       setTokens: (tokenList: IToken[]) => {
         set({tokenList: tokenList})
@@ -31,47 +32,68 @@ export const useBaseStore = create<BaseStore>()(
         set({rwaList: rwaList})
       },
       getTokens: async (chainId?: number) => {
-        const res = await baseApi.getTokens(chainId)
+        const res = await baseApi.getTokens(chainId);
         if (res.code === RESPONSE_CODE.SUCCESS) {
           // 先处理balances
           const _tokenList = (res.data || []).map(token => ({...token, balance: '0'}))
           set({tokenList: _tokenList})
         }
-        return res
+        return res;
       },
       getBaseRwas: async (chainId?: number) => {
-        const res = await baseApi.getBaseRwas(chainId)
+        const res = await baseApi.getBaseRwas(chainId);
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({rwaList: res.data || []})
+          set({ rwaList: res.data || [] });
         }
-        return res
+        return res;
       },
       getStocks: async () => {
-        const res = await baseApi.getStocks()
-        return res
+        const res = await baseApi.getStocks();
+        return res;
       },
       getMarket: async () => {
-        const res = await baseApi.getMarket()
+        const res = await baseApi.getMarket();
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({marketInfo: res.data || []})
+          set({ marketInfo: res.data || [] });
         }
-        return res
+        return res;
       },
       getMarketState: async () => {
-        const res = await baseApi.getMarketState()
+        const res = await baseApi.getMarketState();
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({marketState: res.data || []})
+          set({ marketState: res.data || [] });
         }
-        return res
+        return res;
+      },
+      autoInitialize: async (chainId: number | null) => {
+        if (!chainId) return;
+        
+        if(Date.now() - get().lastInitTime < 1000 * 60 * 60 && get().lastChainId === chainId) {
+          console.log('===> autoInitialize, last init time is less than 1 hour')
+          return
+        }
+
+        await Promise.all([
+          get().getTokens(chainId),
+          get().getBaseRwas(chainId),
+        ]);
+
+        set(() => ({
+          lastChainId: chainId,
+          lastInitTime: Date.now(),
+        }));
       },
     }),
     {
-      name: 'CA_WEB_BASE_INFO',
+      name: "CA_WEB_BASE_INFO",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        count: state.count
-      })
+        count: state.count,
+        tokenList: state.tokenList,
+        rwaList: state.rwaList,
+        lastInitTime: state.lastInitTime,
+        lastChainId: state.lastChainId
+      }),
     }
-  ),
-  
-)
+  )
+);

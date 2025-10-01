@@ -1,5 +1,5 @@
 // src/router/routes.tsx
-import { lazy, type ReactElement } from "react";
+import { lazy } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 
 // 懒加载页面
@@ -15,6 +15,8 @@ const Components = lazy(() => import("../views/components"));
 // Markets children routes
 const MarketTrading = lazy(() => import("../views/markets/MarketTrading"));
 const MarketQuotes = lazy(() => import("../views/markets/MarketQuotes"));
+
+const Assets = lazy(() => import("../views/assets"));
 
 // 路由表
 const routes: RouteObject[] = [
@@ -43,6 +45,10 @@ const routes: RouteObject[] = [
   {
     path: "/lite-trade",
     element: <LiteTrade />,
+  },
+  {
+    path: '/assets',
+    element: <Assets />,
   },
   {
     path: "/kline",

@@ -1,0 +1,74 @@
+import { useTranslation } from "@/hooks/useTranslation";
+import { LazyImage } from "../image/LazyImage";
+import { cn } from "@/utils";
+
+function getVerificationStatusClassName(verified: boolean, issued: boolean) {
+  if (!verified) {
+    return {
+      color: "rgba(255,204,0,1)",
+      bg: "rgba(255,204,0,0.1)",
+      icon: "/images/icons/assets/not_verified.png",
+      text: "notVerified",
+    };
+  } else if (!issued) {
+    return {
+      color: "rgba(0,223,128,1)",
+      bg: "rgba(0,223,128,0.1)",
+      icon: "/images/icons/assets/verified.png",
+      text: "verified",
+    };
+  } else {
+    return {
+      color: "rgba(240,67,73,1)",
+      bg: "rgba(240,67,73,0.1)",
+      icon: "/images/icons/assets/issue.png",
+      text: "issue",
+    };
+  }
+}
+
+export function VerificationStatus(props: {
+  verified: boolean;
+  issued: boolean;
+}) {
+  const { t } = useTranslation();
+  const { verified, issued } = props;
+  const { color, icon, text, bg } = getVerificationStatusClassName(
+    verified,
+    issued
+  );
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 justify-center py-1 px-2 rounded-sm text-xs"
+      )}
+      style={{
+        color,
+        background: bg,
+      }}
+    >
+      <LazyImage src={icon} className="w-3.5 h-3.5" />
+      <span>{t(text)}</span>
+    </div>
+  );
+}
+
+export function Verification(props: { verified: boolean; issued: boolean }) {
+  const { verified, issued } = props;
+  return (
+    <div className="flex flex-row gap-4">
+      <VerificationStatus verified={verified} issued={issued} />
+      {!verified && !issued && <StartVerificationButton />}
+    </div>
+  );
+}
+
+export function StartVerificationButton() {
+  const { t } = useTranslation();
+  return (
+    <button className="cursor-pointer px-4 py-2 text-sm/4  font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)]">
+      {t("startVerification")}
+    </button>
+  );
+}
