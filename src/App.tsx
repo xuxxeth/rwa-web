@@ -10,6 +10,7 @@ import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useRwaBalances } from "./hooks/useRwaBalances";
+import { scanApi } from "./service/scanApi";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -34,10 +35,11 @@ function App() {
   useTokenBalances()
   // 获取Rwa余额
   useRwaBalances()
-  
+
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
+    scanApi.getOrders()
   }, [])
   
   return (
