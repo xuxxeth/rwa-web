@@ -15,3 +15,10 @@ export function useTokens() {
     return []
   },[ chainId, tokenList])
 }
+
+export function useUSDT() {
+  const tokens = useTokens()
+  return useMemo(() => {
+    return tokens.find(token => token.symbol === 'USDT')
+  }, [tokens])
+}

@@ -5,12 +5,13 @@ import { shortenAddress } from "@/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import storage from "@/utils/storage";
-import { CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
+import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants";
 import { cn } from "@/lib/utils";
 import { bscTestnet, useChainId, useChains, xLayerTestnet } from "@/hooks/useCaCommon";
 import { useToast } from "@/hooks/useToast";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from "../image/LazyImage";
+import { useUSDT } from "@/hooks/useTokens";
 
 export function WalletItem({
   wallet,
@@ -55,6 +56,9 @@ export function ConnectButton() {
   const [open, setOpen] = useState(false)
   const [currentWallet, setCurrentWallet] = useState<any>({})
   const hasConnected = useRef<boolean>(false)
+
+  const usdtToken = useUSDT()
+
   // 默认执行一次连接钱包操作
   useEffect(() => {
     if (wallets.length > 0 && !account && !hasConnected.current) {
@@ -68,6 +72,9 @@ export function ConnectButton() {
           handleConnect(connectorType, wallet)
         }
       }
+    }
+    if (account) {
+      storage.setItem(CONNECT_ACCOUNT, account)
     }
   }, [wallets, chains, account, handleConnect])
 
@@ -113,7 +120,7 @@ export function ConnectButton() {
                   <div className="py-3">
                     <div className="flex items-center">
                       <img src="./images/tokens/usdt.png" className="w-5 h-5" alt="" />
-                      <span className="text-[18px] font-semibold ml-2">100.00</span>
+                      <span className="text-[18px] font-semibold ml-2">{usdtToken?.balance}</span>
                     </div>
                     <div className="text-[#6C86AD] text-sm leading-6">{t('Total USDT Balance')}</div>
                   </div>

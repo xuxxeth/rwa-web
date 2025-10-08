@@ -51,7 +51,10 @@ export interface IRwa {
   "state": number,
   "weight": number,
   "balance"?: string,
-  "origin"?: string
+  "origin"?: string,
+  "price"?: string , 
+  "up"?: string, 
+  "lock"?: number, 
 }
 
 // 市场信息
