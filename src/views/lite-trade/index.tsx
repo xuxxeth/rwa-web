@@ -13,12 +13,15 @@ import { FAQ } from "../../components/markets/FAQ";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
 import { useBaseStore } from "@/stores/baseStore";
+import { useRequestSignature } from "@/hooks/useSignature";
 
 function LiteTrade() {
   const { t } = useTranslation()
   const baseStore = useBaseStore()
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
+
+  const { signature, validSignature } = useRequestSignature()
 
   useEffect(() => {
     // baseStore.getTokens()
@@ -41,8 +44,10 @@ function LiteTrade() {
                   <div className="text-[24px] font-medium">{t('limit')}</div>
                   <div className="flex items-center gap-x-5">
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
-                      onClick={() => {
-                        
+                      onClick={async () => {
+                        if (!(await validSignature())) {
+                          signature()
+                        }
                       }}
                     >
                       <LazyImage src="/images/convert/history.png" className="w-9 h-9 cursor-pointer" />

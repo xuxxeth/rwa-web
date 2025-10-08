@@ -21,7 +21,10 @@ export function useRwaBalances() {
         return {
           ...token,
           origin: String(balancesRes[index].balance),
-          balance: formatAmount(String(balancesRes[index].balance), 6, token.precision)
+          balance: formatAmount(String(balancesRes[index].balance), 6, token.precision),
+          price: '203.43',
+          up: "23", 
+          lock: 0 
         }
       })
       baseStore.setRwas(rwaListWithBalances)

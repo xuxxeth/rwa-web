@@ -5,9 +5,10 @@ import { memo, useCallback, useEffect, useState } from "react";
 
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { TokenList } from "../token-list";
-import { CTokenList, tokenList as ctokenList, type CTokenProps } from "../ctoken-list";
+import { CTokenList, type CTokenProps } from "../ctoken-list";
 import { useTokens } from "@/hooks/useTokens";
-import type { IToken } from "@/service/types";
+import type { IRwa, IToken } from "@/service/types";
+import { useRwas } from "@/hooks/useRwaBalances";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -25,6 +26,7 @@ const CurrencyInputPanel = memo(
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
     const tokenList = useTokens()
+    const rwaList = useRwas()
 
     const handleCurrencyClick = useCallback(async () => {
       if (mode === 'in') {
@@ -35,17 +37,17 @@ const CurrencyInputPanel = memo(
       
     }, [mode])
 
-    const [inputToken, setInputToken] = useState<CTokenProps>()
+    const [inputToken, setInputToken] = useState<IRwa>()
     const [outputToken, setOutputToken] = useState<IToken>()
     
     useEffect(() => {
-      if (ctokenList[0]) {
-        setInputToken(ctokenList[0])
+      if (rwaList[0]) {
+        setInputToken(rwaList[0])
       }
       if (tokenList[0]) {
         setOutputToken(tokenList[0])
       }
-    }, [ctokenList, tokenList])
+    }, [rwaList, tokenList])
 
     return (
       <div className={cn(
@@ -71,14 +73,14 @@ const CurrencyInputPanel = memo(
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {inputToken?.balance || '0'} {inputToken?.stock || '0'}</div>
+              <div>Avbl: {inputToken?.balance || '0'} {inputToken?.symbol || ' '}</div>
             </div>
         }
         {
           mode === 'out' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {outputToken?.balance || '0'}</div>
+              <div>Avbl: {outputToken?.balance || '0'} {outputToken?.symbol || ' '}</div>
             </div>
         }
         <DialogController

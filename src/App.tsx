@@ -11,6 +11,7 @@ import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useRwaBalances } from "./hooks/useRwaBalances";
 import { scanApi } from "./service/scanApi";
+import { useActiveWeb3 } from "./hooks/useActiveWe3";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -25,6 +26,7 @@ function RoutesWrapper() {
 
 function App() {
   const { t, i18n } = useTranslation();
+  const { account } = useActiveWeb3()
   const baseStore = useBaseStore()
   useEffect(() => {
     const lng = storage.getItem("CA_LANGUAGE") || "en";
@@ -39,8 +41,13 @@ function App() {
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
-    scanApi.getOrders()
   }, [])
+
+  useEffect(() => {
+    if (account) {
+      scanApi.getOrders()
+    }
+  }, [account])
   
   return (
     <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>

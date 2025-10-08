@@ -1,4 +1,4 @@
-import { REQUEST_TIMEOUT } from '@/config/constants'
+import { CONNECT_ACCOUNT, REQUEST_TIMEOUT } from '@/config/constants'
 import axios from 'axios'
 import { bscTestnet } from '@/hooks/useCaCommon'
 
@@ -10,6 +10,7 @@ import type {
   AxiosRequestHeaders,
   AxiosError
 } from 'axios'
+import storage from '@/utils/storage'
 
 interface RequestInterceptors<T> {
   // 请求拦截
@@ -47,14 +48,23 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     url,
     controller
   )
+  const needAuth = url.includes('/scan/') // ✅ 判断 URL 是否需要授权
+  const account = storage.getItem(CONNECT_ACCOUNT)
+  const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
+  // ✅ 如果存在 account 但没有签名信息，则中止请求
+  if (needAuth && (!localSignature || !localSignature.account)) {
+    controller.abort()
+    // 抛出一个自定义错误让上层能识别
+    return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))
+  }
 
-  const token = localStorage.getItem('Authorization')
+  if (localSignature && localSignature.account && account.toLowerCase() === localSignature.account.toLowerCase()) {
+    const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
+    req.headers.set('Authorization', auth)
+  }
   const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
-  req.headers.set('Authorization', token)
   
   req.headers.set('D11-Chain-Id', chainId)
-  // 接口用的 header 字段是 chainId
-  // req.headers.set('chainId', chainId)
   
   return req
 })
