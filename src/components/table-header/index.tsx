@@ -32,7 +32,7 @@ function TableHeader<SortableField extends string>({
         return (
           <div
             key={key}
-            className="flex-1 flex flex-row items-center justify-center text-white/60 text-sm/11.5 font-medium py-3"
+            className="flex-1 flex flex-row items-center text-white/60 text-sm/11.5 font-medium py-3"
           >
             <button
               className="cursor-pointer flex flex-row items-center"

@@ -2,7 +2,7 @@ import { memo, useId, useMemo, useState } from "react"
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 import { useTokens } from "@/hooks/useTokens"
-import type { IToken } from "@/service/types"
+import type { IToken } from "@/service/base/types"
 
 export type TokenProps = {
   name: string,

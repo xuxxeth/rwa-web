@@ -10,7 +10,7 @@ import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useRwaBalances } from "./hooks/useRwaBalances";
-import { scanApi } from "./service/scanApi";
+import { scanApi } from "@/service/scan/api";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 
 BigNumber.config({

@@ -5,7 +5,7 @@ import { LazyImage } from "../image/LazyImage"
 import { SortButton } from "../sort-button"
 import { cn } from "@/lib/utils"
 import { useRwas } from "@/hooks/useRwaBalances";
-import type { IRwa } from "@/service/types";
+import type { IRwa } from "@/service/base/types";
 
 export type CTokenProps = {
   stock: string,
