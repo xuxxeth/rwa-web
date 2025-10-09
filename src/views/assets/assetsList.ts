@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useBaseStore } from "@/stores/baseStore";
-import type { IToken, IRwas } from "@/service/types";
+import type { IToken, IRwa } from "@/service/base/types";
 import { marketQuoteOptions } from "@/queries";
 import { useQuery } from "@tanstack/react-query";
-import type { IMarketQuote } from "@/views/markets/MarketQuotes/types";
 import { useTokenBalances } from "@/hooks/useCaCommon";
 import { parseAmountToDecimal, multiply, sum } from "@/utils/index";
+import type { IMarketQuote } from "@/service/quote/types";
 
 export function useAssetsList(chainId: number, account: string) {
   const baseStore = useBaseStore();
@@ -101,7 +101,7 @@ function getAssetItemFromToken(token: IToken): IAssetItem {
   };
 }
 
-function getAssetItemFromRwa(rwa: IRwas): IAssetItem {
+function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
   return {
     rwaId: rwa.id,
     token: rwa.symbol,

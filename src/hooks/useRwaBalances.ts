@@ -1,10 +1,10 @@
-import { baseApi } from '@/service/baseApi'
 import { useTokenBalances as useBalances, useChainId  } from './useCaCommon'
 import { RESPONSE_CODE } from '@/config/constants'
 import { useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { formatAmount } from '@/utils'
 import { useBaseStore } from '@/stores/baseStore'
+import { baseApi } from '@/service/base/api'
 
 export function useRwaBalances() {
   const { getTokenBalances } = useBalances()
