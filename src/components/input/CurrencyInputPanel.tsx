@@ -1,14 +1,17 @@
 
 import { cn } from "@/lib/utils";
 import { CurrencyInput } from "./CurrencyInput";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { TokenList } from "../token-list";
-import { CTokenList, type CTokenProps } from "../ctoken-list";
+import { CTokenList } from "../ctoken-list";
 import { useTokens } from "@/hooks/useTokens";
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa, IToken } from "@/service/base/types";
+import { formatTokenAmountWithCommas, } from "@/utils/format";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useTradeStore } from "@/stores/tradeStore";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -23,10 +26,12 @@ type CurrencyInputPanelProps = {
 
 const CurrencyInputPanel = memo(
   ({ mode = 'in', label, placeholder, value, from, regex, onUserInput }: CurrencyInputPanelProps) => {
+    const tradeStore = useTradeStore()
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
     const tokenList = useTokens()
     const rwaList = useRwas()
+    const { t } = useTranslation()
 
     const handleCurrencyClick = useCallback(async () => {
       if (mode === 'in') {
@@ -37,15 +42,17 @@ const CurrencyInputPanel = memo(
       
     }, [mode])
 
-    const [inputToken, setInputToken] = useState<IRwa>()
-    const [outputToken, setOutputToken] = useState<IToken>()
+    // const [inputToken, setInputToken] = useState<IRwa>()
+    // const [outputToken, setOutputToken] = useState<IToken>()
+    const inputToken = useMemo(() => tradeStore.inputToken, [tradeStore.inputToken])
+    const outputToken = useMemo(() => tradeStore.outputToken, [tradeStore.outputToken])
     
     useEffect(() => {
       if (rwaList[0]) {
-        setInputToken(rwaList[0])
+        tradeStore.updateInputToken(rwaList[0])
       }
       if (tokenList[0]) {
-        setOutputToken(tokenList[0])
+        tradeStore.updateOutputToken(tokenList[0])
       }
     }, [rwaList, tokenList])
 
@@ -73,19 +80,19 @@ const CurrencyInputPanel = memo(
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {inputToken?.balance || '0'} {inputToken?.symbol || ' '}</div>
+              <div>Avbl: {formatTokenAmountWithCommas(inputToken?.balance || '0')} {inputToken?.symbol || ' '}</div>
             </div>
         }
         {
           mode === 'out' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {outputToken?.balance || '0'} {outputToken?.symbol || ' '}</div>
+              <div>Avbl: {formatTokenAmountWithCommas(outputToken?.balance || '0')} {outputToken?.symbol || ' '}</div>
             </div>
         }
         <DialogController
           topFixed
-          title="Select a token"
+          title={t("Select a token")}
           open={tokenDialog.open}
           openChange={tokenDialog.setOpen}
         > 
@@ -94,14 +101,14 @@ const CurrencyInputPanel = memo(
             <CTokenList 
               onClick={(token) => {
                 tokenDialog.hide()
-                setInputToken(token)
+                tradeStore.updateInputToken(token)
               }}
             />
           </div>
         </DialogController>
         <DialogController
           topFixed
-          title="Select a token"
+          title={t("Select a token")}
           open={cTokenDialog.open}
           openChange={cTokenDialog.setOpen}
         > 
@@ -109,7 +116,7 @@ const CurrencyInputPanel = memo(
             <TokenList
               onClick={(token) => {
                 cTokenDialog.hide()
-                setOutputToken(token)
+                tradeStore.updateOutputToken(token)
               }}
             />
           </div>

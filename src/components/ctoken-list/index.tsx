@@ -6,6 +6,8 @@ import { SortButton } from "../sort-button"
 import { cn } from "@/lib/utils"
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
+import Pagination from "../pagination";
+import { formatTokenAmountWithCommas } from "@/utils/format";
 
 export type CTokenProps = {
   stock: string,
@@ -28,23 +30,23 @@ const CTokenItem = memo(
       let _info = ''
       if (state === 0) {
         _icon = '/images/icons/market/market_open.png'
-        _info = t('Open')
+        _info = t("Open")
       }
       if (state === 1) {
         _icon = '/images/icons/market/market_pre.png'
-        _info = t('Pre-Market')
+        _info = t("Pre-Market")
       }
       if (state === 2) {
         _icon = '/images/icons/market/market_after.png'
-        _info = t('After Hours')
+        _info = t("After Hours")
       }
       if (state === 3) {
         _icon = '/images/icons/market/market_close.png'
-        _info = t('Market Closed')
+        _info = t("Market Closed")
       }
       if (state === 4) {
         _icon = '/images/icons/market/market_lock.png'
-        _info = t('Trading Halt')
+        _info = t("Trading Halt")
       }
       return {
         icon: _icon,
@@ -60,7 +62,9 @@ const CTokenItem = memo(
         }}
       >
         <div className="flex items-center gap-x-2 w-1/3">
-          <LazyImage src={token.icon} className="w-10 h-10" />
+          <div className="w-10 h-10">
+            <LazyImage src={token.icon} className="w-10 h-10" />
+          </div>
           <div>
             <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>
             <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.name}</div>
@@ -86,7 +90,7 @@ const CTokenItem = memo(
 
         </div>
         <div className="w-1/3 text-right">
-          <div className=" text-[16px] font-medium leading-[24px]">{token.balance}</div>
+          <div className=" text-[16px] font-medium leading-[24px]">{formatTokenAmountWithCommas(token.balance || '0')}</div>
           <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{token.balance}</div>
         </div>
       </div>
@@ -96,6 +100,9 @@ const CTokenItem = memo(
 
 const CTokenList = memo(
   ({ onClick }: { onClick?: (token: IRwa) => void}) => {
+    const { t } = useTranslation()
+
+    const [currentPage, setCurrentPage] = useState(1)
 
     const _id = useId()
     const rwaList = useRwas()
@@ -104,22 +111,34 @@ const CTokenList = memo(
       return filterHolding ? rwaList.filter(token => Number(token.balance) > 0) : rwaList
     }, [rwaList, filterHolding])
 
+    const totalPage = useMemo(() => Math.ceil(filterTokens.length / 7), [filterTokens])
+
     return (
       <div className="min-w-[443px]">
         <div className=" flex items-center">
-          <CheckBox onChange={setFilterHolding} />
-          <span className=" text-[12px] font-normal ml-1">Holdings Only</span>
+          <CheckBox onChange={setFilterHolding} checked={filterHolding} />
+          <span onClick={() => {
+            setFilterHolding(!filterHolding)
+          }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
         </div>
         <div className="mt-2">
           <div className=" flex items-center justify-between text-[12px] font-normal">
-            <div className="w-1/3">Name</div>
-            <div className="flex items-center gap-x-[6px] w-1/3">Change <SortButton /></div>
-            <div className="w-1/3 text-right">Holdings</div>
+            <div className="w-1/3">{t("Name")}</div>
+            <div className="flex items-center gap-x-[6px] w-1/3">{t("Change")} <SortButton /></div>
+            <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
           {
-            filterTokens.slice(0, 6).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+            filterTokens.slice((currentPage - 1) * 7, currentPage * 7).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
           }
         </div>
+        <Pagination currentPage={currentPage} totalPage={totalPage} 
+          onPrevClick={() => { 
+            if (currentPage > 0) {
+              setCurrentPage(currentPage - 1)
+            }
+          }} 
+          onNextClick={() => setCurrentPage(currentPage + 1)} 
+        />
       </div>
     )
   }

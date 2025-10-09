@@ -1,3 +1,4 @@
+import { useId } from "react";
 import VectorSVG from "./vector.svg?react";
 import { cn } from "@/utils";
 
@@ -16,6 +17,7 @@ export default function Pagination({
   // next: { disabled: boolean; onClick: () => void };
   scrollToTopAferClick?: boolean;
 }) {
+  const _id = useId()
   return (
     <div className="flex gap-4 py-2 mt-9 flew-row justify-center">
       {[
@@ -29,8 +31,9 @@ export default function Pagination({
           onClick: onNextClick,
           className: "",
         },
-      ].map(({ className, disabled, onClick }) => (
+      ].map(({ className, disabled, onClick }, index) => (
         <button
+          key={`${_id}-${index}`}
           onClick={() => {
             if (disabled) return;
             onClick();

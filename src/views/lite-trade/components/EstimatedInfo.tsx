@@ -3,8 +3,13 @@ import { LazyImage } from "@/components/image/LazyImage"
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo } from "react"
 
+type EstimatedInfoProps = {
+  expires: number,
+  onEdit?: () => void
+}
+
 const EstimatedInfo = memo(
-  () => {
+  ({ expires, onEdit }: EstimatedInfoProps) => {
     const { t } = useTranslation()
     return (
       <div className="bg-[rgba(6,7,10,0.3)] rounded-[16px] p-4 mt-4 text-white font-normal text-[14px] flex flex-col gap-y-2">
@@ -17,7 +22,7 @@ const EstimatedInfo = memo(
           right={'0.485049404 AMZNc'}
         /> */}
         <BetweenText 
-          left={t('Rate')}
+          left={t("Rate")}
           right={
             <div className="flex items-center">
               <button className=" cursor-pointer">
@@ -28,12 +33,21 @@ const EstimatedInfo = memo(
           }
         />
         <BetweenText 
-          left={t('Network Fee')}
+          left={t("Network Fee")}
           right={'0.015 BNB'}
         />
         <BetweenText 
-          left={t('Expires in')}
-          right={'7 days'}
+          left={t("Expires in")}
+          right={
+            <div className="h-[32px] flex justify-center rounded-[8px] items-center px-2 bg-[rgba(0,149,255,0.1)] text-[#0095FF] text-[14px] font-normal cursor-pointer"
+              onClick={() => {
+                onEdit && onEdit()
+              }}
+            >
+              {expires} {t("days")}
+              <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" />
+            </div>
+          }
         />
       </div>
     )

@@ -42,7 +42,7 @@
   "Whole shares only": "Whole shares only",
   "Order Value": "Order Value",
   "Enter an amount": "Enter an amount",
-  "Insufficient  USDT": "Insufficient  USDT",
+  "Insufficient USDT": "Insufficient USDT",
   "Rate": "Rate",
   "Network Fee": "Network Fee",
   "Expires in": "Expires in",
@@ -127,5 +127,13 @@
       "partiallyFilled": "Partially Filled",
       "open": "Open"
     }
-  }
+  },
+  "Coming Soon": "Coming Soon",
+  "Holdings Only": "Holdings Only",
+  "Name": "Name",
+  "Change": "Change",
+  "Holdings": "Holdings",
+  "Select a token": "Select a token",
+  "days": "days",
+  "Confirm": "Confirm"
 }

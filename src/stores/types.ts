@@ -22,3 +22,16 @@ export interface BaseStore {
   getMarketState: () => Promise<ApiResponse<IMarketState>>,
   autoInitialize: (chainId: number | null) => Promise<void>
 }
+
+export interface TradeStore {
+  inputToken: IRwa | null,
+  outputToken: IToken | null,
+  limitPrice: string,
+  inputSize: string,
+  expires: number,
+  updateInputToken: (rwa: IRwa) => void,
+  updateOutputToken: (token: IToken) => void,
+  updateLimitPrice: (price: string) => void,
+  updateInputSize: (size: string) => void,
+  updateExpires: (expires: number) => void
+}

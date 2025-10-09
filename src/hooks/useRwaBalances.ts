@@ -15,7 +15,7 @@ export function useRwaBalances() {
   const getRwaData = async (chainId: number, account: `0x${string}`) => {
     const res = await baseApi.getBaseRwas(chainId)
     if (res.code === RESPONSE_CODE.SUCCESS) {
-      const rwaList = (res.data || []).slice(0, 1);
+      const rwaList = (res.data || []);
       const balancesRes = await getTokenBalances(account, rwaList.map(token => token.address as `0x${string}`))
       const rwaListWithBalances = rwaList.map((token, index) => {
         return {

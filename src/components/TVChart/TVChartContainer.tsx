@@ -53,15 +53,15 @@ export const TVChartContainer = () => {
 
         const chart = tvWidgetRef.current?.activeChart();
         if (chart) {
-          // 添加成交量指标
-          chart?.createStudy("Volume", false, false).then((studyId) => {
-            const panes = chart.getPanes();
-            if (panes.length > 1) {
-              // 默认第 0 个 pane 是主图，第 1 个就是 Volume
-              const volumePane = panes[1];
-              volumePane.setHeight(100); // 单位是像素，高度随你调
-            }
-          });
+          // 添加成交量指标，暂时不需要
+          // chart?.createStudy("Volume", false, false).then((studyId) => {
+          //   const panes = chart.getPanes();
+          //   if (panes.length > 1) {
+          //     // 默认第 0 个 pane 是主图，第 1 个就是 Volume
+          //     const volumePane = panes[1];
+          //     volumePane.setHeight(100); // 单位是像素，高度随你调
+          //   }
+          // });
           
           // MA5
           chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 export function textPrefix(text: string, prefix: string) {
   return `${prefix}${text}`;
 }
@@ -140,4 +141,8 @@ export function formatWithCommas(value: number | string, decimals?: number): str
     intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
     (decPart ? `.${decPart}` : "")
   );
+}
+
+export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string{
+  return formatWithCommas(formatTokenAmount(value), decimals)
 }
