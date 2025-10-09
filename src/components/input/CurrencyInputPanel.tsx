@@ -7,7 +7,7 @@ import { useShowDialog, DialogController } from '@/components/dialog/DialogContr
 import { TokenList } from "../token-list";
 import { CTokenList, type CTokenProps } from "../ctoken-list";
 import { useTokens } from "@/hooks/useTokens";
-import type { IRwa, IToken } from "@/service/types";
+import type { IRwa, IToken } from "@/service/base/types";
 import { useRwas } from "@/hooks/useRwaBalances";
 
 type CurrencyInputPanelProps = {

@@ -1,5 +1,5 @@
 import type { ApiResponse } from "@/service/client";
-import type { IChain, IMarket, IMarketState, IRwa, IStocks, IToken } from "@/service/types";
+import type { IChain, IMarket, IMarketState, IRwa, IStocks, IToken } from "@/service/base/types";
 
 
 export interface BaseStore {

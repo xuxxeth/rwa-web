@@ -4,7 +4,7 @@ import { LazyImage } from "../image/LazyImage"
 import type { TokenProps } from "../token-list"
 import type { CTokenProps } from "../ctoken-list"
 import { cn } from "@/lib/utils"
-import type { IRwa, IToken } from "@/service/types"
+import type { IRwa, IToken } from "@/service/base/types"
 
 type CurrencyInputProps = {
   disabled?: boolean
