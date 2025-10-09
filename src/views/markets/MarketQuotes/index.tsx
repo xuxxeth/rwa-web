@@ -1,12 +1,15 @@
-import { useState, useMemo, useCallback } from "react";
 import { MainLayout } from "@/layouts/main";
+import ConentLayout from "@/layouts/content";
 import { MarketTrading } from "@/components/market-trading";
-import { SortButton } from "@/components/sort-button-svg";
 import { useTranslation } from "@/hooks/useTranslation";
-import { baseApi } from "@/service/baseApi";
 import { useQuery } from "@tanstack/react-query";
 import { useChainId } from "@/hooks/useCaCommon";
 import { LazyImage } from "@/components/image/LazyImage";
+import {
+  type Order,
+  useTableSort,
+  usePaginationData,
+} from "@/hooks/useTableHelper";
 import {
   cn,
   advancedSort,
@@ -20,60 +23,25 @@ import {
 import BuyButton from "@/components/button/BuyButton";
 import TradingHaltBtn from "@/components/button/TradingHaltBtn";
 import Pagination from "@/components/pagination";
-import { type MarketQuoteResponse, type MarketQuote } from "./types";
-import type { AxiosError } from "axios";
+import { type IMarketQuote } from "./types";
 import MarketQuoteError from "./error";
 import { bscTestnet } from "@/hooks/useCaCommon";
+import { marketQuoteOptions } from "@/queries";
+import TableHeader from "@/components/table-header";
 
 function useMarketQuote() {
   const chainId = useChainId() || bscTestnet.id;
 
-  const { data, isPending, status, isError, error } = useQuery<
-    MarketQuoteResponse,
-    AxiosError,
-    MarketQuoteResponse
-  >({
-    queryKey: ["marketQuotes", chainId],
-    queryFn: () => baseApi.getRWAs<MarketQuoteResponse>(chainId),
-    enabled: chainId !== null,
-  });
+  const { data, isPending, status, isError, error } = useQuery(
+    marketQuoteOptions(chainId)
+  );
 
   return {
-    marketQuotes: data?.data || [],
+    marketQuotes: data ?? [],
     isPending,
     status,
     isError,
     error,
-  };
-}
-
-function usePaginationData(data: MarketQuote[], sort: Sort) {
-  const [page, setPage] = useState(1);
-  const pageSize = 20;
-
-  const sorter = useMemo(() => {
-    if (!sort) return undefined;
-    return MarketQuotesList.find((item) => item.key === sort?.field)?.sorter;
-  }, [sort]);
-
-  const sortedData = useMemo(() => {
-    if (!sort || !sorter) return data;
-    return [...data].sort((a, b) => sorter(a, b)(sort.order));
-  }, [data, sort, sorter]);
-
-  const paginatedData = sortedData.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
-
-  const totalPages = Math.ceil(sortedData.length / pageSize);
-
-  return {
-    paginatedData: paginatedData,
-    currentPage: page,
-    totalPages,
-    setPage,
-    pageSize,
   };
 }
 
@@ -84,37 +52,15 @@ type SortableField =
   | "change"
   | "marketCap"
   | "dailyHigh";
-type Order = "asc" | "desc";
-type Sort = {
-  field: SortableField;
-  order: Order;
-} | null;
 
 export default function MarketQuotes() {
   const { t } = useTranslation();
-  const [sort, setSort] = useState<Sort | null>(null);
-
-  const onSortChange = useCallback<(filed: SortableField) => void>((field) => {
-    setSort((prev: Sort | null) => {
-      if (prev === null || prev.field !== field) {
-        return { field, order: "asc" };
-      }
-      if (prev.order === "asc") {
-        return { field, order: "desc" };
-      }
-      if (prev.order === "desc") {
-        return null;
-      }
-      return null;
-    });
-  }, []);
+  const { sort, onSortChange } = useTableSort<SortableField>();
 
   const { marketQuotes, isError, isPending, status, error } = useMarketQuote();
 
-  const { paginatedData, currentPage, totalPages, setPage } = usePaginationData(
-    marketQuotes,
-    sort
-  );
+  const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
+    usePaginationData<IMarketQuote>(MarketQuotesList, marketQuotes, sort);
 
   // TODO: 增加 loading 态
   if (isPending) {
@@ -127,11 +73,16 @@ export default function MarketQuotes() {
 
   return (
     <MainLayout>
-      <div className="bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
+      <ConentLayout>
         <div className="px-5">
           <MarketTrading state="open" align="center" />
-          <TableTitle sort={sort} onSortChange={onSortChange} />
-          {paginatedData.map((item: MarketQuote) => {
+          <TableHeader<SortableField>
+            lngPrefix="marketQuotes"
+            config={MarketQuotesList}
+            sort={sort}
+            onSortChange={onSortChange}
+          />
+          {paginatedData.map((item: IMarketQuote) => {
             return (
               <div className="flex flex-row px-4 border-b border-white/10">
                 {MarketQuotesList.map(({ render }) => {
@@ -147,71 +98,17 @@ export default function MarketQuotes() {
           <div className="px-5 py-1 mt-2 text-sm/5.5">
             {t("marketQuotes.quoteInfo")}
           </div>
-          {totalPages > 1 && (
-            <div className="flex gap-4 py-2 mt-9 flew-row justify-center">
-              <Pagination
-                prev={{
-                  disabled: currentPage === 1,
-                  onClick: () => {
-                    setPage((s) => s - 1);
-                    ScrollToTop();
-                  },
-                }}
-                next={{
-                  disabled: currentPage === totalPages,
-                  onClick: () => {
-                    setPage((s) => s + 1);
-                    ScrollToTop();
-                  },
-                }}
-              />
-            </div>
+          {totalPage > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPage={totalPage}
+              onPrevClick={onPrevClick}
+              onNextClick={onNextClick}
+            />
           )}
         </div>
-      </div>
+      </ConentLayout>
     </MainLayout>
-  );
-}
-
-// 分页切换的时候，滚动到顶部
-function ScrollToTop() {
-  window.scrollTo({ top: 0, behavior: "auto" });
-}
-
-function TableTitle({
-  sort,
-  onSortChange,
-}: {
-  sort: Sort;
-  onSortChange: (field: SortableField) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex px-4 mt-2 flex-row h-12 border-t border-b border-white/10">
-      {MarketQuotesList.map(({ key, sortable }) => {
-        const order = sort?.field === key ? sort.order : undefined;
-        return (
-          <div
-            key={key}
-            className="flex-1 text-white/60 text-sm/11.5 font-medium"
-          >
-            <button
-              className="cursor-pointer flex flex-row items-center"
-              onClick={() => {
-                onSortChange(key as SortableField);
-              }}
-            >
-              <span className="mr-0.5">{t(`marketQuotes.${key}`)}</span>
-              {sortable && (
-                <div className="w-4 h-4 flex justify-center flex-row items-center">
-                  <SortButton order={order} />
-                </div>
-              )}
-            </button>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -268,67 +165,71 @@ const MarketQuotesList = [
   {
     key: "name",
     sortable: true,
-    render: (item: MarketQuote) => (
+    render: (item: IMarketQuote) => (
       <QuoteName logo={item.icon || ""} name={item.name} />
     ),
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.name, b.name, order),
   },
   {
     key: "token",
     sortable: true,
-    render: (item: MarketQuote) => <TextCell text={item.token} />,
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    render: (item: IMarketQuote) => <TextCell text={item.token} />,
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.token, b.token, order),
   },
   {
     key: "price",
     sortable: true,
-    render: (item: MarketQuote) => (
+    render: (item: IMarketQuote) => (
       <TextCellWithColor
         text={textPrefix(toFixed(item.price), "$")}
         change={strOrNumToSign(item.change)}
         withIcon={false}
       />
     ),
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.price, b.price, order),
   },
   {
     key: "change",
     sortable: true,
-    render: (item: MarketQuote) => (
+    render: (item: IMarketQuote) => (
       <TextCellWithColor
         text={formatPercentage(item.change)}
         change={strOrNumToSign(item.change)}
         withIcon={true}
       />
     ),
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.change, b.change, order),
   },
   {
     key: "marketCap",
     sortable: true,
-    render: (item: MarketQuote) => (
+    render: (item: IMarketQuote) => (
       <TextCell text={textPrefix(formatLargeNumber(item.marketCap), "$")} />
     ),
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.marketCap, b.marketCap, order),
   },
   {
     key: "dailyHigh",
     sortable: true,
-    render: (item: MarketQuote) => (
+    render: (item: IMarketQuote) => (
       <TextCell text={textPrefix(toFixed(item.dailyHigh), "$")} />
     ),
-    sorter: (a: MarketQuote, b: MarketQuote) => (order: Order) =>
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.dailyHigh, b.dailyHigh, order),
   },
   {
     key: "quickBuy",
     sortable: false,
-    render: () => <BuyButton to={"/markets/trading"} />,
-    // render: () => <TradingHaltBtn />,
+    render: (item: IMarketQuote) =>
+      item.rwaState === 0 ? (
+        <BuyButton to={"/markets/trading"} />
+      ) : (
+        <TradingHaltBtn />
+      ),
   },
 ];
