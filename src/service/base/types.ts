@@ -34,7 +34,7 @@ export interface IToken {
   "origin"?: string
 }
 // RWA基础信息
-export interface IRwas {
+export interface IRwa {
   "id": number,
   "stockId": number,
   "chainId": number,

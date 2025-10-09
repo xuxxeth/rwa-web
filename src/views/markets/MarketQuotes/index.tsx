@@ -23,7 +23,7 @@ import {
 import BuyButton from "@/components/button/BuyButton";
 import TradingHaltBtn from "@/components/button/TradingHaltBtn";
 import Pagination from "@/components/pagination";
-import { type IMarketQuote } from "./types";
+import { type IMarketQuote } from "@/service/quote/types"
 import MarketQuoteError from "./error";
 import { bscTestnet } from "@/hooks/useCaCommon";
 import { marketQuoteOptions } from "@/queries";
