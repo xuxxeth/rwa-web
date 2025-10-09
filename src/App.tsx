@@ -10,8 +10,8 @@ import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useRwaBalances } from "./hooks/useRwaBalances";
+import { scanApi } from "@/service/scan/api";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
-import { scanApi } from "./service/scan/api";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数

@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { BaseStore } from './types'
+import { baseApi } from "@/service/base/api"
 import { RESPONSE_CODE } from '@/config/constants'
 import { marketDefault, marketStateDefault } from './defaultData'
-import { baseApi } from '@/service/base/api'
 import type { IRwa, IToken } from '@/service/base/types'
 
 export const useBaseStore = create<BaseStore>()(

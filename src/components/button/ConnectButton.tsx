@@ -45,7 +45,7 @@ export function WalletItem({
 
 
 
-export function ConnectButton() {
+export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation();
   const { toastSuccess, toastError } = useToast()
   const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
@@ -82,7 +82,7 @@ export function ConnectButton() {
     <>
       {
         !account ? 
-          <div className="h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer"
+          <div className={cn("h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer", props.connectBtnClassName)} 
             onClick={() => {
               walletDialog.show()
             }}

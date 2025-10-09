@@ -3,9 +3,9 @@ import { useBaseStore } from "@/stores/baseStore";
 import type { IToken, IRwa } from "@/service/base/types";
 import { marketQuoteOptions } from "@/queries";
 import { useQuery } from "@tanstack/react-query";
-import { useTokenBalances } from "@/hooks/useCaCommon";
-import { parseAmountToDecimal, multiply, sum } from "@/utils/index";
 import type { IMarketQuote } from "@/service/quote/types";
+import { useTokenBalances } from "@/hooks/useCaCommon";
+import { formatAmount, multiply, sum } from "@/utils/index";
 
 export function useAssetsList(chainId: number, account: string) {
   const baseStore = useBaseStore();
@@ -38,10 +38,10 @@ export function useAssetsList(chainId: number, account: string) {
     ];
     (async () => {
       try {
-        const res: bigint[] = await getTokenBalancesByTradingContract(
-          account,
-          realTokenAddressList
-        );
+        const res: bigint[] = (await getTokenBalancesByTradingContract(
+          account as `0x${string}`,
+          realTokenAddressList as `0x${string}`[]
+        )) as bigint[];
         setAmountList(res);
       } catch (error) {
         console.log("getTokenBalancesByTradingContract error", error);
@@ -64,10 +64,11 @@ export function useAssetsList(chainId: number, account: string) {
       ...tokenList.map(getAssetItemFromToken),
       ...rwaList.map(getAssetItemFromRwa),
     ].map((item, idx) => {
-      const quote = marketQuoteMap && item.rwaId && marketQuoteMap[item.rwaId];
+      const quote =
+        marketQuoteMap && item.rwaId ? marketQuoteMap[item.rwaId] : undefined;
       const holdings =
         amountList[idx] !== undefined && item.decimals !== undefined
-          ? parseAmountToDecimal(amountList[idx], item.decimals)
+          ? formatAmount(amountList[idx], item.decimals)
           : undefined;
       item = {
         ...item,
