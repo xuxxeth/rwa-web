@@ -1,11 +1,12 @@
-import client, { type ApiResponse } from "./client";
+import client, { type ApiResponse } from "../client";
 import type { 
   IChain, 
   IMarket, 
   IMarketState, 
   IStocks, 
-  IToken
-} from "./types";
+  IToken,
+  IRwa
+} from "./types"
 
 
 export const baseApi = {
@@ -15,6 +16,4 @@ export const baseApi = {
   getStocks: () => client.get<ApiResponse<IStocks[]>>('/v1/base/stocks'),
   getMarket: () => client.get<ApiResponse<IMarket>>('/v1/base/market'),
   getMarketState: () => client.get<ApiResponse<IMarketState>>('/v1/base/market/state'),
-
-  getRWAs: <T>(chainId: number) => client.get<T>(`/v1/base/quote/markets`),
 };
