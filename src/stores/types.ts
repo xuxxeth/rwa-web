@@ -4,6 +4,8 @@ import type { IChain, IMarket, IMarketState, IRwa, IStocks, IToken } from "@/ser
 
 export interface BaseStore {
   count: number,
+  lastChainId: number | null,
+  lastInitTime: number,
   chainList: IChain[],
   tokenList: IToken[],
   rwaList: IRwa[],
@@ -18,4 +20,5 @@ export interface BaseStore {
   getStocks: () => Promise<ApiResponse<IStocks[]>>,
   getMarket: () => Promise<ApiResponse<IMarket>>,
   getMarketState: () => Promise<ApiResponse<IMarketState>>,
+  autoInitialize: (chainId: number | null) => Promise<void>
 }

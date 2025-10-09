@@ -63,6 +63,11 @@
   "Chairman": "Chairman",
   "Industry": "Industry",
 
+  "startVerification": "Start Verification",
+  "verified": "Verified",
+  "notVerified": "Not Verified",
+  "issue": "Issue",
+  "copied": "Copied",
   "marketQuotes": {
     "name": "NAME",
     "token": "TOKEN",
@@ -76,6 +81,51 @@
     "networkError": {
       "title": "Network seems disconnected.",
       "desc": "Please check your connection."
+    }
+  },
+  "assets": {
+    "walletNotConnected": "Wallet Not Connected",
+    "connectWalletTip": "To access your assets and start trading, please connect your wallet.",
+    "walletAddress": "Wallet Address",
+    "identityVerification": "Identity verification",
+    "estimatedBalance": "Estimated Balance",
+    "tabList": {
+      "assets": "Assets",
+      "orderHistory": "Order History",
+      "tradeHistory": "Trade History"
+    },
+    "assetsTab": {
+      "token": "TOKEN",
+      "holdings": "HOLDINGS",
+      "price": "PRICE",
+      "value": "VALUE(USD)",
+      "actions": "ACTIONS"
+    },
+    "orderHistory": {
+      "openOrders": "Open Orders",
+
+      "tableHeader": {
+        "side": "SIDE",
+        "type": "TYPE",
+        "token": "TOKEN",
+        "orderPrice": "ORDER PRICE",
+        "orderAmount": "ORDER AMOUNT",
+        "filledAmount": "FILLED AMOUNT",
+        "filledValue": "FILLED VALUE",
+        "orderTime": "ORDER TIME",
+        "expiration": "EXPIRATION",
+        "status": "STATUS",
+        "action": "ACTION"
+      },
+
+      "orderHistory": "Order History",
+      "orderType": "Order Type",
+      "status": "Status",
+      "all": "All",
+      "buy": "Buy",
+      "sell": "Sell",
+      "partiallyFilled": "Partially Filled",
+      "open": "Open"
     }
   }
 }

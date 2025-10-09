@@ -3,7 +3,6 @@ import type {
   IChain, 
   IMarket, 
   IMarketState, 
-  IRwa, 
   IStocks, 
   IToken
 } from "./types";

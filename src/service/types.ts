@@ -34,10 +34,12 @@ export interface IToken {
   "origin"?: string
 }
 // RWA基础信息
-export interface IRwa {
+export interface IRwas {
+  "id": number,
   "stockId": number,
   "chainId": number,
   "address": string,
+  "decimals": number,
   "symbol": string,
   "name": string,
   "icon": string,

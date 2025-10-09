@@ -1,5 +1,5 @@
-type MarketQuote = {
-  rwaid: number;
+type IMarketQuote = {
+  rwaId: number;
   name: string;
   token: string;
   price: string;
@@ -7,11 +7,13 @@ type MarketQuote = {
   change: string;
   marketCap: string;
   dailyHigh: string;
+  stockState: 0 | 1 | 5 | 6,
+  rwaState: 0 | 1 | 2 | 3 | 4
 };
 
 type Change = 0 | 1 | -1;
 
-interface MarketQuoteResponse {
-  data: MarketQuote[];
+interface IMarketQuoteResponse {
+  data: IMarketQuote[];
 }
-export type { MarketQuoteResponse, MarketQuote, Change };
+export type { IMarketQuoteResponse, IMarketQuote, Change }; 
