@@ -1,4 +1,4 @@
-import { baseApi } from '@/service/baseApi'
+import { baseApi } from "@/service/base/api"
 import { useTokenBalances as useBalances, useChainId  } from './useCaCommon'
 import { RESPONSE_CODE } from '@/config/constants'
 import { useEffect, useMemo } from 'react'
