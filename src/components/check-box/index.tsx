@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { LazyImage } from "../image/LazyImage";
 import CheckSVG from "./check.svg?react";
 import { cn } from "@/utils";
@@ -10,7 +10,9 @@ type CheckBoxProps = {
 
 const CheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
   const [check, setCheck] = useState(checked);
-
+  useEffect(() => {
+    setCheck(checked)
+  }, [checked])
   return (
     <button
       className=" cursor-pointer outline-none"

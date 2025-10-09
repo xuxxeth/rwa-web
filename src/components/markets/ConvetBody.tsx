@@ -7,8 +7,11 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { useTrading } from "ca-common-web";
 import { parseAmount } from "@/utils";
+import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
+import { useTrading } from "@/hooks/useCaCommon";
+import { ExpiresSetting } from "../expires-setting";
+import { useTradeStore } from "@/stores/tradeStore";
 
 const usdtToken = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
 const applcToken = '0xE6d44C1f14D98AEf73c822d0319751701D54D4cc'
@@ -24,7 +27,9 @@ export function ConverBody({
   from
 }: ConverBodyProps) {
   const { t } = useTranslation()
+  const tradeStore = useTradeStore()
   const { account } = useActiveWeb3()
+  const expiresDialog = useShowDialog()
 
   const [limitPrice, setLimitPrice] = useState('0')
   const [quantity, setQuantity] = useState('0')
@@ -35,21 +40,21 @@ export function ConverBody({
   console.log('approvalState: ', approvalState, allowance)
   console.log('orderValue: ', parseAmount(orderValue))
   const hanleInputPrice = useCallback(async (value: string) => {
-    setLimitPrice(value)
+    tradeStore.updateLimitPrice(value)
   }, [])
   const hanleInputQuantity = useCallback(async (value: string) => {
-    setQuantity(value)
+    tradeStore.updateInputSize(value)
   }, [])
   
   useEffect(() => {
-    if (Number(limitPrice) && Number(quantity)) {
-      const result = new BigNumber(limitPrice)
-        .multipliedBy(quantity)
+    if (Number(tradeStore.limitPrice) && Number(tradeStore.inputSize)) {
+      const result = new BigNumber(tradeStore.limitPrice)
+        .multipliedBy(tradeStore.inputSize)
         .decimalPlaces(6, BigNumber.ROUND_DOWN) // 保留 6 位小数，向下取整
       setOrderValue(result.toFixed())
     }
     
-  }, [limitPrice, quantity])
+  }, [tradeStore.limitPrice, tradeStore.inputSize])
 
   const disabled = useMemo(() => Number(orderValue) <= 0, [orderValue])
   const [txHistory, setTxHistory] = useState<string[]>([])
@@ -107,7 +112,11 @@ export function ConverBody({
         label={t('Order Value')}
         value={orderValue}
       />
-      <EstimatedInfo />
+      <EstimatedInfo
+        expires={tradeStore.expires}
+        onEdit={() => {
+        expiresDialog.show()
+      }} />
       <div className=" flex flex-col gap-y-3">
         {
           txHistory.map(hash => {
@@ -129,7 +138,16 @@ export function ConverBody({
           
         </Button>
       }
-      
+      <DialogController
+        title={t("Expires in")}
+        open={expiresDialog.open}
+        openChange={expiresDialog.setOpen}
+      > 
+        <ExpiresSetting onConfirm={value => {
+          tradeStore.updateExpires(value)
+          expiresDialog.hide()
+        } } />
+      </DialogController>
     </div>
   )
 }

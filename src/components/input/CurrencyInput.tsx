@@ -8,7 +8,7 @@ import type { IRwa, IToken } from "@/service/base/types"
 
 type CurrencyInputProps = {
   disabled?: boolean
-  selectedToken?: IToken | IRwa
+  selectedToken?: IToken | IRwa | null
   mode?: string
   value?: string
   placeholder?: string

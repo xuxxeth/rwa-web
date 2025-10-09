@@ -3,6 +3,8 @@ import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 import { useTokens } from "@/hooks/useTokens"
 import type { IToken } from "@/service/base/types"
+import { formatTokenAmountWithCommas } from "@/utils"
+import { useTranslation } from "@/hooks/useTranslation"
 
 export type TokenProps = {
   name: string,
@@ -27,7 +29,7 @@ const TokenItem = memo(
           </div>
         </div>
         <div className=" text-right">
-          <div className=" text-[16px] font-medium leading-[24px]">{token.balance}</div>
+          <div className=" text-[16px] font-medium leading-[24px]">{formatTokenAmountWithCommas(token.balance || '0')}</div>
           <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{token.balance}</div>
         </div>
       </div>
@@ -45,6 +47,7 @@ const TokenList = memo(
   ({
     onClick
   }: { onClick?: (token: IToken) => void}) => {
+    const { t } = useTranslation()
     const tokenList = useTokens()
     const _id = useId()
 
@@ -55,13 +58,15 @@ const TokenList = memo(
     return (
       <div className="w-[300px]">
         <div className=" flex items-center">
-          <CheckBox onChange={setFilterHolding} />
-          <span className=" text-[12px] font-normal ml-1">Holdings Only</span>
+          <CheckBox onChange={setFilterHolding} checked={filterHolding} />
+          <span onClick={() => {
+            setFilterHolding(!filterHolding)
+          }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
         </div>
         <div className="mt-2">
           <div className=" flex items-center justify-between text-[12px] font-normal">
-            <div>Name</div>
-            <div>Balance</div>
+            <div>{t("Name")}</div>
+            <div>{t("Balance")}</div>
           </div>
           {
             filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token} onClick={onClick}  />)
