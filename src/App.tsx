@@ -12,6 +12,7 @@ import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useRwaBalances } from "./hooks/useRwaBalances";
 import { scanApi } from "@/service/scan/api";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
+import wsService from "./service/WebSocketService";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -41,6 +42,15 @@ function App() {
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
+
+    wsService.init({})
+    wsService.subscribe(["summary"], (data) => {
+      console.log(data)
+    })
+
+    return () => {
+      wsService.close()
+    }
   }, [])
 
   useEffect(() => {
