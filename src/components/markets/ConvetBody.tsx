@@ -85,8 +85,8 @@ export function ConverBody({
       validDate: '10', // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
       amount: '0', // 10 usdt
-      price: parseAmount(limitPrice),   // 1 usdt
-      size: parseAmount(quantity)    // 10
+      price: parseAmount(tradeStore.limitPrice),   // 1 usdt
+      size: parseAmount(tradeStore.inputSize)    // 10
     }
     console.log(params)
     setBuying(true)
@@ -98,7 +98,7 @@ export function ConverBody({
       // @ts-ignore
       setTxHistory([...txHistory, result?.data?.transactionHash?.hash || result?.data?.transactionHash])
     }
-  }, [limitPrice, quantity, orderValue, txHistory, action, paymentToken, placeOrder])
+  }, [tradeStore.limitPrice, tradeStore.inputSize, orderValue, txHistory, action, paymentToken, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
