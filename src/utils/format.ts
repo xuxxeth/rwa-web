@@ -1,6 +1,12 @@
 import BigNumber from 'bignumber.js'
+import prettyMs from "pretty-ms";
+
 export function textPrefix(text: string, prefix: string) {
   return `${prefix}${text}`;
+}
+
+export function textSuffix(text: string, suffix: string) {
+  return `${text} ${suffix}`;
 }
 
 export function toFixed(value: number | string, precision = 2): string {
@@ -145,4 +151,63 @@ export function formatWithCommas(value: number | string, decimals?: number): str
 
 export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string{
   return formatWithCommas(formatTokenAmount(value), decimals)
+}
+
+export function formatTimestamp(seconds: number): string {
+  const formatter = new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false, // 使用24小时制
+  });
+
+  const date = new Date(seconds * 1000);
+
+  const parts = formatter.formatToParts(date);
+
+  // 提取年、月、日、时、分、秒
+  let year = "";
+  let month = "";
+  let day = "";
+  let hour = "";
+  let minute = "";
+  let second = "";
+
+  parts.forEach((part) => {
+    switch (part.type) {
+      case "year":
+        year = part.value;
+        break;
+      case "month":
+        month = part.value;
+        break;
+      case "day":
+        day = part.value;
+        break;
+      case "hour":
+        hour = part.value;
+        break;
+      case "minute":
+        minute = part.value;
+        break;
+      case "second":
+        second = part.value;
+        break;
+    }
+  });
+
+  return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
+}
+
+export function readableDuration(seconds: number) {
+  if (typeof seconds !== "number" || isNaN(seconds) || !isFinite(seconds)) {
+    return "0s";
+  }
+
+  return prettyMs(seconds * 1000, {
+    verbose: true,
+  });
 }

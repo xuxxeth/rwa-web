@@ -1,13 +1,13 @@
-import TableHeader from "@/components/table-header";
+import { TableHeader, TableBody } from "@/components/table-header";
 import { useTableSort, type Order } from "@/hooks/useTableHelper";
 import { type IAssetItem } from "./assetsList";
 import BuyButton from "@/components/button/BuyButton";
 import TradingHaltBtn from "@/components/button/TradingHaltBtn";
-import { LazyImage } from "@/components/image/LazyImage";
-import { textPrefix, toFixed } from "@/utils/format";
 import Pagination from "@/components/pagination";
 import { usePaginationData } from "@/hooks/useTableHelper";
 import { advancedSort } from "@/utils/sort";
+import { TextCell, TokenCell } from "./Shared"
+import { textPrefix, toFixed } from "@/utils/format";
 
 type SortableField = "value";
 function AssetsTable(props: {
@@ -19,30 +19,23 @@ function AssetsTable(props: {
   const { sort, onSortChange } = useTableSort<SortableField>();
 
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
-    usePaginationData<IAssetItem>(assetConfig, assetList, sort);
+    usePaginationData<IAssetItem>(assetTableConfig, assetList, sort);
 
   return (
     <>
-      <TableHeader
+      <TableHeader<SortableField, IAssetItem, unknown>
         className="bg-[rgba(255,255,255,0.04)] rounded-lg border-none px-5"
         lngPrefix="assets.assetsTab"
-        config={assetConfig}
+        config={assetTableConfig}
         sort={sort}
         onSortChange={onSortChange}
       />
-      {paginatedData.map((item: IAssetItem) => {
-        return (
-          <div className="flex flex-row px-5 border-b border-white/10">
-            {assetConfig.map(({ render }) => {
-              return (
-                <div className="flex flex-row items-center flex-1 h-20">
-                  {render(item)}
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+      <TableBody<IAssetItem, unknown>
+        data={paginatedData}
+        config={assetTableConfig}
+        extra={{} as unknown}
+        getKey={(item: IAssetItem) => item.token}
+      />
       {totalPage > 1 && (
         <Pagination
           currentPage={currentPage}
@@ -55,22 +48,12 @@ function AssetsTable(props: {
   );
 }
 
-function TextCell(props: { text: string }) {
-  return <div className="text-sm font-normal">{props.text}</div>;
-}
-
-const assetConfig = [
+const assetTableConfig = [
   {
     key: "token",
     sortable: false,
     render: (item: IAssetItem) => (
-      <div className="flex flex-row gap-2">
-        {item.icon && <LazyImage className="w-10 h-10" src={item.icon || ""} />}
-        <div className="flex flex-col">
-          <div className="text-sm/6">{item.token}</div>
-          <div className="text-60 text-xs/4.5">{item.name}</div>
-        </div>
-      </div>
+      <TokenCell icon={item.icon} token={item.token} name={item.name} />
     ),
   },
   {

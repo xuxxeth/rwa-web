@@ -28,7 +28,6 @@ export function useRwaBalances() {
         }
       })
       baseStore.setRwas(rwaListWithBalances)
-
     }
   }
 

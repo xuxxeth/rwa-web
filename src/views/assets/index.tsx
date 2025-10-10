@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menus } from "@/components/menu";
 import { XFooter } from "@/components/footer";
 import { MainLayout } from "@/layouts/main";
@@ -11,10 +11,14 @@ import { useTranslation } from "@/hooks/useTranslation";
 import AssetsTable from "./assetsTable";
 import { useAssetsList } from "./assetsList";
 import OrderHistory from "./OrderHistory";
+import TradeHistory from "./TradeHistory";
+import { useRwaTokens } from "@/hooks/useTokens";
+import { useBaseStore } from "@/stores/baseStore";
 
 function Assets() {
   const account = useAccount();
   const chainId = useChainId();
+  const baseStore = useBaseStore();
 
   const { t } = useTranslation();
 
@@ -23,6 +27,13 @@ function Assets() {
   const [activeTab, setActiveTab] = useState("assets");
 
   const { assetList, estimatedBalance } = useAssetsList(chainId!, account);
+
+  const rwaTokens = useRwaTokens();
+
+  useEffect(() => {
+    if (!chainId) return;
+    baseStore.autoInitialize(chainId);
+  }, [chainId]);
 
   return (
     <>
@@ -43,6 +54,7 @@ function Assets() {
                     { key: "tradeHistory" },
                   ].map(({ key }) => (
                     <TabsTrigger
+                      key={key}
                       onClick={() => setActiveTab(key)}
                       className="text-xl/7 cursor-pointer px-0 py-2 font-medium!"
                       value={key}
@@ -60,7 +72,18 @@ function Assets() {
                     />
                   )}
                   {activeTab === "orderHistory" && (
-                    <OrderHistory chainId={chainId} account={account} />
+                    <OrderHistory
+                      chainId={chainId}
+                      account={account}
+                      rwaTokens={rwaTokens}
+                    />
+                  )}
+                  {activeTab === "tradeHistory" && (
+                    <TradeHistory
+                      chainId={chainId}
+                      account={account}
+                      rwaTokens={rwaTokens}
+                    />
                   )}
                 </TabsContent>
               </Tabs>
