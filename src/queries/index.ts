@@ -6,6 +6,7 @@ import {
 import { quoteApi } from "@/service/quote/api";
 import { scanApi } from "@/service/scan/api";
 import { type ITrade } from "@/service/scan/types";
+import { type IOpenOrderFilter, type IOpenOrderHistoryFilter, type ITradeHistoryFilter} from "@/stores/orderFilterStore";
 
 // 获取市场行情的 queryOptions
 export function marketQuoteOptions(chainId: number) {
@@ -19,40 +20,40 @@ export function marketQuoteOptions(chainId: number) {
   });
 }
 
-export function openOrderOptions(chainId: number, filters?: { side?: string }) {
+export function openOrderOptions(chainId: number, isSignatureValid: boolean, filters?: IOpenOrderFilter) {
   return queryOptions({
     queryKey: ["openOrder", chainId, filters],
     queryFn: async () => {
       const data = await scanApi.getOpenOrders(filters);
       return data.data || [];
     },
-    enabled: chainId !== null,
+    enabled: chainId !== null && isSignatureValid,
   });
 }
 
-export function orderHistoryOptions(chainId: number) {
+export function orderHistoryOptions(chainId: number, isSignatureValid: boolean, filters?: IOpenOrderHistoryFilter) {
   return queryOptions({
-    queryKey: ["orderHistory", chainId],
+    queryKey: ["orderHistory", chainId, filters],
     queryFn: async () => {
-      const data = await scanApi.getOrderHistory(chainId);
+      const data = await scanApi.getOrderHistory(filters);
+      return data.data || [];
+    },
+    enabled: chainId !== null && isSignatureValid,
+  });
+}
+
+export function tradeHistoryOptions(chainId: number, isSignatureValid: boolean, filters?: ITradeHistoryFilter) {
+  return queryOptions({
+    queryKey: ["tradeHistory", chainId, filters],
+    queryFn: async () => {
+      const data = await scanApi.getTrades(filters);
       return data.data || [];
     },
     enabled: chainId !== null,
   });
 }
 
-export function tradeHistoryOptions(chainId: number) {
-  return queryOptions({
-    queryKey: ["tradeHistory", chainId],
-    queryFn: async () => {
-      const data = await scanApi.getTrades(chainId);
-      return data.data || [];
-    },
-    enabled: chainId !== null,
-  });
-}
-
-export function infiniteTradeHistoryOptions(chainId: number) {
+export function infiniteTradeHistoryOptions(chainId: number, isSignatureValid: boolean) {
   return infiniteQueryOptions<
     {
       data: ITrade[];
@@ -83,6 +84,6 @@ export function infiniteTradeHistoryOptions(chainId: number) {
     },
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage?.nextPage,
-    enabled: chainId !== null,
+    enabled: chainId !== null && isSignatureValid,
   });
 }

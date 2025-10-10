@@ -10,7 +10,7 @@ export type RiskState = 0 | 1;
 export interface IOpenOrder {
   id: number;
   chainId: number;
-  orderId: number;
+  orderId: string;
   stockId: number;
   orderType: OrderType;
   side: OrderSide;

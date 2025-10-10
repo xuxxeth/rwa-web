@@ -167,7 +167,7 @@ export function DropDownFilter(props: {
                 <span>{t("assets.order.all")}</span>
               </>
             ) : (
-              <span className="flex-1 text-left text-sm font-medium">
+              <span className="flex-1 text-left text-sm font-medium truncate">
                 {selectedTypes
                   .map((value) => {
                     const item = items.find((item) => item.value === value);

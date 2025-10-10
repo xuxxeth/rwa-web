@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   DropDownFilter,
@@ -7,8 +7,8 @@ import {
   SideCell,
   TxHashCell,
 } from "./Shared";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { tradeHistoryOptions, infiniteTradeHistoryOptions } from "@/queries";
+import { useQuery } from "@tanstack/react-query";
+import { tradeHistoryOptions } from "@/queries";
 import {
   noop,
   formatTimestamp,
@@ -24,6 +24,12 @@ import {
   TableBody,
   type ITableConfnig,
 } from "@/components/table-header";
+import {
+  useOrderFilterStore,
+  generateTradeHistoryFilterObj,
+} from "@/stores/orderFilterStore";
+import { useSignatureValidStatus } from "@/hooks/useSignature";
+import SignatureVerify from "./SignatureVerify";
 
 function TradeHistory(props: {
   chainId: number;
@@ -31,56 +37,74 @@ function TradeHistory(props: {
   rwaTokens: IRwa[];
 }) {
   const { chainId, account, rwaTokens } = props;
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus();
 
   const { t } = useTranslation();
 
-  // const { data } = useQuery(tradeHistoryOptions(chainId));
+  const { tradeHistoryFilters, updateTradeHistoryFilters } =
+    useOrderFilterStore();
 
-  // console.log("===> trade history data", data);
+  const filters = useMemo(() => {
+    const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters);
+    const otherFilter = {
+      limit: 30,
+    };
+    return { ...userSelectFilter, ...otherFilter };
+  }, [tradeHistoryFilters]);
 
-  const [orderTypes, setOrderTypes] = useState<string[]>(["all"]);
-
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useInfiniteQuery(infiniteTradeHistoryOptions(chainId));
+  const {
+    data,
+    isPending,
+    status: queryStatus,
+    isError,
+    error,
+  } = useQuery(tradeHistoryOptions(chainId, isSignatureValid, filters));
 
   console.log("===> trade history data", data);
 
   // 用于检测滚动到底部的ref
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  // const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (
-        entries[0].isIntersecting &&
-        hasNextPage &&
-        !isFetching &&
-        !isFetchingNextPage
-      ) {
-        // 当滚动到加载更多区域且有下一页数据时，触发加载
-        fetchNextPage();
-      }
-    });
+  // useEffect(() => {
+  //   const observer = new IntersectionObserver((entries) => {
+  //     if (
+  //       entries[0].isIntersecting &&
+  //       hasNextPage &&
+  //       !isFetching &&
+  //       !isFetchingNextPage
+  //     ) {
+  //       // 当滚动到加载更多区域且有下一页数据时，触发加载
+  //       fetchNextPage();
+  //     }
+  //   });
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+  //   if (loadMoreRef.current) {
+  //     observer.observe(loadMoreRef.current);
+  //   }
 
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
+  //   return () => {
+  //     if (loadMoreRef.current) {
+  //       observer.unobserve(loadMoreRef.current);
+  //     }
+  //   };
+  // }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
 
-  const allTrads = data?.pages.flatMap((page) => page.data) || [];
+  // const allTrads = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <>
       <div>
         <DropDownFilter
-          data={orderTypes}
-          onDataChange={setOrderTypes}
-          items={[{ key: "buy" }, { key: "sell" }]}
+          data={tradeHistoryFilters.side}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateTradeHistoryFilters({
+              side: reduce(tradeHistoryFilters.side),
+            })
+          }
+          items={[
+            { key: "buy", value: "0" },
+            { key: "sell", value: "1" },
+          ]}
           title="orderType"
         />
       </div>
@@ -91,12 +115,19 @@ function TradeHistory(props: {
         className="border-none bg-white/4 rounded-md text-60"
         onSortChange={noop}
       />
-      <TableBody
-        data={allTrads}
-        config={tradeHistoryTableConfig}
-        extra={{ rwaTokens }}
-        getKey={(item: ITrade) => item.id}
-      />
+      {isSignatureValid ? (
+        <TableBody
+          data={data ?? []}
+          config={tradeHistoryTableConfig}
+          extra={{ rwaTokens }}
+          getKey={(item: ITrade) => item.id}
+        />
+      ) : (
+        <SignatureVerify
+          className="mt-9"
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
+      )}
     </>
   );
 }

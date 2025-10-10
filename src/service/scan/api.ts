@@ -1,19 +1,25 @@
 import client, { type ApiResponse } from "../client";
 import type { IOrder, ITrade, IOpenOrder } from "./types";
+import type {
+  IOpenOrderFilter,
+  IOpenOrderHistoryFilter,
+  ITradeHistoryFilter,
+} from "@/stores/orderFilterStore";
 
 export const scanApi = {
-  getOpenOrders: async (filters?: { side?: string }) => {
+  getOpenOrders: async (filters?: IOpenOrderFilter) => {
     return await client.get<ApiResponse<IOpenOrder[]>>("/v1/scan/orders", {
       ...filters,
     });
   },
 
-  getOrderHistory: (chainId: number) =>
-    client.get<ApiResponse<IOrder[]>>("/v1/scan/history-orders"),
+  getOrderHistory: (filters?: IOpenOrderHistoryFilter) =>
+    client.get<ApiResponse<IOrder[]>>("/v1/scan/history-orders", {
+      ...filters,
+    }),
 
-  getTrades: (chainId: number, lastOrderId?: number, pageSize: number = 10) =>
+  getTrades: (filters?: ITradeHistoryFilter) =>
     client.get<ApiResponse<ITrade[]>>("/v1/scan/trades", {
-      after: lastOrderId,
-      limit: pageSize,
+      ...filters,
     }),
 };
