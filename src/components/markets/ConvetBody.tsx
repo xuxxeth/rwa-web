@@ -82,7 +82,7 @@ export function ConverBody({
       tif: '1',
       sessionType: '0',
       paymentToken: usdtToken, // address
-      validDate: '10', // s String(7 * 24 * 60 * 60)
+      validDate: String(tradeStore.expires * 24 * 60 * 60), // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(tradeStore.limitPrice),   // 1 usdt
@@ -93,12 +93,8 @@ export function ConverBody({
     const result = await placeOrder(params, {})
     setBuying(false)
     console.log(result)
-    // @ts-ignore
-    if (result?.data?.transactionHash) {
-      // @ts-ignore
-      setTxHistory([...txHistory, result?.data?.transactionHash?.hash || result?.data?.transactionHash])
-    }
-  }, [tradeStore.limitPrice, tradeStore.inputSize, orderValue, txHistory, action, paymentToken, placeOrder])
+ 
+  }, [tradeStore.limitPrice, tradeStore.inputSize, tradeStore.expires, action, paymentToken, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
@@ -131,13 +127,13 @@ export function ConverBody({
         onEdit={() => {
         expiresDialog.show()
       }} />
-      <div className=" flex flex-col gap-y-3">
+      {/* <div className=" flex flex-col gap-y-3">
         {
           txHistory.map(hash => {
             return <a href={`https://testnet.bscscan.com/tx/${hash}`} target="_blank" key={hash} className=" underline text-blue-500">{hash}</a>
           })
         }
-      </div>
+      </div> */}
       
       {
         !account ? <ConnectButtonText /> :
