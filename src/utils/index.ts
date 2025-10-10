@@ -37,7 +37,7 @@ export function formatAmount(
 ): string {
   return new BigNumber(value.toString())
     .dividedBy(new BigNumber(10).pow(decimals)) // 除以 10^decimals
-    .toFixed(precision, BigNumber.ROUND_DOWN) // 保留指定小数位
+    .toFixed(precision, BigNumber.ROUND_DOWN); // 保留指定小数位
 }
 
 export function multiply(num1: string | number, num2: string | number) {
@@ -55,6 +55,21 @@ export function multiply(num1: string | number, num2: string | number) {
   }
 }
 
+export function divide(num1: string | number, num2: string | number) {
+  if (!num1 || !num2 || num2 === "0") return "0";
+  if (num1 === "0") return "0";
+  if (num2 === "1") return String(num1);
+
+  // 使用BigNumber库处理除法，确保小数和大数计算的准确性
+  try {
+    const result = new BigNumber(num1).dividedBy(new BigNumber(num2));
+    return result.toString();
+  } catch (error) {
+    console.error("除法计算错误:", error);
+    throw new Error("Invalid number format for division");
+  }
+}
+
 export function sum(...numbers: (string | number)[]) {
   // 边界情况处理：如果没有输入数字或所有数字都是0，则返回"0"
   if (numbers.length === 0) return "0";
@@ -65,7 +80,8 @@ export function sum(...numbers: (string | number)[]) {
 
     for (const num of numbers) {
       // 跳过空值或无效值
-      if (num === null || num === undefined || num === "" || num === "0") continue;
+      if (num === null || num === undefined || num === "" || num === "0")
+        continue;
 
       total = total.plus(new BigNumber(num));
     }

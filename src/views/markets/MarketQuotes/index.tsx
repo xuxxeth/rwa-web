@@ -23,11 +23,11 @@ import {
 import BuyButton from "@/components/button/BuyButton";
 import TradingHaltBtn from "@/components/button/TradingHaltBtn";
 import Pagination from "@/components/pagination";
-import { type IMarketQuote } from "@/service/quote/types"
+import { type IMarketQuote } from "@/service/quote/types";
 import MarketQuoteError from "./error";
 import { bscTestnet } from "@/hooks/useCaCommon";
 import { marketQuoteOptions } from "@/queries";
-import TableHeader from "@/components/table-header";
+import { TableHeader, TableBody } from "@/components/table-header";
 
 function useMarketQuote() {
   const chainId = useChainId() || bscTestnet.id;
@@ -76,25 +76,18 @@ export default function MarketQuotes() {
       <ConentLayout>
         <div className="px-5">
           <MarketTrading state="open" align="center" />
-          <TableHeader<SortableField>
+          <TableHeader<SortableField, IMarketQuote, unknown>
             lngPrefix="marketQuotes"
             config={MarketQuotesList}
             sort={sort}
             onSortChange={onSortChange}
           />
-          {paginatedData.map((item: IMarketQuote) => {
-            return (
-              <div className="flex flex-row px-4 border-b border-white/10">
-                {MarketQuotesList.map(({ render }) => {
-                  return (
-                    <div className="flex flex-row items-center flex-1 h-20">
-                      {render(item)}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
+          <TableBody<IMarketQuote, unknown>
+            data={paginatedData}
+            config={MarketQuotesList}
+            extra={{} as unknown}
+            getKey={(item: IMarketQuote) => item.rwaId}
+          />
           <div className="px-5 py-1 mt-2 text-sm/5.5">
             {t("marketQuotes.quoteInfo")}
           </div>
