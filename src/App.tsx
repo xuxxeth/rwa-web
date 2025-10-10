@@ -45,7 +45,6 @@ function App() {
 
     wsService.init({})
     wsService.subscribe(["summary"], (data) => {
-      console.log(data)
     })
 
     return () => {
