@@ -151,6 +151,8 @@ export function formatWithCommas(value: number | string, decimals?: number): str
 
 export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string{
   return formatWithCommas(formatTokenAmount(value), decimals)
+}
+
 export function formatTimestamp(seconds: number): string {
   const formatter = new Intl.DateTimeFormat("en", {
     year: "numeric",
