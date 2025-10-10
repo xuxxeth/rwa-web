@@ -12,6 +12,7 @@ import { useShowDialog, DialogController } from '@/components/dialog/DialogContr
 import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
+import wsService from "@/service/WebSocketService";
 
 const usdtToken = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
 const applcToken = '0xE6d44C1f14D98AEf73c822d0319751701D54D4cc'
@@ -44,6 +45,19 @@ export function ConverBody({
   }, [])
   const hanleInputQuantity = useCallback(async (value: string) => {
     tradeStore.updateInputSize(value)
+  }, [])
+
+  const handleSubscribe = (data: any) => {
+    console.log(data)
+  }
+
+  useEffect(() => {
+    wsService.init({})
+
+    wsService.subscribe(["summary"], handleSubscribe)
+    return () => {
+      wsService.unsubscribe(["summary"], handleSubscribe)
+    }
   }, [])
   
   useEffect(() => {
