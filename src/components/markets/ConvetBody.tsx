@@ -48,7 +48,6 @@ export function ConverBody({
   }, [])
 
   const handleSubscribe = (data: any) => {
-    console.log(data)
   }
 
   useEffect(() => {
@@ -82,7 +81,7 @@ export function ConverBody({
       tif: '1',
       sessionType: '0',
       paymentToken: usdtToken, // address
-      validDate: String(tradeStore.expires * 24 * 60 * 60), // s String(7 * 24 * 60 * 60)
+      validDate: String(tradeStore.expires), // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(tradeStore.limitPrice),   // 1 usdt
