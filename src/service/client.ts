@@ -65,6 +65,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
   
   req.headers.set('D11-Chain-Id', chainId)
+  req.headers.set('Ca-Chain-Id', chainId)
   
   return req
 })

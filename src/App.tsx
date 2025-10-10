@@ -55,7 +55,7 @@ function App() {
 
   useEffect(() => {
     if (account) {
-      scanApi.getOrders()
+      scanApi.getOpenOrders()
     }
   }, [account])
   

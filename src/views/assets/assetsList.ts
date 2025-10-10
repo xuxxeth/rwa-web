@@ -1,22 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { useBaseStore } from "@/stores/baseStore";
 import type { IToken, IRwa } from "@/service/base/types";
 import { marketQuoteOptions } from "@/queries";
 import { useQuery } from "@tanstack/react-query";
 import type { IMarketQuote } from "@/service/quote/types";
 import { useTokenBalances } from "@/hooks/useCaCommon";
 import { formatAmount, multiply, sum } from "@/utils/index";
+import { useTokens, useRwaTokens } from "@/hooks/useTokens";
 
 export function useAssetsList(chainId: number, account: string) {
-  const baseStore = useBaseStore();
-  const { tokenList, rwaList } = baseStore;
+  const tokenList = useTokens();
+  const rwaList = useRwaTokens();
+
   const [amountList, setAmountList] = useState<bigint[]>([]);
 
   const { getTokenBalancesByTradingContract } = useTokenBalances();
-
-  useEffect(() => {
-    baseStore.autoInitialize(chainId);
-  }, [chainId]);
 
   const {
     data: marketQuoteData,
@@ -32,15 +29,11 @@ export function useAssetsList(chainId: number, account: string) {
 
   useEffect(() => {
     if (!account || tokenAddressList.length === 0) return;
-    const realTokenAddressList = [
-      "0xbeD5856646F1faBDFc565F47f8Ea18685466B745",
-      "0xE6d44C1f14D98AEf73c822d0319751701D54D4cc",
-    ];
     (async () => {
       try {
         const res: bigint[] = (await getTokenBalancesByTradingContract(
           account as `0x${string}`,
-          realTokenAddressList as `0x${string}`[]
+          tokenAddressList as `0x${string}`[]
         )) as bigint[];
         setAmountList(res);
       } catch (error) {

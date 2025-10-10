@@ -15,8 +15,6 @@ function AccountDetail(props: { estimatedBalance: string; chainId: number }) {
 
   const chain = chains.find((item) => item.id === chainId);
 
-  console.log("===>chain", chain);
-
   return (
     <div className="p-2 rounded-2xl border border-white/10 text-base flex flex-col gap-2">
       <div className="flex flex-row gap-2 px-2 py-4 bg-[rgba(255,255,255,0.04)] rounded-lg">

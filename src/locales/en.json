@@ -101,7 +101,19 @@
       "value": "VALUE(USD)",
       "actions": "ACTIONS"
     },
-    "orderHistory": {
+    "tradeHistory": {
+      "tableHeader": {
+        "side": "SIDE",
+        "type": "TYPE",
+        "token": "TOKEN",
+        "filledQuantity": "FILLED QUANTITY",
+        "tradeValue": "TRADE VALUE",
+        "avgPrice": "AVG PRICE",
+        "time": "TIME",
+        "txId": "TX ID"
+      }
+    },
+    "order": {
       "openOrders": "Open Orders",
 
       "tableHeader": {
@@ -110,14 +122,27 @@
         "token": "TOKEN",
         "orderPrice": "ORDER PRICE",
         "orderAmount": "ORDER AMOUNT",
+        "filledPrice": "FILLED PRICE",
         "filledAmount": "FILLED AMOUNT",
         "filledValue": "FILLED VALUE",
         "orderTime": "ORDER TIME",
         "expiration": "EXPIRATION",
+        "executionTime": "EXECUTION TIME",
+        "txId": "TX ID",
+        "details": "DETAILS",
         "status": "STATUS",
         "action": "ACTION"
       },
 
+      "state": {
+        "open": "Open",
+        "partiallyFilled": "Partially Filled",
+        "orderFailed": "Order Failed",
+        "canceled": "Canceled",
+        "filled": "Filled"
+      },
+
+      "action": "Action",
       "orderHistory": "Order History",
       "orderType": "Order Type",
       "status": "Status",

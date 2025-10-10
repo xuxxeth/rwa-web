@@ -1,9 +1,49 @@
+import { type ReactNode, Fragment } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SortButton } from "@/components/sort-button-svg";
 import { cn } from "@/utils";
 import { type Sort } from "@/hooks/useTableHelper";
 
-function TableHeader<SortableField extends string>({
+export type ITableConfnig<T, U> = Array<{
+  key: string;
+  sortable: boolean;
+  render: (item: T, extra: U) => ReactNode;
+  width?: number;
+  // 是否在空格处换行
+  breakOnSpace?: boolean;
+}>;
+
+export function TableBody<T, Extra>(props: {
+  data: T[];
+  config: ITableConfnig<T, Extra>;
+  extra: Extra;
+  getKey: (item: T) => string | number;
+}) {
+  const { data, config, extra, getKey } = props;
+  return data.map((item: T) => {
+    return (
+      <div
+        key={getKey(item)}
+        className="flex flex-row px-4 border-b border-white/10"
+      >
+        {config.map(({ render, width, key }) => {
+          const style = width ? { flexBasis: width } : { flex: 1 };
+          return (
+            <div
+              key={key}
+              className="flex flex-row items-center h-20"
+              style={style}
+            >
+              {render(item, extra)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  });
+}
+
+export function TableHeader<SortableField extends string, Item, Extra>({
   lngPrefix = "",
   sort,
   onSortChange,
@@ -12,10 +52,7 @@ function TableHeader<SortableField extends string>({
 }: {
   lngPrefix?: string;
   className?: string;
-  config: {
-    key: string;
-    sortable: boolean;
-  }[];
+  config: ITableConfnig<Item, Extra>;
   sort: Sort | null;
   onSortChange: (field: SortableField) => void;
 }) {
@@ -27,12 +64,17 @@ function TableHeader<SortableField extends string>({
         className
       )}
     >
-      {config.map(({ key, sortable }) => {
+      {config.map(({ key, sortable, width, breakOnSpace }) => {
+        const style = width ? { flexBasis: width } : { flex: 1 };
         const order = sort?.field === key ? sort.order : undefined;
+        const text = t(`${lngPrefix}.${key}`);
         return (
           <div
             key={key}
-            className="flex-1 flex flex-row items-center text-white/60 text-sm/11.5 font-medium py-3"
+            className={cn(
+              "flex flex-row items-center text-white/60 text-sm/11.5 font-medium py-3",
+            )}
+            style={style}
           >
             <button
               className="cursor-pointer flex flex-row items-center"
@@ -40,8 +82,15 @@ function TableHeader<SortableField extends string>({
                 onSortChange(key as SortableField);
               }}
             >
-              <span className="mr-0.5 text-sm/3.5 font-medium">
-                {t(`${lngPrefix}.${key}`)}
+              <span className="mr-0.5 text-sm/3.5 font-medium text-left">
+                {breakOnSpace && text.includes(" ")
+                  ? text.split(" ").map((part, index) => (
+                      <Fragment key={index}>
+                        {index > 0 && <br />}
+                        {part}
+                      </Fragment>
+                    ))
+                  : text}
               </span>
               {sortable && (
                 <div className="w-4 h-4 flex justify-center flex-row items-center">
@@ -55,5 +104,3 @@ function TableHeader<SortableField extends string>({
     </div>
   );
 }
-
-export default TableHeader;
