@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   TableHeader,
   TableBody,
@@ -24,17 +24,30 @@ import {
   toFixed,
   formatTimestamp,
 } from "@/utils/format";
+import { useOrderFilterStore } from "@/stores/orderFilterStore";
+import SignatureVerify from "./SignatureVerify";
+import { useSignatureValidStatus } from "@/hooks/useSignature";
+import { generateOrderHistoryFilterObj } from "@/stores/orderFilterStore";
 
 export default function HistoryOrderTable(props: {
   chainId: number;
   account: string;
   rwaTokens: IRwa[];
-  orderTypes: string[];
-  setOrderTypes: (reduce: (prev: string[]) => string[]) => void;
 }) {
-  const { chainId, account, rwaTokens, orderTypes, setOrderTypes } = props;
+  const { chainId, rwaTokens } = props;
 
-  const [status, setStatus] = useState<string[]>(["all"]);
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus();
+
+  const { orderHistoryFilters, updateOrderHistoryFilters } =
+    useOrderFilterStore();
+
+  const filters = useMemo(() => {
+    const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters);
+    const otherFilter = {
+      limit: 30,
+    };
+    return { ...userSelectFilter, ...otherFilter };
+  }, [orderHistoryFilters]);
 
   const {
     data,
@@ -42,7 +55,7 @@ export default function HistoryOrderTable(props: {
     status: queryStatus,
     isError,
     error,
-  } = useQuery(orderHistoryOptions(chainId));
+  } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
 
   console.log("===> order history", data);
 
@@ -50,21 +63,42 @@ export default function HistoryOrderTable(props: {
     <>
       <div className="flex flex-row gap-4">
         <DropDownFilter
-          data={orderTypes}
-          onDataChange={setOrderTypes}
-          items={[{ key: "buy" }, { key: "sell" }]}
+          data={orderHistoryFilters.side}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOrderHistoryFilters({
+              side: reduce(orderHistoryFilters.side),
+            })
+          }
+          items={[
+            { key: "buy", value: "0" },
+            { key: "sell", value: "1" },
+          ]}
           title={"orderType"}
         />
         <DropDownFilter
-          data={status}
-          onDataChange={setStatus}
-          title={"status"}
+          data={orderHistoryFilters.states}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOrderHistoryFilters({
+              states: reduce(orderHistoryFilters.states),
+            })
+          }
+          title={"orderStatus"}
           items={[
             {
-              key: "partiallyFilled",
+              key: "filled",
+              value: "5",
             },
             {
-              key: "open",
+              key: "partiallyFilled",
+              value: "1",
+            },
+            {
+              key: "canceled",
+              value: "3",
+            },
+            {
+              key: "failed",
+              value: "2",
             },
           ]}
         />
@@ -76,12 +110,19 @@ export default function HistoryOrderTable(props: {
         className="border-none bg-white/4 rounded-md text-60"
         onSortChange={noop}
       />
-      <TableBody<IOrder, { rwaTokens: IRwa[] }>
-        data={data ?? []}
-        config={orderHistoryTableConfig}
-        extra={{ rwaTokens }}
-        getKey={(item: IOrder) => item.orderId}
-      />
+      {isSignatureValid ? (
+        <TableBody<IOrder, { rwaTokens: IRwa[] }>
+          data={data ?? []}
+          config={orderHistoryTableConfig}
+          extra={{ rwaTokens }}
+          getKey={(item: IOrder) => item.orderId}
+        />
+      ) : (
+        <SignatureVerify
+          className="mt-9"
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
+      )}
     </>
   );
 }
