@@ -205,4 +205,9 @@ const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
     sortable: false,
     render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
+  {
+    key: 'orderId',
+    sortable: false,
+    render: (item: IOrder) => <TextCell text={item.orderId} />,
+  }
 ];

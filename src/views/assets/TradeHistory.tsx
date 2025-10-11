@@ -192,6 +192,11 @@ const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
     sortable: false,
     render: (item: ITrade) => <TxHashCell hash={item.txHash} />,
   },
+  {
+    key: 'orderId',
+    sortable: false,
+    render: (item: ITrade) => <TextCell text={item.orderId} />,
+  }
 ];
 
 export default TradeHistory;

@@ -55,6 +55,7 @@ export function generateOpenOrderFilterObj(
 export interface IOpenOrderHistoryFilter {
   side?: string;
   states?: string
+  after?: string
 }
 
 export function generateOrderHistoryFilterObj(
@@ -76,6 +77,7 @@ export function generateOrderHistoryFilterObj(
 
 export interface ITradeHistoryFilter {
   side?: string;
+  after?: string;
 }
 
 export function generateTradeHistoryFilterObj(
