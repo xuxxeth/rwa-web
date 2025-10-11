@@ -7,34 +7,34 @@ import { cn } from "@/lib/utils";
 type stateProps = 'pre' | 'after' | 'close' | 'lock' | 'open'
 
 type MarketTradingProps = {
-  state?: stateProps
+  state?: number
   align?: string
 }
 
 const MarketTrading = memo(
-  ({ state = 'pre', align = 'center' }: MarketTradingProps) => {
+  ({ state = 2, align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
     
     const marketInfo = useMemo(() => {
       let _icon = ''
       let _info = ''
-      if (state === 'pre') {
+      if (state === 1) {
         _icon = '/images/icons/market/market_pre.png'
         _info = t('MarketPreInfo')
       }
-      if (state === 'after') {
+      if (state === 3) {
         _icon = '/images/icons/market/market_after.png'
         _info = t('MarketAfterInfo')
       }
-      if (state === 'close') {
-        _icon = '/images/icons/market/market_close.png'
-        _info = t('MarketCloseInfo')
-      }
-      if (state === 'lock') {
-        _icon = '/images/icons/market/market_lock.png'
-        _info = t('MarketLockInfo')
-      }
-      if (state === 'open') {
+      // if (state === 'close') {
+      //   _icon = '/images/icons/market/market_close.png'
+      //   _info = t('MarketCloseInfo')
+      // }
+      // if (state === 'lock') {
+      //   _icon = '/images/icons/market/market_lock.png'
+      //   _info = t('MarketLockInfo')
+      // }
+      if (state === 2) {
         _icon = '/images/icons/market/market_open.png'
         _info = t('MarketOpenInfo')
       }

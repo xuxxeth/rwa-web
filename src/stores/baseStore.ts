@@ -2,10 +2,10 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { BaseStore } from './types'
 import { baseApi } from "@/service/base/api"
-import { RESPONSE_CODE } from '@/config/constants'
+import { MARKET_STATUS, RESPONSE_CODE } from '@/config/constants'
 import { marketDefault, marketStateDefault } from './defaultData'
 import type { IRwa, IRwaPrice, IToken } from '@/service/base/types'
-import { truncate } from '@/utils'
+import { getSecondsSinceMidnight, truncate } from '@/utils'
 
 export const useBaseStore = create<BaseStore>()(
   persist(
@@ -19,6 +19,7 @@ export const useBaseStore = create<BaseStore>()(
       stocksList: [],
       marketInfo: marketDefault,
       marketState: marketStateDefault,
+      marketTradeState: MARKET_STATUS.DEFAULT,
       getChains: async () => {
         const res = await baseApi.getChains();
         if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -50,18 +51,37 @@ export const useBaseStore = create<BaseStore>()(
       },
       getStocks: async () => {
         const res = await baseApi.getStocks();
+        if (res.code === RESPONSE_CODE.SUCCESS) {
+          set({ stocksList: res.data || [] });
+        }
         return res;
       },
       getMarket: async () => {
         const res = await baseApi.getMarket();
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ marketInfo: {...(res.data || {})} });
+          const marketInfo = {...(res.data || {})}
+          let marketState = MARKET_STATUS.DEFAULT
+          if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
+            const nowSecond = getSecondsSinceMidnight()
+            if (nowSecond < marketInfo.tradingStartTime) {
+              marketState = MARKET_STATUS.BEFORE
+            } else if (nowSecond > marketInfo.tradingEndTime) {
+              marketState = MARKET_STATUS.AFTER
+            } else {
+              marketState = MARKET_STATUS.OPEN
+            }
+            
+          }
+          set({marketTradeState: marketState})
+
+          set({ marketInfo: marketInfo });
         }
         return res;
       },
       getMarketState: async () => {
         const res = await baseApi.getMarketState();
         if (res.code === RESPONSE_CODE.SUCCESS) {
+          
           set({ marketState: res.data || [] });
         }
         return res;
@@ -90,11 +110,22 @@ export const useBaseStore = create<BaseStore>()(
           return {
             ...rwa,
             price: truncate(price?.p || 0, rwa.precision),
-            up: truncate(price?.o && price?.p ? price.p - price.o : 0, 2)
+            up: truncate((price?.o && price?.p ? price.p / price.o - 1 : 0) * 100, 2),
           }
         })
         set({ rwaList: rwaList })
-
+      },
+      updateStocksPrice: (priceList: IRwaPrice[]) => {
+        const stocksList = get().stocksList.map(stock => {
+          const price = priceList.find(price => price.S.startsWith(stock.stockCode))
+          return {
+            ...stock,
+            price: truncate(price?.p || 0, 2),
+            up: truncate((price?.o && price?.p ? price.p / price.o - 1 : 0) * 100, 2),
+            cPrice: truncate(price?.c || 0, 2),
+          }
+        })
+        set({ stocksList: stocksList })
       }
     }),
     {

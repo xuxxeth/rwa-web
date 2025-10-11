@@ -13,6 +13,7 @@ import { FAQ } from "../../components/markets/FAQ";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
 import { useRequestSignature } from "@/hooks/useSignature";
+import { useBaseStore } from "@/stores/baseStore";
 
 function LiteTrade() {
   const { t } = useTranslation()
@@ -21,7 +22,7 @@ function LiteTrade() {
   const [showKline, setShowKline] = useState(false)
 
   const { signature, validSignature } = useRequestSignature()
-
+  const marketTradeState = useBaseStore(state => state.marketTradeState)
   useEffect(() => {
     // baseStore.getTokens()
     // baseStore.getBaseRwas()
@@ -33,7 +34,7 @@ function LiteTrade() {
       <Menus />
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
-          <MarketTrading state="open" />
+          <MarketTrading state={marketTradeState} />
           <div className="pt-5 flex gap-x-5">
             <div className="w-[691px] shrink-0">
               <BoxCard className="min-h-[448px] rounded-[32px]">

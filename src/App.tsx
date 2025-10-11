@@ -28,7 +28,12 @@ function RoutesWrapper() {
 function App() {
   const { t, i18n } = useTranslation();
   const { account } = useActiveWeb3()
-  const baseStore = useBaseStore()
+  const updateRwasPrice = useBaseStore(state => state.updateRwasPrice)
+  const updateStocksPrice = useBaseStore(state => state.updateStocksPrice)
+  const getChains = useBaseStore(state => state.getChains)
+  const getMarket = useBaseStore(state => state.getMarket)
+  const getStocks = useBaseStore(state => state.getStocks)
+
   useEffect(() => {
     const lng = storage.getItem("CA_LANGUAGE") || "en";
     i18n.changeLanguage(lng);
@@ -41,12 +46,14 @@ function App() {
 
   // 获取通用基础信息
   useEffect(() => {
-    baseStore.getChains()
-    baseStore.getMarket()
+    getChains()
+    getMarket()
+    getStocks()
     wsService.init({})
     wsService.subscribe(["summary"], (data) => {
       if (data.type === 'summary') {
-        baseStore.updateRwasPrice(data.data || [])
+        updateRwasPrice(data.data || [])
+        updateStocksPrice(data.data || [])
       }
     })
 
@@ -54,12 +61,6 @@ function App() {
       wsService.close()
     }
   }, [])
-
-  useEffect(() => {
-    if (account) {
-      scanApi.getOpenOrders()
-    }
-  }, [account])
   
   return (
     <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>
