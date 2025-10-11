@@ -1,99 +1,149 @@
 "use client";
 
 import * as React from "react";
-import { CalendarIcon } from "lucide-react";
+import { subDays, format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { type DateRange } from "react-day-picker";
+import VectorSVG from "../pagination/vector.svg?react";
+import ArrowSVG from "./arrow.svg?react";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
+// import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DayPicker, getDefaultClassNames } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import "./custom.css";
 
-function formatDate(date: Date | undefined) {
-  if (!date) {
-    return "";
-  }
+const FormatStr = "yyyy-MM-dd";
 
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
+export function DatePickerWithRange({
+  userSelectedDateRange,
+  onUserSelectedDataRangeChanged,
+}: {
+  userSelectedDateRange: {
+    from: number | undefined;
+    end: number | undefined;
+  };
+  onUserSelectedDataRangeChanged: (dateRange: {
+    startTime?: number;
+    endTime?: number;
+  }) => void;
+}) {
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: userSelectedDateRange.from
+      ? new Date(userSelectedDateRange.from * 1000)
+      : new Date(),
+    to: userSelectedDateRange.end
+      ? new Date(userSelectedDateRange.end * 1000)
+      : new Date(),
   });
-}
 
-function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
-  return !isNaN(date.getTime());
-}
+  const [isOpen, setIsOpen] = React.useState(false);
 
-export default function Calendar28() {
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(
-    new Date("2025-06-01")
-  );
-  const [month, setMonth] = React.useState<Date | undefined>(date);
-  const [value, setValue] = React.useState(formatDate(date));
+  const defaultClassNames = getDefaultClassNames();
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative flex gap-2">
-        <Input
-          id="date"
-          value={value}
-          placeholder="June 01, 2025"
-          className="bg-background pr-10"
-          onChange={(e) => {
-            const date = new Date(e.target.value);
-            setValue(e.target.value);
-            if (isValidDate(date)) {
-              setDate(date);
-              setMonth(date);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setOpen(true);
-            }
-          }}
-        />
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              id="date-picker"
-              variant="ghost"
-              className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
-            >
-              <CalendarIcon className="size-3.5" />
-              <span className="sr-only">Select date</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-auto overflow-hidden p-0"
-            align="end"
-            alignOffset={-8}
-            sideOffset={10}
+    <div className={cn("grid gap-2")}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(_open) => {
+          setIsOpen(_open);
+          if (!_open) {
+            onUserSelectedDataRangeChanged({
+              startTime: date?.from
+                ? Math.floor(date.from.getTime() / 1000)
+                : undefined,
+              endTime: date?.to
+                ? Math.ceil(date.to.getTime() / 1000)
+                : undefined,
+            });
+          }
+        }}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            id="date"
+            className={cn(
+              "w-[275px] h-10 rounded-sm border border-white/10 text-white bg-transparent justify-start text-left font-normal",
+              isOpen ? "border-[rgba(156,255,58,0.5)]" : ""
+            )}
           >
-            <Calendar
-              mode="range"
-              // selected={date}
-              captionLayout="dropdown"
-              month={month}
-              onMonthChange={setMonth}
-              // onSelect={(date) => {
-              //   setDate(date);
-              //   setValue(formatDate(date));
-              //   setOpen(false);
-              // }}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+            <CalendarIcon />
+            {date?.from ? (
+              date.to ? (
+                <>
+                  {format(date.from, FormatStr)}
+                  <ArrowSVG />
+                  {format(date.to, FormatStr)}
+                </>
+              ) : (
+                format(date.from, FormatStr)
+              )
+            ) : (
+              <span>Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-auto p-0"
+          style={{ border: "none" }}
+          align="start"
+        >
+          <DayPicker
+            numberOfMonths={2}
+            captionLayout={"label"}
+            showOutsideDays={false}
+            selected={date}
+            onSelect={(newDate: DateRange | undefined) => {
+              setDate(newDate);
+            }}
+            mode="range"
+            components={{
+              Chevron: ({ className, orientation, ...props }) => {
+                if (orientation === "left") {
+                  return <VectorSVG className="rotate-180" />;
+                }
+                if (orientation === "right") {
+                  return <VectorSVG />;
+                }
+                return (
+                  <VectorSVG className={cn("size-4", className)} {...props} />
+                );
+              },
+            }}
+            classNames={{
+              root: cn(
+                defaultClassNames.root,
+                "w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4"
+              ),
+              nav: cn(
+                defaultClassNames.nav,
+                "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1"
+              ),
+              month_caption: cn(
+                defaultClassNames.month_caption,
+                "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]"
+              ),
+              button_previous: cn(
+                defaultClassNames.button_previous,
+                "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50"
+              ),
+            }}
+          />
+          {/* <Calendar  原生的 Calendar 有奇怪的样式问题，暂时不使用
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
+            onSelect={setDate}
+            numberOfMonths={2}
+          /> */}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

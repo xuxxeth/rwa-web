@@ -1,4 +1,13 @@
 import { create } from "zustand";
+import { subDays } from "date-fns";
+
+function generateDefaultStartTime() {
+  return Math.ceil(subDays(new Date(), 30).getTime() / 1000);
+}
+
+function generateDefaultEndTime() {
+  return Math.ceil(Date.now() / 1000);
+}
 
 export const useOrderFilterStore = create<OrderFilterStore>()((set) => ({
   openOrderFilters: {
@@ -8,10 +17,14 @@ export const useOrderFilterStore = create<OrderFilterStore>()((set) => ({
   orderHistoryFilters: {
     side: ["all"],
     states: ["all"],
+    startTime: generateDefaultStartTime(),
+    endTime: generateDefaultEndTime(),
   },
   tradeHistoryFilters: {
     side: ["all"],
     states: ["all"],
+    startTime: generateDefaultStartTime(),
+    endTime: generateDefaultEndTime(),
   },
 
   updateOpenOrderFilters: (
@@ -55,8 +68,10 @@ export function generateOpenOrderFilterObj(
 
 export interface IOpenOrderHistoryFilter {
   side?: string;
-  states?: string
-  after?: string
+  states?: string;
+  after?: string;
+  startTime?: number;
+  endTime?: number;
 }
 
 export function generateOrderHistoryFilterObj(
@@ -73,12 +88,20 @@ export function generateOrderHistoryFilterObj(
   if (!filters.states.includes("all") && filters.states.length > 0) {
     filterObj.states = filters.states.join(",");
   }
+  if(filters.startTime) {
+    filterObj.startTime = filters.startTime;
+  }
+  if(filters.endTime) {
+    filterObj.endTime = filters.endTime;
+  }
   return filterObj;
 }
 
 export interface ITradeHistoryFilter {
   side?: string;
   after?: string;
+  startTime?: number;
+  endTime?: number;
 }
 
 export function generateTradeHistoryFilterObj(
@@ -92,8 +115,14 @@ export function generateTradeHistoryFilterObj(
   ) {
     filterObj.side = filters.side.join(",");
   }
+  if (filters.startTime) {
+    filterObj.startTime = filters.startTime;
+  }
+  if (filters.endTime) {
+    filterObj.endTime = filters.endTime;
+  }
   return filterObj;
-} 
+}
 
 interface OrderFilterStore {
   openOrderFilters: {
@@ -103,10 +132,14 @@ interface OrderFilterStore {
   orderHistoryFilters: {
     side: string[];
     states: string[];
+    startTime: number;
+    endTime: number;
   };
   tradeHistoryFilters: {
     side: string[];
     states: string[];
+    startTime: number;
+    endTime: number;
   };
   updateOpenOrderFilters: (
     filters: Partial<OrderFilterStore["openOrderFilters"]>
