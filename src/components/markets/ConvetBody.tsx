@@ -7,13 +7,14 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { compareBigNumber, isGreater, isLess, parseAmount } from "@/utils";
+import { compareBigNumber, isGreater, isLess, multiply, parseAmount } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import wsService from "@/service/WebSocketService";
 import { useBaseStore } from "@/stores/baseStore";
+import { useToast } from "@/hooks/useToast";
 
 const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
@@ -27,6 +28,7 @@ export function ConverBody({
   from
 }: ConverBodyProps) {
   const { t } = useTranslation()
+  const { toastError } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
   const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
   const updateInputSize = useTradeStore(state => state.updateInputSize)
@@ -36,13 +38,16 @@ export function ConverBody({
   const expires = useTradeStore(state => state.expires)
   const inputToken = useTradeStore(state => state.inputToken)
   const outputToken = useTradeStore(state => state.outputToken)
-
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
-  const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action])
+  const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken, outputToken])
+  
+  const approveAmount = useMemo(() => {
+    return multiply(orderValue, inputToken?.price ?? '0')
+  }, [orderValue, inputToken])
 
-  const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(orderValue || '0')))
+  const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)
@@ -79,14 +84,14 @@ export function ConverBody({
 
   const handlePlaceOrder = useCallback(async () => {
     const params = {
-      stockId: '1',
+      stockId: String(inputToken?.stockId),
       tradeType: '0',
       side: action === 'buy' ? '0' : '1',
       tif: '1',
       sessionType: '0',
       paymentToken: outputToken?.address || '', // address
-      validDate: String(expires), // s String(7 * 24 * 60 * 60)
-      networkFee: '30000', // 0.002
+      validDate: String(expires), // D
+      networkFee: parseAmount(marketInfo.networkFeeInNative, 18), // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(limitPrice),   // 1 usdt
       size: parseAmount(inputSize)    // 10
@@ -96,8 +101,11 @@ export function ConverBody({
     const result = await placeOrder(params, {})
     setBuying(false)
     console.log(result)
+    if (result && result?.code === -1) {
+      toastError({title: typeof result?.message === 'string' ? result.message : result.message?.name || ''})
+    }
  
-  }, [limitPrice, inputSize, expires, action, paymentToken, outputToken, placeOrder])
+  }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
@@ -109,7 +117,7 @@ export function ConverBody({
     if (Number(orderValue) <= 0) return t('Enter an amount')
     if (isInsufficient) return t("Insufficient USDT")
     
-    return buying ? (action === 'buy' ? 'Buying' : 'Selling') : (actionText + ` ${inputToken?.symbol}`)
+    return (actionText + ` ${inputToken?.symbol}`)
 
   }, [t, actionText, buying, disabled, inputToken, orderValue, isInsufficient])
 
@@ -147,10 +155,12 @@ export function ConverBody({
       }} />
       {
         !account ? <ConnectButtonText /> :
-        <Button variant={buttonVariant} className={cn(
-          "w-full mt-8",
-          from === 'markets' ? 'h-[52px]' : ''
-        )}
+        <Button variant={buttonVariant} 
+          loading={buying}
+          className={cn(
+            "w-full mt-8",
+            from === 'markets' ? 'h-[52px]' : ''
+          )}
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}
         >

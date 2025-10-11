@@ -40,6 +40,13 @@ export const RESPONSE_CODE = {
   SUCCESS: 9200
 }
 
+export const MARKET_STATUS = {
+  DEFAULT: -1,
+  BEFORE: 1,
+  OPEN: 2,
+  AFTER: 3
+}
+
 
 const RED = "#FF6767";
 const GREEN = "#47D0A5";

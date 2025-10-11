@@ -51,7 +51,7 @@ export function multiply(num1: string | number, num2: string | number) {
     return result.toString();
   } catch (error) {
     console.error("乘法计算错误:", error);
-    throw new Error("Invalid number format for multiplication");
+    return '0';
   }
 }
 
@@ -66,7 +66,7 @@ export function divide(num1: string | number, num2: string | number) {
     return result.toString();
   } catch (error) {
     console.error("除法计算错误:", error);
-    throw new Error("Invalid number format for division");
+    return '0';
   }
 }
 
@@ -89,6 +89,14 @@ export function sum(...numbers: (string | number)[]) {
     return total.toString();
   } catch (error) {
     console.error("加法计算错误:", error);
-    throw new Error("Invalid number format for summation");
+    return '0';
   }
+}
+// 返回当前时间距零点的秒数
+export function getSecondsSinceMidnight(): number {
+  const now = new Date()
+  const midnight = new Date(now)
+  midnight.setHours(0, 0, 0, 0)
+  const diffMs = now.getTime() - midnight.getTime()
+  return Math.floor(diffMs / 1000)
 }

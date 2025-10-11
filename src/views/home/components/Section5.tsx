@@ -1,6 +1,6 @@
 import { useId } from "react"
 
-export function Section5() {
+export default function Section5() {
   const ptList = [
     {logo: './images/home/pt_web3dev.png'},
     {logo: './images/home/pt_ploygon.png'},

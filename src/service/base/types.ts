@@ -12,13 +12,16 @@ export interface IChain {
 }
 
 // 股票信息
-export interface IStocks {
+export interface IStock {
   "id": number,
   "stockCode": string,
   "stockName": string,
   "icon": string,
   "state": number,
-  "weight": number
+  "weight": number,
+  "price"?: string , 
+  "up"?: string, 
+  "cPrice"?: string, 
 }
 // token信息
 export interface IToken {

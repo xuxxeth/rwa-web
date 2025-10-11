@@ -1,11 +1,13 @@
 
 import { Menus } from "@/components/menu";
-import { Section1 } from "./components/Section1";
-import { Section2 } from "./components/Section2";
-import { Section3 } from "./components/Section3";
-import { Section4 } from "./components/Section4";
-import { Section5 } from "./components/Section5";
 import { XFooter } from "@/components/footer";
+import { lazy } from "react";
+import { Section1 } from "./components/Section1";
+const Section2 = lazy(() => import("./components/Section2"));
+const Section3 = lazy(() => import("./components/Section3"));
+const Section4 = lazy(() => import("./components/Section4"));
+const Section5 = lazy(() => import("./components/Section5"));
+
 
 function Home() {
   return (

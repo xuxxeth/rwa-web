@@ -1,5 +1,6 @@
 import { useId } from "react"
 import { cn } from "@/utils"
+import { useRouter } from "@/hooks/useRouter"
 
 export function Section1() {
   const starList = [
@@ -13,6 +14,7 @@ export function Section1() {
     // {path: './images/icons/star/8.png'},
   ]
   const _id = useId()
+  const router = useRouter()
   return (
     <>
       {
@@ -35,7 +37,11 @@ export function Section1() {
             <div className="text-[18px] leading-[26px] text-center w-[680px] ">Our platform unites traditional finance with blockchain innovation, enabling tokenized assets and on-chain trading to transform capital markets—making them more efficient, transparent, and accessible.</div>
           </div>
           <div className="flex justify-center mt-[64px]">
-            <div className="bg-[#FFFFFF] rounded-[100px] h-[64px] flex items-center justify-center px-[90px] text-[#1A1B23] font-semibold text-[18px]">Start Trading</div>
+            <div className="bg-[#FFFFFF] rounded-[100px] h-[64px] flex items-center justify-center px-[90px] text-[#1A1B23] font-semibold text-[18px] cursor-pointer"
+              onClick={() => {
+                router.push('/markets')
+              }}
+            >Start Trading</div>
           </div>
         </div>
       </div>

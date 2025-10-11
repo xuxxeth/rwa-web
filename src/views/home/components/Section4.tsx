@@ -1,6 +1,6 @@
 import { useId } from "react"
 
-export function Section4() {
+export default function Section4() {
   const descList = [
     {
       title: 'Built on Trust and Transparency',
