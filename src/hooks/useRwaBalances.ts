@@ -40,9 +40,8 @@ export function useRwaBalances() {
 }
 
 export function useRwas() {
-  const baseStore = useBaseStore()
+  const rwaList = useBaseStore(state => state.rwaList)
   const chainId = useChainId()
-  const rwaList = useMemo(() => baseStore.rwaList, [baseStore.rwaList])
   
   return useMemo(() => {
     if (chainId && rwaList) {

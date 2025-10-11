@@ -211,3 +211,41 @@ export function readableDuration(seconds: number) {
     verbose: true,
   });
 }
+
+export function compareBigNumber(a: string | number, b: string | number): -1 | 0 | 1 {
+  const numA = new BigNumber(a);
+  const numB = new BigNumber(b);
+  console.log(a, b)
+  if (numA.isLessThan(numB)) return -1;
+  if (numA.isGreaterThan(numB)) return 1;
+  return 0;
+}
+
+function toBN(value: string | number | BigNumber): BigNumber {
+  return new BigNumber(value ?? 0);
+}
+
+/** 是否相等 */
+export function isEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+  return toBN(a).isEqualTo(toBN(b));
+}
+
+/** 是否大于 */
+export function isGreater(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+  return toBN(a).isGreaterThan(toBN(b));
+}
+
+/** 是否大于等于 */
+export function isGreaterOrEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+  return toBN(a).isGreaterThanOrEqualTo(toBN(b));
+}
+
+/** 是否小于 */
+export function isLess(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+  return toBN(a).isLessThan(toBN(b));
+}
+
+/** 是否小于等于 */
+export function isLessOrEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+  return toBN(a).isLessThanOrEqualTo(toBN(b));
+}

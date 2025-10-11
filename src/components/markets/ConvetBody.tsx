@@ -7,15 +7,14 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { parseAmount } from "@/utils";
+import { compareBigNumber, isGreater, isLess, parseAmount } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import wsService from "@/service/WebSocketService";
+import { useBaseStore } from "@/stores/baseStore";
 
-const usdtToken = '0xbeD5856646F1faBDFc565F47f8Ea18685466B745'
-const applcToken = '0xE6d44C1f14D98AEf73c822d0319751701D54D4cc'
 const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
 type ConverBodyProps = {
@@ -28,23 +27,28 @@ export function ConverBody({
   from
 }: ConverBodyProps) {
   const { t } = useTranslation()
-  const tradeStore = useTradeStore()
+  const marketInfo = useBaseStore(state => state.marketInfo)
+  const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
+  const updateInputSize = useTradeStore(state => state.updateInputSize)
+  const updateExpires = useTradeStore(state => state.updateExpires)
+  const limitPrice = useTradeStore(state => state.limitPrice)
+  const inputSize = useTradeStore(state => state.inputSize)
+  const expires = useTradeStore(state => state.expires)
+  const inputToken = useTradeStore(state => state.inputToken)
+  const outputToken = useTradeStore(state => state.outputToken)
+
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
+  const [orderValue, setOrderValue] = useState('')
+  const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action])
 
-  const [limitPrice, setLimitPrice] = useState('0')
-  const [quantity, setQuantity] = useState('0')
-  const [orderValue, setOrderValue] = useState('0')
-  const paymentToken = useMemo(() => action === 'buy' ? usdtToken : applcToken, [action])
-
-  const { placeOrder, approvalState, allowance } = useTrading(paymentToken, trading, BigInt(parseAmount(orderValue)))
-  console.log('approvalState: ', approvalState, allowance)
-  console.log('orderValue: ', parseAmount(orderValue))
+  const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(orderValue || '0')))
+  console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
-    tradeStore.updateLimitPrice(value)
+    updateLimitPrice(value)
   }, [])
   const hanleInputQuantity = useCallback(async (value: string) => {
-    tradeStore.updateInputSize(value)
+    updateInputSize(value)
   }, [])
 
   const handleSubscribe = (data: any) => {
@@ -60,17 +64,17 @@ export function ConverBody({
   }, [])
   
   useEffect(() => {
-    if (Number(tradeStore.limitPrice) && Number(tradeStore.inputSize)) {
-      const result = new BigNumber(tradeStore.limitPrice)
-        .multipliedBy(tradeStore.inputSize)
+    if (Number(limitPrice) && Number(inputSize)) {
+      const result = new BigNumber(limitPrice)
+        .multipliedBy(inputSize)
         .decimalPlaces(6, BigNumber.ROUND_DOWN) // 保留 6 位小数，向下取整
       setOrderValue(result.toFixed())
+    } else {
+      setOrderValue('')
     }
     
-  }, [tradeStore.limitPrice, tradeStore.inputSize])
+  }, [limitPrice, inputSize])
 
-  const disabled = useMemo(() => Number(orderValue) <= 0, [orderValue])
-  const [txHistory, setTxHistory] = useState<string[]>([])
   const [buying, setBuying] = useState(false)
 
   const handlePlaceOrder = useCallback(async () => {
@@ -80,12 +84,12 @@ export function ConverBody({
       side: action === 'buy' ? '0' : '1',
       tif: '1',
       sessionType: '0',
-      paymentToken: usdtToken, // address
-      validDate: String(tradeStore.expires), // s String(7 * 24 * 60 * 60)
+      paymentToken: outputToken?.address || '', // address
+      validDate: String(expires), // s String(7 * 24 * 60 * 60)
       networkFee: '30000', // 0.002
       amount: '0', // 10 usdt
-      price: parseAmount(tradeStore.limitPrice),   // 1 usdt
-      size: parseAmount(tradeStore.inputSize)    // 10
+      price: parseAmount(limitPrice),   // 1 usdt
+      size: parseAmount(inputSize)    // 10
     }
     console.log(params)
     setBuying(true)
@@ -93,10 +97,21 @@ export function ConverBody({
     setBuying(false)
     console.log(result)
  
-  }, [tradeStore.limitPrice, tradeStore.inputSize, tradeStore.expires, action, paymentToken, placeOrder])
+  }, [limitPrice, inputSize, expires, action, paymentToken, outputToken, placeOrder])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
-  const buttonText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
+  const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
+  const isInsufficient = useMemo(() => orderValue ? (isGreater(orderValue, outputToken?.balance || '0')) : false, [orderValue, outputToken])
+
+  const disabled = useMemo(() => Number(orderValue) <= 0 || !!isInsufficient, [orderValue, isInsufficient])
+
+  const buttonText = useMemo(() => {
+    if (Number(orderValue) <= 0) return t('Enter an amount')
+    if (isInsufficient) return t("Insufficient USDT")
+    
+    return buying ? (action === 'buy' ? 'Buying' : 'Selling') : (actionText + ` ${inputToken?.symbol}`)
+
+  }, [t, actionText, buying, disabled, inputToken, orderValue, isInsufficient])
 
   return (
     <div className="mt-4">
@@ -120,20 +135,16 @@ export function ConverBody({
         mode="out"
         label={t('Order Value')}
         value={orderValue}
+        isInsufficient={isInsufficient}
       />
       <EstimatedInfo
-        expires={tradeStore.expires}
+        marketInfo={marketInfo}
+        inputToken={inputToken}
+        outputToken={outputToken}
+        expires={expires}
         onEdit={() => {
         expiresDialog.show()
       }} />
-      {/* <div className=" flex flex-col gap-y-3">
-        {
-          txHistory.map(hash => {
-            return <a href={`https://testnet.bscscan.com/tx/${hash}`} target="_blank" key={hash} className=" underline text-blue-500">{hash}</a>
-          })
-        }
-      </div> */}
-      
       {
         !account ? <ConnectButtonText /> :
         <Button variant={buttonVariant} className={cn(
@@ -143,7 +154,7 @@ export function ConverBody({
           disabled={disabled || buying}
           onClick={() => handlePlaceOrder()}
         >
-          { disabled ? t('Enter an amount') : buying ? (action === 'buy' ? 'Buying' : 'Selling') : (buttonText + ' APPLc') }
+          { buttonText }
           
         </Button>
       }
@@ -153,7 +164,7 @@ export function ConverBody({
         openChange={expiresDialog.setOpen}
       > 
         <ExpiresSetting onConfirm={value => {
-          tradeStore.updateExpires(value)
+          updateExpires(value)
           expiresDialog.hide()
         } } />
       </DialogController>

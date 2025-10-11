@@ -1,8 +1,6 @@
 import { memo, useEffect, useMemo, useState } from "react"
 import { NumberInput } from "./NumberInput"
 import { LazyImage } from "../image/LazyImage"
-import type { TokenProps } from "../token-list"
-import type { CTokenProps } from "../ctoken-list"
 import { cn } from "@/lib/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 
@@ -14,8 +12,10 @@ type CurrencyInputProps = {
   placeholder?: string
   from?: string
   regex?: string
+  isInsufficient?: boolean
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
+  onFocus?: (focus: boolean) => void
 }
 
 const CurrencyInput = memo(
@@ -27,8 +27,10 @@ const CurrencyInput = memo(
     value,
     from,
     regex,
+    isInsufficient,
     onCurrencyClick,
-    onUserInput
+    onUserInput,
+    onFocus
   }: CurrencyInputProps) => {
     const [inputValue, setInputValue] = useState('')
     useEffect(() => {
@@ -39,7 +41,8 @@ const CurrencyInput = memo(
         <NumberInput 
           className={cn(
             "flex-1 min-w-0",
-            from === 'markets' ? ' placeholder:text-[18px] text-[18px] flex-1' : ''
+            from === 'markets' ? ' placeholder:text-[18px] text-[18px] flex-1' : '',
+            isInsufficient ? "text-[#FF593C]" : ""
           )}
           placeholder={placeholder}
           disabled={disabled}
@@ -49,6 +52,7 @@ const CurrencyInput = memo(
             setInputValue(input)
             onUserInput && onUserInput(input)
           }} 
+          onFocus={onFocus}
           
         />
         {

@@ -8,7 +8,7 @@ export interface WSMessage {
 }
 export interface ResMessage {
   type: string;
-  data: string;
+  data: any;
 }
 
 type Listener = (data: ResMessage) => void;

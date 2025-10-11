@@ -84,3 +84,14 @@ export interface IMarketState {
   "tradingDayType": number,
   "status": number
 }
+
+export interface IRwaPrice {
+  "S": string,          // 股票编号    
+  "p": number,  // 最新价
+  "o": number,  // 今开价
+  "l": number,  // 最低价
+  "h": number,  // 最高价
+  "c": number,  // 当日收盘价
+  "pc": number, // 昨日收盘价
+  "T": number  // 时间戳(秒)
+}

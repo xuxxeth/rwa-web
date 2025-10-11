@@ -4,7 +4,8 @@ import type { BaseStore } from './types'
 import { baseApi } from "@/service/base/api"
 import { RESPONSE_CODE } from '@/config/constants'
 import { marketDefault, marketStateDefault } from './defaultData'
-import type { IRwa, IToken } from '@/service/base/types'
+import type { IRwa, IRwaPrice, IToken } from '@/service/base/types'
+import { truncate } from '@/utils'
 
 export const useBaseStore = create<BaseStore>()(
   persist(
@@ -54,7 +55,7 @@ export const useBaseStore = create<BaseStore>()(
       getMarket: async () => {
         const res = await baseApi.getMarket();
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ marketInfo: res.data || [] });
+          set({ marketInfo: {...(res.data || {})} });
         }
         return res;
       },
@@ -83,6 +84,18 @@ export const useBaseStore = create<BaseStore>()(
           lastInitTime: Date.now(),
         }));
       },
+      updateRwasPrice: (priceList: IRwaPrice[]) => {
+        const rwaList = get().rwaList.map(rwa => {
+          const price = priceList.find(price => price.S === rwa.symbol)
+          return {
+            ...rwa,
+            price: truncate(price?.p || 0, rwa.precision),
+            up: truncate(price?.o && price?.p ? price.p - price.o : 0, 2)
+          }
+        })
+        set({ rwaList: rwaList })
+
+      }
     }),
     {
       name: "CA_WEB_BASE_INFO",
