@@ -199,7 +199,7 @@ const openOrderTableConfig: ITableConfnig<IOpenOrder, { rwaTokens: IRwa[] }> = [
   },
 ];
 
-function CancelOrderButton(props: { orderId: number }) {
+function CancelOrderButton(props: { orderId: string }) {
   const { t } = useTranslation();
   const { orderId } = props;
   const { cancelOrder } = useTradeUtils();
@@ -209,7 +209,8 @@ function CancelOrderButton(props: { orderId: number }) {
   const handleCancelOrder = async () => {
     try {
       setIsCanceling(true);
-      await cancelOrder(orderId, { wait: true });
+      // TODO: 需要在 ca-common-web 里修复
+      await cancelOrder(orderId as unknown as number, { wait: true });
       toastSuccess({
         title: t("assets.order.cancelOrderSuccess"),
       });

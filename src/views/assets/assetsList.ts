@@ -108,7 +108,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
 
 export interface IAssetItem {
   rwaId?: number;
-  token?: string;
+  token: string;
   name?: string;
   holdings?: string;
   decimals?: number;

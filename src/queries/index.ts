@@ -114,40 +114,41 @@ export function tradeHistoryOptions(
   });
 }
 
-export function infiniteTradeHistoryOptions(
-  chainId: number,
-  isSignatureValid: boolean
-) {
-  return infiniteQueryOptions<
-    {
-      data: ITrade[];
-      nextPage: number | undefined;
-    },
-    Error,
-    InfiniteData<
-      {
-        data: ITrade[];
-        nextPage: number | undefined;
-      },
-      number | undefined
-    >,
-    [string, number],
-    number | undefined
-  >({
-    queryKey: ["infiniteTradeHistory", chainId],
-    queryFn: async ({ pageParam }) => {
-      // pageParam 是前一页的最后一个orderId，初始值为undefined
-      const data = await scanApi.getTrades(chainId, pageParam, 10);
-      const trades = data.data ?? [];
+// export function infiniteTradeHistoryOptions(
+//   chainId: number,
+//   isSignatureValid: boolean,
+//   filters?: ITradeHistoryFilter
+// ) {
+//   return infiniteQueryOptions<
+//     {
+//       data: ITrade[];
+//       nextPage: number | undefined;
+//     },
+//     Error,
+//     InfiniteData<
+//       {
+//         data: ITrade[];
+//         nextPage: number | undefined;
+//       },
+//       number | undefined
+//     >,
+//     [string, number],
+//     string | undefined
+//   >({
+//     queryKey: ["infiniteTradeHistory", chainId],
+//     queryFn: async ({ pageParam }) => {
+//       // pageParam 是前一页的最后一个orderId，初始值为undefined
+//       const data = await scanApi.getTrades({ ...filters, after: pageParam });
+//       const trades = data.data ?? [];
 
-      return {
-        data: trades,
-        nextPage:
-          trades.length > 0 ? trades[trades.length - 1].orderId : undefined,
-      };
-    },
-    initialPageParam: undefined,
-    getNextPageParam: (lastPage) => lastPage?.nextPage,
-    enabled: chainId !== null && isSignatureValid,
-  });
-}
+//       return {
+//         data: trades,
+//         nextPage:
+//           trades.length > 0 ? trades[trades.length - 1].orderId : undefined,
+//       };
+//     },
+//     initialPageParam: undefined,
+//     getNextPageParam: (lastPage) => lastPage?.nextPage,
+//     enabled: chainId !== null && isSignatureValid,
+//   });
+// }

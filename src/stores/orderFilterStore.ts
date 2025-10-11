@@ -77,6 +77,7 @@ export function generateOrderHistoryFilterObj(
 
 export interface ITradeHistoryFilter {
   side?: string;
+  after?: string;
 }
 
 export function generateTradeHistoryFilterObj(
