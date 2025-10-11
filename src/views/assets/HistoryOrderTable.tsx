@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import {
   TableHeader,
   TableBody,
   type ITableConfnig,
 } from "@/components/table-header";
 import { type IRwa } from "@/service/base/types";
-import { orderHistoryOptions } from "@/queries";
-import { useQuery } from "@tanstack/react-query";
+import { orderHistoryOptions, infiniteOrderHistoryOptions } from "@/queries";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { type IOrder } from "@/service/scan/types";
 import { noop } from "@/utils";
 import {
@@ -44,20 +44,60 @@ export default function HistoryOrderTable(props: {
   const filters = useMemo(() => {
     const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters);
     const otherFilter = {
-      limit: 30,
+      limit: 10,
     };
     return { ...userSelectFilter, ...otherFilter };
   }, [orderHistoryFilters]);
 
+  // const {
+  //   data,
+  //   isPending,
+  //   status: queryStatus,
+  //   isError,
+  //   error,
+  // } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
+
   const {
     data,
-    isPending,
-    status: queryStatus,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
     isError,
-    error,
-  } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
+  } = useInfiniteQuery(
+    infiniteOrderHistoryOptions(chainId, isSignatureValid, filters)
+  );
 
-  console.log("===> order history", data);
+  const allOrders = data?.pages?.flatMap((page) => page.data) || [];
+
+  console.log("===> order history", data, "===> hasNextPage", hasNextPage);
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (
+        entries[0].isIntersecting &&
+        hasNextPage &&
+        !isFetching &&
+        !isFetchingNextPage
+      ) {
+        // 当滚动到加载更多区域且有下一页数据时，触发加载
+        fetchNextPage();
+      }
+    });
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -111,12 +151,29 @@ export default function HistoryOrderTable(props: {
         onSortChange={noop}
       />
       {isSignatureValid ? (
-        <TableBody<IOrder, { rwaTokens: IRwa[] }>
-          data={data ?? []}
-          config={orderHistoryTableConfig}
-          extra={{ rwaTokens }}
-          getKey={(item: IOrder) => item.orderId}
-        />
+        <>
+          <TableBody<IOrder, { rwaTokens: IRwa[] }>
+            data={allOrders}
+            config={orderHistoryTableConfig}
+            extra={{ rwaTokens }}
+            getKey={(item: IOrder) => item.orderId}
+          />
+          <div ref={loadMoreRef} className="py-4 text-center">
+            {isFetchingNextPage ? (
+              <div className="text-gray-500">加载中...</div>
+            ) : hasNextPage ? (
+              <div className="text-gray-400">滚动加载更多</div>
+            ) : allOrders.length > 0 ? (
+              <div className="text-gray-400">没有更多数据了</div>
+            ) : null}
+          </div>
+          {isLoading && allOrders.length === 0 && (
+            <div className="py-8 text-center text-gray-500">加载中...</div>
+          )}
+          {!isLoading && allOrders.length === 0 && (
+            <div className="py-8 text-center text-gray-400">暂无数据</div>
+          )}
+        </>
       ) : (
         <SignatureVerify
           className="mt-9"
@@ -206,8 +263,8 @@ const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
     render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
   {
-    key: 'orderId',
+    key: "orderId",
     sortable: false,
     render: (item: IOrder) => <TextCell text={item.orderId} />,
-  }
+  },
 ];

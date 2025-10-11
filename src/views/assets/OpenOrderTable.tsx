@@ -3,11 +3,11 @@ import {
   TableBody,
   type ITableConfnig,
 } from "@/components/table-header";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type IRwa } from "@/service/base/types";
-import { openOrderOptions } from "@/queries";
-import { useQuery } from "@tanstack/react-query";
+import { openOrderOptions, infiniteOpenOrderOptions } from "@/queries";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { type IOpenOrder } from "@/service/scan/types";
 import {
   SideCell,
@@ -54,14 +54,53 @@ export default function OpenOrderTable(props: {
     return { ...userSelectFilter, ...otherFilter };
   }, [openOrderFilters]);
 
+  // const {
+  //   data,
+  //   isPending,
+  //   status: queryStatus,
+  //   isError,
+  //   error,
+  //   refetch,
+  // } = useQuery(openOrderOptions(chainId, isSignatureValid, filter));
   const {
     data,
-    isPending,
-    status: queryStatus,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
     isError,
-    error,
-    refetch,
-  } = useQuery(openOrderOptions(chainId, isSignatureValid, filter));
+  } = useInfiniteQuery(
+    infiniteOpenOrderOptions(chainId, isSignatureValid, filter)
+  );
+
+  const allOpenOrders = data?.pages?.flatMap((page) => page.data) || [];
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (
+        entries[0].isIntersecting &&
+        hasNextPage &&
+        !isFetching &&
+        !isFetchingNextPage
+      ) {
+        // 当滚动到加载更多区域且有下一页数据时，触发加载
+        fetchNextPage();
+      }
+    });
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
 
   return (
     <>
@@ -101,12 +140,29 @@ export default function OpenOrderTable(props: {
         onSortChange={noop}
       />
       {isSignatureValid ? (
-        <TableBody<IOpenOrder, { rwaTokens: IRwa[] }>
-          data={data ?? []}
-          config={openOrderTableConfig}
-          extra={{ rwaTokens }}
-          getKey={(item: IOpenOrder) => item.id}
-        />
+        <>
+          <TableBody<IOpenOrder, { rwaTokens: IRwa[] }>
+            data={allOpenOrders}
+            config={openOrderTableConfig}
+            extra={{ rwaTokens }}
+            getKey={(item: IOpenOrder) => item.id}
+          />
+          <div ref={loadMoreRef} className="py-4 text-center">
+            {isFetchingNextPage ? (
+              <div className="text-gray-500">加载中...</div>
+            ) : hasNextPage ? (
+              <div className="text-gray-400">滚动加载更多</div>
+            ) : allOpenOrders.length > 0 ? (
+              <div className="text-gray-400">没有更多数据了</div>
+            ) : null}
+          </div>
+          {isLoading && allOpenOrders.length === 0 && (
+            <div className="py-8 text-center text-gray-500">加载中...</div>
+          )}
+          {!isLoading && allOpenOrders.length === 0 && (
+            <div className="py-8 text-center text-gray-400">暂无数据</div>
+          )}
+        </>
       ) : (
         <SignatureVerify
           className="mt-9"
