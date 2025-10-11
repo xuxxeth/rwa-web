@@ -37,7 +37,6 @@ export function useRequestSignature() {
 export function useSignatureValidStatus(): [boolean, () => void] {
   const { validSignature } = useRequestSignature();
   const [isSignatureValid, setIsSignatureValid] = useState(!!validSignature());
-  console.log('===> isSignatureValid', isSignatureValid);
 
   const refreshIsSignatureValid = () => {
     setIsSignatureValid(!!validSignature());

@@ -36,6 +36,7 @@ export const useOrderFilterStore = create<OrderFilterStore>()((set) => ({
 
 export interface IOpenOrderFilter {
   side?: string;
+  after?: string;
 }
 
 export function generateOpenOrderFilterObj(

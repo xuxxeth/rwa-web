@@ -7,8 +7,8 @@ import {
   SideCell,
   TxHashCell,
 } from "./Shared";
-import { useQuery } from "@tanstack/react-query";
-import { tradeHistoryOptions } from "@/queries";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { infiniteTradeHistoryOptions, tradeHistoryOptions } from "@/queries";
 import {
   noop,
   formatTimestamp,
@@ -47,49 +47,63 @@ function TradeHistory(props: {
   const filters = useMemo(() => {
     const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters);
     const otherFilter = {
-      limit: 30,
+      limit: 10,
     };
     return { ...userSelectFilter, ...otherFilter };
   }, [tradeHistoryFilters]);
 
+  // const {
+  //   data,
+  //   isPending,
+  //   status: queryStatus,
+  //   isError,
+  //   error,
+  // } = useQuery(tradeHistoryOptions(chainId, isSignatureValid, filters));
+
   const {
     data,
-    isPending,
+    isLoading,
     status: queryStatus,
     isError,
     error,
-  } = useQuery(tradeHistoryOptions(chainId, isSignatureValid, filters));
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(
+    infiniteTradeHistoryOptions(chainId, isSignatureValid, filters)
+  );
 
   console.log("===> trade history data", data);
 
   // 用于检测滚动到底部的ref
-  // const loadMoreRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver((entries) => {
-  //     if (
-  //       entries[0].isIntersecting &&
-  //       hasNextPage &&
-  //       !isFetching &&
-  //       !isFetchingNextPage
-  //     ) {
-  //       // 当滚动到加载更多区域且有下一页数据时，触发加载
-  //       fetchNextPage();
-  //     }
-  //   });
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (
+        entries[0].isIntersecting &&
+        hasNextPage &&
+        !isFetching &&
+        !isFetchingNextPage
+      ) {
+        // 当滚动到加载更多区域且有下一页数据时，触发加载
+        fetchNextPage();
+      }
+    });
 
-  //   if (loadMoreRef.current) {
-  //     observer.observe(loadMoreRef.current);
-  //   }
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
 
-  //   return () => {
-  //     if (loadMoreRef.current) {
-  //       observer.unobserve(loadMoreRef.current);
-  //     }
-  //   };
-  // }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
 
-  // const allTrads = data?.pages.flatMap((page) => page.data) || [];
+  const allTrads = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <>
@@ -116,12 +130,29 @@ function TradeHistory(props: {
         onSortChange={noop}
       />
       {isSignatureValid ? (
-        <TableBody
-          data={data ?? []}
-          config={tradeHistoryTableConfig}
-          extra={{ rwaTokens }}
-          getKey={(item: ITrade) => item.id}
-        />
+        <>
+          <TableBody
+            data={allTrads}
+            config={tradeHistoryTableConfig}
+            extra={{ rwaTokens }}
+            getKey={(item: ITrade) => item.id}
+          />
+          <div ref={loadMoreRef} className="py-4 text-center">
+            {isFetchingNextPage ? (
+              <div className="text-gray-500">加载中...</div>
+            ) : hasNextPage ? (
+              <div className="text-gray-400">滚动加载更多</div>
+            ) : allTrads.length > 0 ? (
+              <div className="text-gray-400">没有更多数据了</div>
+            ) : null}
+          </div>
+          {isLoading && allTrads.length === 0 && (
+            <div className="py-8 text-center text-gray-500">加载中...</div>
+          )}
+          {!isLoading && allTrads.length === 0 && (
+            <div className="py-8 text-center text-gray-400">暂无数据</div>
+          )}
+        </>
       ) : (
         <SignatureVerify
           className="mt-9"
@@ -193,10 +224,10 @@ const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
     render: (item: ITrade) => <TxHashCell hash={item.txHash} />,
   },
   {
-    key: 'orderId',
+    key: "orderId",
     sortable: false,
     render: (item: ITrade) => <TextCell text={item.orderId} />,
-  }
+  },
 ];
 
 export default TradeHistory;
