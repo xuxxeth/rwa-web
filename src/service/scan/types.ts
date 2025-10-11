@@ -28,7 +28,7 @@ export interface IOpenOrder {
 
 export interface IOrder {
   id: number;
-  orderId: number;
+  orderId: string;
   chainId: number;
   stockId: number;
   orderType: OrderType;
@@ -56,7 +56,7 @@ export interface ITrade {
   amount: string;
   chainId: number;
   id: number;
-  orderId: number;
+  orderId: string;
   orderType: OrderType;
   side: OrderSide;
   // 成交数量

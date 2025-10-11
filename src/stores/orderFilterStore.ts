@@ -55,6 +55,7 @@ export function generateOpenOrderFilterObj(
 export interface IOpenOrderHistoryFilter {
   side?: string;
   states?: string
+  after?: string
 }
 
 export function generateOrderHistoryFilterObj(
