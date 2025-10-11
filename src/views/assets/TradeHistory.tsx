@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   DropDownFilter,
@@ -7,8 +7,8 @@ import {
   SideCell,
   TxHashCell,
 } from "./Shared";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { tradeHistoryOptions, infiniteTradeHistoryOptions } from "@/queries";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { infiniteTradeHistoryOptions, tradeHistoryOptions } from "@/queries";
 import {
   noop,
   formatTimestamp,
@@ -24,6 +24,12 @@ import {
   TableBody,
   type ITableConfnig,
 } from "@/components/table-header";
+import {
+  useOrderFilterStore,
+  generateTradeHistoryFilterObj,
+} from "@/stores/orderFilterStore";
+import { useSignatureValidStatus } from "@/hooks/useSignature";
+import SignatureVerify from "./SignatureVerify";
 
 function TradeHistory(props: {
   chainId: number;
@@ -31,17 +37,42 @@ function TradeHistory(props: {
   rwaTokens: IRwa[];
 }) {
   const { chainId, account, rwaTokens } = props;
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus();
 
   const { t } = useTranslation();
 
-  // const { data } = useQuery(tradeHistoryOptions(chainId));
+  const { tradeHistoryFilters, updateTradeHistoryFilters } =
+    useOrderFilterStore();
 
-  // console.log("===> trade history data", data);
+  const filters = useMemo(() => {
+    const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters);
+    const otherFilter = {
+      limit: 10,
+    };
+    return { ...userSelectFilter, ...otherFilter };
+  }, [tradeHistoryFilters]);
 
-  const [orderTypes, setOrderTypes] = useState<string[]>(["all"]);
+  // const {
+  //   data,
+  //   isPending,
+  //   status: queryStatus,
+  //   isError,
+  //   error,
+  // } = useQuery(tradeHistoryOptions(chainId, isSignatureValid, filters));
 
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useInfiniteQuery(infiniteTradeHistoryOptions(chainId));
+  const {
+    data,
+    isLoading,
+    status: queryStatus,
+    isError,
+    error,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery(
+    infiniteTradeHistoryOptions(chainId, isSignatureValid, filters)
+  );
 
   console.log("===> trade history data", data);
 
@@ -78,9 +109,16 @@ function TradeHistory(props: {
     <>
       <div>
         <DropDownFilter
-          data={orderTypes}
-          onDataChange={setOrderTypes}
-          items={[{ key: "buy" }, { key: "sell" }]}
+          data={tradeHistoryFilters.side}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateTradeHistoryFilters({
+              side: reduce(tradeHistoryFilters.side),
+            })
+          }
+          items={[
+            { key: "buy", value: "0" },
+            { key: "sell", value: "1" },
+          ]}
           title="orderType"
         />
       </div>
@@ -91,12 +129,36 @@ function TradeHistory(props: {
         className="border-none bg-white/4 rounded-md text-60"
         onSortChange={noop}
       />
-      <TableBody
-        data={allTrads}
-        config={tradeHistoryTableConfig}
-        extra={{ rwaTokens }}
-        getKey={(item: ITrade) => item.id}
-      />
+      {isSignatureValid ? (
+        <>
+          <TableBody
+            data={allTrads}
+            config={tradeHistoryTableConfig}
+            extra={{ rwaTokens }}
+            getKey={(item: ITrade) => item.id}
+          />
+          <div ref={loadMoreRef} className="py-4 text-center">
+            {isFetchingNextPage ? (
+              <div className="text-gray-500">加载中...</div>
+            ) : hasNextPage ? (
+              <div className="text-gray-400">滚动加载更多</div>
+            ) : allTrads.length > 0 ? (
+              <div className="text-gray-400">没有更多数据了</div>
+            ) : null}
+          </div>
+          {isLoading && allTrads.length === 0 && (
+            <div className="py-8 text-center text-gray-500">加载中...</div>
+          )}
+          {!isLoading && allTrads.length === 0 && (
+            <div className="py-8 text-center text-gray-400">暂无数据</div>
+          )}
+        </>
+      ) : (
+        <SignatureVerify
+          className="mt-9"
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
+      )}
     </>
   );
 }
@@ -160,6 +222,11 @@ const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
     key: "txId",
     sortable: false,
     render: (item: ITrade) => <TxHashCell hash={item.txHash} />,
+  },
+  {
+    key: "orderId",
+    sortable: false,
+    render: (item: ITrade) => <TextCell text={item.orderId} />,
   },
 ];
 

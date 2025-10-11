@@ -115,6 +115,7 @@
     },
     "order": {
       "openOrders": "Open Orders",
+      "cancelOrder": "Cancel Order",
 
       "tableHeader": {
         "side": "SIDE",
@@ -145,14 +146,24 @@
       "action": "Action",
       "orderHistory": "Order History",
       "orderType": "Order Type",
-      "status": "Status",
+      "orderStatus": "Status",
       "all": "All",
       "buy": "Buy",
       "sell": "Sell",
       "partiallyFilled": "Partially Filled",
-      "open": "Open"
+      "open": "Open",
+      "failed": "Order Failed",
+      "canceled": "Canceled",
+      "filled": "Filled",
+      "cancelOrderSuccess": "Cancel Order Success",
+      "cancelOrdering": "Canceling"
     }
   },
+  "signatureVerify": "Signature Verification",
+  "signatureVerifyDescTop": "为保证您的个人信息安全,",
+  "signatureVerifyDescBottom": "进行钱包签名以查看订单和成交记录相关信息",
+  
+  "gotoSignature": "进行签名",
   "Coming Soon": "Coming Soon",
   "Holdings Only": "Holdings Only",
   "Name": "Name",
