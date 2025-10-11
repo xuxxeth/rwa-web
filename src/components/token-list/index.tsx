@@ -36,12 +36,6 @@ const TokenItem = memo(
     )
   }
 )
-export const tokenList: TokenProps[] = [
-  {name: 'Tether USD', symbol: 'USDT', icon: '/images/tokens/usdt.png', balance: '100.3'},
-  {name: 'USD coin', symbol: 'USDC', icon: '/images/tokens/usdc.png', balance: '100.3'},
-  {name: 'BNB', symbol: 'BNB', icon: '/images/tokens/bnb.png', balance: '0'},
-  {name: 'OKB', symbol: 'OKB', icon: '/images/tokens/okb.png', balance: '0'},
-]
 
 const TokenList = memo(
   ({

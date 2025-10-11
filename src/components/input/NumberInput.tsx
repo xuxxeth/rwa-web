@@ -14,7 +14,7 @@ type NumberInputProps = {
   className?: string
   regex?: string
   onInput: (input: string) => void
-
+  onFocus?: (focus: boolean) => void
 }
 
 const NumberInput = memo(
@@ -24,7 +24,8 @@ const NumberInput = memo(
     disabled,
     placeholder,
     regex = `^\\d*(?:\\\\[.])?\\d{0,2}$`,
-    onInput
+    onInput,
+    onFocus
   }: NumberInputProps) => {
   const inputRegex = RegExp(regex)
   const enforcer = (nextUserInput: string) => {
@@ -37,13 +38,19 @@ const NumberInput = memo(
       <Input
         disabled={disabled}
         className={cn(
-          "flex-1 w-auto text-[28px] placeholder:text-[rgba(255,255,255,0.3)] placeholder:text-[20px] placeholder:font-medium disabled:opacity-100 text-white font-semibold h-[42px]",
+          "caret-[#9CFF3A] leading-tight flex-1 w-auto text-[28px] placeholder:text-[rgba(255,255,255,0.3)] placeholder:text-[20px] placeholder:font-medium disabled:opacity-100 text-white font-semibold h-[42px]",
           className
         )}
         placeholder={placeholder || '0'}
         value={value}
         onChange={e => {
           enforcer(e.target.value)
+        }}
+        onFocus={() => {
+          onFocus && onFocus(true)
+        }}
+        onBlur={() => {
+          onFocus && onFocus(false)
         }}
       />
     )

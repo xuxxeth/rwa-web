@@ -80,13 +80,16 @@ const CTokenItem = memo(
               <span className={cn(
                 " font-normal text-[12px]",
                 Number(token.up) > 0 ? 'text-[#50E3C2]' : 'text-[rgba(227,80,122,1)]'
-              )}>2.98%</span>
+              )}>{Math.abs(Number(token.up))}%</span>
             </div>
           </div>
-          <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
-            <LazyImage src={marketInfo.icon} className="w-[12px]" />
-            <span className="text-[9px] font-medium">{marketInfo.info}</span>
-          </div>
+          {
+            token.state === 4 && 
+              <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
+                <LazyImage src={marketInfo.icon} className="w-[12px]" />
+                <span className="text-[9px] font-medium">{marketInfo.info}</span>
+              </div>
+          }
 
         </div>
         <div className="w-1/3 text-right">

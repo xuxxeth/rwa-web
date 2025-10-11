@@ -47,8 +47,7 @@ export function ChainItem({
 
 
 export function SwitchButton() {
-  const baseStore = useBaseStore()
-  const chains = useMemo(() => baseStore.chainList, [baseStore.chainList])
+  const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
 
   const [selected, setSelected] = useState<typeof chains[0] | null>(null)

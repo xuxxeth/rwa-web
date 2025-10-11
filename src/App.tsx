@@ -42,9 +42,12 @@ function App() {
   // 获取通用基础信息
   useEffect(() => {
     baseStore.getChains()
-
+    baseStore.getMarket()
     wsService.init({})
     wsService.subscribe(["summary"], (data) => {
+      if (data.type === 'summary') {
+        baseStore.updateRwasPrice(data.data || [])
+      }
     })
 
     return () => {

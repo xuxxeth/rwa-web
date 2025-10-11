@@ -4,18 +4,13 @@ import { useBaseStore } from "@/stores/baseStore";
 
 export function useRwaTokens() {
   const chainId = useChainId();
-  const baseStore = useBaseStore();
-
-  const rwaList = useMemo(() => baseStore.rwaList, [baseStore.rwaList]);
-
+  const rwaList = useBaseStore(state => state.rwaList);
   return chainId ? rwaList ?? [] : [];
 }
 
 export function useTokens() {
-  const baseStore = useBaseStore();
+  const tokenList = useBaseStore(state => state.tokenList);
   const chainId = useChainId();
-  const tokenList = useMemo(() => baseStore.tokenList, [baseStore.tokenList]);
-
   return useMemo(() => {
     if (chainId && tokenList) {
       return tokenList.filter((token) => token.chainId === chainId);
