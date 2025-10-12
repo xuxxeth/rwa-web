@@ -9,6 +9,7 @@ import type { IRwa } from "@/service/base/types";
 import Pagination from "../pagination";
 import { formatTokenAmountWithCommas } from "@/utils/format";
 import { multiply } from "@/utils";
+import { useBaseStore } from "@/stores/baseStore";
 
 export type CTokenProps = {
   stock: string,
@@ -108,15 +109,24 @@ const CTokenItem = memo(
 const CTokenList = memo(
   ({ onClick }: { onClick?: (token: IRwa) => void}) => {
     const { t } = useTranslation()
-
+    const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const [currentPage, setCurrentPage] = useState(1)
 
     const _id = useId()
     const rwaList = useRwas()
+    const rwaListWithBalance = useMemo(() => {
+      return rwaList.map(rwa => {
+        return {
+          ...rwa,
+          ...tokenWithBalance[rwa.address]
+        }
+      })
+    }, [rwaList, tokenWithBalance])
+
     const [filterHolding, setFilterHolding] = useState(false)
     const filterTokens = useMemo(() => {
-      return filterHolding ? rwaList.filter(token => Number(token.balance) > 0) : rwaList
-    }, [rwaList, filterHolding])
+      return filterHolding ? rwaListWithBalance.filter(token => Number(token.balance) > 0) : rwaListWithBalance
+    }, [rwaListWithBalance, filterHolding])
 
     const totalPage = useMemo(() => Math.ceil(filterTokens.length / 7), [filterTokens])
 

@@ -30,6 +30,7 @@ export function ConverBody({
   const { t } = useTranslation()
   const { toastError } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
+  const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
   const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
   const updateInputSize = useTradeStore(state => state.updateInputSize)
   const updateExpires = useTradeStore(state => state.updateExpires)
@@ -38,6 +39,7 @@ export function ConverBody({
   const expires = useTradeStore(state => state.expires)
   const inputToken = useTradeStore(state => state.inputToken)
   const outputToken = useTradeStore(state => state.outputToken)
+
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
@@ -101,14 +103,16 @@ export function ConverBody({
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 19)})
+    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 19), wait: true})
     setBuying(false)
     console.log(result)
     if (result && result?.code === -1) {
       toastError({title: typeof result?.message === 'string' ? result.message : result.message?.name || ''})
+    } else {
+      freshTokenBalances()
     }
  
-  }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder])
+  }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])

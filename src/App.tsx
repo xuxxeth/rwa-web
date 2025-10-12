@@ -9,8 +9,6 @@ import { useTranslation } from "./hooks/useTranslation";
 import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
-import { useRwaBalances } from "./hooks/useRwaBalances";
-import { scanApi } from "@/service/scan/api";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import wsService from "./service/WebSocketService";
 
@@ -43,7 +41,7 @@ function App() {
 
   // 两个汇总到一起处理了
   // 获取余额信息
-  // useTokenBalances()
+  useTokenBalances()
   // 获取Rwa余额
   // useRwaBalances()
 

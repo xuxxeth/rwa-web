@@ -5,6 +5,7 @@ import { useTokens } from "@/hooks/useTokens"
 import type { IToken } from "@/service/base/types"
 import { formatTokenAmountWithCommas } from "@/utils"
 import { useTranslation } from "@/hooks/useTranslation"
+import { useBaseStore } from "@/stores/baseStore"
 
 export type TokenProps = {
   name: string,
@@ -42,13 +43,23 @@ const TokenList = memo(
     onClick
   }: { onClick?: (token: IToken) => void}) => {
     const { t } = useTranslation()
+    const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const tokenList = useTokens()
+
     const _id = useId()
+    const tokenListWithBalance = useMemo(() => {
+      return tokenList.map(rwa => {
+        return {
+          ...rwa,
+          ...tokenWithBalance[rwa.address]
+        }
+      })
+    }, [tokenList, tokenWithBalance])
 
     const [filterHolding, setFilterHolding] = useState(false)
     const filterTokens = useMemo(() => {
-      return filterHolding ? tokenList.filter(token => Number(token.balance) > 0) : tokenList
-    }, [tokenList, filterHolding])
+      return filterHolding ? tokenListWithBalance.filter(token => Number(token.balance) > 0) : tokenListWithBalance
+    }, [tokenListWithBalance, filterHolding])
     return (
       <div className="w-[300px]">
         <div className=" flex items-center">
