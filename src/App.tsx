@@ -27,28 +27,33 @@ function RoutesWrapper() {
 
 function App() {
   const { t, i18n } = useTranslation();
-  const { account } = useActiveWeb3()
+  const { account, chainId } = useActiveWeb3()
   const updateRwasPrice = useBaseStore(state => state.updateRwasPrice)
   const updateStocksPrice = useBaseStore(state => state.updateStocksPrice)
-  const getChains = useBaseStore(state => state.getChains)
-  const getMarket = useBaseStore(state => state.getMarket)
-  const getStocks = useBaseStore(state => state.getStocks)
+  const initBaseStore = useBaseStore(state => state.init)
+
+  // const getChains = useBaseStore(state => state.getChains)
+  // const getMarket = useBaseStore(state => state.getMarket)
+  // const getStocks = useBaseStore(state => state.getStocks)
 
   useEffect(() => {
     const lng = storage.getItem("CA_LANGUAGE") || "en";
     i18n.changeLanguage(lng);
   }, [i18n]);
 
+  // 两个汇总到一起处理了
   // 获取余额信息
-  useTokenBalances()
+  // useTokenBalances()
   // 获取Rwa余额
-  useRwaBalances()
+  // useRwaBalances()
 
-  // 获取通用基础信息
   useEffect(() => {
-    getChains()
-    getMarket()
-    getStocks()
+    if(!chainId) return
+    // 初始化baseStore
+    initBaseStore(chainId)
+  }, [chainId])
+  
+  useEffect(() => {
     wsService.init({})
     wsService.subscribe(["summary"], (data) => {
       if (data.type === 'summary') {

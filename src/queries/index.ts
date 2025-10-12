@@ -190,7 +190,7 @@ export function infiniteTradeHistoryOptions(
       const trades = data.data ?? [];
       const hasNextPage = trades.length > 0;
       const nextPageParams = hasNextPage
-        ? trades[trades.length - 1].orderId
+        ? trades[trades.length - 1].id
         : undefined;
 
       return {

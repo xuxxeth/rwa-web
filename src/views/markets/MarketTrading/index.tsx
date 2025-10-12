@@ -28,7 +28,7 @@ function Markets() {
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
             <div>cAMZN</div>
           </div>
-          <MarketTrading state="open" align="left" />
+          <MarketTrading align="left" />
           <div className="pt-5 flex gap-x-5">
             <div className="flex-1">
               <KlineBody />

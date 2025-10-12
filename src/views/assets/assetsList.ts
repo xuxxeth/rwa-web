@@ -31,6 +31,7 @@ export function useAssetsList(chainId: number, account: string) {
     if (!account || tokenAddressList.length === 0) return;
     (async () => {
       try {
+        console.log('==> tokenAddressList', tokenAddressList)
         const res: bigint[] = (await getTokenBalancesByTradingContract(
           account as `0x${string}`,
           tokenAddressList as `0x${string}`[]
@@ -40,7 +41,7 @@ export function useAssetsList(chainId: number, account: string) {
         console.log("getTokenBalancesByTradingContract error", error);
       }
     })();
-  }, [account, tokenAddressList]);
+  }, [account]);
 
   const marketQuoteMap = useMemo(() => {
     return marketQuoteData?.reduce(

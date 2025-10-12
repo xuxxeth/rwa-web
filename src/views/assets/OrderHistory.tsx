@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/utils";
 import { type IRwa } from "@/service/base/types";
-import SignatureVerify from "./SignatureVerify";
 import HistoryOrderTable from "./HistoryOrderTable";
 import OpenOrderTable from "./OpenOrderTable";
 
