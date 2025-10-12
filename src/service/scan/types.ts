@@ -55,7 +55,7 @@ export interface ITrade {
   // 成交金额
   amount: string;
   chainId: number;
-  id: number;
+  id: string;
   orderId: string;
   orderType: OrderType;
   side: OrderSide;

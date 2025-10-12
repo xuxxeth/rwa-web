@@ -75,7 +75,7 @@ export default function MarketQuotes() {
     <MainLayout>
       <ConentLayout>
         <div className="px-5">
-          <MarketTrading state="open" align="center" />
+          <MarketTrading state={2} align="center" />
           <TableHeader<SortableField, IMarketQuote, unknown>
             lngPrefix="marketQuotes"
             config={MarketQuotesList}
