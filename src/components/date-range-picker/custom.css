@@ -1,0 +1,41 @@
+.rdp-weekday {
+  color: rgba(108, 134, 173, 1);
+  font-weight: 400;
+  font-size: 15px;
+  width: 36px;
+  height: 36px;
+}
+
+.rdp-caption_label {
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.rdp-range_start {
+  background: linear-gradient(to right, transparent 50%, rgba(69, 122, 255, 0.2) 50%);
+}
+
+.rdp-range_middle {
+  background-color: rgba(69, 122, 255, 0.2)
+}
+
+.rdp-range_end {
+  background: linear-gradient(to left, transparent 50%, rgba(69, 122, 255, 0.2) 50%);
+}
+
+.rdp-selected {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.rdp-selected .rdp-day_button {
+  border: none;
+}
+
+.rdp-range_start .rdp-day_button {
+  background-color: rgba(69, 122, 255, 1)
+}
+
+.rdp-range_end .rdp-day_button {
+  background-color: rgba(69, 122, 255, 1)
+}

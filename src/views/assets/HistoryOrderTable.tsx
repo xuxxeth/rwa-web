@@ -28,6 +28,7 @@ import { useOrderFilterStore } from "@/stores/orderFilterStore";
 import SignatureVerify from "./SignatureVerify";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import { generateOrderHistoryFilterObj } from "@/stores/orderFilterStore";
+import { DatePickerWithRange } from "@/components/date-range-picker";
 
 export default function HistoryOrderTable(props: {
   chainId: number;
@@ -40,6 +41,16 @@ export default function HistoryOrderTable(props: {
 
   const { orderHistoryFilters, updateOrderHistoryFilters } =
     useOrderFilterStore();
+
+  const onUserSelectedDataRangeChanged = (dateRange: {
+    startTime?: number;
+    endTime?: number;
+  }) => {
+    updateOrderHistoryFilters({
+      startTime: dateRange.startTime,
+      endTime: dateRange.endTime,
+    });
+  };
 
   const filters = useMemo(() => {
     const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters);
@@ -70,8 +81,6 @@ export default function HistoryOrderTable(props: {
   );
 
   const allOrders = data?.pages?.flatMap((page) => page.data) || [];
-
-  console.log("===> order history", data, "===> hasNextPage", hasNextPage);
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -141,6 +150,13 @@ export default function HistoryOrderTable(props: {
               value: "2",
             },
           ]}
+        />
+        <DatePickerWithRange
+          userSelectedDateRange={{
+            from: orderHistoryFilters.startTime,
+            end: orderHistoryFilters.endTime,
+          }}
+          onUserSelectedDataRangeChanged={onUserSelectedDataRangeChanged}
         />
       </div>
       <TableHeader<"", IOrder, { rwaTokens: IRwa[] }>

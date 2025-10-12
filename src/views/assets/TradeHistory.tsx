@@ -30,6 +30,7 @@ import {
 } from "@/stores/orderFilterStore";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignatureVerify from "./SignatureVerify";
+import { DatePickerWithRange } from "@/components/date-range-picker";
 
 function TradeHistory(props: {
   chainId: number;
@@ -43,6 +44,16 @@ function TradeHistory(props: {
 
   const { tradeHistoryFilters, updateTradeHistoryFilters } =
     useOrderFilterStore();
+
+  const onUserSelectedDataRangeChanged = (dateRange: {
+    startTime?: number;
+    endTime?: number;
+  }) => {
+    updateTradeHistoryFilters({
+      startTime: dateRange.startTime,
+      endTime: dateRange.endTime,
+    });
+  };
 
   const filters = useMemo(() => {
     const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters);
@@ -107,7 +118,7 @@ function TradeHistory(props: {
 
   return (
     <>
-      <div>
+      <div className="flex flex-row gap-4">
         <DropDownFilter
           data={tradeHistoryFilters.side}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -120,6 +131,13 @@ function TradeHistory(props: {
             { key: "sell", value: "1" },
           ]}
           title="orderType"
+        />
+        <DatePickerWithRange
+          userSelectedDateRange={{
+            from: tradeHistoryFilters.startTime,
+            end: tradeHistoryFilters.endTime,
+          }}
+          onUserSelectedDataRangeChanged={onUserSelectedDataRangeChanged}
         />
       </div>
       <TableHeader<"", ITrade, { rwaTokens: IRwa[] }>
