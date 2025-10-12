@@ -13,6 +13,7 @@ export interface BaseStore {
   marketState: IMarketState,
   marketTradeState: number,
   tokenWithBalance: Record<string, ITokenWithBalance>,
+  freshTokenBalancesCount: number,
   setTokenWithBalance: (tokenWithBalance: Record<string, ITokenWithBalance>) => void,
   tokenWithPrice: Record<string, ITokenWithPrice>,
   setTokenWithPrice: (tokenWithPrice: Record<string, ITokenWithPrice>) => void,
@@ -27,6 +28,7 @@ export interface BaseStore {
   getMarketState: () => Promise<ApiResponse<IMarketState>>,
   updateRwasPrice: (priceList: IRwaPrice[]) => void
   updateStocksPrice: (priceList: IRwaPrice[]) => void
+  freshTokenBalances: () => void
 }
 
 export interface TradeStore {

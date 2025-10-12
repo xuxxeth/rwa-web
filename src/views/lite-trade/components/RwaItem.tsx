@@ -1,36 +1,28 @@
 import { LazyImage } from "@/components/image/LazyImage"
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
+import type { IRwa } from "@/service/base/types"
 import { memo, useMemo } from "react"
 
-type RwaItemProps = {
-  stock: string,
-  rwa: string,
-  icon: string,
-  price: string,
-  up: string,
-  lock?: Number
-}
-
 const RwaItem = memo(
-  ({ data }: { data: RwaItemProps}) => {
+  ({ data }: { data: IRwa}) => {
     const { t } = useTranslation()
     const upAmount = useMemo(() => Number(data.up), [data])
     
     return (
       <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white">
         <div className=" flex justify-between">
-          <img src={data.icon} className="w-[46px] h-[46px] rounded-full" alt={data.rwa} />
+          <img src={data.icon} className="w-[46px] h-[46px] rounded-full" alt={data.symbol} />
           {
-            data.lock && 
+            data.lock ? 
               <div className="flex items-center h-[20px] px-1 text-[12px] font-medium gap-x-1 bg-[rgba(255,255,255,0.1)] rounded-[4px]">
                 <LazyImage src="/images/convert/trade_lock.png" className="w-[16px] h-[16px]" />
                 <span>{t('Trading Halt')}</span>
-              </div>
+              </div> : null
           }
         </div>
-        <div className="mt-1 text-[20px] font-medium">{data.rwa}</div>
-        <div className=" font-normal text-[14px] text-[rgba(255,255,255,0.8)]">{data.stock}</div>
+        <div className="mt-1 text-[20px] font-medium">{data.symbol}</div>
+        <div className=" font-normal text-[14px] text-[rgba(255,255,255,0.8)]">{data.name}</div>
         <div className="mt-4 flex items-center gap-x-2">
           <div className=" text-[22px] font-medium">${data.price}</div>
           <div className={cn(

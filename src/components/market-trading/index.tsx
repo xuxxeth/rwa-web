@@ -43,7 +43,7 @@ const MarketTrading = memo(
         info: _info
       }
     }, [state])
-
+    
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center ",
@@ -51,7 +51,10 @@ const MarketTrading = memo(
       )}>
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">
-            <LazyImage src={marketInfo.icon} className="w-6" />
+            {
+              marketInfo.icon && <LazyImage src={marketInfo.icon} className="w-6" />
+            }
+            
           </div>
           <div className=" font-medium text-[14px]">{marketInfo.info}</div>
         </div>

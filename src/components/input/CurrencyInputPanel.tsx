@@ -10,6 +10,7 @@ import { useRwas } from "@/hooks/useRwaBalances";
 import { formatTokenAmountWithCommas, } from "@/utils/format";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTradeStore } from "@/stores/tradeStore";
+import { useBaseStore } from "@/stores/baseStore";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -30,12 +31,32 @@ const CurrencyInputPanel = memo(
     const updateInputToken = useTradeStore(state => state.updateInputToken)
     const updateOutputToken = useTradeStore(state => state.updateOutputToken)
 
+    const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
+
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
     const tokenList = useTokens()
     const rwaList = useRwas()
+
     const { t } = useTranslation()
     const [inputFocus, setInputFocus] = useState(false)
+
+    const rwaListWithBalance = useMemo(() => {
+      return rwaList.map(rwa => {
+        return {
+          ...rwa,
+          ...tokenWithBalance[rwa.address]
+        }
+      })
+    }, [rwaList, tokenWithBalance])
+    const tokenListWithBalance = useMemo(() => {
+      return tokenList.map(rwa => {
+        return {
+          ...rwa,
+          ...tokenWithBalance[rwa.address]
+        }
+      })
+    }, [tokenList, tokenWithBalance])
 
     const handleCurrencyClick = useCallback(async () => {
       if (mode === 'in') {
@@ -45,18 +66,15 @@ const CurrencyInputPanel = memo(
       }
       
     }, [mode])
-
-    // const [inputToken, setInputToken] = useState<IRwa>()
-    // const [outputToken, setOutputToken] = useState<IToken>()
     
     useEffect(() => {
-      if (rwaList[0]) {
-        updateInputToken(rwaList[0])
+      if (rwaListWithBalance[0]) {
+        updateInputToken(rwaListWithBalance[0])
       }
-      if (tokenList[0]) {
-        updateOutputToken(tokenList[0])
+      if (tokenListWithBalance[0]) {
+        updateOutputToken(tokenListWithBalance[0])
       }
-    }, [rwaList.length, tokenList.length])
+    }, [rwaListWithBalance.length, tokenListWithBalance.length, tokenWithBalance])
 
     return (
       <div className={cn(

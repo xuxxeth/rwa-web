@@ -1,11 +1,11 @@
 import { baseApi } from "@/service/base/api"
 import { useTokenBalances as useBalances, useChainId  } from './useCaCommon'
 import { RESPONSE_CODE } from '@/config/constants'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { formatAmount } from '@/utils'
 import { useBaseStore,  } from '@/stores/baseStore'
-import type { ITokenWithBalance } from '@/service/base/types'
+import type { IToken, ITokenWithBalance } from '@/service/base/types'
 
 import { useTokens, useRwaTokens } from './useTokens'
 
@@ -16,21 +16,9 @@ export function useTokenBalances() {
   const tokenList = useTokens()
   const rwaRwaList = useRwaTokens()
   const setTokenWithBalance = useBaseStore(state => state.setTokenWithBalance)
+  const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
 
-  const getTokensData = async (chainId: number, account: `0x${string}`, tokenList: Array<IToken | IRwaToken>) => {
-    // const res = await baseApi.getTokens(chainId)
-    // if (res.code === RESPONSE_CODE.SUCCESS) {
-    //   const tokenList = (res.data || []);
-    //   const balancesRes = await getTokenBalances(account, tokenList.map(token => token.address as `0x${string}`))
-    //   const tokenListWithBalances = tokenList.map((token, index) => {
-    //     return {
-    //       ...token,
-    //       origin: String(balancesRes[index].balance),
-    //       balance: formatAmount(String(balancesRes[index].balance), 6, token.precision)
-    //     }
-    //   })
-    //   baseStore.setTokens(tokenListWithBalances)
-    // }
+  const getTokensData = async ( account: `0x${string}`, tokenList: Array<IToken | IToken>) => {
     const balancesRes = await getTokenBalances(account, tokenList.map(token => token.address as `0x${string}`))
     const tokenWithBalance = balancesRes.reduce((acc, cur, index) => {
       acc[tokenList[index].address] = {
@@ -39,12 +27,30 @@ export function useTokenBalances() {
       }
       return acc
     }, {} as Record<string, ITokenWithBalance>)
+
     setTokenWithBalance(tokenWithBalance)
   }
 
-  useEffect(() => {
-    if (chainId && account) {
-      getTokensData(chainId, account, [...tokenList, ...rwaRwaList])
+  const refreshTokenBalances = useCallback(() => {
+    if (account && tokenList && rwaRwaList) {
+      // @ts-ignore
+      getTokensData(account, [...tokenList, ...rwaRwaList])
     }
-  }, [chainId, account, tokenList, rwaRwaList])
+  }, [account, tokenList, rwaRwaList])
+
+  useEffect(() => {
+    if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0) {
+      // @ts-ignore
+      getTokensData(account, [...tokenList, ...rwaRwaList])
+    }
+  }, [chainId, account, tokenList.length, rwaRwaList.length, freshTokenBalancesCount])
+
+  return {
+    refreshTokenBalances: refreshTokenBalances
+  }
+}
+
+export function useTokenBalance(address: string) {
+  const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
+  return useMemo(() => address && tokenWithBalance[address], [address, tokenWithBalance])
 }

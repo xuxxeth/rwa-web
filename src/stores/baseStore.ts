@@ -30,6 +30,7 @@ export const useBaseStore = create<BaseStore>()(
       marketState: marketStateDefault,
       marketTradeState: MARKET_STATUS.DEFAULT,
       tokenWithBalance: {},
+      freshTokenBalancesCount: 1,
       // TODO: 使用 Map 可能性能更好?
       // 更新 token 余额
       setTokenWithBalance: (
@@ -160,20 +161,24 @@ export const useBaseStore = create<BaseStore>()(
         });
         set({ stocksList: stocksList });
       },
+      freshTokenBalances: () => {
+        set({freshTokenBalancesCount: get().freshTokenBalancesCount + 1})
+        
+      }
     }),
     {
       name: "CA_WEB_BASE_INFO",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        tokenList: state.tokenList,
-        rwaList: state.rwaList,
-        chainList: state.chainList,
-        stocksList: state.stocksList,
-        marketInfo: state.marketInfo,
-        marketState: state.marketState,
-        marketTradeState: state.marketTradeState,
-        lastInitTime: state.lastInitTime,
-        lastChainId: state.lastChainId,
+        // tokenList: state.tokenList,
+        // rwaList: state.rwaList,
+        // chainList: state.chainList,
+        // stocksList: state.stocksList,
+        // marketInfo: state.marketInfo,
+        // marketState: state.marketState,
+        // marketTradeState: state.marketTradeState,
+        // lastInitTime: state.lastInitTime,
+        // lastChainId: state.lastChainId,
       }),
     }
   )
