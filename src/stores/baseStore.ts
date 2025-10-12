@@ -106,7 +106,8 @@ export const useBaseStore = create<BaseStore>()(
       },
       updateRwasPrice: (priceList: IRwaPrice[]) => {
         const rwaList = get().rwaList.map(rwa => {
-          const price = priceList.find(price => price.S === rwa.symbol)
+          const symbol = rwa.symbol
+          const price = priceList.find(price => price.S === symbol)
           return {
             ...rwa,
             price: truncate(price?.p || 0, rwa.precision),

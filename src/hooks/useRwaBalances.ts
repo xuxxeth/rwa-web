@@ -22,8 +22,8 @@ export function useRwaBalances() {
           ...token,
           origin: String(balancesRes[index].balance),
           balance: formatAmount(String(balancesRes[index].balance), 6, token.precision),
-          price: '203.43',
-          up: "23", 
+          price: '0',
+          up: "0", 
           lock: 0 
         }
       })

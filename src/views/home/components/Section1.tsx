@@ -28,7 +28,7 @@ export function Section1() {
       <div className="w-full h-[750px] overflow-hidden relative text-white">
         <div className="w-[661px] h-[661px] circle-bg">
         </div>
-        <div className=" relative z-50">
+        <div className=" relative z-30">
           <div className="text-[45px] font-medium text-center mt-[218px]">Empowering the Convergence of </div>
           <div className="flex justify-center mt-2">
             <div className="text-[70px] leading-[70px] font-medium text-center w-[900px] ">Traditional Finance and On-Chain Innovation</div>

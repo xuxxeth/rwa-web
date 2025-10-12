@@ -8,6 +8,7 @@ import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
 import Pagination from "../pagination";
 import { formatTokenAmountWithCommas } from "@/utils/format";
+import { multiply } from "@/utils";
 
 export type CTokenProps = {
   stock: string,
@@ -53,8 +54,11 @@ const CTokenItem = memo(
         info: _info
       }
     }, [token])
-
-
+    
+    const balanceValue = useMemo(() => {
+      if (!token.balance || !token.price) return  '0'
+      return formatTokenAmountWithCommas(multiply(token.balance, token.price), token.precision)
+    }, [token.balance, token.price])
     return (
       <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
         onClick={() => {
@@ -94,7 +98,7 @@ const CTokenItem = memo(
         </div>
         <div className="w-1/3 text-right">
           <div className=" text-[16px] font-medium leading-[24px]">{formatTokenAmountWithCommas(token.balance || '0')}</div>
-          <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{token.balance}</div>
+          <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{balanceValue}</div>
         </div>
       </div>
     )

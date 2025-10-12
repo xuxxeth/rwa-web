@@ -2,38 +2,32 @@ import { GoButton } from "@/components/go-button";
 import { RwaCard } from "@/components/rwa-card";
 import { MARKET_STATUS } from "@/config/constants";
 import { MainLayout } from "@/layouts/main";
-import type { IStock } from "@/service/base/types";
+import type { IRwa, IStock } from "@/service/base/types";
 import { useBaseStore } from "@/stores/baseStore";
 import { cn } from "@/utils";
 import { useEffect, useId, useMemo, useState } from "react";
 
 const showStocks = ['AAPL', 'TSLA', 'COIN', 'NVDA']
 export default function Section2() {
-  const investList = [
-    {name: 'NIVDIA', cname: 'cNVDA', percent: '19.49', icon: './images/home/nvda.png'},
-    {name: 'Apple', cname: 'cAAPL', percent: '19.49', icon: './images/home/apple.png'},
-    {name: 'Tesla', cname: 'cTSLA', percent: '-19.49', icon: './images/home/tsla.png'},
-    {name: 'Amazon', cname: 'cAMAZ', percent: '-19.49', icon: './images/home/amaz.png'},
-  ]
   const _id = useId()
 
   const marketTradeState = useBaseStore(state => state.marketTradeState)
 
-  const stocksList = useBaseStore(state => state.stocksList)
-  const [filterStocks, setFilterStocks] = useState<IStock[]>([])
+  const rwaList = useBaseStore(state => state.rwaList)
+  const [filterStocks, setFilterStocks] = useState<IRwa[]>([])
   useEffect(() => {
-    let stocks: IStock[] = []
+    let rwas: IRwa[] = []
     showStocks.forEach(code => {
-      const stock = stocksList.find(stock => stock.stockCode === code)
-      if (stock) {
-        stocks.push({
-          ...stock,
+      const rwa = rwaList.find(rwa => rwa.symbol.startsWith(code))
+      if (rwa) {
+        rwas.push({
+          ...rwa,
           icon: `./images/home/${code.toLowerCase()}.png`
         })
       }
     })
-    setFilterStocks(stocks)
-  }, [stocksList])
+    setFilterStocks(rwas)
+  }, [rwaList])
 
   return (
     <MainLayout>
@@ -56,8 +50,8 @@ export default function Section2() {
                         <img src={item.icon} className=" scale-50" alt="" />
                       </div>
                       <div className="p-[56px] text-white">
-                        <div className="text-[45px] font-semibold">{item.stockCode}</div>
-                        <div className="text-[25px] font-semibold text-[rgba(255,255,255,0.6)]">{item.stockName}</div>
+                        <div className="text-[45px] font-semibold">{item.symbol}</div>
+                        <div className="text-[25px] font-semibold text-[rgba(255,255,255,0.6)]">{item.name}</div>
                         <div className="text-[32px] font-medium flex items-center justify-between mt-14">
                           <div className="flex items-center gap-x-2">
                             <span>24 hours</span> 
@@ -73,7 +67,7 @@ export default function Section2() {
                               <span className={cn(
                                   "",
                                 Number(item.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-                              )}>{item.cPrice} $</span>
+                              )}>{item.price} $</span>
                             }
                             
                           </div>
