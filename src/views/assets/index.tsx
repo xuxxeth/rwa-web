@@ -18,7 +18,7 @@ import { useBaseStore } from "@/stores/baseStore";
 function Assets() {
   const account = useAccount();
   const chainId = useChainId();
-  const baseStore = useBaseStore();
+  const autoInitialize = useBaseStore(state => state.init);
 
   const { t } = useTranslation();
 
@@ -32,7 +32,7 @@ function Assets() {
 
   useEffect(() => {
     if (!chainId) return;
-    baseStore.autoInitialize(chainId);
+    autoInitialize(chainId);
   }, [chainId]);
 
   return (
