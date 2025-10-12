@@ -1,9 +1,8 @@
 import type { ApiResponse } from "@/service/client";
-import type { IChain, IMarket, IMarketState, IRwa, IRwaPrice, IStock, IToken } from "@/service/base/types";
+import type { IChain, IMarket, IMarketState, IRwa, IRwaPrice, IStock, IToken, ITokenWithBalance, ITokenWithPrice} from "@/service/base/types";
 
 
 export interface BaseStore {
-  count: number,
   lastChainId: number | null,
   lastInitTime: number,
   chainList: IChain[],
@@ -13,6 +12,11 @@ export interface BaseStore {
   marketInfo: IMarket,
   marketState: IMarketState,
   marketTradeState: number,
+  tokenWithBalance: Record<string, ITokenWithBalance>,
+  setTokenWithBalance: (tokenWithBalance: Record<string, ITokenWithBalance>) => void,
+  tokenWithPrice: Record<string, ITokenWithPrice>,
+  setTokenWithPrice: (tokenWithPrice: Record<string, ITokenWithPrice>) => void,
+  init: (chainId: number | null) => Promise<void>,
   setTokens: (tokenList: IToken[]) => void,
   setRwas: (rwaList: IRwa[]) => void,
   getChains: () => Promise<ApiResponse<IChain[]>>,
@@ -21,7 +25,6 @@ export interface BaseStore {
   getStocks: () => Promise<ApiResponse<IStock[]>>,
   getMarket: () => Promise<ApiResponse<IMarket>>,
   getMarketState: () => Promise<ApiResponse<IMarketState>>,
-  autoInitialize: (chainId: number | null) => Promise<void>,
   updateRwasPrice: (priceList: IRwaPrice[]) => void
   updateStocksPrice: (priceList: IRwaPrice[]) => void
 }

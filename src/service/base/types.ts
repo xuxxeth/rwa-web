@@ -11,6 +11,15 @@ export interface IChain {
   "scan": string
 }
 
+export interface ITokenWithBalance {
+  "origin"?: string,
+  "balance"?: string,
+}
+
+export interface ITokenWithPrice  {
+  "price"?: string , 
+}
+
 // 股票信息
 export interface IStock {
   "id": number,
@@ -23,6 +32,7 @@ export interface IStock {
   "up"?: string, 
   "cPrice"?: string, 
 }
+
 // token信息
 export interface IToken {
   "chainId": 1,
