@@ -42,10 +42,12 @@ export function ConverBody({
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken, outputToken])
-  
+
   const approveAmount = useMemo(() => {
     return multiply(orderValue, inputToken?.price ?? '0')
   }, [orderValue, inputToken])
+
+  console.log('orderValue: ', orderValue, approveAmount)
 
   const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
   console.log(approvalState, allowance)
@@ -91,14 +93,15 @@ export function ConverBody({
       sessionType: '0',
       paymentToken: outputToken?.address || '', // address
       validDate: String(expires), // D
-      networkFee: parseAmount(marketInfo.networkFeeInNative, 18), // 0.002
+      // networkFee: parseAmount(marketInfo.networkFeeInNative, 18), // 0.002
+      networkFee: '0', // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(limitPrice),   // 1 usdt
       size: parseAmount(inputSize)    // 10
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params, {})
+    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 19)})
     setBuying(false)
     console.log(result)
     if (result && result?.code === -1) {
