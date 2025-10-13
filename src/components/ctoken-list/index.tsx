@@ -78,14 +78,14 @@ const CTokenItem = memo(
         <div className="w-1/3 flex items-center gap-x-2">
           <div className="">
             <div className="flex items-center gap-x-2">
-              <span className=" text-[16px] font-medium">${token.price}</span>
+              <span className=" text-[16px] font-medium">${token.price || '--'}</span>
             </div>
             <div className="flex items-center gap-x-[4px]">
               <LazyImage src={Number(token.up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"} className="w-[6px]" />
               <span className={cn(
                 " font-normal text-[12px]",
                 Number(token.up) > 0 ? 'text-[#50E3C2]' : 'text-[rgba(227,80,122,1)]'
-              )}>{Math.abs(Number(token.up))}%</span>
+              )}>{Math.abs(Number(token.up || '0'))}%</span>
             </div>
           </div>
           {

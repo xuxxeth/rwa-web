@@ -62,11 +62,11 @@ export default function Section2() {
                                 <span className={cn(
                                   "",
                                   Number(item.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-                                )}>{item.up}%</span>
+                                )}>{item.up || '--'}%</span>
                               </> : 
                               <span className={cn(
                                   "",
-                                Number(item.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
+                                Number(item.up || '--') > 0 ? "text-[#34C759]" : "text-[#FF383C]"
                               )}>{item.price} $</span>
                             }
                             

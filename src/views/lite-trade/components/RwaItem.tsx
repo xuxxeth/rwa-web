@@ -7,7 +7,7 @@ import { memo, useMemo } from "react"
 const RwaItem = memo(
   ({ data }: { data: IRwa}) => {
     const { t } = useTranslation()
-    const upAmount = useMemo(() => Number(data.up), [data])
+    const upAmount = useMemo(() => Number(data.up || '0'), [data])
     
     return (
       <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white">
@@ -24,7 +24,7 @@ const RwaItem = memo(
         <div className="mt-1 text-[20px] font-medium">{data.symbol}</div>
         <div className=" font-normal text-[14px] text-[rgba(255,255,255,0.8)]">{data.name}</div>
         <div className="mt-4 flex items-center gap-x-2">
-          <div className=" text-[22px] font-medium">${data.price}</div>
+          <div className=" text-[22px] font-medium">${data.price || '--'}</div>
           <div className={cn(
             "h-[29px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
             upAmount > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
