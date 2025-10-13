@@ -17,6 +17,7 @@ import {
   truncate,
   checkSymbolEqual,
   symbolToLower,
+  getEasternSecondsSinceMidnight,
 } from "@/utils";
 
 const ENABLE_CACHE = true;
@@ -147,7 +148,7 @@ export const useBaseStore = create<BaseStore>()(
           const marketInfo = { ...(res.data || {}) };
           let marketState = MARKET_STATUS.DEFAULT;
           if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
-            const nowSecond = getSecondsSinceMidnight();
+            const nowSecond = getEasternSecondsSinceMidnight();
             if (nowSecond < marketInfo.tradingStartTime) {
               marketState = MARKET_STATUS.BEFORE;
             } else if (nowSecond > marketInfo.tradingEndTime) {

@@ -108,3 +108,15 @@ export function checkSymbolEqual(symbol1: string, symbol2: string) {
 export function symbolToLower(symbol: string) {
   return symbol.toLowerCase()
 }
+
+export function getEasternSecondsSinceMidnight() {
+  const now = new Date();
+  const estString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+  const estDate = new Date(estString);
+
+  const midnight = new Date(estDate);
+  midnight.setHours(0, 0, 0, 0);
+
+  const diffMs = estDate.getTime() - midnight.getTime();
+  return Math.floor(diffMs / 1000); // 秒数
+}
