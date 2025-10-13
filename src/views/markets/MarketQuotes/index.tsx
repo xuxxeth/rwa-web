@@ -101,7 +101,7 @@ export default function MarketQuotes() {
 function QuoteName(props: { logo: string; name: string }) {
   return (
     <>
-      <LazyImage src={'/images/icons/chains/bsc.png'} className='w-10 h-10 mr-2' />
+      <LazyImage src={props.logo} className='w-10 h-10 mr-2' />
       <TextCell text={props.name} />
     </>
   )
