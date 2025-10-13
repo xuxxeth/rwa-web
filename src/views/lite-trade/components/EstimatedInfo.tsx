@@ -1,5 +1,6 @@
 import { BetweenText } from "@/components/between-text"
 import { LazyImage } from "@/components/image/LazyImage"
+import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
 import type { IMarket, IRwa, IToken } from "@/service/base/types"
 import { memo } from "react"
@@ -15,6 +16,7 @@ type EstimatedInfoProps = {
 const EstimatedInfo = memo(
   ({ inputToken, outputToken, expires, marketInfo, onEdit }: EstimatedInfoProps) => {
     const { t } = useTranslation()
+    const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
     return (
       <div className="bg-[rgba(6,7,10,0.3)] rounded-[16px] p-4 mt-4 text-white font-normal text-[14px] flex flex-col gap-y-2">
         {/* <BetweenText 
@@ -32,7 +34,7 @@ const EstimatedInfo = memo(
               <button className=" cursor-pointer">
                 <LazyImage src="/images/icons/refresh.png" className="w-[10px] mr-1" />
               </button>
-              <span>1 {inputToken?.symbol || '-'} = {inputToken?.price || '-'} {outputToken?.symbol || '-'}</span>
+              <span>1 {inputToken?.symbol || '-'} = {inputTokenPrice?.price || '--'} {outputToken?.symbol || '--'}</span>
             </div>
           }
         />

@@ -99,6 +99,10 @@ export interface IMarket {
   "validDate": number
 }
 // 券商状态信息
+/**
+ * tradingDayType： 4-美股全日市 5-美股上半日市 6-美股下半日市 7-新股全日市 8-新股上半日市 9-新股下半日市 10-美股期权全日市 11-美股期权上半日市 12- 美股期权下半日）
+ * status: 0-未开盘 1-港股早盘竞价 2- 美股/期权盘前交易 3-交易中 4-午间休市 5-港股收 市竞价 6-美股/期权盘后交易 7-已收盘 8-新股开市 前交易 9-新股收市前交易 10-新股收盘交易 11-A 股通待开盘 12-美股夜盘 13-全球交易时段 14-场 外交易
+ */
 export interface IMarketState {
   "market": string,
   "desc": string,

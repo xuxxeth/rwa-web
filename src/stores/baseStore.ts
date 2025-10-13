@@ -13,7 +13,6 @@ import type {
   IStockWithPrice
 } from "@/service/base/types";
 import {
-  getSecondsSinceMidnight,
   truncate,
   checkSymbolEqual,
   symbolToLower,
@@ -36,7 +35,6 @@ export const useBaseStore = create<BaseStore>()(
       marketInfo: marketDefault,
       marketState: marketStateDefault,
       marketTradeState: MARKET_STATUS.DEFAULT,
-
       freshTokenBalancesCount: 1,
       // TODO: 使用 Map 可能性能更好?
       // token 余额
