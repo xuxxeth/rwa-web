@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/useToast";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from "../image/LazyImage";
 import { useUSDT } from "@/hooks/useTokens";
+import CopyButton from "./copyButton";
 
 export function WalletItem({
   wallet,
@@ -113,9 +114,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 <div className=" px-4">
                   <div className="flex items-center justify-between py-3">
                     <div className=" text-sm font-semibold">{shortenAddress(account)}</div>
-                    <button className=" cursor-pointer">
-                      <img src="./images/icons/copy.png" className="w-[14px] h-[14px]" alt="" />
-                    </button>
+                    <CopyButton copyText={account}/>
                   </div>
                   <div className="py-3">
                     <div className="flex items-center">

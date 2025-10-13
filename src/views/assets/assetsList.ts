@@ -1,9 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
 import type { IToken, IRwa } from '@/service/base/types'
-import { marketQuoteOptions } from '@/queries'
-import { useQuery } from '@tanstack/react-query'
-import type { IMarketQuote } from '@/service/quote/types'
-import { useTokenBalances } from '@/hooks/useCaCommon'
 import { formatAmount, multiply, sum, symbolToLower } from '@/utils/index'
 import { useTokens, useRwaTokens } from '@/hooks/useTokens'
 import { useBaseStore } from '@/stores/baseStore'
@@ -27,7 +22,7 @@ export function useAssetsList(chainId: number, account: string) {
       balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
     token.rwaPrice = priceFromStore ? priceFromStore.price : undefined
     const calculatePrice = token.tokenPrice ?? token.rwaPrice
-    
+
     if (token.holdings !== undefined && calculatePrice !== undefined) {
       token.value = formatAmount(multiply(token.holdings, calculatePrice), 2)
     }
@@ -58,6 +53,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     decimals: rwa.decimals,
     address: rwa.address,
     icon: rwa.icon,
+    rwaState: rwa.state
   }
 }
 

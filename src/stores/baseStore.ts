@@ -68,6 +68,7 @@ export const useBaseStore = create<BaseStore>()(
                   (cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100,
                   2
                 ),
+                dailyHigh: truncate(cur?.h || 0, rwa.precision),
               };
             }
             return acc;
