@@ -1,6 +1,7 @@
 import { GoButton } from "@/components/go-button";
 import { RwaCard } from "@/components/rwa-card";
 import { MARKET_STATUS } from "@/config/constants";
+import { useRwaPrice } from "@/hooks/useTokenBalances";
 import { MainLayout } from "@/layouts/main";
 import type { IRwa, IStock } from "@/service/base/types";
 import { useBaseStore } from "@/stores/baseStore";
@@ -8,10 +9,42 @@ import { cn } from "@/utils";
 import { useEffect, useId, useMemo, useState } from "react";
 
 const showStocks = ['AAPL', 'TSLA', 'COIN', 'NVDA']
+
+export const RwaPrice = (
+  ({
+    rwaData
+  }: {rwaData: IRwa}) => {
+
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
+    const rwaPrice = useRwaPrice(rwaData.symbol)
+
+    if (!rwaPrice) return null
+    return (
+      <>
+        {
+          marketTradeState === MARKET_STATUS.OPEN ?
+          <>
+            <img src={Number(rwaPrice.up) > 0 ? './images/home/rate_up.png' : './images/home/rate_down.png'} className="w-[16px]" alt="" />
+            <span className={cn(
+              "",
+              Number(rwaPrice.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
+            )}>{rwaPrice.up || '--'}%</span>
+          </> : 
+          <span className={cn(
+              "",
+            Number(rwaPrice.up || '--') > 0 ? "text-[#34C759]" : "text-[#FF383C]"
+          )}>{rwaPrice.price} $</span>
+        }
+      </>
+    )
+  }
+)
+
+
+
 export default function Section2() {
   const _id = useId()
 
-  const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   const rwaList = useBaseStore(state => state.rwaList)
   const [filterStocks, setFilterStocks] = useState<IRwa[]>([])
@@ -55,21 +88,8 @@ export default function Section2() {
                         <div className="text-[32px] font-medium flex items-center justify-between mt-14">
                           <div className="flex items-center gap-x-2">
                             <span>24 hours</span> 
-                            {
-                              marketTradeState === MARKET_STATUS.OPEN ?
-                              <>
-                                <img src={Number(item.up) > 0 ? './images/home/rate_up.png' : './images/home/rate_down.png'} className="w-[16px]" alt="" />
-                                <span className={cn(
-                                  "",
-                                  Number(item.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-                                )}>{item.up || '--'}%</span>
-                              </> : 
-                              <span className={cn(
-                                  "",
-                                Number(item.up || '--') > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-                              )}>{item.price} $</span>
-                            }
                             
+                            <RwaPrice rwaData={item} />
                           </div>
                           <GoButton />
                         </div>

@@ -11,6 +11,8 @@ import { formatTokenAmountWithCommas, } from "@/utils/format";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
+import { symbolToLower } from "@/utils";
+import { useTokenBalance } from "@/hooks/useTokenBalances";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -41,23 +43,6 @@ const CurrencyInputPanel = memo(
     const { t } = useTranslation()
     const [inputFocus, setInputFocus] = useState(false)
 
-    const rwaListWithBalance = useMemo(() => {
-      return rwaList.map(rwa => {
-        return {
-          ...rwa,
-          ...tokenWithBalance[rwa.address]
-        }
-      })
-    }, [rwaList, tokenWithBalance])
-    const tokenListWithBalance = useMemo(() => {
-      return tokenList.map(rwa => {
-        return {
-          ...rwa,
-          ...tokenWithBalance[rwa.address]
-        }
-      })
-    }, [tokenList, tokenWithBalance])
-
     const handleCurrencyClick = useCallback(async () => {
       if (mode === 'in') {
         tokenDialog.setOpen(true)
@@ -67,14 +52,17 @@ const CurrencyInputPanel = memo(
       
     }, [mode])
     
+    const inputTokenBalance = useTokenBalance(inputToken?.symbol || '') 
+    const outputTokenBalance = useTokenBalance(outputToken?.symbol || '') 
+
     useEffect(() => {
-      if (rwaListWithBalance[0]) {
-        updateInputToken(rwaListWithBalance[0])
+      if (rwaList[0]) {
+        updateInputToken(rwaList[0])
       }
-      if (tokenListWithBalance[0]) {
-        updateOutputToken(tokenListWithBalance[0])
+      if (tokenList[0]) {
+        updateOutputToken(tokenList[0])
       }
-    }, [rwaListWithBalance.length, tokenListWithBalance.length, tokenWithBalance])
+    }, [rwaList.length, tokenList.length, tokenWithBalance])
 
     return (
       <div className={cn(
@@ -105,7 +93,7 @@ const CurrencyInputPanel = memo(
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {formatTokenAmountWithCommas(inputToken?.balance || '0')} {inputToken?.symbol || ' '}</div>
+              <div>Avbl: {formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')} {inputToken?.symbol || ' '}</div>
             </div>
         }
         {
@@ -115,7 +103,7 @@ const CurrencyInputPanel = memo(
               <div>Avbl: <span className={cn(
                 "",
                 isInsufficient ? "text-[#FF593C]" : ""
-              )}>{formatTokenAmountWithCommas(outputToken?.balance || '0')} {outputToken?.symbol || ' '}</span></div>
+              )}>{formatTokenAmountWithCommas(outputTokenBalance?.balance || '0')} {outputToken?.symbol || ' '}</span></div>
             </div>
         }
         <DialogController

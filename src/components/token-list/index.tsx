@@ -3,7 +3,7 @@ import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 import { useTokens } from "@/hooks/useTokens"
 import type { IToken } from "@/service/base/types"
-import { formatTokenAmountWithCommas } from "@/utils"
+import { formatTokenAmountWithCommas, symbolToLower } from "@/utils"
 import { useTranslation } from "@/hooks/useTranslation"
 import { useBaseStore } from "@/stores/baseStore"
 
@@ -51,7 +51,7 @@ const TokenList = memo(
       return tokenList.map(rwa => {
         return {
           ...rwa,
-          ...tokenWithBalance[rwa.address]
+          ...tokenWithBalance[symbolToLower(rwa.symbol)]
         }
       })
     }, [tokenList, tokenWithBalance])

@@ -8,8 +8,9 @@ import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
 import Pagination from "../pagination";
 import { formatTokenAmountWithCommas } from "@/utils/format";
-import { multiply } from "@/utils";
+import { multiply, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
+import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 
 export type CTokenProps = {
   stock: string,
@@ -21,6 +22,48 @@ export type CTokenProps = {
   lock?: number
   state?: string
 }
+
+export const CTokenPrice = memo(({ symbol, up }: { symbol: string; up: string }) => {
+  const tokenPrice = useRwaPrice(symbol)?.price ?? "0";
+
+  return (
+    <div className="flex items-center gap-x-2">
+      <span className="text-[16px] font-medium">${tokenPrice}</span>
+      <div className="flex items-center gap-x-[4px]">
+        <img
+          src={Number(up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
+          className="w-[6px]"
+        />
+        <span
+          className={
+            Number(up) > 0
+              ? "text-[#50E3C2] text-[12px]"
+              : "text-[rgba(227,80,122,1)] text-[12px]"
+          }
+        >
+          {Math.abs(Number(up || "0"))}%
+        </span>
+      </div>
+    </div>
+  );
+});
+export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string; pricePrecision: number }) => {
+  const tokenBalance = useTokenBalance(symbol)?.balance ?? "0";
+  const tokenPrice = useRwaPrice(symbol)?.price ?? "0";
+
+  const total = multiply(tokenBalance, tokenPrice);
+
+  return (
+    <div className="text-right">
+      <div className="text-[16px] font-medium leading-[24px]">
+        {formatTokenAmountWithCommas(tokenBalance)}
+      </div>
+      <div className="text-[12px] text-[rgba(255,255,255,0.6)]">
+        ≈ ${formatTokenAmountWithCommas(total, pricePrecision)}
+      </div>
+    </div>
+  );
+});
 
 const CTokenItem = memo(
 
@@ -76,18 +119,7 @@ const CTokenItem = memo(
           </div>
         </div>
         <div className="w-1/3 flex items-center gap-x-2">
-          <div className="">
-            <div className="flex items-center gap-x-2">
-              <span className=" text-[16px] font-medium">${token.price || '--'}</span>
-            </div>
-            <div className="flex items-center gap-x-[4px]">
-              <LazyImage src={Number(token.up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"} className="w-[6px]" />
-              <span className={cn(
-                " font-normal text-[12px]",
-                Number(token.up) > 0 ? 'text-[#50E3C2]' : 'text-[rgba(227,80,122,1)]'
-              )}>{Math.abs(Number(token.up || '0'))}%</span>
-            </div>
-          </div>
+          <CTokenPrice symbol={token.symbol} up={token.up || '0'} />
           {
             token.state === 4 && 
               <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
@@ -98,8 +130,7 @@ const CTokenItem = memo(
 
         </div>
         <div className="w-1/3 text-right">
-          <div className=" text-[16px] font-medium leading-[24px]">{formatTokenAmountWithCommas(token.balance || '0')}</div>
-          <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{balanceValue}</div>
+          <CTokenBalance symbol={token.symbol} pricePrecision={token.precision} />
         </div>
       </div>
     )
@@ -118,7 +149,7 @@ const CTokenList = memo(
       return rwaList.map(rwa => {
         return {
           ...rwa,
-          ...tokenWithBalance[rwa.address]
+          ...tokenWithBalance[symbolToLower(rwa.symbol)]
         }
       })
     }, [rwaList, tokenWithBalance])

@@ -1,8 +1,29 @@
 import { LazyImage } from "@/components/image/LazyImage"
+import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
 import type { IRwa } from "@/service/base/types"
 import { memo, useMemo } from "react"
+
+const RwaItemPrice = memo(
+  ({ data }: { data: IRwa}) => {
+    const rwaPrice = useRwaPrice(data.symbol)
+    if (!rwaPrice) return null
+
+    return (
+      <div className="mt-4 flex items-center gap-x-2">
+        <div className=" text-[22px] font-medium">${rwaPrice.price || '--'}</div>
+        <div className={cn(
+          "h-[29px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
+          Number(rwaPrice.up) > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
+        )}>
+          <LazyImage src={Number(rwaPrice.up) > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />
+          {Math.abs(Number(rwaPrice.up))}%
+        </div>
+      </div>
+    )
+  }
+)
 
 const RwaItem = memo(
   ({ data }: { data: IRwa}) => {
@@ -23,16 +44,7 @@ const RwaItem = memo(
         </div>
         <div className="mt-1 text-[20px] font-medium">{data.symbol}</div>
         <div className=" font-normal text-[14px] text-[rgba(255,255,255,0.8)]">{data.name}</div>
-        <div className="mt-4 flex items-center gap-x-2">
-          <div className=" text-[22px] font-medium">${data.price || '--'}</div>
-          <div className={cn(
-            "h-[29px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
-            upAmount > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
-          )}>
-            <LazyImage src={upAmount > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />
-            {Math.abs(upAmount)}%
-          </div>
-        </div>
+        <RwaItemPrice data={data} />
       </div>
     )
   }
