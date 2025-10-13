@@ -17,8 +17,8 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
   const { t } = useTranslation()
-
-  const { tradeHistoryFilters, updateTradeHistoryFilters } = useOrderFilterStore()
+  const tradeHistoryFilters = useOrderFilterStore(state => state.tradeHistoryFilters)
+  const updateTradeHistoryFilters = useOrderFilterStore(state => state.updateTradeHistoryFilters)
 
   const onUserSelectedDataRangeChanged = (dateRange: { startTime?: number; endTime?: number }) => {
     updateTradeHistoryFilters({
@@ -95,7 +95,20 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
           ]}
-          title='orderType'
+          title='side'
+        />
+        <DropDownFilter
+          data={tradeHistoryFilters.orderType}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateTradeHistoryFilters({
+              orderType: reduce(tradeHistoryFilters.orderType),
+            })
+          }
+          items={[
+            { key: 'limit', value: '0' },
+            { key: 'market', value: '1' },
+          ]}
+          title={'orderType'}
         />
         <DatePickerWithRange
           userSelectedDateRange={{

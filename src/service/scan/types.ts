@@ -1,4 +1,4 @@
-// 0 市价单 1 限价单
+// 0 限价单 1 市价单
 export type OrderType = 0 | 1;
 // 0 买单 1 卖单
 export type OrderSide = 0 | 1;
