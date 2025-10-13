@@ -1,14 +1,10 @@
-import { useMemo, useEffect, useRef } from "react";
-import {
-  TableHeader,
-  TableBody,
-  type ITableConfnig,
-} from "@/components/table-header";
-import { type IRwa } from "@/service/base/types";
-import { orderHistoryOptions, infiniteOrderHistoryOptions } from "@/queries";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { type IOrder } from "@/service/scan/types";
-import { noop } from "@/utils";
+import { useMemo, useEffect, useRef } from 'react'
+import { TableHeader, TableBody, type ITableConfnig } from '@/components/table-header'
+import { type IRwa } from '@/service/base/types'
+import { orderHistoryOptions, infiniteOrderHistoryOptions } from '@/queries'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { type IOrder } from '@/service/scan/types'
+import { noop } from '@/utils'
 import {
   SideCell,
   TokenCell,
@@ -17,48 +13,40 @@ import {
   TxHashCell,
   OrderTypeCell,
   DropDownFilter,
-} from "./Shared";
-import {
-  textPrefix,
-  textSuffix,
-  toFixed,
-  formatTimestamp,
-} from "@/utils/format";
-import { useOrderFilterStore } from "@/stores/orderFilterStore";
-import SignatureVerify from "./SignatureVerify";
-import { useSignatureValidStatus } from "@/hooks/useSignature";
-import { generateOrderHistoryFilterObj } from "@/stores/orderFilterStore";
-import { DatePickerWithRange } from "@/components/date-range-picker";
+} from './Shared'
+import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
+import { useOrderFilterStore } from '@/stores/orderFilterStore'
+import SignatureVerify from './SignatureVerify'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
+import { generateOrderHistoryFilterObj } from '@/stores/orderFilterStore'
+import { DatePickerWithRange } from '@/components/date-range-picker'
 
 export default function HistoryOrderTable(props: {
-  chainId: number;
-  account: string;
-  rwaTokens: IRwa[];
+  chainId: number
+  account: string
+  rwaTokens: IRwa[]
 }) {
-  const { chainId, rwaTokens } = props;
+  const { chainId, rwaTokens } = props
 
-  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus();
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
-  const { orderHistoryFilters, updateOrderHistoryFilters } =
-    useOrderFilterStore();
+  const orderHistoryFilters = useOrderFilterStore(state => state.orderHistoryFilters)
+  const updateOrderHistoryFilters = useOrderFilterStore(state => state.updateOrderHistoryFilters)
 
-  const onUserSelectedDataRangeChanged = (dateRange: {
-    startTime?: number;
-    endTime?: number;
-  }) => {
+  const onUserSelectedDataRangeChanged = (dateRange: { startTime?: number; endTime?: number }) => {
     updateOrderHistoryFilters({
       startTime: dateRange.startTime,
       endTime: dateRange.endTime,
-    });
-  };
+    })
+  }
 
   const filters = useMemo(() => {
-    const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters);
+    const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters)
     const otherFilter = {
       limit: 10,
-    };
-    return { ...userSelectFilter, ...otherFilter };
-  }, [orderHistoryFilters]);
+    }
+    return { ...userSelectFilter, ...otherFilter }
+  }, [orderHistoryFilters])
 
   // const {
   //   data,
@@ -68,49 +56,35 @@ export default function HistoryOrderTable(props: {
   //   error,
   // } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isFetching,
-    isLoading,
-    isError,
-  } = useInfiniteQuery(
-    infiniteOrderHistoryOptions(chainId, isSignatureValid, filters)
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
+    useInfiniteQuery(infiniteOrderHistoryOptions(chainId, isSignatureValid, filters))
 
-  const allOrders = data?.pages?.flatMap((page) => page.data) || [];
+  const allOrders = data?.pages?.flatMap(page => page.data) || []
 
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (
-        entries[0].isIntersecting &&
-        hasNextPage &&
-        !isFetching &&
-        !isFetchingNextPage
-      ) {
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasNextPage && !isFetching && !isFetchingNextPage) {
         // 当滚动到加载更多区域且有下一页数据时，触发加载
-        fetchNextPage();
+        fetchNextPage()
       }
-    });
+    })
 
     if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+      observer.observe(loadMoreRef.current)
     }
 
     return () => {
       if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+        observer.unobserve(loadMoreRef.current)
       }
-    };
-  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]);
+    }
+  }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
   return (
     <>
-      <div className="flex flex-row gap-4">
+      <div className='flex flex-row gap-4'>
         <DropDownFilter
           data={orderHistoryFilters.side}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -119,10 +93,23 @@ export default function HistoryOrderTable(props: {
             })
           }
           items={[
-            { key: "buy", value: "0" },
-            { key: "sell", value: "1" },
+            { key: 'buy', value: '0' },
+            { key: 'sell', value: '1' },
           ]}
-          title={"orderType"}
+          title={'side'}
+        />
+        <DropDownFilter
+          data={orderHistoryFilters.orderType}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOrderHistoryFilters({
+              orderType: reduce(orderHistoryFilters.orderType),
+            })
+          }
+          items={[
+            { key: 'limit', value: '0' },
+            { key: 'market', value: '1' },
+          ]}
+          title={'orderType'}
         />
         <DropDownFilter
           data={orderHistoryFilters.states}
@@ -131,23 +118,23 @@ export default function HistoryOrderTable(props: {
               states: reduce(orderHistoryFilters.states),
             })
           }
-          title={"orderStatus"}
+          title={'orderStatus'}
           items={[
             {
-              key: "filled",
-              value: "5",
+              key: 'filled',
+              value: '5',
             },
             {
-              key: "partiallyFilled",
-              value: "1",
+              key: 'partiallyFilled',
+              value: '1',
             },
             {
-              key: "canceled",
-              value: "3",
+              key: 'canceled',
+              value: '3',
             },
             {
-              key: "failed",
-              value: "2",
+              key: 'failed',
+              value: '2',
             },
           ]}
         />
@@ -159,11 +146,11 @@ export default function HistoryOrderTable(props: {
           onUserSelectedDataRangeChanged={onUserSelectedDataRangeChanged}
         />
       </div>
-      <TableHeader<"", IOrder, { rwaTokens: IRwa[] }>
-        lngPrefix="assets.order.tableHeader"
+      <TableHeader<'', IOrder, { rwaTokens: IRwa[] }>
+        lngPrefix='assets.order.tableHeader'
         config={orderHistoryTableConfig}
         sort={null}
-        className="border-none bg-white/4 rounded-md text-60"
+        className='border-none bg-white/4 rounded-md text-60'
         onSortChange={noop}
       />
       {isSignatureValid ? (
@@ -174,113 +161,102 @@ export default function HistoryOrderTable(props: {
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
           />
-          <div ref={loadMoreRef} className="py-4 text-center">
+          <div ref={loadMoreRef} className='py-4 text-center'>
             {isFetchingNextPage ? (
-              <div className="text-gray-500">加载中...</div>
+              <div className='text-gray-500'>加载中...</div>
             ) : hasNextPage ? (
-              <div className="text-gray-400">滚动加载更多</div>
+              <div className='text-gray-400'>滚动加载更多</div>
             ) : allOrders.length > 0 ? (
-              <div className="text-gray-400">没有更多数据了</div>
+              <div className='text-gray-400'>没有更多数据了</div>
             ) : null}
           </div>
           {isLoading && allOrders.length === 0 && (
-            <div className="py-8 text-center text-gray-500">加载中...</div>
+            <div className='py-8 text-center text-gray-500'>加载中...</div>
           )}
           {!isLoading && allOrders.length === 0 && (
-            <div className="py-8 text-center text-gray-400">暂无数据</div>
+            <div className='py-8 text-center text-gray-400'>暂无数据</div>
           )}
         </>
       ) : (
-        <SignatureVerify
-          className="mt-9"
-          refreshIsSignatureValid={refreshIsSignatureValid}
-        />
+        <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
       )}
     </>
-  );
+  )
 }
 
 const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
   {
-    key: "side",
+    key: 'side',
     sortable: false,
     render: (item: IOrder) => <SideCell side={item.side} />,
     width: 60,
   },
   {
-    key: "type",
+    key: 'type',
     sortable: false,
     render: (item: IOrder) => <OrderTypeCell orderType={item.orderType} />,
-    width: 80,
+    width: 60,
   },
   {
-    key: "token",
+    key: 'token',
     sortable: false,
+    width: 150,
     render: (item: IOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
-      const rwa = rwaTokens.find((token) => token.stockId === item.stockId);
-      return (
-        <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
-      );
+      const rwa = rwaTokens.find(token => token.stockId === item.stockId)
+      return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
     },
   },
   {
-    key: "orderPrice",
+    key: 'orderPrice',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOrder) => (
-      <TextCell text={textPrefix(toFixed(item.price), "$")} />
-    ),
+    render: (item: IOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
   },
   {
-    key: "orderAmount",
+    key: 'orderAmount',
     sortable: false,
     breakOnSpace: true,
     render: (item: IOrder) => <TextCell text={item.size} />,
   },
   {
-    key: "filledAmount",
+    key: 'filledAmount',
     sortable: false,
     breakOnSpace: true,
     render: (item: IOrder) => <TextCell text={item.settledSize} />,
   },
   {
-    key: "filledValue",
+    key: 'filledValue',
     breakOnSpace: true,
     sortable: false,
     render: (item: IOrder) => (
       <TextCell
         text={
-          item.settledAmount === "0"
-            ? textSuffix(item.settledAmount, "USDT")
-            : textSuffix(toFixed(item.settledAmount, 3), "USDT")
+          item.settledAmount === '0'
+            ? textSuffix(item.settledAmount, 'USDT')
+            : textSuffix(toFixed(item.settledAmount, 3), 'USDT')
         }
       />
     ),
   },
   {
-    key: "executionTime",
+    key: 'executionTime',
     sortable: false,
     breakOnSpace: true,
     render: (item: IOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
   },
   {
-    key: "status",
+    key: 'status',
     sortable: false,
     render: (item: IOrder) => <OrderStatusCell state={item.state} />,
   },
   {
-    key: "details",
+    key: 'details',
     sortable: false,
     render: () => null,
   },
   {
-    key: "txId",
+    key: 'txId',
     sortable: false,
     render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
-  {
-    key: "orderId",
-    sortable: false,
-    render: (item: IOrder) => <TextCell text={item.orderId} />,
-  },
-];
+]

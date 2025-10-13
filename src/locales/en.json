@@ -145,6 +145,9 @@
 
       "action": "Action",
       "orderHistory": "Order History",
+      "market": "Market",
+      "limit": "Limit",
+      "side": "Side",
       "orderType": "Order Type",
       "orderStatus": "Status",
       "all": "All",
@@ -155,7 +158,7 @@
       "failed": "Order Failed",
       "canceled": "Canceled",
       "filled": "Filled",
-      "cancelOrderSuccess": "Cancel Order Success",
+      "cancelOrderSuccess": "Order cancellation request submitted successfully.",
       "cancelOrdering": "Canceling"
     }
   },
