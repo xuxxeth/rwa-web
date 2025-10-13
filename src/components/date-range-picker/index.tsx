@@ -1,137 +1,118 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { subDays, format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { type DateRange } from "react-day-picker";
-import VectorSVG from "../pagination/vector.svg?react";
-import ArrowSVG from "./arrow.svg?react";
+import * as React from 'react'
+import { subDays, format } from 'date-fns'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { type DateRange } from 'react-day-picker'
+import VectorSVG from '../pagination/vector.svg?react'
+import ArrowSVG from './arrow.svg?react'
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 // import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { DayPicker, getDefaultClassNames } from "react-day-picker";
-import "react-day-picker/dist/style.css";
-import "./custom.css";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { DayPicker, getDefaultClassNames } from 'react-day-picker'
+import 'react-day-picker/dist/style.css'
+import './custom.css'
 
-const FormatStr = "yyyy-MM-dd";
+const FormatStr = 'yyyy-MM-dd'
 
 export function DatePickerWithRange({
   userSelectedDateRange,
   onUserSelectedDataRangeChanged,
 }: {
   userSelectedDateRange: {
-    from: number | undefined;
-    end: number | undefined;
-  };
-  onUserSelectedDataRangeChanged: (dateRange: {
-    startTime?: number;
-    endTime?: number;
-  }) => void;
+    from: number | undefined
+    end: number | undefined
+  }
+  onUserSelectedDataRangeChanged: (dateRange: { startTime?: number; endTime?: number }) => void
 }) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: userSelectedDateRange.from
-      ? new Date(userSelectedDateRange.from * 1000)
-      : new Date(),
-    to: userSelectedDateRange.end
-      ? new Date(userSelectedDateRange.end * 1000)
-      : new Date(),
-  });
+    from: userSelectedDateRange.from ? new Date(userSelectedDateRange.from * 1000) : new Date(),
+    to: userSelectedDateRange.end ? new Date(userSelectedDateRange.end * 1000) : new Date(),
+  })
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false)
 
-  const defaultClassNames = getDefaultClassNames();
+  const defaultClassNames = getDefaultClassNames()
 
   return (
-    <div className={cn("grid gap-2")}>
+    <div className={cn('grid gap-2')}>
       <Popover
         open={isOpen}
-        onOpenChange={(_open) => {
-          setIsOpen(_open);
+        onOpenChange={_open => {
+          setIsOpen(_open)
           if (!_open) {
             onUserSelectedDataRangeChanged({
-              startTime: date?.from
-                ? Math.floor(date.from.getTime() / 1000)
-                : undefined,
-              endTime: date?.to
-                ? Math.ceil(date.to.getTime() / 1000)
-                : undefined,
-            });
+              startTime: date?.from ? Math.floor(date.from.getTime() / 1000) : undefined,
+              endTime: date?.to ? Math.ceil(date.to.getTime() / 1000) : undefined,
+            })
           }
         }}
       >
         <PopoverTrigger asChild>
           <Button
-            id="date"
+            id='date'
             className={cn(
-              "w-[275px] h-10 rounded-sm border border-white/10 text-white bg-transparent justify-start text-left font-normal",
-              isOpen ? "border-[rgba(156,255,58,0.5)]" : ""
+              'w-[265px] h-10 rounded-sm border border-white/10 text-white bg-transparent justify-start text-left font-normal',
+              isOpen ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
           >
             <CalendarIcon />
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, FormatStr)}
-                  <ArrowSVG />
-                  {format(date.to, FormatStr)}
+                  <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
+                  <span className='w-4 h-4 py-1 px-[2.5px]'>
+                    <ArrowSVG style={{ width: '11.7px', height: 8 }} />
+                  </span>
+                  <span className='text-sm/5.5 font-medium'>{format(date.to, FormatStr)}</span>
                 </>
               ) : (
-                format(date.from, FormatStr)
+                <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
               )
             ) : (
-              <span>Pick a date</span>
+              <span className='text-sm/5.5 font-medium'>Pick a date</span>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className="w-auto p-0"
-          style={{ border: "none" }}
-          align="start"
-        >
+        <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='start'>
           <DayPicker
             numberOfMonths={2}
-            captionLayout={"label"}
+            captionLayout={'label'}
             showOutsideDays={false}
             selected={date}
             onSelect={(newDate: DateRange | undefined) => {
-              setDate(newDate);
+              setDate(newDate)
             }}
-            mode="range"
+            mode='range'
             components={{
               Chevron: ({ className, orientation, ...props }) => {
-                if (orientation === "left") {
-                  return <VectorSVG className="rotate-180" />;
+                if (orientation === 'left') {
+                  return <VectorSVG className='rotate-180' />
                 }
-                if (orientation === "right") {
-                  return <VectorSVG />;
+                if (orientation === 'right') {
+                  return <VectorSVG />
                 }
-                return (
-                  <VectorSVG className={cn("size-4", className)} {...props} />
-                );
+                return <VectorSVG className={cn('size-4', className)} {...props} />
               },
             }}
             classNames={{
               root: cn(
                 defaultClassNames.root,
-                "w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4"
+                'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4'
               ),
               nav: cn(
                 defaultClassNames.nav,
-                "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1"
+                'absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1'
               ),
               month_caption: cn(
                 defaultClassNames.month_caption,
-                "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]"
+                'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]'
               ),
               button_previous: cn(
                 defaultClassNames.button_previous,
-                "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50"
+                'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50'
               ),
             }}
           />
@@ -145,5 +126,5 @@ export function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
-  );
+  )
 }

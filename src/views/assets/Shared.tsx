@@ -1,153 +1,139 @@
-import { useState } from "react";
-import { LazyImage } from "@/components/image/LazyImage";
-import { cn, shortenAddress } from "@/utils";
-import { useTranslation } from "@/hooks/useTranslation";
-import CopyButton from "@/components/button/copyButton";
+import { useState } from 'react'
+import { LazyImage } from '@/components/image/LazyImage'
+import { cn, shortenAddress } from '@/utils'
+import { useTranslation } from '@/hooks/useTranslation'
+import CopyButton from '@/components/button/copyButton'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import VectorSVG from "@/components/pagination/vector.svg?react";
-import { CheckBoxBySVG } from "@/components/check-box";
-import { textSuffix, toFixed } from "@/utils";
-import type { OrderType } from "@/service/scan/types";
+} from '@/components/ui/dropdown-menu'
+import VectorSVG from '@/components/pagination/vector.svg?react'
+import { CheckBoxBySVG } from '@/components/check-box'
+import { textSuffix, toFixed } from '@/utils'
+import type { OrderType } from '@/service/scan/types'
 
 export function TextCell(props: { text: string | number; className?: string }) {
-  return (
-    <div className={cn("text-sm/5.5 font-normal", props.className)}>
-      {props.text}
-    </div>
-  );
+  return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
 }
 
 export function OrderTypeCell(props: { orderType: OrderType }) {
-  const { orderType } = props;
+  const { orderType } = props
 
-  return <TextCell text={orderType === 0 ? "Limit" : "Market"} />;
+  return <TextCell text={orderType === 0 ? 'Limit' : 'Market'} />
 }
 
 export function ValueCell({ amount }: { amount: string }) {
   return (
     <TextCell
-      text={
-        amount === "0"
-          ? textSuffix(amount, "USDT")
-          : textSuffix(toFixed(amount, 3), "USDT")
-      }
+      text={amount === '0' ? textSuffix(amount, 'USDT') : textSuffix(toFixed(amount, 3), 'USDT')}
     />
-  );
+  )
 }
 
 export function SideCell(props: { side: 0 | 1 }) {
-  const { side } = props;
+  const { t } = useTranslation()
+  const { side } = props
 
   return (
     <TextCell
-      text={side === 0 ? "buy" : "sell"}
-      className={
-        side === 0 ? "text-[rgba(33,201,94,1)]" : "text-[rgba(255,89,60,1)]"
-      }
+      text={side === 0 ? t('assets.order.buy') : t('assets.order.sell')}
+      className={side === 0 ? 'text-[rgba(33,201,94,1)]' : 'text-[rgba(255,89,60,1)]'}
     />
-  );
+  )
 }
 
 export function TxHashCell({ hash }: { hash: string }) {
   return (
-    <div className="flex flex-row items-center gap-2 cursor-pointer">
-      <span className="text-sm font-medium text-[rgba(26,133,255,1)]">
+    <div className='flex flex-row items-center gap-2 cursor-pointer'>
+      <span className='text-sm font-medium text-[rgba(26,133,255,1)]'>
         {shortenAddress(hash, 4, 3)}
       </span>
       <CopyButton copyText={hash} />
     </div>
-  );
+  )
 }
 
 export function TokenCell(props: {
-  icon: string | undefined;
-  token: string | undefined;
-  name: string | undefined;
+  icon: string | undefined
+  token: string | undefined
+  name: string | undefined
 }) {
   return (
-    <div className="flex flex-row gap-2">
-      {props.icon && <LazyImage className="w-10 h-10" src={props.icon || ""} />}
-      <div className="flex flex-col">
-        <div className="text-sm/6">{props.token}</div>
-        <div className="text-60 text-xs/4.5">{props.name}</div>
+    <div className='flex flex-row gap-2'>
+      {props.icon && <LazyImage className='w-10 h-10' src={props.icon || ''} />}
+      <div className='flex flex-col'>
+        <div className='text-sm/6'>{props.token}</div>
+        <div className='text-60 text-xs/4.5'>{props.name}</div>
       </div>
     </div>
-  );
+  )
 }
 
 const ORDER_STATUS: { [key: number]: { text: string; className: string } } = {
   0: {
-    text: "open",
-    className: "text-[rgba(38,192,226,1)] bg-[rgba(38,192,226,0.1)]",
+    text: 'open',
+    className: 'text-[rgba(38,192,226,1)] bg-[rgba(38,192,226,0.1)]',
   },
   1: {
-    text: "partiallyFilled",
-    className: "text-[rgba(242,147,57,1)] bg-[rgba(242,147,57,0.1)]",
+    text: 'partiallyFilled',
+    className: 'text-[rgba(242,147,57,1)] bg-[rgba(242,147,57,0.1)]',
   },
   2: {
-    text: "orderFailed",
-    className: "text-[rgba(209,26,42,1)] bg-[rgba(209,26,42,0.1)]",
+    text: 'orderFailed',
+    className: 'text-[rgba(209,26,42,1)] bg-[rgba(209,26,42,0.1)]',
   },
   3: {
-    text: "canceled",
-    className: "text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]",
+    text: 'canceled',
+    className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
   },
   5: {
-    text: "filled",
-    className: "text-[rgba(58,151,76,1)] bg-[rgba(58,151,76,0.1)]",
+    text: 'filled',
+    className: 'text-[rgba(58,151,76,1)] bg-[rgba(58,151,76,0.1)]',
   },
-};
+}
 
 export function OrderStatusCell(props: { state: number }) {
-  const { t } = useTranslation();
-  const config = ORDER_STATUS[props.state];
+  const { t } = useTranslation()
+  const config = ORDER_STATUS[props.state]
   return (
-    <button
-      className={cn(
-        "text-xs/4.5 px-2 py-1 rounded-sm font-medium",
-        config?.className || ""
-      )}
-    >
+    <button className={cn('text-xs/4.5 px-2 py-1 rounded-sm font-medium', config?.className || '')}>
       {config.text && t(`assets.order.state.${config.text}`)}
     </button>
-  );
+  )
 }
 
 export function DropDownFilter(props: {
-  data: string[];
-  onDataChange: (reduce: (prev: string[]) => string[]) => void;
-  items: { key: string; value: string }[];
-  title: string;
+  data: string[]
+  onDataChange: (reduce: (prev: string[]) => string[]) => void
+  items: { key: string; value: string }[]
+  title: string
 }) {
-  const { t } = useTranslation();
-  const { items } = props;
-  const [open, setOpen] = useState(false);
+  const { t } = useTranslation()
+  const { items } = props
+  const [open, setOpen] = useState(false)
 
-  const selectedTypes = props.data;
-  const setSelectedTypes = props.onDataChange;
+  const selectedTypes = props.data
+  const setSelectedTypes = props.onDataChange
 
   const handleItemClick = (type: string) => {
     setSelectedTypes((prev: string[]) => {
-      if (type === "all") {
-        return prev.includes("all") ? ["all"] : ["all"];
+      if (type === 'all') {
+        return prev.includes('all') ? ['all'] : ['all']
       }
       // 如果点击了非"all"选项，先移除"all"
-      const withoutAll = prev.filter((item) => item !== "all");
-      let res = [];
+      const withoutAll = prev.filter(item => item !== 'all')
+      let res = []
       if (withoutAll.includes(type)) {
-        res = withoutAll.filter((item) => item !== type);
+        res = withoutAll.filter(item => item !== type)
       } else {
-        res = [...withoutAll, type];
+        res = [...withoutAll, type]
       }
-      return res.length === 0 ? ["all"] : res;
-    });
-  };
+      return res.length === 0 ? ['all'] : res
+    })
+  }
 
   return (
     <div>
@@ -155,45 +141,39 @@ export function DropDownFilter(props: {
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger
             className={cn(
-              "cursor-pointer w-[211px] h-10 flex items-center px-4 py-2 border border-white/10 rounded-lg",
-              open ? "border-[rgba(156,255,58,0.5)]" : ""
+              'cursor-pointer w-[211px] h-10 flex items-center px-4 py-2 border border-white/10 rounded-lg',
+              open ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
           >
-            {selectedTypes.includes("all") ? (
+            {selectedTypes.includes('all') ? (
               <>
-                <span className="flex-1 text-left text-sm font-medium">
+                <span className='flex-1 text-left text-sm font-medium'>
                   {t(`assets.order.${props.title}`)}
                 </span>
-                <span>{t("assets.order.all")}</span>
+                <span>{t('assets.order.all')}</span>
               </>
             ) : (
-              <span className="flex-1 text-left text-sm font-medium truncate">
+              <span className='flex-1 text-left text-sm font-medium truncate'>
                 {selectedTypes
-                  .map((value) => {
-                    const item = items.find((item) => item.value === value);
-                    return t(`assets.order.${item?.key}`);
+                  .map(value => {
+                    const item = items.find(item => item.value === value)
+                    return t(`assets.order.${item?.key}`)
                   })
-                  .join(", ")}
+                  .join(', ')}
               </span>
             )}
-            <div
-              className={cn(
-                "w-4.5 h-4.5 flex items-center justify-center ml-2"
-              )}
-            >
-              <VectorSVG
-                className={cn("w-[7px] h-3", open ? "rotate-270" : "rotate-90")}
-              />
+            <div className={cn('w-4.5 h-4.5 flex items-center justify-center ml-2')}>
+              <VectorSVG className={cn('w-[7px] h-3', open ? 'rotate-270' : 'rotate-90')} />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="bg-[rgba(19,24,35,1)] border-none w-[211px] py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]"
-            align="end"
+            className='bg-[rgba(19,24,35,1)] border-none w-[211px] py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            align='end'
           >
             {[
               {
-                key: "all",
-                value: "all",
+                key: 'all',
+                value: 'all',
                 hasSeperator: true,
               },
               ...items,
@@ -203,41 +183,38 @@ export function DropDownFilter(props: {
                 value,
                 hasSeperator = false,
               }: {
-                key: string;
-                hasSeperator?: boolean;
-                value: string;
+                key: string
+                hasSeperator?: boolean
+                value: string
               }) => {
-                const checked = selectedTypes.includes(value);
+                const checked = selectedTypes.includes(value)
                 const mentItem = (
                   <DropdownMenuItem
                     key={key}
-                    onClick={(e) => e.preventDefault()}
-                    className="px-4 py-3 flex flex-row justify-between"
+                    onClick={e => e.preventDefault()}
+                    className='px-4 py-3 flex flex-row justify-between'
                   >
-                    <CheckBoxBySVG
-                      checked={checked}
-                      onChange={() => handleItemClick(value)}
-                    />
+                    <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
                     <span
                       className={cn(
-                        "text-base/6  font-medium",
-                        checked ? "text-white" : "text-[rgba(108,134,173,1)]"
+                        'text-base/6  font-medium',
+                        checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
                       )}
                     >
                       {t(`assets.order.${key}`)}
                     </span>
                   </DropdownMenuItem>
-                );
+                )
 
                 if (hasSeperator) {
                   return (
                     <>
                       {mentItem}
-                      <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuSeparator className='bg-white/10' />
                     </>
-                  );
+                  )
                 } else {
-                  return mentItem;
+                  return mentItem
                 }
               }
             )}
@@ -245,5 +222,5 @@ export function DropDownFilter(props: {
         </DropdownMenu>
       </div>
     </div>
-  );
+  )
 }

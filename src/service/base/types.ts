@@ -19,6 +19,7 @@ export interface ITokenWithBalance {
 export interface ITokenWithPrice  {
   "price"?: string , 
   "up"?: string, 
+  "dailyHigh"?: string,
 }
 
 export interface IStockWithPrice {
