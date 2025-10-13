@@ -15,6 +15,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import wsService from "@/service/WebSocketService";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
+import { useTokenBalance } from "@/hooks/useTokenBalances";
 
 const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
@@ -116,7 +117,8 @@ export function ConverBody({
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
-  const isInsufficient = useMemo(() => orderValue ? (isGreater(orderValue, outputToken?.balance || '0')) : false, [orderValue, outputToken])
+  const inputTokenBalance = useTokenBalance(inputToken?.symbol || '') 
+  const isInsufficient = useMemo(() => orderValue ? (isGreater(orderValue, inputTokenBalance?.balance || '0')) : false, [orderValue, outputToken])
 
   const disabled = useMemo(() => Number(orderValue) <= 0 || !!isInsufficient, [orderValue, isInsufficient])
 
