@@ -100,3 +100,11 @@ export function getSecondsSinceMidnight(): number {
   const diffMs = now.getTime() - midnight.getTime()
   return Math.floor(diffMs / 1000)
 }
+
+export function checkSymbolEqual(symbol1: string, symbol2: string) {
+  return symbol1.toLowerCase() === symbol2.toLowerCase()
+}
+
+export function symbolToLower(symbol: string) {
+  return symbol.toLowerCase()
+}

@@ -10,8 +10,14 @@ import type {
   IToken,
   ITokenWithBalance,
   ITokenWithPrice,
+  IStockWithPrice
 } from "@/service/base/types";
-import { getSecondsSinceMidnight, truncate } from "@/utils";
+import {
+  getSecondsSinceMidnight,
+  truncate,
+  checkSymbolEqual,
+  symbolToLower,
+} from "@/utils";
 
 const ENABLE_CACHE = true;
 // 缓存时间，2小时
@@ -29,20 +35,79 @@ export const useBaseStore = create<BaseStore>()(
       marketInfo: marketDefault,
       marketState: marketStateDefault,
       marketTradeState: MARKET_STATUS.DEFAULT,
-      tokenWithBalance: {},
+
       freshTokenBalancesCount: 1,
       // TODO: 使用 Map 可能性能更好?
-      // 更新 token 余额
+      // token 余额
+      tokenWithBalance: {},
       setTokenWithBalance: (
         tokenWithBalance: Record<string, ITokenWithBalance>
       ) => {
         set({ tokenWithBalance: tokenWithBalance });
       },
+
+      // token 价格
       tokenWithPrice: {},
       // 更新 token 价格
       setTokenWithPrice: (tokenWithPrice: Record<string, ITokenWithPrice>) => {
         set({ tokenWithPrice: tokenWithPrice });
       },
+      // 使用 websocket 数据更新 token 价格
+      setTokenWithPriceByWebSocketData: (data: IRwaPrice[]) => {
+        const rwaList = get().rwaList;
+        if (rwaList.length === 0) return;
+        const tokenWithPrices: Record<string, ITokenWithPrice> = data.reduce(
+          (acc, cur) => {
+            const rwa = rwaList.find((item) =>
+              checkSymbolEqual(item.symbol, cur.S)
+            );
+            if (rwa) {
+              acc[symbolToLower(cur.S)] = {
+                price: truncate(cur.p || 0, rwa.precision),
+                up: truncate(
+                  (cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100,
+                  2
+                ),
+              };
+            }
+            return acc;
+          },
+          {} as Record<string, ITokenWithPrice>
+        );
+        set({ tokenWithPrice: tokenWithPrices });
+      },
+
+      // 股票价格
+      stockWithPrice: {},
+      setStockWithPrice: (stockWithPrice: Record<string, IStockWithPrice>) => {
+        set({ stockWithPrice: stockWithPrice });
+      },
+      // 使用 websocket 数据更新股票价格
+      setStockWithPriceByWebSocketData: (data: IRwaPrice[]) => {
+        const stocksList = get().stocksList;
+        if (stocksList.length === 0) return;
+        const stockWithPrices: Record<string, IStockWithPrice> = data.reduce(
+          (acc, cur) => {
+            const stock = stocksList.find((item) =>
+              checkSymbolEqual(item.stockCode, cur.S)
+            );
+            if (stock) {
+              acc[symbolToLower(cur.S)] = {
+                price: truncate(cur?.p || 0, 2),
+                up: truncate(
+                  (cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100,
+                  2
+                ),
+                cPrice: truncate(cur?.c || 0, 2),
+              };
+            }
+            return acc;
+          },
+          {} as Record<string, IStockWithPrice>
+        );
+        set({ stockWithPrice: stockWithPrices });
+      },
+
       getChains: async () => {
         const res = await baseApi.getChains();
         if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -162,9 +227,8 @@ export const useBaseStore = create<BaseStore>()(
         set({ stocksList: stocksList });
       },
       freshTokenBalances: () => {
-        set({freshTokenBalancesCount: get().freshTokenBalancesCount + 1})
-        
-      }
+        set({ freshTokenBalancesCount: get().freshTokenBalancesCount + 1 });
+      },
     }),
     {
       name: "CA_WEB_BASE_INFO",
