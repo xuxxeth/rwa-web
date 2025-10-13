@@ -19,16 +19,23 @@ BigNumber.config({
 });
 
 function RoutesWrapper() {
-  
   return useRoutes(routes);
 }
 
 function App() {
   const { t, i18n } = useTranslation();
-  const { account, chainId } = useActiveWeb3()
-  const updateRwasPrice = useBaseStore(state => state.updateRwasPrice)
-  const updateStocksPrice = useBaseStore(state => state.updateStocksPrice)
-  const initBaseStore = useBaseStore(state => state.init)
+  const { account, chainId } = useActiveWeb3();
+  // const updateRwasPrice = useBaseStore((state) => state.updateRwasPrice);
+  // const updateStocksPrice = useBaseStore((state) => state.updateStocksPrice);
+  const initBaseStore = useBaseStore((state) => state.init);
+  const setTokenWithPriceByWebSocketData = useBaseStore(
+    (state) => state.setTokenWithPriceByWebSocketData
+  );
+  const setStockWithPriceByWebSocketData = useBaseStore(
+    (state) => state.setStockWithPriceByWebSocketData
+  );
+
+
 
   // const getChains = useBaseStore(state => state.getChains)
   // const getMarket = useBaseStore(state => state.getMarket)
@@ -41,30 +48,33 @@ function App() {
 
   // 两个汇总到一起处理了
   // 获取余额信息
-  useTokenBalances()
+  useTokenBalances();
   // 获取Rwa余额
   // useRwaBalances()
 
   useEffect(() => {
-    if(!chainId) return
+    if (!chainId) return;
     // 初始化baseStore
-    initBaseStore(chainId)
-  }, [chainId])
-  
+    initBaseStore(chainId);
+  }, [chainId]);
+
   useEffect(() => {
-    wsService.init({})
+    wsService.init({});
     wsService.subscribe(["summary"], (data) => {
-      if (data.type === 'summary') {
-        updateRwasPrice(data.data || [])
-        updateStocksPrice(data.data || [])
+      if (data.type === "summary") {
+        // setTokenWithPrice()
+        // debugger
+        // updateRwasPrice(data.data || [])
+        setTokenWithPriceByWebSocketData(data.data || [])
+        setStockWithPriceByWebSocketData(data.data || [])
       }
-    })
+    });
 
     return () => {
-      wsService.close()
-    }
-  }, [])
-  
+      wsService.close();
+    };
+  }, []);
+
   return (
     <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>
       <Suspense fallback={<div>{t("Loading")}...</div>}>

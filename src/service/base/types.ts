@@ -18,6 +18,13 @@ export interface ITokenWithBalance {
 
 export interface ITokenWithPrice  {
   "price"?: string , 
+  "up"?: string, 
+}
+
+export interface IStockWithPrice {
+  "price"?: string , 
+  "up"?: string, 
+  "cPrice"?: string, 
 }
 
 // 股票信息
