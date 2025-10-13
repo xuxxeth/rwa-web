@@ -2,7 +2,7 @@ import { BrowserRouter, useRoutes } from "react-router-dom";
 import BigNumber from "bignumber.js";
 import routes from "./routes";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import storage from "./utils/storage";
 import { useTranslation } from "./hooks/useTranslation";
 
@@ -11,6 +11,7 @@ import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import wsService from "./service/WebSocketService";
+import { ScrollToTop } from "./components/ScrollToTop";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -25,8 +26,6 @@ function RoutesWrapper() {
 function App() {
   const { t, i18n } = useTranslation();
   const { account, chainId } = useActiveWeb3();
-  // const updateRwasPrice = useBaseStore((state) => state.updateRwasPrice);
-  // const updateStocksPrice = useBaseStore((state) => state.updateStocksPrice);
   const initBaseStore = useBaseStore((state) => state.init);
   const setTokenWithPriceByWebSocketData = useBaseStore(
     (state) => state.setTokenWithPriceByWebSocketData
@@ -35,11 +34,7 @@ function App() {
     (state) => state.setStockWithPriceByWebSocketData
   );
 
-
-
-  // const getChains = useBaseStore(state => state.getChains)
-  // const getMarket = useBaseStore(state => state.getMarket)
-  // const getStocks = useBaseStore(state => state.getStocks)
+  const framePending = useRef<Boolean>(false)
 
   useEffect(() => {
     const lng = storage.getItem("CA_LANGUAGE") || "en";
@@ -61,13 +56,18 @@ function App() {
   useEffect(() => {
     wsService.init({});
     wsService.subscribe(["summary"], (data) => {
-      if (data.type === "summary") {
-        // setTokenWithPrice()
-        // debugger
-        // updateRwasPrice(data.data || [])
-        setTokenWithPriceByWebSocketData(data.data || [])
-        setStockWithPriceByWebSocketData(data.data || [])
+      if (!framePending.current) {
+        framePending.current = true
+        requestAnimationFrame(() => {
+          if (data.type === "summary") {
+            setTokenWithPriceByWebSocketData(data.data || [])
+            setStockWithPriceByWebSocketData(data.data || [])
+          }
+          framePending.current = false
+        })
+        
       }
+      
     });
 
     return () => {
@@ -79,6 +79,7 @@ function App() {
     <ErrorBoundary fallback={<h2>{t("pageError")}</h2>}>
       <Suspense fallback={<div>{t("Loading")}...</div>}>
         <BrowserRouter>
+          <ScrollToTop />
           <RoutesWrapper />
         </BrowserRouter>
         <Toaster position="top-center" />

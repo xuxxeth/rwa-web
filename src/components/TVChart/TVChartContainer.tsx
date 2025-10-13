@@ -8,6 +8,7 @@ export const TVChartContainer = () => {
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
   
   useEffect(() => {
+    console.log(chartContainerRef.current, 333333333)
     if (!chartContainerRef.current) {
         return () => { };
     }
@@ -45,6 +46,7 @@ export const TVChartContainer = () => {
       },
 
     };
+    console.log(window.TradingView?.widget, 3333333333)
     if (window.TradingView?.widget) {
       tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
       tvWidgetRef.current?.onChartReady(function () {

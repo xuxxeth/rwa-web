@@ -56,13 +56,16 @@ const CurrencyInputPanel = memo(
     const outputTokenBalance = useTokenBalance(outputToken?.symbol || '') 
 
     useEffect(() => {
-      if (rwaList[0]) {
+      if (rwaList[0] && !inputToken) {
         updateInputToken(rwaList[0])
       }
+    }, [rwaList.length, inputToken])
+
+    useEffect(() => {
       if (tokenList[0]) {
         updateOutputToken(tokenList[0])
       }
-    }, [rwaList.length, tokenList.length, tokenWithBalance])
+    }, [tokenList.length])
 
     return (
       <div className={cn(

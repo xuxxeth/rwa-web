@@ -33,7 +33,8 @@ export const useTradeStore = create<TradeStore>()(
       name: "CA_WEB_TRADE_INFO",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        
+        inputToken: state.inputToken,
+        outputToken: state.outputToken,
       }),
     }
   )

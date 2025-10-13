@@ -1,7 +1,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Divide } from "../divide";
 import { useTranslation } from "@/hooks/useTranslation";
-import { shortenAddress } from "@/utils";
+import { formatTokenAmountWithCommas, shortenAddress } from "@/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import storage from "@/utils/storage";
@@ -13,6 +13,7 @@ import { useShowDialog, DialogController } from '@/components/dialog/DialogContr
 import { LazyImage } from "../image/LazyImage";
 import { useUSDT } from "@/hooks/useTokens";
 import CopyButton from "./copyButton";
+import { useTokenBalance } from "@/hooks/useTokenBalances";
 
 export function WalletItem({
   wallet,
@@ -59,6 +60,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const hasConnected = useRef<boolean>(false)
 
   const usdtToken = useUSDT()
+  const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
   // 默认执行一次连接钱包操作
   useEffect(() => {
@@ -119,7 +121,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <div className="py-3">
                     <div className="flex items-center">
                       <img src="./images/tokens/usdt.png" className="w-5 h-5" alt="" />
-                      <span className="text-[18px] font-semibold ml-2">{usdtToken?.balance}</span>
+                      <span className="text-[18px] font-semibold ml-2">{formatTokenAmountWithCommas(usdtBalance?.balance ?? '0', usdtToken?.precision) }</span>
                     </div>
                     <div className="text-[#6C86AD] text-sm leading-6">{t('Total USDT Balance')}</div>
                   </div>
