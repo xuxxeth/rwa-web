@@ -49,7 +49,7 @@ export function TxHashCell({ hash }: { hash: string }) {
   return (
     <div className='flex flex-row items-center gap-2 cursor-pointer'>
       <span className='text-sm font-medium text-[rgba(26,133,255,1)]'>
-        {shortenAddress(hash, 4, 3)}
+        {shortenAddress(hash, 4, 4)}
       </span>
       <CopyButton copyText={hash} />
     </div>

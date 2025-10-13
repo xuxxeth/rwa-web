@@ -28,7 +28,8 @@ export default function OpenOrderTable(props: {
 }) {
   const { chainId, account, rwaTokens } = props
 
-  const { openOrderFilters, updateOpenOrderFilters } = useOrderFilterStore()
+  const openOrderFilters = useOrderFilterStore(state => state.openOrderFilters)
+  const updateOpenOrderFilters = useOrderFilterStore(state => state.updateOpenOrderFilters)
 
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
@@ -48,6 +49,7 @@ export default function OpenOrderTable(props: {
   //   error,
   //   refetch,
   // } = useQuery(openOrderOptions(chainId, isSignatureValid, filter));
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
     useInfiniteQuery(infiniteOpenOrderOptions(chainId, isSignatureValid, filter))
 
@@ -88,7 +90,7 @@ export default function OpenOrderTable(props: {
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
           ]}
-          title={'orderType'}
+          title={'side'}
         />
         {/* <DropDownFilter
           data={openOrderFilters.states}

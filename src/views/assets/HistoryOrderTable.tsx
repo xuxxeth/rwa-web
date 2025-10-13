@@ -30,7 +30,8 @@ export default function HistoryOrderTable(props: {
 
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
-  const { orderHistoryFilters, updateOrderHistoryFilters } = useOrderFilterStore()
+  const orderHistoryFilters = useOrderFilterStore(state => state.orderHistoryFilters)
+  const updateOrderHistoryFilters = useOrderFilterStore(state => state.updateOrderHistoryFilters)
 
   const onUserSelectedDataRangeChanged = (dateRange: { startTime?: number; endTime?: number }) => {
     updateOrderHistoryFilters({
@@ -94,6 +95,19 @@ export default function HistoryOrderTable(props: {
           items={[
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
+          ]}
+          title={'side'}
+        />
+        <DropDownFilter
+          data={orderHistoryFilters.orderType}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOrderHistoryFilters({
+              orderType: reduce(orderHistoryFilters.orderType),
+            })
+          }
+          items={[
+            { key: 'limit', value: '0' },
+            { key: 'market', value: '1' },
           ]}
           title={'orderType'}
         />
