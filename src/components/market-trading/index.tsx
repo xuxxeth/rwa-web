@@ -15,6 +15,7 @@ const MarketTrading = memo(
   ({ state = 2, align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
     
+    
     const marketInfo = useMemo(() => {
       let _icon = ''
       let _info = ''

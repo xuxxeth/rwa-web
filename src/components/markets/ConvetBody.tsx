@@ -104,7 +104,7 @@ export function ConverBody({
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 19), wait: true})
+    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true})
     setBuying(false)
     console.log(result)
     if (result && result?.code === -1) {
@@ -118,17 +118,31 @@ export function ConverBody({
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
   const inputTokenBalance = useTokenBalance(inputToken?.symbol || '') 
-  const isInsufficient = useMemo(() => orderValue ? (isGreater(orderValue, inputTokenBalance?.balance || '0')) : false, [orderValue, outputToken])
+  const outputTokenBalance = useTokenBalance(outputToken?.symbol || '') 
 
-  const disabled = useMemo(() => Number(orderValue) <= 0 || !!isInsufficient, [orderValue, isInsufficient])
+  const isInsufficient = useMemo(
+    () => action === 'buy' && orderValue ? (isGreater(orderValue, outputTokenBalance?.balance || '0')) : false, 
+    [orderValue, outputTokenBalance, action]
+  )
+
+  const isSellInsufficient = useMemo(
+    () => action === 'sell' && orderValue ? (isGreater(orderValue, inputTokenBalance?.balance || '0')) : false, 
+    [orderValue, inputTokenBalance, action]
+  )
+
+  const disabled = useMemo(
+    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) , 
+    [orderValue, isInsufficient, isSellInsufficient, action]
+  )
 
   const buttonText = useMemo(() => {
     if (Number(orderValue) <= 0) return t('Enter an amount')
-    if (isInsufficient) return t("Insufficient USDT")
+    if (isInsufficient) return t("Insufficient") + ' ' + outputToken?.symbol
+    if (isSellInsufficient) return t("Insufficient") + ' ' + inputToken?.symbol
     
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, actionText, buying, disabled, inputToken, orderValue, isInsufficient])
+  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient])
 
   return (
     <div className="mt-4">
@@ -145,6 +159,7 @@ export function ConverBody({
         label={t('Quantity')}
         placeholder={t('Whole shares only')}
         onUserInput={hanleInputQuantity}
+        isInsufficient={isSellInsufficient}
       />
       <div className="h-2"></div>
       <CurrencyInputPanel

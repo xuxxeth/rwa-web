@@ -93,7 +93,10 @@ const CurrencyInputPanel = memo(
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
               <div className="">≈ $0.00</div>
-              <div>Avbl: {formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')} {inputToken?.symbol || ' '}</div>
+              <div>Avbl: <span className={cn(
+                "",
+                isInsufficient ? "text-[#FF593C]" : ""
+              )}>{formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')} {inputToken?.symbol || ' '}</span></div>
             </div>
         }
         {
