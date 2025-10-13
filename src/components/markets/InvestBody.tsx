@@ -8,12 +8,6 @@ export function InvestBody() {
   const router = useRouter()
   const { t } = useTranslation()
   const _id = useId()
-  // const rwaList = [
-  //   {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98'},
-  //   {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98'},
-  //   {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1},
-  //   {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1},
-  // ]
   const rwaList = useBaseStore(state => state.rwaList)
   const filterRwaList = useMemo(() => rwaList.slice(0, 6), [rwaList])
 

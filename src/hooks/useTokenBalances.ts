@@ -56,7 +56,9 @@ export function useTokenBalances() {
   }
 }
 
-export function useTokenBalance(address: string) {
-  const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
-  return useMemo(() => address && tokenWithBalance[address], [address, tokenWithBalance])
-}
+
+export const useTokenBalance = (symbol: string) =>
+  useBaseStore((state) => state.tokenWithBalance[symbolToLower(symbol)]);
+
+export const useRwaPrice = (symbol: string) =>
+  useBaseStore((state) => state.tokenWithPrice[symbolToLower(symbol)]);
