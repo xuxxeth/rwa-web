@@ -15,7 +15,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import wsService from "@/service/WebSocketService";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
-import { useTokenBalance } from "@/hooks/useTokenBalances";
+import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 
 const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
@@ -46,8 +46,10 @@ export function ConverBody({
   const [orderValue, setOrderValue] = useState('')
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken, outputToken])
 
+  const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
+
   const approveAmount = useMemo(() => {
-    return multiply(orderValue, inputToken?.price ?? '0')
+    return multiply(orderValue, inputTokenPrice?.price ?? '0')
   }, [orderValue, inputToken])
 
   console.log('orderValue: ', orderValue, approveAmount)
@@ -61,17 +63,11 @@ export function ConverBody({
     updateInputSize(value)
   }, [])
 
-  const handleSubscribe = (data: any) => {
-  }
-
   useEffect(() => {
-    wsService.init({})
-
-    wsService.subscribe(["summary"], handleSubscribe)
-    return () => {
-      wsService.unsubscribe(["summary"], handleSubscribe)
+    if (inputTokenPrice) {
+      updateLimitPrice(inputTokenPrice.price ?? '0')
     }
-  }, [])
+  }, [inputToken, inputTokenPrice, updateLimitPrice])
   
   useEffect(() => {
     if (Number(limitPrice) && Number(inputSize)) {
@@ -147,6 +143,7 @@ export function ConverBody({
   return (
     <div className="mt-4">
       <CurrencyInputPanel
+        value={limitPrice}
         from={from}
         mode="price"
         label={t('Limit price')}
@@ -160,6 +157,7 @@ export function ConverBody({
         placeholder={t('Whole shares only')}
         onUserInput={hanleInputQuantity}
         isInsufficient={isSellInsufficient}
+        quantityValue={orderValue}
       />
       <div className="h-2"></div>
       <CurrencyInputPanel
@@ -168,6 +166,7 @@ export function ConverBody({
         label={t('Order Value')}
         value={orderValue}
         isInsufficient={isInsufficient}
+        orderValue={orderValue}
       />
       {
         Number(orderValue) > 0 && 

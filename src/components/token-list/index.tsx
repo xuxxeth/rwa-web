@@ -22,8 +22,8 @@ const TokenItem = memo(
           onClick && onClick(token)
         }}
       >
-        <div className="flex items-center gap-x-2">
-          <LazyImage src={token.icon} className="w-10 h-10" />
+        <div className="flex items-center gap-x-2 shrink-0">
+          <LazyImage src={token.icon} className="w-10 h-10 rounded-full shrink-0" />
           <div>
             <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>
             <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.name}</div>

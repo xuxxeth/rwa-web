@@ -41,7 +41,7 @@ export const StockInfo = memo(
         <div className="flex items-center">
           <div className="w-[54px] h-[54px]">
             {
-              inputToken?.icon && <LazyImage src={inputToken?.icon} className="w-[54px] h-[54px]" />
+              inputToken?.icon && <LazyImage src={inputToken?.icon} className="w-[54px] h-[54px] rounded-full" />
             }
           </div>
           

@@ -22,18 +22,18 @@ type CurrencyInputPanelProps = {
   value?: string
   regex?: string
   isInsufficient?: boolean
+  quantityValue?: string
+  orderValue?: string
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
 }
 
 const CurrencyInputPanel = memo(
-  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, onUserInput }: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, quantityValue, orderValue, onUserInput }: CurrencyInputPanelProps) => {
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
     const updateOutputToken = useTradeStore(state => state.updateOutputToken)
-
-    const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
 
     const tokenDialog = useShowDialog()
     const cTokenDialog = useShowDialog()
@@ -95,7 +95,7 @@ const CurrencyInputPanel = memo(
         {
           mode === 'in' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
-              <div className="">≈ $0.00</div>
+              <div className="">≈ ${formatTokenAmountWithCommas(quantityValue || '0', inputToken?.precision)}</div>
               <div>Avbl: <span className={cn(
                 "",
                 isInsufficient ? "text-[#FF593C]" : ""
@@ -105,7 +105,7 @@ const CurrencyInputPanel = memo(
         {
           mode === 'out' && 
             <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
-              <div className="">≈ $0.00</div>
+              <div className="">≈ ${formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)}</div>
               <div>Avbl: <span className={cn(
                 "",
                 isInsufficient ? "text-[#FF593C]" : ""

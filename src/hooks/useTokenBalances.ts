@@ -8,6 +8,7 @@ import { useBaseStore } from '@/stores/baseStore'
 import type { IToken, ITokenWithBalance } from '@/service/base/types'
 
 import { useTokens, useRwaTokens } from './useTokens'
+import { useWssStore } from '@/stores/wssStore'
 
 export function useTokenBalances() {
   const { getTokenBalances } = useBalances()
@@ -62,3 +63,6 @@ export const useTokenBalance = (symbol: string) =>
 
 export const useRwaPrice = (symbol: string) =>
   useBaseStore((state) => state.tokenWithPrice[symbolToLower(symbol)]);
+
+export const useStableRwaPrice = (symbol: string) =>
+  useWssStore((state) => state.stableTokenWithPrice[symbolToLower(symbol)]);

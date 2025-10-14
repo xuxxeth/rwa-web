@@ -12,6 +12,7 @@ import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import wsService from "./service/WebSocketService";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { useWssStore } from "./stores/wssStore";
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -33,6 +34,7 @@ function App() {
   const setStockWithPriceByWebSocketData = useBaseStore(
     (state) => state.setStockWithPriceByWebSocketData
   );
+  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
 
   const framePending = useRef<Boolean>(false)
 
@@ -62,6 +64,7 @@ function App() {
           if (data.type === "summary") {
             setTokenWithPriceByWebSocketData(data.data || [])
             setStockWithPriceByWebSocketData(data.data || [])
+            stableTokenWithPrice(data.data || [])
           }
           framePending.current = false
         })
