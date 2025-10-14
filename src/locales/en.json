@@ -179,5 +179,8 @@
   "Holdings": "Holdings",
   "Select a token": "Select a token",
   "days": "days",
-  "Confirm": "Confirm"
+  "Confirm": "Confirm",
+  "identity": {
+    "Identity_verification": "Identity verification"
+  }
 }

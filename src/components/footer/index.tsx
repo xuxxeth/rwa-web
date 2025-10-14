@@ -35,7 +35,7 @@ export function XFooter() {
           <div>
             <div className=" font-semibold">Contact</div>
             <div className="flex items-center mt-6">
-              <img src="/images/icons/mail.png" className="w-6" alt="" />
+              <img src="/images/icons/e_mail.png" className="w-6" alt="" />
               <div className="text-80 ml-2">contact@cyberalpha.cc</div>
             </div>
           </div>

@@ -15,6 +15,7 @@ const Components = lazy(() => import("../views/components"));
 // Markets children routes
 const MarketTrading = lazy(() => import("../views/markets/MarketTrading"));
 const MarketQuotes = lazy(() => import("../views/markets/MarketQuotes"));
+const Identity = lazy(() => import("../views/identity"));
 
 const Assets = lazy(() => import("../views/assets"));
 
@@ -50,6 +51,11 @@ const routes: RouteObject[] = [
     path: '/assets',
     element: <Assets />,
   },
+  {
+    path: '/identity',
+    element: <Identity />,
+  },
+
   {
     path: "/kline",
     element: <KLine />,

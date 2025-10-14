@@ -83,7 +83,7 @@ function App() {
 
   return (
     <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>
-      <Suspense fallback={<div>{t('Loading')}...</div>}>
+      <Suspense fallback={<div className=' text-white flex justify-center items-center h-screen '>{t('Loading')}...</div>}>
         <BrowserRouter>
           <ScrollToTop />
           <RoutesWrapper />
