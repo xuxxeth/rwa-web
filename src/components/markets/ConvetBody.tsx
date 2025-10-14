@@ -169,14 +169,18 @@ export function ConverBody({
         value={orderValue}
         isInsufficient={isInsufficient}
       />
-      <EstimatedInfo
-        marketInfo={marketInfo}
-        inputToken={inputToken}
-        outputToken={outputToken}
-        expires={expires}
-        onEdit={() => {
-        expiresDialog.show()
-      }} />
+      {
+        Number(orderValue) > 0 && 
+          <EstimatedInfo
+            marketInfo={marketInfo}
+            inputToken={inputToken}
+            outputToken={outputToken}
+            expires={expires}
+            onEdit={() => {
+            expiresDialog.show()
+          }} />
+      }
+      
       {
         !account ? <ConnectButtonText /> :
         <Button variant={buttonVariant} 
