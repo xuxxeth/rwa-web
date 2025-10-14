@@ -80,7 +80,7 @@ export function SubMenus() {
                 <div className=" px-4 flex items-center cursor-pointer py-2"
                   onClick={() => setCurrentSub(0)}
                 >
-                  <img src="./images/icons/back.png" className="w-6" alt="" />
+                  <img src="/images/icons/back.png" className="w-6" alt="" />
                   <span className="text-sm font-medium ml-2">{t('Back')}</span>
                 </div>
                 <div className=" px-4">

@@ -4,12 +4,12 @@ import { lazy, useEffect, useState } from "react";
 const TVChartContainer = lazy(() => import("@/components/TVChart/TVChartContainer"))
 
 export const TradingChart = () => {
-  const status = useScript("/libraries/datafeeds/udf/dist/bundle.js");
+  // const status = useScript("/libraries/datafeeds/udf/dist/bundle.js");
   const statusLibrary = useScript("/libraries/charting_library/charting_library.js");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (status === "ready" && statusLibrary === "ready") {
+    if (statusLibrary === "ready") {
       
       const check = () => {
         if (window.TradingView?.widget) {
@@ -20,7 +20,7 @@ export const TradingChart = () => {
       };
       check();
     }
-  }, [status, statusLibrary]);
+  }, [statusLibrary]);
 
   return ready ? <TVChartContainer /> : <div className="h-[600px]"></div>
 

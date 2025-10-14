@@ -4,13 +4,13 @@ import { useRouter } from "@/hooks/useRouter"
 
 export function Section1() {
   const starList = [
-    {path: './images/icons/star/1.png'},
-    {path: './images/icons/star/2.png'},
-    {path: './images/icons/star/3.png'},
-    {path: './images/icons/star/4.png'},
-    {path: './images/icons/star/5.png'},
-    {path: './images/icons/star/6.png'},
-    {path: './images/icons/star/7.png'},
+    {path: '/images/icons/star/1.png'},
+    {path: '/images/icons/star/2.png'},
+    {path: '/images/icons/star/3.png'},
+    {path: '/images/icons/star/4.png'},
+    {path: '/images/icons/star/5.png'},
+    {path: '/images/icons/star/6.png'},
+    {path: '/images/icons/star/7.png'},
     // {path: './images/icons/star/8.png'},
   ]
   const _id = useId()

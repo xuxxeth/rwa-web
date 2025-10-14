@@ -13,6 +13,7 @@ import type {
 } from "@/service/base/types";
 
 export interface BaseStore {
+  currentWallet: any,
   lastChainId: number | null;
   lastInitTime: number;
   chainList: IChain[];
@@ -25,6 +26,7 @@ export interface BaseStore {
   tokenWithBalance: Record<string, ITokenWithBalance>;
   freshTokenBalancesCount: number;
   stockWithPrice: Record<string, IStockWithPrice>;
+  setCurrentWallet: (wallet: any) => void,
   setStockWithPrice: (
     stockWithPrice: Record<string, IStockWithPrice>
   ) => void;

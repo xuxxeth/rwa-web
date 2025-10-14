@@ -5,17 +5,17 @@ export default function Section4() {
     {
       title: 'Built on Trust and Transparency',
       desc: [
-        {text: 'Tokenized with 1:1 Real-World Backing', icon: './images/home/icon_bt_1.png'},
-        {text: 'Held Safely by Third-Party Broker', icon: './images/home/icon_bt_2.png'},
-        {text: 'Full Redemption Guarantee', icon: './images/home/icon_bt_3.png'},
+        {text: 'Tokenized with 1:1 Real-World Backing', icon: '/images/home/icon_bt_1.png'},
+        {text: 'Held Safely by Third-Party Broker', icon: '/images/home/icon_bt_2.png'},
+        {text: 'Full Redemption Guarantee', icon: '/images/home/icon_bt_3.png'},
       ]
     },
     {
       title: 'Unchained Potential',
       desc: [
-        {text: 'ERC-20 Compatible & Fully Transferable', icon: './images/home/icon_up_1.png'},
-        {text: 'Composable Across DeFi Ecosystems', icon: './images/home/icon_up_2.png'},
-        {text: 'Cross-Chain Ready by Design', icon: './images/home/icon_up_3.png'},
+        {text: 'ERC-20 Compatible & Fully Transferable', icon: '/images/home/icon_up_1.png'},
+        {text: 'Composable Across DeFi Ecosystems', icon: '/images/home/icon_up_2.png'},
+        {text: 'Cross-Chain Ready by Design', icon: '/images/home/icon_up_3.png'},
       ]
     }
   ]
@@ -55,7 +55,7 @@ export default function Section4() {
         </div>
       </div>
 
-      <img src="./images/home/section4.png" className="w-[447px] h-[895px] absolute right-0 bottom-0 -mb-[447px]" alt="" />
+      <img src="/images/home/section4.png" className="w-[447px] h-[895px] absolute right-0 bottom-0 -mb-[447px]" alt="" />
     </div>
   )
 }

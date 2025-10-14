@@ -10,7 +10,7 @@ export function GoButton({ onClick }: { onClick?: () => void }) {
       onMouseLeave={() => setHover(false)}
       onClick={() => onClick && onClick()}
     >
-      <img src="./images/icons/go.png" className={cn(
+      <img src="/images/icons/go.png" className={cn(
         "w-[50px] h-[50px]",
         hover ? 'drop-shadow': ''
       )} alt="" />

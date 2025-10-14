@@ -79,10 +79,8 @@ const CurrencyInput = memo(
               }
               {/* @ts-ignore */}
               <div className={cn(" text-[24px] font-medium ml-2 mr-1", from === 'markets' ? 'text-[16px]' : '')}>{selectedToken?.symbol || selectedToken?.rwa}</div>
-              {
-                from === 'markets' && mode === 'in' ? null :
-                <LazyImage src="/images/convert/arrow-down.png" className="w-[24px] h-[24px]" />
-              }
+              
+              <LazyImage src="/images/convert/arrow-down.png" className="w-[24px] h-[24px]" />
               
             </div>
         }

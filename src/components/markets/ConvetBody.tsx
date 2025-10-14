@@ -181,7 +181,7 @@ export function ConverBody({
       }
       
       {
-        !account ? <ConnectButtonText /> :
+        !account ? <div className="mt-4"><ConnectButtonText /></div> :
         <Button variant={buttonVariant} 
           loading={buying}
           className={cn(
