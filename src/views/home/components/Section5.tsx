@@ -2,11 +2,11 @@ import { useId } from "react"
 
 export default function Section5() {
   const ptList = [
-    {logo: './images/home/pt_web3dev.png'},
-    {logo: './images/home/pt_ploygon.png'},
-    {logo: './images/home/pt_metamask.png'},
-    {logo: './images/home/pt_the.png'},
-    {logo: './images/home/pt_ploygon.png'},
+    {logo: '/images/home/pt_web3dev.png'},
+    {logo: '/images/home/pt_ploygon.png'},
+    {logo: '/images/home/pt_metamask.png'},
+    {logo: '/images/home/pt_the.png'},
+    {logo: '/images/home/pt_ploygon.png'},
   ]
   const _id = useId()
   return (

@@ -6,7 +6,7 @@ export default function Section3() {
 
       </div>
       <div className="w-[1440px] h-[367px] relative">
-        <img src="./images/home/section3.png" className="w-full h-[367px] absolute top-0 left-0 right-0" alt="" />
+        <img src="/images/home/section3.png" className="w-full h-[367px] absolute top-0 left-0 right-0" alt="" />
         <div className=" relative z-10 h-full flex items-center text-white pl-[158px]">
           <div className="w-[520px]">
             <div className="text-[44px] font-semibold ">On-Chain Gateway to Global Markets</div>

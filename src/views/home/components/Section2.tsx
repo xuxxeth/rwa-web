@@ -26,7 +26,7 @@ export const RwaPrice = (
         {
           marketTradeState === MARKET_STATUS.OPEN ?
           <>
-            <img src={Number(rwaPrice.up) > 0 ? './images/home/rate_up.png' : './images/home/rate_down.png'} className="w-[16px]" alt="" />
+            <img src={Number(rwaPrice.up) > 0 ? '/images/home/rate_up.png' : '/images/home/rate_down.png'} className="w-[16px]" alt="" />
             <span className={cn(
               "",
               Number(rwaPrice.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
@@ -68,8 +68,8 @@ export default function Section2() {
   return (
     <MainLayout>
       <div className="h-[1066px] bg-[#06070A] relative text-white">
-        <img src="./images/icons/star/8.png" className=" absolute top-0 right-[221px]" alt="" />
-        <img src="./images/home/section2_bg.png" className="w-[600px] h-[600px] absolute left-[50%] -translate-x-[300px] top-[180px]" alt="" />
+        <img src="/images/icons/star/8.png" className=" absolute top-0 right-[221px]" alt="" />
+        <img src="/images/home/section2_bg.png" className="w-[600px] h-[600px] absolute left-[50%] -translate-x-[300px] top-[180px]" alt="" />
         <div className=" relative z-10">
           <div className=" font-semibold text-[44px] pt-[72px] text-center">Institutional grade investment experience</div>
           <div className=" flex justify-center">
