@@ -83,8 +83,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
   }, [wallets, chains, account, handleConnect])
 
-  console.log(currentWallet, 22222222)
-
   return (
     <>
       {
