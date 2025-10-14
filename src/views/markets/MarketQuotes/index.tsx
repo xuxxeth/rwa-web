@@ -10,9 +10,8 @@ import {
   cn,
   advancedSort,
   textPrefix,
+  textSuffix,
   strOrNumToSign,
-  formatPercentage,
-  formatLargeNumber,
   toFixed,
   type Change,
   symbolToLower,
@@ -101,7 +100,7 @@ export default function MarketQuotes() {
 function QuoteName(props: { logo: string; name: string }) {
   return (
     <>
-      <LazyImage src={props.logo} className='w-10 h-10 mr-2' />
+      <LazyImage src={props.logo} className='w-10 h-10 mr-2 rounded-[50%]' />
       <TextCell text={props.name} />
     </>
   )
@@ -167,7 +166,7 @@ const MarketQuotesList = [
     sortable: true,
     render: (item: IMarketQuote) => (
       <TextCellWithColor
-        text={item.up ? formatPercentage(item.up) : '--'}
+        text={item.up ? textSuffix(item.up, '%', 0) : '--'}
         change={strOrNumToSign(item.up ?? 0)}
         withIcon={true}
       />

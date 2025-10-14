@@ -13,6 +13,9 @@ import {
   TxHashCell,
   OrderTypeCell,
   DropDownFilter,
+  ScrollLoadMore,
+  AmountCell,
+  ValueCell,
 } from './Shared'
 import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
@@ -96,7 +99,7 @@ export default function HistoryOrderTable(props: {
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
           ]}
-          title={'side'}
+          title={'orderSide'}
         />
         <DropDownFilter
           data={orderHistoryFilters.orderType}
@@ -161,21 +164,13 @@ export default function HistoryOrderTable(props: {
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
           />
-          <div ref={loadMoreRef} className='py-4 text-center'>
-            {isFetchingNextPage ? (
-              <div className='text-gray-500'>加载中...</div>
-            ) : hasNextPage ? (
-              <div className='text-gray-400'>滚动加载更多</div>
-            ) : allOrders.length > 0 ? (
-              <div className='text-gray-400'>没有更多数据了</div>
-            ) : null}
-          </div>
-          {isLoading && allOrders.length === 0 && (
-            <div className='py-8 text-center text-gray-500'>加载中...</div>
-          )}
-          {!isLoading && allOrders.length === 0 && (
-            <div className='py-8 text-center text-gray-400'>暂无数据</div>
-          )}
+          <ScrollLoadMore<IOrder>
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            data={allOrders}
+            isLoading={isLoading}
+            loadMoreRef={loadMoreRef}
+          />
         </>
       ) : (
         <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
@@ -216,27 +211,19 @@ const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderAmount',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOrder) => <TextCell text={item.size} />,
+    render: (item: IOrder) => <AmountCell amount={item.size} />,
   },
   {
     key: 'filledAmount',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOrder) => <TextCell text={item.settledSize} />,
+    render: (item: IOrder) => <AmountCell amount={item.settledSize} />,
   },
   {
     key: 'filledValue',
     breakOnSpace: true,
     sortable: false,
-    render: (item: IOrder) => (
-      <TextCell
-        text={
-          item.settledAmount === '0'
-            ? textSuffix(item.settledAmount, 'USDT')
-            : textSuffix(toFixed(item.settledAmount, 3), 'USDT')
-        }
-      />
-    ),
+    render: (item: IOrder) => <ValueCell value={item.settledAmount} />,
   },
   {
     key: 'executionTime',
@@ -250,13 +237,14 @@ const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
     render: (item: IOrder) => <OrderStatusCell state={item.state} />,
   },
   {
+    key: 'txHash',
+    sortable: false,
+    width: 125,
+    render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
+  },
+  {
     key: 'details',
     sortable: false,
     render: () => null,
-  },
-  {
-    key: 'txId',
-    sortable: false,
-    render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
 ]

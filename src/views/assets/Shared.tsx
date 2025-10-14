@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type RefObject } from 'react'
 import { LazyImage } from '@/components/image/LazyImage'
 import { cn, shortenAddress } from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -14,9 +14,14 @@ import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed } from '@/utils'
 import type { OrderType } from '@/service/scan/types'
+import BigNumber from 'bignumber.js'
 
 export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
+}
+
+export function AmountCell(props: { amount: string }) {
+  return <TextCell text={formatAssetMount(props.amount)} />
 }
 
 export function OrderTypeCell(props: { orderType: OrderType }) {
@@ -25,10 +30,11 @@ export function OrderTypeCell(props: { orderType: OrderType }) {
   return <TextCell text={orderType === 0 ? 'Limit' : 'Market'} />
 }
 
-export function ValueCell({ amount }: { amount: string }) {
+export function ValueCell(props: { value: string }) {
+  const { value } = props
   return (
     <TextCell
-      text={amount === '0' ? textSuffix(amount, 'USDT') : textSuffix(toFixed(amount, 3), 'USDT')}
+      text={value === '0' ? textSuffix(value, 'USDT') : textSuffix(toFixed(value, 3), 'USDT')}
     />
   )
 }
@@ -63,7 +69,7 @@ export function TokenCell(props: {
 }) {
   return (
     <div className='flex flex-row gap-2'>
-      {props.icon && <LazyImage className='w-10 h-10' src={props.icon || ''} />}
+      {props.icon && <LazyImage className='w-10 h-10 rounded-[50%]' src={props.icon} />}
       <div className='flex flex-col'>
         <div className='text-sm/6'>{props.token}</div>
         <div className='text-60 text-xs/4.5'>{props.name}</div>
@@ -223,4 +229,51 @@ export function DropDownFilter(props: {
       </div>
     </div>
   )
+}
+
+export function ScrollLoadMore<TData>(props: {
+  isFetchingNextPage: boolean
+  hasNextPage: boolean
+  data: TData[]
+  isLoading: boolean
+  loadMoreRef: RefObject<HTMLDivElement | null>
+}) {
+  const { t } = useTranslation()
+  const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef } = props
+  return (
+    <>
+      <div ref={loadMoreRef} className='py-4 text-center'>
+        {isFetchingNextPage ? (
+          <div className='text-gray-500'>{t('assets.loading')}...</div>
+        ) : hasNextPage ? (
+          <div className='text-gray-400'>{t('assets.scrollToLoadMore')}</div>
+        ) : data.length > 0 ? (
+          <div className='text-gray-400'>{t('assets.noMoreData')}</div>
+        ) : null}
+      </div>
+      {isLoading && data.length === 0 && (
+        <div className='py-8 text-center text-gray-500'>{t('assets.loading')}...</div>
+      )}
+      {!isLoading && data.length === 0 && (
+        <div className='py-8 text-center text-gray-400'>{t('assets.noDataAvailable')}</div>
+      )}
+    </>
+  )
+}
+
+// 资产的数量统一处理成: 小于1保留5位，大于1保留两位。进位四舍五入
+export function formatAssetMount(amount: string | number) {
+  const bnAmount = new BigNumber(amount)
+  if (!bnAmount.isFinite() || bnAmount.isNaN()) {
+    return '0'
+  }
+  // 处理零值
+  if (bnAmount.isZero()) {
+    return '0'
+  }
+  if (bnAmount.abs().lt(1)) {
+    return bnAmount.toFixed(5, BigNumber.ROUND_HALF_UP)
+  } else {
+    return bnAmount.toFixed(2, BigNumber.ROUND_HALF_UP)
+  }
 }
