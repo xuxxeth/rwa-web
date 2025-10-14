@@ -1,5 +1,5 @@
 import type { IToken, IRwa } from '@/service/base/types'
-import { formatAmount, multiply, sum, symbolToLower } from '@/utils/index'
+import { multiply, sum, symbolToLower, toFixed } from '@/utils/index'
 import { useTokens, useRwaTokens } from '@/hooks/useTokens'
 import { useBaseStore } from '@/stores/baseStore'
 
@@ -24,7 +24,7 @@ export function useAssetsList(chainId: number, account: string) {
     const calculatePrice = token.tokenPrice ?? token.rwaPrice
 
     if (token.holdings !== undefined && calculatePrice !== undefined) {
-      token.value = formatAmount(multiply(token.holdings, calculatePrice), 2)
+      token.value = toFixed(multiply(token.holdings, calculatePrice), 2)
     }
     return token
   })
