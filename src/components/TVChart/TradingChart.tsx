@@ -10,10 +10,12 @@ export const TradingChart = () => {
 
   useEffect(() => {
     if (status === "ready" && statusLibrary === "ready") {
-      // 脚本加载完成后调用全局方法
-      console.log('脚本加载完成')
+      
       const check = () => {
-        if (window.TradingView?.widget) setReady(true);
+        if (window.TradingView?.widget) {
+          setReady(true)
+          console.log('脚本加载完成')
+        }
         else setTimeout(check, 100);
       };
       check();
