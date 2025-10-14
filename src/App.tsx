@@ -10,9 +10,10 @@ import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
-import wsService from "./service/WebSocketService";
+import wsService from "@/service/webSocket/service"
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssStore } from "./stores/wssStore";
+import type { ISummaryData } from './service/webSocket/types'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -58,15 +59,15 @@ function App() {
   useEffect(() => {
     wsService.init({})
 
-    const listener = (data: any) => {
+    const listener = (data: ISummaryData) => {
       if (!framePending.current) {
         framePending.current = true
         requestAnimationFrame(() => {
-          if (data.type === 'summary') {
-            setTokenWithPriceByWebSocketData(data.data || [])
-            setStockWithPriceByWebSocketData(data.data || [])
-            stableTokenWithPrice(data.data || [])
-          }
+          // if (data.type === 'summary') {
+            setTokenWithPriceByWebSocketData(data || [])
+            setStockWithPriceByWebSocketData(data || [])
+            stableTokenWithPrice(data || [])
+          // }
           framePending.current = false
         })
       }
