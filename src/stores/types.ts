@@ -61,3 +61,10 @@ export interface TradeStore {
   updateInputSize: (size: string) => void;
   updateExpires: (expires: number) => void;
 }
+
+export interface WssStore {
+  priceInitialized: Boolean,
+  stableTokenWithPrice: Record<string, ITokenWithPrice>;
+  tokenWithPrice: Record<string, ITokenWithPrice>;
+  setStableTokenWithPrice: (data: IRwaPrice[]) => void;
+}

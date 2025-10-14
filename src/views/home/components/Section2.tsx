@@ -59,7 +59,6 @@ export default function Section2() {
       if (rwa) {
         rwas.push({
           ...rwa,
-          icon: `./images/home/${code.toLowerCase()}.png`
         })
       }
     })
@@ -82,9 +81,9 @@ export default function Section2() {
                 filterStocks.map((item, index) => {
                   return (
                     <RwaCard key={`${_id}-${index}`}>
-                      <div className=" absolute -right-[26px] -top-[29px] bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.12)] 
+                      <div className=" absolute -right-[26px] -top-[29px] 
                       w-[95px] h-[95px] rounded-full flex justify-center items-center backdrop-blur-[20px]">
-                        <img src={item.icon} className=" scale-50" alt="" />
+                        <img src={item.icon} className=" w-full rounded-full" alt="" />
                       </div>
                       <div className="p-[56px] text-white">
                         <div className="text-[45px] font-semibold">{item.symbol}</div>

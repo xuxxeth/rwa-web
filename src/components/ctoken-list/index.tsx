@@ -104,9 +104,9 @@ const CTokenItem = memo(
           onClick && onClick(token)
         }}
       >
-        <div className="flex items-center gap-x-2 w-1/3">
-          <div className="w-10 h-10">
-            <LazyImage src={token.icon} className="w-10 h-10" />
+        <div className="flex items-center gap-x-2 w-1/3 shrink-0">
+          <div className="w-10 h-10 shrink-0">
+            <LazyImage src={token.icon} className="w-10 h-10 rounded-full" />
           </div>
           <div>
             <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>

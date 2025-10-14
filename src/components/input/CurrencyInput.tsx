@@ -73,7 +73,7 @@ const CurrencyInput = memo(
             >
               {
                 selectedToken?.icon && <LazyImage src={selectedToken?.icon} className={cn(
-                  "w-[24px] h-[24px]",
+                  "w-[24px] h-[24px] rounded-full",
                   from === 'markets' ? 'w-[18px] h-[18px]' : ''
                 )} />
               }
