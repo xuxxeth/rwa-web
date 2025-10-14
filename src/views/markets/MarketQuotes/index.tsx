@@ -25,22 +25,11 @@ import { bscTestnet } from '@/hooks/useCaCommon'
 import { marketQuoteOptions } from '@/queries'
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useRwaTokens } from '@/hooks/useTokens'
-
 import { useBaseStore } from '@/stores/baseStore'
-
-function useMarketQuote() {
-  const chainId = useChainId() || bscTestnet.id
-
-  const { data, isPending, status, isError, error } = useQuery(marketQuoteOptions(chainId))
-
-  return {
-    marketQuotes: data ?? [],
-    isPending,
-    status,
-    isError,
-    error,
-  }
-}
+import wsService from '@/service/webSocket/service'
+import { type ISummaryData } from '@/service/webSocket/types'
+import { type IQuote } from '@/service/quote/types'
+import { useEffect, useState } from 'react'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -50,9 +39,12 @@ export default function MarketQuotes() {
 
   const rwaList = useRwaTokens()
 
+  const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
+
   const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
 
   const marketQuotes: IMarketQuote[] = rwaList.map(rwa => {
+    // const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
     const priceFromStore = tokenWithPrice[symbolToLower(rwa.symbol)]
     return {
       ...rwa,
@@ -61,6 +53,23 @@ export default function MarketQuotes() {
       dailyHigh: priceFromStore?.dailyHigh,
     }
   })
+
+  useEffect(() => {
+    // const listener = (data: ISummaryData) => {
+    //   const obj = data.reduce((acc, item) => {
+    //     acc[symbolToLower(item.S)] = {
+    //       price: item.p,
+    //     }
+    //     return acc
+    //   }, {} as Record<string, IQuote>)
+    // }
+
+    // wsService.on('summary', listener)
+
+    return () => {
+      // wsService.off('summary', listener)
+    }
+  }, [])
 
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(MarketQuotesList, marketQuotes, sort)

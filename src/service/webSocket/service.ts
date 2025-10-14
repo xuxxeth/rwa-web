@@ -1,4 +1,5 @@
 import ReconnectingWebSocket from 'reconnecting-websocket'
+import type { IAggregateData, ISummaryData, IPingData } from './types'
 
 export const WSS_URL = import.meta.env.VITE_WSS_URL
 
@@ -7,12 +8,20 @@ export interface WSMessage {
   args: any
 }
 
-export interface ResMessage {
-  type: string
-  data: any
+export interface ResMessage<T extends EventType> {
+  type: T
+  data: EventDataMap[T]
 }
 
-type Listener = (data: ResMessage) => void
+type EventType = 'summary' | 'aggregate' | 'ping'
+
+type EventDataMap = {
+  summary: ISummaryData
+  aggregate: IAggregateData
+  ping: IPingData
+}
+
+type Listener<T extends EventType> = (data: ResMessage<T>['data']) => void
 
 interface WSOptions {
   url?: string
@@ -24,8 +33,8 @@ interface WSOptions {
 class WebSocketService {
   private static instance: WebSocketService
   private ws: ReconnectingWebSocket | null = null
-  private listeners: Map<string, Set<Listener>> = new Map()
-  private subscriptions: Set<string> = new Set()
+  private listeners: Map<EventType, Set<Listener<EventType>>> = new Map()
+  private subscriptions: Set<EventType> = new Set()
   private url: string = ''
   private options?: WSOptions
   private pendingQueue: WSMessage[] = []
@@ -93,9 +102,9 @@ class WebSocketService {
   /** 处理消息 */
   private handleMessage(raw: any) {
     try {
-      const data: ResMessage = JSON.parse(raw)
+      const data = JSON.parse(raw) as ResMessage<EventType>
       if (data.type === 'ping') {
-        this.replyPong(data)
+        this.replyPong(data as ResMessage<'ping'>)
         return
       }
 
@@ -106,7 +115,7 @@ class WebSocketService {
   }
 
   /** 自动回复 pong */
-  private replyPong(pingData: ResMessage) {
+  private replyPong(pingData: ResMessage<'ping'>) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const pong = { request: 'pong', args: { ts: Date.now() } }
       this.ws.send(JSON.stringify(pong))
@@ -115,11 +124,11 @@ class WebSocketService {
   }
 
   /** 分发事件 */
-  private dispatch(data: ResMessage) {
+  private dispatch(data: ResMessage<EventType>) {
     // 调用对应事件监听器
     const listeners = this.listeners.get(data.type)
     if (listeners) {
-      listeners.forEach(cb => cb(data))
+      listeners.forEach(cb => cb(data.data))
     }
   }
 
@@ -140,8 +149,8 @@ class WebSocketService {
     // 批量一次性订阅所有 topic
     this.send({ request: 'sub', args: [...this.subscriptions] })
   }
-  
-  public on(eventType: string, listener: Listener) {
+
+  public on<T extends EventType>(eventType: T, listener: Listener<T>) {
     this.ensureInitialized()
 
     // 检查是否是第一个监听器
@@ -152,7 +161,9 @@ class WebSocketService {
     if (!this.listeners.has(eventType)) {
       this.listeners.set(eventType, new Set())
     }
-    this.listeners.get(eventType)!.add(listener)
+
+    const listenerSet = this.listeners.get(eventType)! as Set<Listener<T>>
+    listenerSet.add(listener)
 
     // 如果是第一个监听器，自动订阅
     if (isFirstListener) {
@@ -160,7 +171,7 @@ class WebSocketService {
     }
   }
 
-  private subscribe(topic: string | string[]) {
+  private subscribe(topic: EventType | EventType[]) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出不在 subscriptions 中的新 topic
     const newTopics = topicList.filter(t => !this.subscriptions.has(t))
@@ -178,7 +189,7 @@ class WebSocketService {
     this.send({ request: 'sub', args: newTopics })
   }
 
-  private unsubscribe(topic: string | string[]) {
+  private unsubscribe(topic: EventType | EventType[]) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出在 subscriptions 中的 topic
     const validTopics = topicList.filter(t => this.subscriptions.has(t))
@@ -198,13 +209,14 @@ class WebSocketService {
   }
 
   /** 移除事件监听 */
-  public off(eventType: string, listener: Listener) {
+  public off<T extends EventType>(eventType: T, listener: Listener<T>) {
     if (!this.listeners.has(eventType)) return
     // 移除监听器
-    this.listeners.get(eventType)!.delete(listener)
+    const listenerSet = this.listeners.get(eventType)! as Set<Listener<T>>
+    listenerSet.delete(listener)
 
     // 检查是否还有监听器
-    const hasListeners = this.listeners.get(eventType)!.size > 0
+    const hasListeners = listenerSet.size > 0
 
     // 如果没有监听器了，自动取消订阅
     if (!hasListeners) {

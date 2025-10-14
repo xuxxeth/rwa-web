@@ -77,7 +77,7 @@
     "dailyHigh": "DAILY HIGH",
     "quickBuy": "QUICK BUY",
     "tradingHalt": "TRADING HALT",
-    "quoteInfo": "*Cyberalpha提供的股票代币不包含分红/投票权",
+    "quoteInfo": "*Cyberalpha's stock tokens do not include dividend or voting rights.",
     "networkError": {
       "title": "Network seems disconnected.",
       "desc": "Please check your connection."
@@ -168,10 +168,10 @@
     "noDataAvailable": "No data available"
   },
   "signatureVerify": "Signature Verification",
-  "signatureVerifyDescTop": "为保证您的个人信息安全,",
-  "signatureVerifyDescBottom": "进行钱包签名以查看订单和成交记录相关信息",
+  "signatureVerifyDescTop": "To ensure the security of your personal information,",
+  "signatureVerifyDescBottom": "please sign with your wallet to view order and trade history information",
 
-  "gotoSignature": "进行签名",
+  "gotoSignature": "Sign Now",
   "Coming Soon": "Coming Soon",
   "Holdings Only": "Holdings Only",
   "Name": "Name",
