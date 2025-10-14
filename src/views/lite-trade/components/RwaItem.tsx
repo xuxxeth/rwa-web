@@ -12,9 +12,9 @@ const RwaItemPrice = memo(
 
     return (
       <div className="mt-4 flex items-center gap-x-2">
-        <div className=" text-[22px] font-medium">${rwaPrice.price || '--'}</div>
+        <div className=" text-[22px] min-w-[90px] font-medium">${rwaPrice.price || '--'}</div>
         <div className={cn(
-          "h-[29px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
+          "h-[29px] min-w-[70px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
           Number(rwaPrice.up) > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
         )}>
           <LazyImage src={Number(rwaPrice.up) > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />

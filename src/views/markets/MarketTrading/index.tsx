@@ -11,13 +11,12 @@ import { KlineSwitch } from "@/components/markets/KlineSwitch";
 import { ConverBody } from "@/components/markets/ConvetBody";
 import { FAQ } from "@/components/markets/FAQ";
 import { KlineBody } from "../components/Klinebody";
+import { useTradeStore } from "@/stores/tradeStore";
 
 function Markets() {
   const { t } = useTranslation()
-
   const [action, setAction] = useState('buy')
-  const [showKline, setShowKline] = useState(false)
-
+  const inputToken = useTradeStore(state => state.inputToken)
   return (
     <>
       {/* <Menus /> */}
@@ -26,7 +25,7 @@ function Markets() {
           <div className="flex items-center text-[12px] font-normal my-3">
             <div>{t('Markets')}</div>
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
-            <div>cAMZN</div>
+            <div>{inputToken?.symbol || '--'}</div>
           </div>
           <MarketTrading align="left" />
           <div className="pt-5 flex gap-x-5">

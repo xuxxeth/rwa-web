@@ -1,10 +1,12 @@
 import { GoButton } from "@/components/go-button";
 import { RwaCard } from "@/components/rwa-card";
 import { MARKET_STATUS } from "@/config/constants";
+import { useRouter } from "@/hooks/useRouter";
 import { useRwaPrice } from "@/hooks/useTokenBalances";
 import { MainLayout } from "@/layouts/main";
 import type { IRwa, IStock } from "@/service/base/types";
 import { useBaseStore } from "@/stores/baseStore";
+import { useTradeStore } from "@/stores/tradeStore";
 import { cn } from "@/utils";
 import { useEffect, useId, useMemo, useState } from "react";
 
@@ -45,9 +47,11 @@ export const RwaPrice = (
 export default function Section2() {
   const _id = useId()
 
-
+  const router = useRouter()
   const rwaList = useBaseStore(state => state.rwaList)
   const [filterStocks, setFilterStocks] = useState<IRwa[]>([])
+  const updateInputToken = useTradeStore(state => state.updateInputToken)
+
   useEffect(() => {
     let rwas: IRwa[] = []
     showStocks.forEach(code => {
@@ -91,7 +95,12 @@ export default function Section2() {
                             
                             <RwaPrice rwaData={item} />
                           </div>
-                          <GoButton />
+                          <GoButton 
+                            onClick={() => {
+                              updateInputToken(item)
+                              router.push('/lite-trade')
+                            }}
+                          />
                         </div>
                       </div>
                     </RwaCard>

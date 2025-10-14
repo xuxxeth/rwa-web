@@ -23,25 +23,24 @@ export type CTokenProps = {
   state?: string
 }
 
-export const CTokenPrice = memo(({ symbol, up }: { symbol: string; up: string }) => {
-  const tokenPrice = useRwaPrice(symbol)?.price ?? "0";
-
+export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
+  const tokenPrice = useRwaPrice(symbol);
   return (
     <div className="flex items-center gap-x-2">
-      <span className="text-[16px] font-medium">${tokenPrice}</span>
+      <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
       <div className="flex items-center gap-x-[4px]">
         <img
-          src={Number(up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
+          src={Number(tokenPrice?.up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
           className="w-[6px]"
         />
         <span
           className={
-            Number(up) > 0
+            Number(tokenPrice?.up) > 0
               ? "text-[#50E3C2] text-[12px]"
               : "text-[rgba(227,80,122,1)] text-[12px]"
           }
         >
-          {Math.abs(Number(up || "0"))}%
+          {Math.abs(Number(tokenPrice?.up || "0"))}%
         </span>
       </div>
     </div>
@@ -99,10 +98,6 @@ const CTokenItem = memo(
       }
     }, [token])
     
-    const balanceValue = useMemo(() => {
-      if (!token.balance || !token.price) return  '0'
-      return formatTokenAmountWithCommas(multiply(token.balance, token.price), token.precision)
-    }, [token.balance, token.price])
     return (
       <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
         onClick={() => {
@@ -119,7 +114,7 @@ const CTokenItem = memo(
           </div>
         </div>
         <div className="w-1/3 flex items-center gap-x-2">
-          <CTokenPrice symbol={token.symbol} up={token.up || '0'} />
+          <CTokenPrice symbol={token.symbol} />
           {
             token.state === 4 && 
               <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">

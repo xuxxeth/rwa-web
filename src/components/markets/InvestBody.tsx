@@ -19,7 +19,7 @@ export function InvestBody() {
       <div className="w-[562px] mt-4 text-[16px] text-[rgba(255,255,255,0.8)] text-center font-normal">
         {t('Fast execution')}
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-4 w-full">
+      <div className="mt-4 grid grid-cols-2 gap-4 w-full min-h-[670px]">
         {
           filterRwaList.map((rwa, index) => {
             return (
