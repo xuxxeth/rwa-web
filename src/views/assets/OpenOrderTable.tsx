@@ -10,9 +10,11 @@ import {
   TokenCell,
   OrderStatusCell,
   ValueCell,
+  AmountCell,
   TextCell,
   OrderTypeCell,
   DropDownFilter,
+  ScrollLoadMore,
 } from './Shared'
 import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration } from '@/utils'
 import { useTradeUtils } from '@/hooks/useCaCommon'
@@ -26,6 +28,7 @@ export default function OpenOrderTable(props: {
   account: string
   rwaTokens: IRwa[]
 }) {
+  const { t } = useTranslation()
   const { chainId, account, rwaTokens } = props
 
   const openOrderFilters = useOrderFilterStore(state => state.openOrderFilters)
@@ -90,7 +93,7 @@ export default function OpenOrderTable(props: {
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
           ]}
-          title={'side'}
+          title={'orderSide'}
         />
         {/* <DropDownFilter
           data={openOrderFilters.states}
@@ -121,21 +124,13 @@ export default function OpenOrderTable(props: {
             extra={{ rwaTokens }}
             getKey={(item: IOpenOrder) => item.id}
           />
-          <div ref={loadMoreRef} className='py-4 text-center'>
-            {isFetchingNextPage ? (
-              <div className='text-gray-500'>加载中...</div>
-            ) : hasNextPage ? (
-              <div className='text-gray-400'>滚动加载更多</div>
-            ) : allOpenOrders.length > 0 ? (
-              <div className='text-gray-400'>没有更多数据了</div>
-            ) : null}
-          </div>
-          {isLoading && allOpenOrders.length === 0 && (
-            <div className='py-8 text-center text-gray-500'>加载中...</div>
-          )}
-          {!isLoading && allOpenOrders.length === 0 && (
-            <div className='py-8 text-center text-gray-400'>暂无数据</div>
-          )}
+          <ScrollLoadMore<IOpenOrder>
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            data={allOpenOrders}
+            isLoading={isLoading}
+            loadMoreRef={loadMoreRef}
+          />
         </>
       ) : (
         <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
@@ -178,19 +173,19 @@ const openOrderTableConfig: ITableConfnig<IOpenOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderAmount',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOpenOrder) => <TextCell text={item.size} />,
+    render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
   },
   {
     key: 'filledAmount',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOpenOrder) => <TextCell text={item.settledSize} />,
+    render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
   },
   {
     key: 'filledValue',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOpenOrder) => <ValueCell amount={item.settledAmount} />,
+    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
   },
   {
     key: 'orderTime',

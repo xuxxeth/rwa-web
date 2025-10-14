@@ -1,6 +1,16 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
-import { DropDownFilter, TextCell, TokenCell, SideCell, TxHashCell, OrderTypeCell } from './Shared'
+import {
+  DropDownFilter,
+  TextCell,
+  TokenCell,
+  SideCell,
+  TxHashCell,
+  OrderTypeCell,
+  ScrollLoadMore,
+  AmountCell,
+  ValueCell,
+} from './Shared'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteTradeHistoryOptions, tradeHistoryOptions } from '@/queries'
 import { noop, formatTimestamp, toFixed, textPrefix, textSuffix, divide } from '@/utils'
@@ -95,7 +105,7 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             { key: 'buy', value: '0' },
             { key: 'sell', value: '1' },
           ]}
-          title='side'
+          title='orderSide'
         />
         <DropDownFilter
           data={tradeHistoryFilters.orderType}
@@ -133,21 +143,13 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
           />
-          <div ref={loadMoreRef} className='py-4 text-center'>
-            {isFetchingNextPage ? (
-              <div className='text-gray-500'>加载中...</div>
-            ) : hasNextPage ? (
-              <div className='text-gray-400'>滚动加载更多</div>
-            ) : allTrads.length > 0 ? (
-              <div className='text-gray-400'>没有更多数据了</div>
-            ) : null}
-          </div>
-          {isLoading && allTrads.length === 0 && (
-            <div className='py-8 text-center text-gray-500'>加载中...</div>
-          )}
-          {!isLoading && allTrads.length === 0 && (
-            <div className='py-8 text-center text-gray-400'>暂无数据</div>
-          )}
+          <ScrollLoadMore<ITrade>
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            data={allTrads}
+            isLoading={isLoading}
+            loadMoreRef={loadMoreRef}
+          />
         </>
       ) : (
         <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
@@ -179,17 +181,11 @@ const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
     },
   },
   {
-    key: 'filledQuantity',
+    key: 'filledAmount',
     sortable: false,
-    render: (item: ITrade, { rwaTokens }: { rwaTokens: IRwa[] }) => {
-      const rwa = rwaTokens.find(token => token.stockId === item.stockId)
-      return <TextCell text={textSuffix(toFixed(item.size, 4), rwa?.symbol || '')} />
-    },
-  },
-  {
-    key: 'tradeValue',
-    sortable: false,
-    render: (item: ITrade) => <TextCell text={textPrefix(toFixed(item.amount, 2), '$')} />,
+    render: (item: ITrade, { rwaTokens }: { rwaTokens: IRwa[] }) => (
+      <AmountCell amount={item.size} />
+    ),
   },
   {
     key: 'avgPrice',
@@ -199,13 +195,18 @@ const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
     ),
   },
   {
+    key: 'tradeValue',
+    sortable: false,
+    render: (item: ITrade) => <ValueCell value={item.amount} />,
+  },
+  {
     key: 'time',
     sortable: false,
     breakOnSpace: true,
     render: (item: ITrade) => <TextCell text={formatTimestamp(item.txTime)} />,
   },
   {
-    key: 'txId',
+    key: 'txHash',
     sortable: false,
     render: (item: ITrade) => <TxHashCell hash={item.txHash} />,
   },

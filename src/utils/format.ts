@@ -1,95 +1,87 @@
 import BigNumber from 'bignumber.js'
-import prettyMs from "pretty-ms";
+import prettyMs from 'pretty-ms'
 
 export function textPrefix(text: string, prefix: string) {
-  return `${prefix}${text}`;
+  return `${prefix}${text}`
 }
 
-export function textSuffix(text: string, suffix: string) {
-  return `${text} ${suffix}`;
+export function textSuffix(text: string, suffix: string, spaceCount: number = 1) {
+  const spaces = ' '.repeat(Math.max(0, spaceCount))
+  return `${text}${spaces}${suffix}`
 }
 
 export function toFixed(value: number | string, precision = 2): string {
-  const num = typeof value === "string" ? parseFloat(value) : value;
+  const num = typeof value === 'string' ? parseFloat(value) : value
 
   if (isNaN(num)) {
-    return `${(0).toFixed(precision)}`;
+    return `${(0).toFixed(precision)}`
   }
 
-  return num.toFixed(precision);
+  return num.toFixed(precision)
 }
 
 // 格式化百分比，保留两位小数
-export function formatPercentage(
-  value: string | number,
-  precision = 2
-): string {
-  const num = typeof value === "string" ? parseFloat(value) : value;
+export function formatPercentage(value: string | number, precision = 2): string {
+  const num = typeof value === 'string' ? parseFloat(value) : value
 
   if (isNaN(num)) {
-    return `${toFixed(0, precision)}%`;
+    return `${toFixed(0, precision)}%`
   }
 
-  return `${toFixed(num * 100, precision)}%`;
+  return `${toFixed(num * 100, precision)}%`
 }
 
 const units = [
-  { threshold: 1e12, unit: "T", divisor: 1e12 },
-  { threshold: 1e9, unit: "B", divisor: 1e9 },
-  { threshold: 1e6, unit: "M", divisor: 1e6 },
-  { threshold: 1e3, unit: "K", divisor: 1e3 },
-];
+  { threshold: 1e12, unit: 'T', divisor: 1e12 },
+  { threshold: 1e9, unit: 'B', divisor: 1e9 },
+  { threshold: 1e6, unit: 'M', divisor: 1e6 },
+  { threshold: 1e3, unit: 'K', divisor: 1e3 },
+]
 
-export function formatLargeNumber(
-  val: string | number,
-  precision: number = 2
-): string {
-  const num = typeof val === "string" ? parseFloat(val.replace(/,/g, "")) : val;
+export function formatLargeNumber(val: string | number, precision: number = 2): string {
+  const num = typeof val === 'string' ? parseFloat(val.replace(/,/g, '')) : val
 
-  if (isNaN(num) || num === 0 || Object.is(num, -0))
-    return (0).toFixed(precision);
+  if (isNaN(num) || num === 0 || Object.is(num, -0)) return (0).toFixed(precision)
 
-  const matchedUnit = units.find((item) => num >= item.threshold) || {
-    unit: "",
+  const matchedUnit = units.find(item => num >= item.threshold) || {
+    unit: '',
     divisor: 1,
-  };
+  }
 
-  let convertedValue = num / matchedUnit.divisor;
+  let convertedValue = num / matchedUnit.divisor
 
   // 动态进位处理
   if (convertedValue >= 999.995) {
-    const upperUnit = units.find(
-      (u) => u.divisor === matchedUnit.divisor * 1000
-    );
+    const upperUnit = units.find(u => u.divisor === matchedUnit.divisor * 1000)
 
     if (upperUnit) {
-      convertedValue = convertedValue / 1e3;
-      matchedUnit.unit = upperUnit.unit;
-      matchedUnit.divisor = upperUnit.divisor;
+      convertedValue = convertedValue / 1e3
+      matchedUnit.unit = upperUnit.unit
+      matchedUnit.divisor = upperUnit.divisor
     }
   }
 
-  const formatter = new Intl.NumberFormat("en-US", {
+  const formatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: precision, // 强制保留最小小数位数
     maximumFractionDigits: precision, // 严格限制最大小数位数
-  });
+  })
 
-  return `${formatter.format(convertedValue)}${matchedUnit.unit}`;
+  return `${formatter.format(convertedValue)}${matchedUnit.unit}`
 }
 
-export type Change = 0 | 1 | -1;
+export type Change = 0 | 1 | -1
 // 将一个字符串或者数字转换为 1, -1, 0
 export function strOrNumToSign(val: string | number): Change {
-  const numValue = typeof val === "string" ? parseFloat(val) : val;
+  const numValue = typeof val === 'string' ? parseFloat(val) : val
 
   // 处理无效数值
   if (isNaN(numValue)) {
-    return 0;
+    return 0
   }
 
-  const rawSign = Math.sign(numValue);
+  const rawSign = Math.sign(numValue)
 
-  return Object.is(rawSign, -0) ? 0 : rawSign > 0 ? 1 : rawSign < 0 ? -1 : 0;
+  return Object.is(rawSign, -0) ? 0 : rawSign > 0 ? 1 : rawSign < 0 ? -1 : 0
 }
 
 /**
@@ -98,16 +90,16 @@ export function strOrNumToSign(val: string | number): Change {
  * @param decimals 保留的小数位数
  */
 export function truncate(value: number | string, decimals: number): string {
-  const bn = new BigNumber(value);
-  if (bn.isNaN()) return "0";
-  return bn.decimalPlaces(decimals, BigNumber.ROUND_DOWN).toFixed(decimals);
+  const bn = new BigNumber(value)
+  if (bn.isNaN()) return '0'
+  return bn.decimalPlaces(decimals, BigNumber.ROUND_DOWN).toFixed(decimals)
 }
 
 /**
  * 股票代币价格显示：精确到后3位（截断）
  */
 export function formatStockPrice(value: number | string): string {
-  return truncate(value, 3);
+  return truncate(value, 3)
 }
 
 /**
@@ -118,19 +110,16 @@ export function formatStockPrice(value: number | string): string {
  *    - 0.01 - 1 → 保留 4 位
  *    - < 0.01 → 保留 6 位
  */
-export function formatTokenAmount(
-  value: number | string,
-  isStockToken = false
-): string {
-  const bn = new BigNumber(value);
-  if (bn.isNaN()) return "0";
+export function formatTokenAmount(value: number | string, isStockToken = false): string {
+  const bn = new BigNumber(value)
+  if (bn.isNaN()) return '0'
 
-  if (isStockToken) return truncate(value, 4);
+  if (isStockToken) return truncate(value, 4)
 
-  const absVal = bn.abs();
-  if (absVal.isGreaterThan(1)) return truncate(value, 2);
-  if (absVal.isGreaterThan(0.01)) return truncate(value, 4);
-  return truncate(value, 6);
+  const absVal = bn.abs()
+  if (absVal.isGreaterThan(1)) return truncate(value, 2)
+  if (absVal.isGreaterThan(0.01)) return truncate(value, 4)
+  return truncate(value, 6)
 }
 
 /**
@@ -138,114 +127,119 @@ export function formatTokenAmount(
  * 例如：1234567.89 -> 1,234,567.89
  */
 export function formatWithCommas(value: number | string, decimals?: number): string {
-  if (value === null || value === undefined || value === "") return "0";
-  const bn = new BigNumber(value);
-  if (bn.isNaN()) return "0";
-  const fixed = decimals != null ? bn.toFixed(decimals) : bn.toString();
-  const [intPart, decPart] = fixed.split(".");
-  return (
-    intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") +
-    (decPart ? `.${decPart}` : "")
-  );
+  if (value === null || value === undefined || value === '') return '0'
+  const bn = new BigNumber(value)
+  if (bn.isNaN()) return '0'
+  const fixed = decimals != null ? bn.toFixed(decimals) : bn.toString()
+  const [intPart, decPart] = fixed.split('.')
+  const test1 = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  const test = decPart ? `.${decPart}` : ''
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (decPart ? `.${decPart}` : '')
 }
 
-export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string{
+export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string {
   return formatWithCommas(formatTokenAmount(value), decimals)
 }
 
 export function formatTimestamp(seconds: number): string {
-  const formatter = new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+  const formatter = new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
     hour12: false, // 使用24小时制
-  });
+  })
 
-  const date = new Date(seconds * 1000);
+  const date = new Date(seconds * 1000)
 
-  const parts = formatter.formatToParts(date);
+  const parts = formatter.formatToParts(date)
 
   // 提取年、月、日、时、分、秒
-  let year = "";
-  let month = "";
-  let day = "";
-  let hour = "";
-  let minute = "";
-  let second = "";
+  let year = ''
+  let month = ''
+  let day = ''
+  let hour = ''
+  let minute = ''
+  let second = ''
 
-  parts.forEach((part) => {
+  parts.forEach(part => {
     switch (part.type) {
-      case "year":
-        year = part.value;
-        break;
-      case "month":
-        month = part.value;
-        break;
-      case "day":
-        day = part.value;
-        break;
-      case "hour":
-        hour = part.value;
-        break;
-      case "minute":
-        minute = part.value;
-        break;
-      case "second":
-        second = part.value;
-        break;
+      case 'year':
+        year = part.value
+        break
+      case 'month':
+        month = part.value
+        break
+      case 'day':
+        day = part.value
+        break
+      case 'hour':
+        hour = part.value
+        break
+      case 'minute':
+        minute = part.value
+        break
+      case 'second':
+        second = part.value
+        break
     }
-  });
+  })
 
-  return `${year}/${month}/${day} ${hour}:${minute}:${second}`;
+  return `${year}/${month}/${day} ${hour}:${minute}:${second}`
 }
 
 export function readableDuration(seconds: number) {
-  if (typeof seconds !== "number" || isNaN(seconds) || !isFinite(seconds)) {
-    return "0s";
+  if (typeof seconds !== 'number' || isNaN(seconds) || !isFinite(seconds)) {
+    return '0s'
   }
 
   return prettyMs(seconds * 1000, {
     verbose: true,
-  });
+  })
 }
 
 export function compareBigNumber(a: string | number, b: string | number): -1 | 0 | 1 {
-  const numA = new BigNumber(a);
-  const numB = new BigNumber(b);
+  const numA = new BigNumber(a)
+  const numB = new BigNumber(b)
   console.log(a, b)
-  if (numA.isLessThan(numB)) return -1;
-  if (numA.isGreaterThan(numB)) return 1;
-  return 0;
+  if (numA.isLessThan(numB)) return -1
+  if (numA.isGreaterThan(numB)) return 1
+  return 0
 }
 
 function toBN(value: string | number | BigNumber): BigNumber {
-  return new BigNumber(value ?? 0);
+  return new BigNumber(value ?? 0)
 }
 
 /** 是否相等 */
 export function isEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
-  return toBN(a).isEqualTo(toBN(b));
+  return toBN(a).isEqualTo(toBN(b))
 }
 
 /** 是否大于 */
 export function isGreater(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
-  return toBN(a).isGreaterThan(toBN(b));
+  return toBN(a).isGreaterThan(toBN(b))
 }
 
 /** 是否大于等于 */
-export function isGreaterOrEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
-  return toBN(a).isGreaterThanOrEqualTo(toBN(b));
+export function isGreaterOrEqual(
+  a: string | number | BigNumber,
+  b: string | number | BigNumber
+): boolean {
+  return toBN(a).isGreaterThanOrEqualTo(toBN(b))
 }
 
 /** 是否小于 */
 export function isLess(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
-  return toBN(a).isLessThan(toBN(b));
+  return toBN(a).isLessThan(toBN(b))
 }
 
 /** 是否小于等于 */
-export function isLessOrEqual(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
-  return toBN(a).isLessThanOrEqualTo(toBN(b));
+export function isLessOrEqual(
+  a: string | number | BigNumber,
+  b: string | number | BigNumber
+): boolean {
+  return toBN(a).isLessThanOrEqualTo(toBN(b))
 }

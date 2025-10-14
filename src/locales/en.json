@@ -106,11 +106,11 @@
         "side": "SIDE",
         "type": "TYPE",
         "token": "TOKEN",
-        "filledQuantity": "FILLED QUANTITY",
+        "filledAmount": "FILLED AMOUNT",
         "tradeValue": "TRADE VALUE",
         "avgPrice": "AVG PRICE",
         "time": "TIME",
-        "txId": "TX ID"
+        "txHash": "TX HASH"
       }
     },
     "order": {
@@ -129,7 +129,7 @@
         "orderTime": "ORDER TIME",
         "expiration": "EXPIRATION",
         "executionTime": "EXECUTION TIME",
-        "txId": "TX ID",
+        "txHash": "TX HASH",
         "details": "DETAILS",
         "status": "STATUS",
         "action": "ACTION"
@@ -149,6 +149,7 @@
       "limit": "Limit",
       "side": "Side",
       "orderType": "Order Type",
+      "orderSide": "Order Side",
       "orderStatus": "Status",
       "all": "All",
       "buy": "Buy",
@@ -160,12 +161,16 @@
       "filled": "Filled",
       "cancelOrderSuccess": "Order cancellation request submitted successfully.",
       "cancelOrdering": "Canceling"
-    }
+    },
+    "loading": "Loading",
+    "scrollToLoadMore": "Scroll to load more",
+    "noMoreData": "No more data",
+    "noDataAvailable": "No data available"
   },
   "signatureVerify": "Signature Verification",
   "signatureVerifyDescTop": "为保证您的个人信息安全,",
   "signatureVerifyDescBottom": "进行钱包签名以查看订单和成交记录相关信息",
-  
+
   "gotoSignature": "进行签名",
   "Coming Soon": "Coming Soon",
   "Holdings Only": "Holdings Only",

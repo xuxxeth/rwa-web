@@ -7,7 +7,7 @@ import Pagination from '@/components/pagination'
 import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
 import { TextCell, TokenCell } from './Shared'
-import { textPrefix, toFixed } from '@/utils/format'
+import { textPrefix, toFixed, formatWithCommas } from '@/utils/format'
 
 type SortableField = 'value'
 function AssetsTable(props: { chainId: number; account: string; assetsList: IAssetItem[] }) {
@@ -56,7 +56,7 @@ const assetTableConfig = [
     key: 'holdings',
     sortable: false,
     render: (item: IAssetItem) => (
-      <TextCell text={item.holdings ?? '--'} />
+      <TextCell text={item.holdings ? formatWithCommas(item.holdings, 2) : '--'} />
     ),
   },
   {
@@ -71,7 +71,7 @@ const assetTableConfig = [
     key: 'value',
     sortable: true,
     render: (item: IAssetItem) => (
-      <TextCell text={item.value ? textPrefix(toFixed(item.value, 2), '$') : '--'} />
+      <TextCell text={item.value ? textPrefix(formatWithCommas(item.value, 2), '$') : '--'} />
     ),
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
       advancedSort(a.value ?? '0', b.value ?? '0', order),
