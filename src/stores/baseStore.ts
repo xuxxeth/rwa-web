@@ -151,9 +151,9 @@ export const useBaseStore = create<BaseStore>()(
           let marketState = MARKET_STATUS.DEFAULT;
           if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
             const nowSecond = getEasternSecondsSinceMidnight();
-            if (nowSecond < marketInfo.tradingStartTime) {
+            if (nowSecond < marketInfo.tradingStartTime - marketInfo.preMarketMinutes) {
               marketState = MARKET_STATUS.BEFORE;
-            } else if (nowSecond > marketInfo.tradingEndTime) {
+            } else if (nowSecond > marketInfo.tradingEndTime + marketInfo.afterMarketMinutes) {
               marketState = MARKET_STATUS.AFTER;
             } else {
               marketState = MARKET_STATUS.OPEN;

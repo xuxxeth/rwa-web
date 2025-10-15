@@ -13,19 +13,30 @@ import { FAQ } from "../../components/markets/FAQ";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
 import { useRequestSignature } from "@/hooks/useSignature";
+import { useWssOn } from "@/hooks/useWssOn";
+import { useBaseStore } from "@/stores/baseStore";
+import { useWssStore } from "@/stores/wssStore";
 
 function LiteTrade() {
   const { t } = useTranslation()
-  // const baseStore = useBaseStore()
+  const setTokenWithPriceByWebSocketData = useBaseStore(
+    state => state.setTokenWithPriceByWebSocketData
+  )
+  const setStockWithPriceByWebSocketData = useBaseStore(
+    (state) => state.setStockWithPriceByWebSocketData
+  );
+  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+  
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
 
   const { signature, validSignature } = useRequestSignature()
-  useEffect(() => {
-    // baseStore.getTokens()
-    // baseStore.getBaseRwas()
-    // baseStore.getStocks()
-  }, [])
+
+  useWssOn('summary', (data: any) => {
+    setTokenWithPriceByWebSocketData(data || [])
+    setStockWithPriceByWebSocketData(data || [])
+    stableTokenWithPrice(data || [])
+  })
 
   return (
     <>

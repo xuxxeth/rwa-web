@@ -13,7 +13,7 @@ export interface ResMessage<T extends EventType> {
   data: EventDataMap[T]
 }
 
-type EventType = 'summary' | 'aggregate' | 'ping'
+export type EventType = 'summary' | 'aggregate' | 'ping'
 
 type EventDataMap = {
   summary: ISummaryData
