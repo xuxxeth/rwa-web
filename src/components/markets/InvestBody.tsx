@@ -3,6 +3,7 @@ import { RwaItem } from "../../views/lite-trade/components/RwaItem"
 import { useId, useMemo } from "react"
 import { useBaseStore } from "@/stores/baseStore"
 import { useRouter } from "@/hooks/useRouter"
+import { useTradeStore } from "@/stores/tradeStore"
 
 export function InvestBody() {
   const router = useRouter()
@@ -10,6 +11,7 @@ export function InvestBody() {
   const _id = useId()
   const rwaList = useBaseStore(state => state.rwaList)
   const filterRwaList = useMemo(() => rwaList.slice(0, 6), [rwaList])
+  const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   return (
     <div className=" flex flex-col items-center">
@@ -23,7 +25,9 @@ export function InvestBody() {
         {
           filterRwaList.map((rwa, index) => {
             return (
-              <RwaItem key={`${_id}-${index}`} data={rwa} />
+              <RwaItem key={`${_id}-${index}`} data={rwa} onClick={data => {
+                updateInputToken(data)
+              }} />
             )
           })
         }

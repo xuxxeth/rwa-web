@@ -12,7 +12,6 @@ import { useShowDialog, DialogController } from '@/components/dialog/DialogContr
 import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
-import wsService from "@/service/WebSocketService";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
 import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
@@ -122,8 +121,8 @@ export function ConverBody({
   )
 
   const isSellInsufficient = useMemo(
-    () => action === 'sell' && orderValue ? (isGreater(orderValue, inputTokenBalance?.balance || '0')) : false, 
-    [orderValue, inputTokenBalance, action]
+    () => action === 'sell' && inputSize ? (isGreater(inputSize, inputTokenBalance?.balance || '0')) : false, 
+    [inputSize, inputTokenBalance, action]
   )
 
   const disabled = useMemo(

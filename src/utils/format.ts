@@ -140,6 +140,18 @@ export function formatWithCommas(value: number | string, decimals?: number): str
 export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string {
   return formatWithCommas(formatTokenAmount(value), decimals)
 }
+export function formatNumberWithCommas(
+  value: number | string,
+  decimal = 2
+): string {
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+
+  return num
+    .toFixed(decimal)                  // 先保留 decimal 位
+    .replace(/\.?0+$/, '')             // 去掉末尾多余的 0 和小数点
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 千分位
+}
 
 export function formatTimestamp(seconds: number): string {
   const formatter = new Intl.DateTimeFormat('en', {

@@ -16,9 +16,13 @@ import { useRequestSignature } from "@/hooks/useSignature";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
+import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
+import { OrderList } from "@/components/markets/OrderList";
 
 function LiteTrade() {
   const { t } = useTranslation()
+  const orderDialog = useShowDialog()
+  
   const setTokenWithPriceByWebSocketData = useBaseStore(
     state => state.setTokenWithPriceByWebSocketData
   )
@@ -54,7 +58,12 @@ function LiteTrade() {
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
                       onClick={async () => {
                         if (!(await validSignature())) {
-                          signature()
+                          const res = await signature()
+                          if (res.signature) {
+                            orderDialog.setOpen(true)
+                          }
+                        } else {
+                          orderDialog.setOpen(true)
                         }
                       }}
                     >
@@ -81,6 +90,15 @@ function LiteTrade() {
 
       </MainLayout>
       <XFooter />
+      <DialogController
+        topFixed
+        top={30}
+        title={t("assets.tabList.orderHistory")}
+        open={orderDialog.open}
+        openChange={orderDialog.setOpen}
+      > 
+        <OrderList show={orderDialog.open} />
+      </DialogController>
     </>
     
   )
