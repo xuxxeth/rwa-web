@@ -243,3 +243,7 @@ export function isLessOrEqual(
 ): boolean {
   return toBN(a).isLessThanOrEqualTo(toBN(b))
 }
+
+export async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

@@ -17,6 +17,18 @@ import './custom.css'
 
 const FormatStr = 'yyyy-MM-dd'
 
+export function setStartOfDay(date: Date): Date {
+  const newDate = new Date(date)
+  newDate.setHours(0, 0, 0, 0)
+  return newDate
+}
+
+export function setEndOfDay(date: Date): Date {
+  const newDate = new Date(date)
+  newDate.setHours(23, 59, 59, 999)
+  return newDate
+}
+
 export function DatePickerWithRange({
   userSelectedDateRange,
   onUserSelectedDataRangeChanged,
@@ -82,8 +94,11 @@ export function DatePickerWithRange({
             captionLayout={'label'}
             showOutsideDays={false}
             selected={date}
-            onSelect={(newDate: DateRange | undefined) => {
-              setDate(newDate)
+            onSelect={(_date: DateRange | undefined) => {
+              setDate({
+                from: _date?.from ? setStartOfDay(_date.from) : undefined,
+                to: _date?.to ? setEndOfDay(_date.to) : undefined,
+              })
             }}
             mode='range'
             components={{

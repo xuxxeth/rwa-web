@@ -78,27 +78,55 @@ export function TokenCell(props: {
   )
 }
 
+const openStatus = {
+  text: 'open',
+  className: 'text-[rgba(38,192,226,1)] bg-[rgba(38,192,226,0.1)]',
+}
+
+const partiallyFilledStatus = {
+  text: 'partiallyFilled',
+  className: 'text-[rgba(242,147,57,1)] bg-[rgba(242,147,57,0.1)]',
+}
+
+const failedStatus = {
+  text: 'orderFailed',
+  className: 'text-[rgba(209,26,42,1)] bg-[rgba(209,26,42,0.1)]',
+}
+
+const canceledStatus = {
+  text: 'canceled',
+  className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
+}
+
+const filledStatus = {
+  text: 'filled',
+  className: 'text-[rgba(58,151,76,1)] bg-[rgba(58,151,76,0.1)]',
+}
+
+const pendingCancelStatus = {
+  text: 'pendingCancel',
+  className: '',
+}
+
 const ORDER_STATUS: { [key: number]: { text: string; className: string } } = {
-  0: {
-    text: 'open',
-    className: 'text-[rgba(38,192,226,1)] bg-[rgba(38,192,226,0.1)]',
-  },
-  1: {
-    text: 'partiallyFilled',
-    className: 'text-[rgba(242,147,57,1)] bg-[rgba(242,147,57,0.1)]',
-  },
-  2: {
-    text: 'orderFailed',
-    className: 'text-[rgba(209,26,42,1)] bg-[rgba(209,26,42,0.1)]',
-  },
-  3: {
-    text: 'canceled',
-    className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
-  },
-  5: {
-    text: 'filled',
-    className: 'text-[rgba(58,151,76,1)] bg-[rgba(58,151,76,0.1)]',
-  },
+  // 0 等待提交
+  0: openStatus,
+  // 1 部分成交
+  1: partiallyFilledStatus,
+  // 2 下单失败
+  2: failedStatus,
+  // 3 撤单
+  3: canceledStatus,
+  // 4 部成撤单
+  4: partiallyFilledStatus,
+  // 5 完全成交
+  5: filledStatus,
+  // 6 废单
+  6: canceledStatus,
+  // 7 市场关闭撤单
+  7: canceledStatus,
+  // 8 待撤单
+  8: pendingCancelStatus,
 }
 
 export function OrderStatusCell(props: { state: number }) {
