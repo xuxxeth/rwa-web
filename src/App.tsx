@@ -14,6 +14,7 @@ import wsService from "@/service/webSocket/service"
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssStore } from "./stores/wssStore";
 import type { ISummaryData } from './service/webSocket/types'
+import { useWssOn } from './hooks/useWssOn'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -29,15 +30,6 @@ function App() {
   const { t, i18n } = useTranslation()
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
-  const setTokenWithPriceByWebSocketData = useBaseStore(
-    state => state.setTokenWithPriceByWebSocketData
-  )
-  const setStockWithPriceByWebSocketData = useBaseStore(
-    (state) => state.setStockWithPriceByWebSocketData
-  );
-  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
-
-  const framePending = useRef<Boolean>(false)
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -56,28 +48,10 @@ function App() {
     initBaseStore(chainId)
   }, [chainId])
 
+  const { wsService } = useWssOn()
+
   useEffect(() => {
-    wsService.init({})
-
-    const listener = (data: ISummaryData) => {
-      if (!framePending.current) {
-        framePending.current = true
-        requestAnimationFrame(() => {
-          // if (data.type === 'summary') {
-            setTokenWithPriceByWebSocketData(data || [])
-            setStockWithPriceByWebSocketData(data || [])
-            stableTokenWithPrice(data || [])
-          // }
-          framePending.current = false
-        })
-      }
-    }
-
-    wsService.on('summary', listener)
-
     return () => {
-      wsService.off('summary', listener)
-
       wsService.close()
     }
   }, [])

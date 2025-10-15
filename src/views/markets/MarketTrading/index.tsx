@@ -12,11 +12,29 @@ import { ConverBody } from "@/components/markets/ConvetBody";
 import { FAQ } from "@/components/markets/FAQ";
 import { KlineBody } from "../components/Klinebody";
 import { useTradeStore } from "@/stores/tradeStore";
+import { useWssOn } from "@/hooks/useWssOn";
+import { useBaseStore } from "@/stores/baseStore";
+import { useWssStore } from "@/stores/wssStore";
 
 function Markets() {
   const { t } = useTranslation()
   const [action, setAction] = useState('buy')
   const inputToken = useTradeStore(state => state.inputToken)
+
+  const setTokenWithPriceByWebSocketData = useBaseStore(
+    state => state.setTokenWithPriceByWebSocketData
+  )
+  const setStockWithPriceByWebSocketData = useBaseStore(
+    (state) => state.setStockWithPriceByWebSocketData
+  );
+  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+
+  useWssOn('summary', (data: any) => {
+    setTokenWithPriceByWebSocketData(data || [])
+    setStockWithPriceByWebSocketData(data || [])
+    stableTokenWithPrice(data || [])
+  })
+
   return (
     <>
       {/* <Menus /> */}

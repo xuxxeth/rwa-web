@@ -1,8 +1,8 @@
 import { Menus } from "@/components/menu"
 import { MainLayout } from "@/layouts/main"
-import { IdentityLayout } from "./components/Identitylayout"
 import { XFooter } from "@/components/footer"
 import { BaseInfo } from "./components/BaseInfo"
+import { IdentityLayout } from "./components/IdentityLayout"
 
 
 function Identity() {
