@@ -50,3 +50,10 @@ export function useRwas() {
     return []
   },[ chainId, rwaList])
 }
+
+export function useRwaByStockId(stockId?: number) {
+  const rwaList = useBaseStore(state => state.rwaList)
+  return useMemo(() => {
+    return rwaList.find(token => token.stockId === stockId)
+  }, [rwaList])
+}

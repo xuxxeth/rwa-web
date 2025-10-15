@@ -15,11 +15,16 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
+import { useRequestSignature } from "@/hooks/useSignature";
+import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
+import { OrderList } from "@/components/markets/OrderList";
 
 function Markets() {
   const { t } = useTranslation()
   const [action, setAction] = useState('buy')
   const inputToken = useTradeStore(state => state.inputToken)
+  const orderDialog = useShowDialog()
+  const { signature, validSignature } = useRequestSignature()
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
     state => state.setTokenWithPriceByWebSocketData
@@ -57,8 +62,15 @@ function Markets() {
                   <div className="text-[16px] font-medium flex-1 border-b border-[rgba(255,255,255,0.1)] leading-6">{t('limit')}</div>
                   <div className="flex items-center gap-x-5">
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-7 h-7 rounded-[8px] overflow-hidden cursor-pointer"
-                      onClick={() => {
-                        
+                      onClick={async () => {
+                        if (!(await validSignature())) {
+                          const res = await signature()
+                          if (res.signature) {
+                            orderDialog.setOpen(true)
+                          }
+                        } else {
+                          orderDialog.setOpen(true)
+                        }
                       }}
                     >
                       <LazyImage src="/images/convert/history.png" className="w-7 h-7 cursor-pointer" />
@@ -75,6 +87,15 @@ function Markets() {
         </div>
 
       </MainLayout>
+      <DialogController
+        topFixed
+        top={30}
+        title={t("assets.tabList.orderHistory")}
+        open={orderDialog.open}
+        openChange={orderDialog.setOpen}
+      > 
+        <OrderList show={orderDialog.open} />
+      </DialogController>
       {/* <XFooter /> */}
     </>
     

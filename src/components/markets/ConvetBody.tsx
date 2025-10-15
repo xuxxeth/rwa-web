@@ -121,8 +121,8 @@ export function ConverBody({
   )
 
   const isSellInsufficient = useMemo(
-    () => action === 'sell' && orderValue ? (isGreater(orderValue, inputTokenBalance?.balance || '0')) : false, 
-    [orderValue, inputTokenBalance, action]
+    () => action === 'sell' && inputSize ? (isGreater(inputSize, inputTokenBalance?.balance || '0')) : false, 
+    [inputSize, inputTokenBalance, action]
   )
 
   const disabled = useMemo(

@@ -15,6 +15,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssStore } from "./stores/wssStore";
 import type { ISummaryData } from './service/webSocket/types'
 import { useWssOn } from './hooks/useWssOn'
+import { Loading } from './components/loading'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -59,7 +60,7 @@ function App() {
 
   return (
     <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>
-      <Suspense fallback={<div className=' text-white flex justify-center items-center h-screen '>{t('Loading')}...</div>}>
+      <Suspense fallback={<div className=' text-white flex justify-center items-center h-screen '><Loading /></div>}>
         <BrowserRouter>
           <ScrollToTop />
           <RoutesWrapper />

@@ -31,12 +31,14 @@ export function DialogController({
   children,
   title,
   topFixed,
+  top,
   open,
   openChange
 }: {
   children?: React.ReactNode;
   title?: string
   topFixed?: boolean
+  top?: number
   open: boolean
   openChange: (open: boolean) => void
 }) {
@@ -44,8 +46,9 @@ export function DialogController({
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(
         'rounded-[16px]',
-        topFixed ? 'top-[20%] translate-y-[0]' : ''
-      )}>
+        topFixed ? 'top-[10%] translate-y-[0]' : ''
+      )}
+      >
         <DialogHeader>
           <DialogTitle>{title || ''}</DialogTitle>
         </DialogHeader>

@@ -9,15 +9,18 @@ const RwaItemPrice = memo(
   ({ data }: { data: IRwa}) => {
     const rwaPrice = useRwaPrice(data.symbol)
     if (!rwaPrice) return null
-
+    const up = useMemo(() => Number(rwaPrice.up), [rwaPrice.up])
     return (
       <div className="mt-4 flex items-center gap-x-2">
         <div className=" text-[22px] min-w-[90px] font-medium">${rwaPrice.price || '--'}</div>
         <div className={cn(
           "h-[29px] min-w-[70px] rounded-[4px] bg-[rgba(255,255,255,0.1)] py-1 px-2 flex items-center justify-center font-normal text-[14px]",
-          Number(rwaPrice.up) > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
+           up === 0 ? 'text-[#A1A1A1]' : up > 0 ? 'text-[#50E3C2]' : 'text-[#E3507A]'
         )}>
-          <LazyImage src={Number(rwaPrice.up) > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />
+          {
+            up !== 0 && <LazyImage src={up > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />
+          }
+          
           {Math.abs(Number(rwaPrice.up))}%
         </div>
       </div>
@@ -26,12 +29,14 @@ const RwaItemPrice = memo(
 )
 
 const RwaItem = memo(
-  ({ data }: { data: IRwa}) => {
+  ({ data, onClick }: { data: IRwa, onClick?: (data: IRwa) => void}) => {
     const { t } = useTranslation()
-    const upAmount = useMemo(() => Number(data.up || '0'), [data])
-    
     return (
-      <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white">
+      <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white cursor-pointer"
+        onClick={() => {
+          onClick && onClick(data)
+        }}
+      >
         <div className=" flex justify-between">
           <img src={data.icon} className="w-[46px] h-[46px] rounded-full" alt={data.symbol} />
           {

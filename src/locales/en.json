@@ -184,6 +184,16 @@
   "Select a token": "Select a token",
   "days": "days",
   "Confirm": "Confirm",
+  "Order Price": "Order Price",
+  "Order Amount": "Order Amount",
+  "Filled Amount": "Filled Amount",
+  "Filled Value": "Filled Value",
+  "Order Time": "Order Time",
+  "Execution Time": "Execution Time",
+  "Expiration": "Expiration",
+  "Actions": "Actions",
+  "Details": "Details",
+  "No records found": "No records found",
   "identity": {
     "Identity_verification": "Identity verification"
   }

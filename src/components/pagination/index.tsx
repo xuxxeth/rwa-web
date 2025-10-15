@@ -9,6 +9,7 @@ export default function Pagination({
   scrollToTopAferClick = true,
   prevDisabled,
   nextDisabled,
+  className
 }: {
   currentPage?: number;
   totalPage?: number;
@@ -19,9 +20,13 @@ export default function Pagination({
   // prev: { disabled: boolean; onClick: () => void };
   // next: { disabled: boolean; onClick: () => void };
   scrollToTopAferClick?: boolean;
+  className?: string
 }) {
   return (
-    <div className="flex gap-4 py-2 mt-9 flew-row justify-center">
+    <div className={cn(
+      "flex gap-4 py-2 mt-9 flew-row justify-center",
+      className
+    )}>
       {[
         {
           key: "prev",
