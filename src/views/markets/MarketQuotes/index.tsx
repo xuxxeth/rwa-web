@@ -15,6 +15,7 @@ import {
   toFixed,
   type Change,
   symbolToLower,
+  multiply,
 } from '@/utils'
 import BuyButton from '@/components/button/BuyButton'
 import TradingHaltBtn from '@/components/button/TradingHaltBtn'
@@ -25,11 +26,11 @@ import { bscTestnet } from '@/hooks/useCaCommon'
 import { marketQuoteOptions } from '@/queries'
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useRwaTokens } from '@/hooks/useTokens'
-import { useBaseStore } from '@/stores/baseStore'
 import wsService from '@/service/webSocket/service'
 import { type ISummaryData } from '@/service/webSocket/types'
 import { type IQuote } from '@/service/quote/types'
 import { useEffect, useState } from 'react'
+import { truncate, divide, subtract } from '@/utils'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -41,33 +42,43 @@ export default function MarketQuotes() {
 
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
-  const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
-
   const marketQuotes: IMarketQuote[] = rwaList.map(rwa => {
-    // const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
-    const priceFromStore = tokenWithPrice[symbolToLower(rwa.symbol)]
+    const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+
     return {
       ...rwa,
-      price: priceFromStore?.price,
-      up: priceFromStore?.up,
-      dailyHigh: priceFromStore?.dailyHigh,
+      price: quote?.price,
+      up: quote?.up,
+      dailyHigh: quote?.dailyHigh,
     }
   })
 
   useEffect(() => {
-    // const listener = (data: ISummaryData) => {
-    //   const obj = data.reduce((acc, item) => {
-    //     acc[symbolToLower(item.S)] = {
-    //       price: item.p,
-    //     }
-    //     return acc
-    //   }, {} as Record<string, IQuote>)
-    // }
+    const listener = (data: ISummaryData) => {
+      console.log('summary data', data)
+      const obj = data.reduce(
+        (acc, item) => {
+          acc[symbolToLower(item.S)] = {
+            price: truncate(item.p, 2),
+            // item.p 最新价 itme.o 今开价
+            // up = (最新价 - 金开价) - 1
+            up:
+              item.o && item.p
+                ? truncate(multiply(subtract(divide(item.p, item.o), 1), 100), 2)
+                : '0',
+            dailyHigh: item.h ? truncate(item.h, 2) : '0',
+          }
+          return acc
+        },
+        {} as Record<string, IQuote>
+      )
+      setTokenWithQuote(obj)
+    }
 
-    // wsService.on('summary', listener)
+    wsService.on('summary', listener)
 
     return () => {
-      // wsService.off('summary', listener)
+      wsService.off('summary', listener)
     }
   }, [])
 

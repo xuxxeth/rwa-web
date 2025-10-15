@@ -70,6 +70,21 @@ export function divide(num1: string | number, num2: string | number) {
   }
 }
 
+
+export function subtract(num1: string | number, num2: string | number) {
+  if (!num1 || !num2 || num1 === "0") return String(num2);
+  if (num2 === "0") return String(num1);
+
+  // 使用BigNumber库处理减法，确保小数和大数计算的准确性
+  try {
+    const result = new BigNumber(num1).minus(new BigNumber(num2));
+    return result.toString();
+  } catch (error) {
+    console.error("减法计算错误:", error);
+    return '0';
+  }
+}
+
 export function sum(...numbers: (string | number)[]) {
   // 边界情况处理：如果没有输入数字或所有数字都是0，则返回"0"
   if (numbers.length === 0) return "0";

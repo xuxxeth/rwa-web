@@ -1,27 +1,22 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import type { BaseStore } from "./types";
-import { baseApi } from "@/service/base/api";
-import { MARKET_STATUS, RESPONSE_CODE } from "@/config/constants";
-import { marketDefault, marketStateDefault } from "./defaultData";
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import type { BaseStore } from './types'
+import { baseApi } from '@/service/base/api'
+import { MARKET_STATUS, RESPONSE_CODE } from '@/config/constants'
+import { marketDefault, marketStateDefault } from './defaultData'
 import type {
   IRwa,
   IRwaPrice,
   IToken,
   ITokenWithBalance,
   ITokenWithPrice,
-  IStockWithPrice
-} from "@/service/base/types";
-import {
-  truncate,
-  checkSymbolEqual,
-  symbolToLower,
-  getEasternSecondsSinceMidnight,
-} from "@/utils";
+  IStockWithPrice,
+} from '@/service/base/types'
+import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight } from '@/utils'
 
-const ENABLE_CACHE = true;
+const ENABLE_CACHE = true
 // 缓存时间，2小时
-const CACHE_TIME = 1000 * 60 * 60 * 2;
+const CACHE_TIME = 1000 * 60 * 60 * 2
 
 export const useBaseStore = create<BaseStore>()(
   persist(
@@ -41,114 +36,102 @@ export const useBaseStore = create<BaseStore>()(
       // token 余额
       tokenWithBalance: {},
       setCurrentWallet: (wallt: any) => {
-        set({currentWallet: wallt})
+        set({ currentWallet: wallt })
       },
-      setTokenWithBalance: (
-        tokenWithBalance: Record<string, ITokenWithBalance>
-      ) => {
-        set({ tokenWithBalance: tokenWithBalance });
+      setTokenWithBalance: (tokenWithBalance: Record<string, ITokenWithBalance>) => {
+        set({ tokenWithBalance: tokenWithBalance })
       },
 
       // token 价格
       tokenWithPrice: {},
       // 更新 token 价格
       setTokenWithPrice: (tokenWithPrice: Record<string, ITokenWithPrice>) => {
-        set({ tokenWithPrice: tokenWithPrice });
+        set({ tokenWithPrice: tokenWithPrice })
       },
       // 使用 websocket 数据更新 token 价格
       setTokenWithPriceByWebSocketData: (data: IRwaPrice[]) => {
-        const rwaList = get().rwaList;
-        if (rwaList.length === 0) return;
+        const rwaList = get().rwaList
+        if (rwaList.length === 0) return
         const tokenWithPrices: Record<string, ITokenWithPrice> = data.reduce(
           (acc, cur) => {
-            const rwa = rwaList.find((item) =>
-              checkSymbolEqual(item.symbol, cur.S)
-            );
+            const rwa = rwaList.find(item => checkSymbolEqual(item.symbol, cur.S))
             if (rwa) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur.p || 0, rwa.precision),
-                up: truncate(
-                  (cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100,
-                  2
-                ),
+                up: truncate((cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100, 2),
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
-              };
+              }
             }
-            return acc;
+            return acc
           },
           {} as Record<string, ITokenWithPrice>
-        );
-        set({ tokenWithPrice: tokenWithPrices });
+        )
+        set({ tokenWithPrice: tokenWithPrices })
       },
 
       // 股票价格
       stockWithPrice: {},
       setStockWithPrice: (stockWithPrice: Record<string, IStockWithPrice>) => {
-        set({ stockWithPrice: stockWithPrice });
+        set({ stockWithPrice: stockWithPrice })
       },
       // 使用 websocket 数据更新股票价格
       setStockWithPriceByWebSocketData: (data: IRwaPrice[]) => {
-        const stocksList = get().stocksList;
-        if (stocksList.length === 0) return;
+        const stocksList = get().stocksList
+        if (stocksList.length === 0) return
         const stockWithPrices: Record<string, IStockWithPrice> = data.reduce(
           (acc, cur) => {
-            const stock = stocksList.find((item) =>
-              checkSymbolEqual(item.stockCode, cur.S)
-            );
+            const stock = stocksList.find(item => checkSymbolEqual(item.stockCode, cur.S))
             if (stock) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur?.p || 0, 2),
-                up: truncate(
-                  (cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100,
-                  2
-                ),
+                up: truncate((cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100, 2),
                 cPrice: truncate(cur?.c || 0, 2),
-              };
+              }
             }
-            return acc;
+            return acc
           },
           {} as Record<string, IStockWithPrice>
-        );
-        set({ stockWithPrice: stockWithPrices });
+        )
+        set({ stockWithPrice: stockWithPrices })
       },
 
       getChains: async () => {
-        const res = await baseApi.getChains();
+        const res = await baseApi.getChains()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ chainList: res.data || [] });
+          set({ chainList: res.data || [] })
         }
-        return res;
+        return res
       },
       setTokens: (tokenList: IToken[]) => {
-        set({ tokenList: tokenList });
+        set({ tokenList: tokenList })
       },
       setRwas: (rwaList: IRwa[]) => {
-        set({ rwaList: rwaList });
+        set({ rwaList: rwaList })
       },
       getTokens: async (chainId?: number) => {
-        const res = await baseApi.getTokens(chainId);
-        set({ tokenList: res.data || [] });
-        return res;
+        const res = await baseApi.getTokens(chainId)
+        set({ tokenList: res.data || [] })
+        return res
       },
       getBaseRwas: async (chainId?: number) => {
-        const res = await baseApi.getBaseRwas(chainId);
+        const res = await baseApi.getBaseRwas(chainId)
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ rwaList: res.data || [] });
+          set({ rwaList: res.data || [] })
         }
-        return res;
+        return res
       },
       getStocks: async () => {
-        const res = await baseApi.getStocks();
+        const res = await baseApi.getStocks()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ stocksList: res.data || [] });
+          set({ stocksList: res.data || [] })
         }
-        return res;
+        return res
       },
       getMarket: async () => {
-        const res = await baseApi.getMarket();
+        const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          const marketInfo = { ...(res.data || {}) };
-          let marketState = MARKET_STATUS.DEFAULT;
+          const marketInfo = { ...(res.data || {}) }
+          let marketState = MARKET_STATUS.DEFAULT
           if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
             const nowSecond = getEasternSecondsSinceMidnight();
             if (nowSecond < marketInfo.tradingStartTime - marketInfo.preMarketMinutes) {
@@ -156,34 +139,32 @@ export const useBaseStore = create<BaseStore>()(
             } else if (nowSecond > marketInfo.tradingEndTime + marketInfo.afterMarketMinutes) {
               marketState = MARKET_STATUS.AFTER;
             } else {
-              marketState = MARKET_STATUS.OPEN;
+              marketState = MARKET_STATUS.OPEN
             }
           }
-          set({ marketTradeState: marketState });
+          set({ marketTradeState: marketState })
 
-          set({ marketInfo: marketInfo });
+          set({ marketInfo: marketInfo })
         }
-        return res;
+        return res
       },
       getMarketState: async () => {
-        const res = await baseApi.getMarketState();
+        const res = await baseApi.getMarketState()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ marketState: res.data || [] });
+          set({ marketState: res.data || [] })
         }
-        return res;
+        return res
       },
       init: async (chainId: number | null) => {
-        if (!chainId) return;
+        if (!chainId) return
 
         if (
           ENABLE_CACHE &&
           Date.now() - get().lastInitTime < CACHE_TIME &&
           get().lastChainId === chainId
         ) {
-          console.log(
-            `ChainId: ${chainId}, init, last init time is less than 2 hours`
-          );
-          return;
+          console.log(`ChainId: ${chainId}, init, last init time is less than 2 hours`)
+          return
         }
 
         await Promise.all([
@@ -193,51 +174,43 @@ export const useBaseStore = create<BaseStore>()(
           get().getStocks(),
           get().getMarket(),
           get().getMarketState(),
-        ]);
+        ])
         set(() => ({
           lastChainId: chainId,
           lastInitTime: Date.now(),
-        }));
+        }))
       },
       updateRwasPrice: (priceList: IRwaPrice[]) => {
-        const rwaList = get().rwaList.map((rwa) => {
-          const price = priceList.find((price) => price.S === rwa.symbol);
+        const rwaList = get().rwaList.map(rwa => {
+          const price = priceList.find(price => price.S === rwa.symbol)
           return {
             ...rwa,
             price: truncate(price?.p || 0, rwa.precision),
-            up: truncate(
-              (price?.o && price?.p ? price.p / price.o - 1 : 0) * 100,
-              2
-            ),
-          };
-        });
-        set({ rwaList: rwaList });
+            up: truncate((price?.o && price?.p ? price.p / price.o - 1 : 0) * 100, 2),
+          }
+        })
+        set({ rwaList: rwaList })
       },
       updateStocksPrice: (priceList: IRwaPrice[]) => {
-        const stocksList = get().stocksList.map((stock) => {
-          const price = priceList.find((price) =>
-            price.S.startsWith(stock.stockCode)
-          );
+        const stocksList = get().stocksList.map(stock => {
+          const price = priceList.find(price => price.S.startsWith(stock.stockCode))
           return {
             ...stock,
             price: truncate(price?.p || 0, 2),
-            up: truncate(
-              (price?.o && price?.p ? price.p / price.o - 1 : 0) * 100,
-              2
-            ),
+            up: truncate((price?.o && price?.p ? price.p / price.o - 1 : 0) * 100, 2),
             cPrice: truncate(price?.c || 0, 2),
-          };
-        });
-        set({ stocksList: stocksList });
+          }
+        })
+        set({ stocksList: stocksList })
       },
       freshTokenBalances: () => {
-        set({ freshTokenBalancesCount: get().freshTokenBalancesCount + 1 });
+        set({ freshTokenBalancesCount: get().freshTokenBalancesCount + 1 })
       },
     }),
     {
-      name: "CA_WEB_BASE_INFO",
+      name: 'CA_WEB_BASE_INFO',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         // tokenList: state.tokenList,
         // rwaList: state.rwaList,
         // chainList: state.chainList,
@@ -250,4 +223,4 @@ export const useBaseStore = create<BaseStore>()(
       }),
     }
   )
-);
+)
