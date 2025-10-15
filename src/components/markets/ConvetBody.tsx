@@ -12,7 +12,6 @@ import { useShowDialog, DialogController } from '@/components/dialog/DialogContr
 import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
-import wsService from "@/service/WebSocketService";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
 import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
