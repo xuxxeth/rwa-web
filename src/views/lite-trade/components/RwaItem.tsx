@@ -8,8 +8,9 @@ import { memo, useMemo } from "react"
 const RwaItemPrice = memo(
   ({ data }: { data: IRwa}) => {
     const rwaPrice = useRwaPrice(data.symbol)
+    const up = useMemo(() => Number(rwaPrice?.up || '0'), [rwaPrice?.up])
+
     if (!rwaPrice) return null
-    const up = useMemo(() => Number(rwaPrice.up), [rwaPrice.up])
     return (
       <div className="mt-4 flex items-center gap-x-2">
         <div className=" text-[22px] min-w-[90px] font-medium">${rwaPrice.price || '--'}</div>
