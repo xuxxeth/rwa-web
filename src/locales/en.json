@@ -140,7 +140,11 @@
         "partiallyFilled": "Partially Filled",
         "orderFailed": "Order Failed",
         "canceled": "Canceled",
-        "filled": "Filled"
+        "filled": "Filled",
+        "partiallyFilledAndCancelled": "Partially Filled and Canceled",
+        "rejected": "Rejected",
+        "marketCloseCanceled": "Market Close Canceled",
+        "pendingCancel": "Pending Cancel"
       },
 
       "action": "Action",

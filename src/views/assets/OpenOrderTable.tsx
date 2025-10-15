@@ -16,7 +16,7 @@ import {
   DropDownFilter,
   ScrollLoadMore,
 } from './Shared'
-import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration } from '@/utils'
+import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, sleep } from '@/utils'
 import { useTradeUtils } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
 import { useOrderFilterStore, generateOpenOrderFilterObj } from '@/stores/orderFilterStore'
@@ -53,8 +53,16 @@ export default function OpenOrderTable(props: {
   //   refetch,
   // } = useQuery(openOrderOptions(chainId, isSignatureValid, filter));
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
-    useInfiniteQuery(infiniteOpenOrderOptions(chainId, isSignatureValid, filter))
+  const {
+    data,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
+    isError,
+  } = useInfiniteQuery(infiniteOpenOrderOptions(chainId, isSignatureValid, filter))
 
   const allOpenOrders = data?.pages?.flatMap(page => page.data) || []
 
@@ -109,7 +117,7 @@ export default function OpenOrderTable(props: {
           title={"orderStatus"}
         /> */}
       </div>
-      <TableHeader<'', IOpenOrder, { rwaTokens: IRwa[] }>
+      <TableHeader<'', IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }>
         lngPrefix='assets.order.tableHeader'
         config={openOrderTableConfig}
         sort={null}
@@ -118,10 +126,10 @@ export default function OpenOrderTable(props: {
       />
       {isSignatureValid ? (
         <>
-          <TableBody<IOpenOrder, { rwaTokens: IRwa[] }>
+          <TableBody<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }>
             data={allOpenOrders}
             config={openOrderTableConfig}
-            extra={{ rwaTokens }}
+            extra={{ rwaTokens, refetch }}
             getKey={(item: IOpenOrder) => item.id}
           />
           <ScrollLoadMore<IOpenOrder>
@@ -141,82 +149,87 @@ export default function OpenOrderTable(props: {
 
 const Day = 1 * 60 * 60 * 24
 
-const openOrderTableConfig: ITableConfnig<IOpenOrder, { rwaTokens: IRwa[] }> = [
-  {
-    key: 'side',
-    sortable: false,
-    render: (item: IOpenOrder) => <SideCell side={item.side} />,
-    width: 60,
-  },
-  {
-    key: 'type',
-    sortable: false,
-    render: (item: IOpenOrder) => <OrderTypeCell orderType={item.orderType} />,
-    width: 60,
-  },
-  {
-    key: 'token',
-    sortable: false,
-    width: 150,
-    render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
-      const rwa = rwaTokens.find(token => token.stockId === item.stockId)
-      return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
+const openOrderTableConfig: ITableConfnig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> =
+  [
+    {
+      key: 'side',
+      sortable: false,
+      render: (item: IOpenOrder) => <SideCell side={item.side} />,
+      width: 60,
     },
-  },
-  {
-    key: 'orderPrice',
-    sortable: false,
-    breakOnSpace: true,
-    render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
-  },
-  {
-    key: 'orderAmount',
-    sortable: false,
-    breakOnSpace: true,
-    render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
-  },
-  {
-    key: 'filledAmount',
-    sortable: false,
-    breakOnSpace: true,
-    render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
-  },
-  {
-    key: 'filledValue',
-    sortable: false,
-    breakOnSpace: true,
-    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
-  },
-  {
-    key: 'orderTime',
-    sortable: false,
-    render: (item: IOpenOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
-  },
-  {
-    key: 'expiration',
-    sortable: false,
-    render: (item: IOpenOrder) => {
-      return <TextCell text={readableDuration(item.validDate * Day)} />
+    {
+      key: 'type',
+      sortable: false,
+      render: (item: IOpenOrder) => <OrderTypeCell orderType={item.orderType} />,
+      width: 60,
     },
-  },
-  {
-    key: 'status',
-    sortable: false,
-    render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
-  },
-  {
-    key: 'action',
-    sortable: false,
-    render: (item: IOpenOrder) => <CancelOrderButton orderId={item.orderId} />,
-  },
-]
+    {
+      key: 'token',
+      sortable: false,
+      width: 150,
+      render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+        const rwa = rwaTokens.find(token => token.stockId === item.stockId)
+        return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
+      },
+    },
+    {
+      key: 'orderPrice',
+      sortable: false,
+      breakOnSpace: true,
+      render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
+    },
+    {
+      key: 'orderAmount',
+      sortable: false,
+      breakOnSpace: true,
+      render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
+    },
+    {
+      key: 'filledAmount',
+      sortable: false,
+      breakOnSpace: true,
+      render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
+    },
+    {
+      key: 'filledValue',
+      sortable: false,
+      breakOnSpace: true,
+      render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
+    },
+    {
+      key: 'orderTime',
+      sortable: false,
+      render: (item: IOpenOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
+    },
+    {
+      key: 'expiration',
+      sortable: false,
+      render: (item: IOpenOrder) => {
+        return <TextCell text={readableDuration(item.validDate * Day)} />
+      },
+    },
+    {
+      key: 'status',
+      sortable: false,
+      render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
+    },
+    {
+      key: 'action',
+      sortable: false,
+      render: (item: IOpenOrder, { refetch }) => (
+        <CancelOrderButton refetch={refetch} orderId={item.orderId} />
+      ),
+    },
+  ]
 
-function CancelOrderButton(props: { orderId: string }) {
+function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
+  const { refetch } = props
   const { t } = useTranslation()
   const { orderId } = props
   const { cancelOrder } = useTradeUtils()
   const { toastSuccess } = useToast()
   const [isCanceling, setIsCanceling] = useState(false)
+  const maxRefetchCount = useRef(5)
 
   const handleCancelOrder = async () => {
     try {
@@ -226,6 +239,11 @@ function CancelOrderButton(props: { orderId: string }) {
       toastSuccess({
         title: t('assets.order.cancelOrderSuccess'),
       })
+      while (maxRefetchCount.current > 0) {
+        maxRefetchCount.current--
+        refetch()
+        await sleep(1000)
+      }
     } catch (error) {
       console.log('===> cancel order error', error)
     } finally {

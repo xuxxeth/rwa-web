@@ -1,12 +1,16 @@
 import { create } from 'zustand'
 import { subDays } from 'date-fns'
+import { setStartOfDay, setEndOfDay } from '@/components/date-range-picker'
 
 function generateDefaultStartTime() {
-  return Math.ceil(subDays(new Date(), 30).getTime() / 1000)
+  const thirtyDaysAgo = subDays(new Date(), 30)
+  return Math.floor(setStartOfDay(thirtyDaysAgo).getTime() / 1000)
 }
 
 function generateDefaultEndTime() {
-  return Math.ceil(Date.now() / 1000)
+  const now = new Date()
+  // 设置为当天的23:59:59
+  return Math.floor(setEndOfDay(now).getTime() / 1000)
 }
 
 export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
