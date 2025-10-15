@@ -51,6 +51,7 @@ function App() {
   const { wsService } = useWssOn()
 
   useEffect(() => {
+    wsService.init({})
     return () => {
       wsService.close()
     }
