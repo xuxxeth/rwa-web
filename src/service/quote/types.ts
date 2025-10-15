@@ -1,13 +1,10 @@
 import { type IRwa } from '../base/types'
 
 export interface IQuote {
-  price?: number
-  up?: number
-  dailyHigh?: number
+  price?: string
+  up?: string
+  dailyHigh?: string
 }
 
-export interface IMarketQuote extends IRwa {
-  price?: string,
-  up?: string,
-  dailyHigh?: string,
-}
+export type IMarketQuote = IQuote & IRwa
+  
