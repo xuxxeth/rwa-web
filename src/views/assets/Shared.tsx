@@ -35,7 +35,7 @@ export function ValueCell(props: { value: string }) {
   const { value } = props
   return (
     <TextCell
-      text={value === '0' ? textSuffix(value, 'USDT') : textSuffix(toFixed(value, 3), 'USDT')}
+      text={value === '0' ? textSuffix(value, 'USDT') : textSuffix(toFixed(value, 2), 'USDT')}
     />
   )
 }
@@ -300,9 +300,6 @@ export function formatAssetMount(amount: string | number) {
   if (bnAmount.isZero()) {
     return '0'
   }
-  if (bnAmount.abs().lt(1)) {
-    return bnAmount.toFixed(5, BigNumber.ROUND_HALF_UP)
-  } else {
-    return bnAmount.toFixed(2, BigNumber.ROUND_HALF_UP)
-  }
+  // 四舍五入取整
+  return bnAmount.toFixed(0, BigNumber.ROUND_HALF_UP)
 }
