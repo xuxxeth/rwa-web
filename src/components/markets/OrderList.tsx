@@ -9,11 +9,12 @@ import { OrderItem } from "./OrderItem"
 import { Loading } from "../loading"
 import { NoData } from "./NoData"
 import Pagination from "../pagination"
+import { RESPONSE_CODE } from "@/config/constants"
 
 
 
 const OrderList = memo(
-  ({ show }: { show: Boolean }) => {
+  ({ show, onClose }: { show: Boolean, onClose?: () => void}) => {
     const { t } = useTranslation()
 
     const [openOrderList, setOpenOrderList] = useState<IOpenOrder[]>([])
@@ -32,9 +33,15 @@ const OrderList = memo(
       // getOrderHistory
       setLoading(true)
       const action = type === 'open' ? scanApi.getOpenOrders : scanApi.getOrderHistory
-      const res = await action({ after })
+      // @ts-ignore
+      const res = await action({ after, noError: true })
       setLoading(false)
-      if (res.code === 9200) {
+      console.log(res)
+      if (!res) {
+
+        return
+      }
+      if (res.code === RESPONSE_CODE.SUCCESS) {
         const _data = res.data || []
         if (_data.length < 10) {
           setNextDisabled(true)
@@ -45,6 +52,13 @@ const OrderList = memo(
           afterList.current.push(_data[_data.length - 1].orderId)
           setNextDisabled(false)
         }
+        return
+      }
+      // 未签名，则关闭弹窗，拉起签名
+      if (res.code === RESPONSE_CODE.UNAUTHORIZED) {
+        toastError({title: t('Unauthorized')})
+        onClose && onClose()
+        return
       }
     }, [])
 

@@ -37,7 +37,8 @@ export const Tif = {
 }
 
 export const RESPONSE_CODE = {
-  SUCCESS: 9200
+  SUCCESS: 9200,
+  UNAUTHORIZED: 9401
 }
 
 export const MARKET_STATUS = {
