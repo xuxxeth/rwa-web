@@ -74,6 +74,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         if (wallet) {
           hasConnected.current = true
           setCurrentWallet(wallet)
+           // @ts-ignore
           handleConnect(connectorType, wallet)
         }
       }
@@ -166,7 +167,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 wallets.map((wallet) => {
                   return (
                     <WalletItem 
-                      key={wallet.info.uuid} 
+                      key={wallet.info.name} 
                       wallet={wallet}
                       onClick={async () => {
                         setOpen(false)
@@ -174,6 +175,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                         const chainId = parseInt(wallet.provider.chainId, 16)
                         const chain = chains.find(chain => Number(chain.id) === chainId)
                         if (chain) {
+                          // @ts-ignore
                           await handleConnect('inject', wallet)
                           setCurrentWallet(wallet)
                           walletDialog.hide()

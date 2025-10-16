@@ -77,8 +77,9 @@ const OrderList = memo(
         // TODO: 需要在 ca-common-web 里修复
         const result = await cancelOrder(orderId, { wait: true })
         console.log(result)
-        if (result && result?.code === -1) {
-          toastError({title: typeof result?.message === 'string' ? result.message : result.message?.name || ''})
+        if (result && result?.code !== 9200) {
+          // @ts-ignore
+          toastError({title: result?.data.name + ': ' + result?.data.errorCode})
         } else {
           toastSuccess({
             title: t('assets.order.cancelOrderSuccess'),

@@ -21,6 +21,7 @@ const ConnectButtonText = memo(
               wallet = _wallet
             }
           }
+          // @ts-ignore
           await handleConnect('inject', wallet)
         }}
       >

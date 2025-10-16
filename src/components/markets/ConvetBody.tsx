@@ -102,8 +102,9 @@ export function ConverBody({
     const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true})
     setBuying(false)
     console.log(result)
-    if (result && result?.code === -1) {
-      toastError({title: typeof result?.message === 'string' ? result.message : result.message?.name || ''})
+    if (result && result?.code !== 9200) {
+      // @ts-ignore
+      toastError({title: result?.data.name + ': ' + result?.data.errorCode})
     } else {
       freshTokenBalances()
     }
