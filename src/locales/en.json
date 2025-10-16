@@ -73,6 +73,7 @@
     "token": "TOKEN",
     "price": "PRICE",
     "change": "CHANGE(%)",
+    "buy": "Buy",
     "marketCap": "MARKET CAP",
     "dailyHigh": "DAILY HIGH",
     "quickBuy": "QUICK BUY",

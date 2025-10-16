@@ -251,7 +251,7 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
         await sleep(1000)
       }
     } catch (error) {
-      console.log('===> cancel order error', error)
+      console.log('cancel order error', error)
     } finally {
       setIsCanceling(false)
     }

@@ -36,7 +36,6 @@ export function useAssetsList(chainId: number, account: string) {
 
   useEffect(() => {
     const listener = (data: IAggregateData) => {
-      console.log('===>data from aggregate', data)
       const items = data.Items
 
       const priceMap = items.reduce((acc: Record<string, { price: number }>, cur) => {

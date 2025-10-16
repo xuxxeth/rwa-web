@@ -71,8 +71,6 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
     })
   )
 
-  console.log('===> trade history data', data)
-
   // 用于检测滚动到底部的ref
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
