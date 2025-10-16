@@ -62,7 +62,13 @@ export default function OpenOrderTable(props: {
     isFetching,
     isLoading,
     isError,
-  } = useInfiniteQuery(infiniteOpenOrderOptions(chainId, isSignatureValid, filter))
+  } = useInfiniteQuery(
+    infiniteOpenOrderOptions(chainId, isSignatureValid, filter, {
+      onUnAuthorized: () => {
+        refreshIsSignatureValid(false)
+      },
+    })
+  )
 
   const allOpenOrders = data?.pages?.flatMap(page => page.data) || []
 
