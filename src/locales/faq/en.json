@@ -1,0 +1,31 @@
+[
+  {
+    "q": "What is Cyber Alpha?",
+    "a": "Cyber Alpha is a pioneering platform revolutionizing Real World Assets (RWA) through blockchain innovation, enabling seamless tokenization and trading of high-value traditional assets in a decentralized ecosystem. We deliver institutional-grade price accuracy, unparalleled transparency, and secure on-chain settlement. Cyber Alpha empowers both traditional investors and crypto natives to access global markets with efficiency and trust, fostering a compliant bridge between legacy finance and the future of DeFi."
+  },
+  {
+    "q": "Where do tokenized stock prices come from?",
+    "a": "Prices are sourced from real-time market data of underlying equities through licensed brokerage partners. Cyber Alpha’s on-chain prices track the actual market prices 1:1 with minimal latency."
+  },
+  {
+    "q": "When can I trade Cyber Alpha tokenized stocks?",
+    "a": "Cyber Alpha currently enables trading of tokenized assets during U.S. stock market hours (9:30 AM to 4:00 PM ET, Monday through Friday), aligning seamlessly with traditional financial markets to ensure robust liquidity and optimal pricing. Looking ahead, we’re committed to unlocking 24/7 trading, empowering users with unparalleled flexibility to access global markets anytime, anywhere, through our innovative blockchain infrastructure."
+  },
+  {
+    "q": "What are the trading fees on Cyber Alpha?",
+    "a": "Cyber Alpha’s total cost consists of two parts: Platform Fee: 0.04%, which supports system operation, institutional liquidity services, and premium OTC exchange services. Trading Fee: The actual execution fee is charged by our licensed brokerage partners, and varies based on order execution specifics."
+  },
+  {
+    "q": "How are Cyber Alpha tokenized stocks settled?",
+    "a": "Cyber Alpha settles trades using traditional market liquidity, verified by on-chain oracle prices to ensure fair and transparent execution. If a price deviation is detected, the system triggers manual review, and settlement may take slightly longer to protect users’ interests."
+  }
+]
+  
+  
+  
+
+  
+  
+
+  
+  

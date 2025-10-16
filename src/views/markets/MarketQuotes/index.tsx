@@ -55,7 +55,6 @@ export default function MarketQuotes() {
 
   useEffect(() => {
     const listener = (data: ISummaryData) => {
-      console.log('summary data', data)
       const obj = data.reduce(
         (acc, item) => {
           acc[symbolToLower(item.S)] = {

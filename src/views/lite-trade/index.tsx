@@ -6,10 +6,9 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { ConverBody } from "../../components/markets/ConvetBody";
 import { InvestBody } from "../../components/markets/InvestBody";
 import { XFooter } from "@/components/footer";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { MarketTrading } from "@/components/market-trading";
 import { ConvertTabs } from "../../components/markets/ConvertTabs";
-import { FAQ } from "../../components/markets/FAQ";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
 import { useRequestSignature } from "@/hooks/useSignature";
@@ -18,6 +17,8 @@ import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
+
+const FAQ = lazy(() => import("../../components/markets/FAQ"));
 
 function LiteTrade() {
   const { t } = useTranslation()

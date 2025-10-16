@@ -18,8 +18,10 @@ import { useWssStore } from "@/stores/wssStore";
 import { useRequestSignature } from "@/hooks/useSignature";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
+import { useRouter } from "@/hooks/useRouter";
 
 function Markets() {
+  const router = useRouter()
   const { t } = useTranslation()
   const [action, setAction] = useState('buy')
   const inputToken = useTradeStore(state => state.inputToken)
@@ -46,7 +48,12 @@ function Markets() {
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
           <div className="flex items-center text-[12px] font-normal my-3">
-            <div>{t('Markets')}</div>
+            <div 
+              className=" cursor-pointer"
+              onClick={() => {
+                router.push('/markets/quotes')
+              }}
+            >{t('Markets')}</div>
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
             <div>{inputToken?.symbol || '--'}</div>
           </div>
@@ -56,7 +63,7 @@ function Markets() {
               <KlineBody />
             </div>
             <div className="w-[350px] shrink-0">
-              <BoxCard className="min-h-[448px] rounded-[4px]">
+              <BoxCard className="min-h-[448px] rounded-[4px] p-4">
                 <ConvertTabs from="markets" onChange={(tab) => setAction(tab.key)} />
                 <div className="flex items-center justify-between mt-5">
                   <div className="text-[16px] font-medium flex-1 border-b border-[rgba(255,255,255,0.1)] leading-6">{t('limit')}</div>

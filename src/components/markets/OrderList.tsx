@@ -36,7 +36,6 @@ const OrderList = memo(
       // @ts-ignore
       const res = await action({ after, noError: true })
       setLoading(false)
-      console.log(res)
       if (!res) {
 
         return
@@ -128,7 +127,7 @@ const OrderList = memo(
           
         </div>
         {
-          filterOrderList.length > 0 &&
+          filterOrderList.length >= 10 &&
             <Pagination
               className="mt-1"
               currentPage={currentPage}
