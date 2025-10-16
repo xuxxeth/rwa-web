@@ -62,8 +62,8 @@ export default function MarketQuotes() {
             // item.p 最新价 itme.o 今开价
             // up = (最新价 - 金开价) - 1
             up:
-              item.o && item.p
-                ? truncate(multiply(subtract(divide(item.p, item.o), 1), 100), 2)
+              item.p && item.pc
+                ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
                 : '0',
             dailyHigh: item.h ? truncate(item.h, 2) : '0',
           }
