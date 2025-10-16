@@ -1,4 +1,4 @@
-import { CONNECT_ACCOUNT, REQUEST_TIMEOUT } from '@/config/constants'
+import { CODE_TO_HANDLER, CONNECT_ACCOUNT, REQUEST_TIMEOUT, type ErrorHandlers } from '@/config/constants'
 import axios from 'axios'
 import { bscTestnet } from '@/hooks/useCaCommon'
 
@@ -23,6 +23,7 @@ interface RequestInterceptors<T> {
 
 interface RequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: RequestInterceptors<T>
+  errorHandlers?: ErrorHandlers
 }
 // 通用接口响应结构
 export interface ApiResponse<T> {
@@ -78,9 +79,17 @@ axiosInstance.interceptors.response.use(
     return res
   },
   (error: AxiosError) => {
+    const config = error.config as RequestConfig
     console.log('err： ' + error) // for debug
-    
+
+    // 在这里可以统一处理下错误
     if (error.response && error.response.data) {
+      const apiResponse = error.response.data as ApiResponse<any>
+      const apiResponseCode = apiResponse.code
+      const handler = config.errorHandlers?.[CODE_TO_HANDLER[apiResponseCode]]
+      if( handler) {
+        handler()
+      }
       return Promise.resolve(error.response)
     }
 
@@ -123,14 +132,11 @@ const client = {
         ...config
       })
     } catch (error) {
-      console.log(error)
       if (params.noError) {
         return null
       }
       throw error
-      // return null
     }
-    
   },
 
   post: async <T = any>(url: string, data?: any, config?: RequestConfig) => {
