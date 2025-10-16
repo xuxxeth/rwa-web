@@ -63,7 +63,7 @@ function Markets() {
               <KlineBody />
             </div>
             <div className="w-[350px] shrink-0">
-              <BoxCard className="min-h-[448px] rounded-[4px]">
+              <BoxCard className="min-h-[448px] rounded-[4px] p-4">
                 <ConvertTabs from="markets" onChange={(tab) => setAction(tab.key)} />
                 <div className="flex items-center justify-between mt-5">
                   <div className="text-[16px] font-medium flex-1 border-b border-[rgba(255,255,255,0.1)] leading-6">{t('limit')}</div>

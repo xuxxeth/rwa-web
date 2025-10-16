@@ -84,7 +84,7 @@ export function SubMenus() {
                   <span className="text-sm font-medium ml-2">{t('Back')}</span>
                 </div>
                 <div className=" px-4">
-                  <LanguageItem title="Englist"  
+                  <LanguageItem title="English"  
                     onClick={() => changeLanguage('en')}
                     selected={i18n.language === 'en'}
                   />

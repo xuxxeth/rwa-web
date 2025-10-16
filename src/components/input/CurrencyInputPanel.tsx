@@ -94,10 +94,13 @@ const CurrencyInputPanel = memo(
         />
         {
           mode === 'in' && 
-            <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
+            <div className={cn(
+              " mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between",
+              from === "markets" ? "text-[12px]" : ""
+            )}>
               <div title={formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)} className={cn(
                 "truncate whitespace-nowrap text-ellipsis",
-                from === "markets" ? "w-[90px] overflow-hidden" : ""
+                from === "markets" ? "w-[120px] overflow-hidden" : ""
               )}>≈ ${formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)}</div>
               <div>Avbl: <span className={cn(
                 "",
@@ -107,10 +110,13 @@ const CurrencyInputPanel = memo(
         }
         {
           mode === 'out' && 
-            <div className=" mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between">
+            <div className={cn(
+              " mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between",
+              from === "markets" ? "text-[12px]" : ""
+            )}>
               <div title={formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)} className={cn(
                 "truncate whitespace-nowrap text-ellipsis",
-                from === "markets" ? "w-[90px] overflow-hidden" : ""
+                from === "markets" ? "w-[120px] overflow-hidden" : ""
               )}>≈ ${formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)}</div>
               <div>Avbl: <span className={cn(
                 "",
