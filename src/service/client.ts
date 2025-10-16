@@ -74,10 +74,16 @@ axiosInstance.interceptors.response.use(
     const url = res.config.url || ''
     abortControllerMap.delete(url)
     // 这里不能做任何处理，否则后面的 interceptors 拿不到完整的上下文了
+
     return res
   },
   (error: AxiosError) => {
     console.log('err： ' + error) // for debug
+    
+    if (error.response && error.response.data) {
+      return Promise.resolve(error.response)
+    }
+
     return Promise.reject(error)
   }
 )
@@ -118,6 +124,9 @@ const client = {
       })
     } catch (error) {
       console.log(error)
+      if (params.noError) {
+        return null
+      }
       throw error
       // return null
     }

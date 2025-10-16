@@ -97,7 +97,10 @@ function LiteTrade() {
         open={orderDialog.open}
         openChange={orderDialog.setOpen}
       > 
-        <OrderList show={orderDialog.open} />
+        <OrderList show={orderDialog.open} onClose={() => {
+          orderDialog.setOpen(false)
+          signature()
+        }} />
       </DialogController>
     </>
     
