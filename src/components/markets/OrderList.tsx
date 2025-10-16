@@ -86,7 +86,7 @@ const OrderList = memo(
         }
         
       } catch (error) {
-        console.log('===> cancel order error', error)
+        console.log('cancel order error', error)
       } finally {
         setIsCanceling(false)
       }
