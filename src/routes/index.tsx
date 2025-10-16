@@ -59,7 +59,6 @@ const routes: RouteObject[] = [
     path: '/identity/:step',
     element: <Identity />,
   },
-
   {
     path: "/kline",
     element: <KLine />,
