@@ -78,7 +78,7 @@ const KlineBody = memo(
         <div className="mt-4">
           <TradingChart />
         </div>
-        <Statistics />
+        {/* <Statistics /> */}
         <Profile />
       </div>
     )

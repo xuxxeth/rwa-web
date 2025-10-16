@@ -169,7 +169,7 @@ const OrderItem = memo(
         
         <div className="h-[13px] flex justify-center items-center mt-1 bg-[rgba(255,255,255,0.1)] cursor-pointer"
           onClick={() => {
-            onExpand && onExpand(order.orderId)
+            onExpand && onExpand( expand ? '' : order.orderId)
           }}
         >
           <LazyImage src="/images/icons/down-arrow.png" className={cn(

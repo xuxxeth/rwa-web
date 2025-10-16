@@ -3,6 +3,7 @@ import { RwaCard } from "@/components/rwa-card";
 import { MARKET_STATUS } from "@/config/constants";
 import { useRouter } from "@/hooks/useRouter";
 import { useRwaPrice } from "@/hooks/useTokenBalances";
+import { useTranslation } from "@/hooks/useTranslation";
 import { MainLayout } from "@/layouts/main";
 import type { IRwa, IStock } from "@/service/base/types";
 import { useBaseStore } from "@/stores/baseStore";
@@ -46,7 +47,7 @@ export const RwaPrice = (
 
 export default function Section2() {
   const _id = useId()
-
+  const { t } = useTranslation()
   const router = useRouter()
   const rwaList = useBaseStore(state => state.rwaList)
   const [filterStocks, setFilterStocks] = useState<IRwa[]>([])
@@ -71,9 +72,9 @@ export default function Section2() {
         <img src="/images/icons/star/8.png" className=" absolute top-0 right-[221px]" alt="" />
         <img src="/images/home/section2_bg.png" className="w-[600px] h-[600px] absolute left-[50%] -translate-x-[300px] top-[180px]" alt="" />
         <div className=" relative z-10">
-          <div className=" font-semibold text-[44px] pt-[72px] text-center">Institutional grade investment experience</div>
+          <div className=" font-semibold text-[44px] pt-[72px] text-center">{t('home.text4')}</div>
           <div className=" flex justify-center">
-            <div className="text-[18px] text-[rgba(255,255,255,0.8)] w-[790px] mt-6 text-center">Rapid execution and tight spreads, delivering a cost-efficient trading environment designed to meet the demands of sophisticated investors</div>
+            <div className="text-[18px] text-[rgba(255,255,255,0.8)] w-[790px] mt-6 text-center">{t('home.text5')}</div>
           </div>
           <div className="flex justify-center mt-[64px]">
             <div className=" grid grid-cols-2 gap-[88px]">

@@ -10,10 +10,7 @@ import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
-import wsService from "@/service/webSocket/service"
 import { ScrollToTop } from "./components/ScrollToTop";
-import { useWssStore } from "./stores/wssStore";
-import type { ISummaryData } from './service/webSocket/types'
 import { useWssOn } from './hooks/useWssOn'
 import { Loading } from './components/loading'
 

@@ -2,8 +2,6 @@ import { memo, useId, useMemo, useState } from "react"
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
-import { SortButton } from "../sort-button"
-import { cn } from "@/lib/utils"
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
 import Pagination from "../pagination";
@@ -11,6 +9,8 @@ import { formatTokenAmountWithCommas } from "@/utils/format";
 import { multiply, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
 import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { SortButton } from "../sort-button-svg";
+import { useTableSort } from "@/hooks/useTableHelper";
 
 export type CTokenProps = {
   stock: string,
@@ -132,9 +132,13 @@ const CTokenItem = memo(
   }
 )
 
+type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
+
 const CTokenList = memo(
   ({ onClick }: { onClick?: (token: IRwa) => void}) => {
     const { t } = useTranslation()
+    const { sort, onSortChange } = useTableSort<SortableField>()
+    
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -154,6 +158,15 @@ const CTokenList = memo(
       return filterHolding ? rwaListWithBalance.filter(token => Number(token.balance) > 0) : rwaListWithBalance
     }, [rwaListWithBalance, filterHolding])
 
+    const sortTokens = useMemo(() => {
+      if (sort?.order) {
+        return filterTokens.sort((token1, token2) => {
+          return sort.order === 'asc' ? Number(token1.price) - Number(token2.price) : Number(token2.price) - Number(token1.price)
+        })
+      }
+      return filterTokens
+    }, [sort, filterTokens])
+
     const totalPage = useMemo(() => Math.ceil(filterTokens.length / 7), [filterTokens])
 
     return (
@@ -167,11 +180,17 @@ const CTokenList = memo(
         <div className="mt-2">
           <div className=" flex items-center justify-between text-[12px] font-normal">
             <div className="w-1/3">{t("Name")}</div>
-            <div className="flex items-center gap-x-[6px] w-1/3">{t("Change")} <SortButton /></div>
+            <div className="flex items-center w-1/3 cursor-pointer"
+              onClick={() => {
+                onSortChange('price')
+              }}
+              >{t("Change")}
+              <div className="text-[rgba(255,255,255,0.6)]"><SortButton order={sort?.order} /></div>
+            </div>
             <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
           {
-            filterTokens.slice((currentPage - 1) * 7, currentPage * 7).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+            sortTokens.slice((currentPage - 1) * 7, currentPage * 7).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
           }
         </div>
         <Pagination currentPage={currentPage} totalPage={totalPage} 
