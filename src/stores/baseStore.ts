@@ -58,7 +58,7 @@ export const useBaseStore = create<BaseStore>()(
             if (rwa) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur.p || 0, rwa.precision),
-                up: truncate((cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100, 2),
+                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
               }
             }
@@ -84,7 +84,7 @@ export const useBaseStore = create<BaseStore>()(
             if (stock) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur?.p || 0, 2),
-                up: truncate((cur?.o && cur?.p ? cur.p / cur.o - 1 : 0) * 100, 2),
+                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
                 cPrice: truncate(cur?.c || 0, 2),
               }
             }
