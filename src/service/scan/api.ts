@@ -18,13 +18,21 @@ export const scanApi = {
     )
   },
 
-  getOrderHistory: (filters?: IOpenOrderHistoryFilter) =>
-    client.get<ApiResponse<IOrder[]>>('/v1/scan/history-orders', {
-      ...filters,
-    }),
+  getOrderHistory: (filters?: IOpenOrderHistoryFilter, errorHandlers?: ErrorHandlers) =>
+    client.get<ApiResponse<IOrder[]>>(
+      '/v1/scan/history-orders',
+      {
+        ...filters,
+      },
+      { errorHandlers }
+    ),
 
-  getTrades: (filters?: ITradeHistoryFilter) =>
-    client.get<ApiResponse<ITrade[]>>('/v1/scan/trades', {
-      ...filters,
-    }),
+  getTrades: (filters?: ITradeHistoryFilter, errorHandlers?: ErrorHandlers) =>
+    client.get<ApiResponse<ITrade[]>>(
+      '/v1/scan/trades',
+      {
+        ...filters,
+      },
+      { errorHandlers }
+    ),
 }

@@ -60,7 +60,13 @@ export default function HistoryOrderTable(props: {
   // } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
-    useInfiniteQuery(infiniteOrderHistoryOptions(chainId, isSignatureValid, filters))
+    useInfiniteQuery(
+      infiniteOrderHistoryOptions(chainId, isSignatureValid, filters, {
+        onUnAuthorized: () => {
+          refreshIsSignatureValid(false)
+        },
+      })
+    )
 
   const allOrders = data?.pages?.flatMap(page => page.data) || []
 
@@ -211,12 +217,14 @@ const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderAmount',
     sortable: false,
     breakOnSpace: true,
+    width: 100,
     render: (item: IOrder) => <AmountCell amount={item.size} />,
   },
   {
     key: 'filledAmount',
     sortable: false,
     breakOnSpace: true,
+    width: 100,
     render: (item: IOrder) => <AmountCell amount={item.settledSize} />,
   },
   {

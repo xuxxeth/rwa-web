@@ -63,7 +63,13 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
     isFetching,
     isFetchingNextPage,
     fetchNextPage,
-  } = useInfiniteQuery(infiniteTradeHistoryOptions(chainId, isSignatureValid, filters))
+  } = useInfiniteQuery(
+    infiniteTradeHistoryOptions(chainId, isSignatureValid, filters, {
+      onUnAuthorized: () => {
+        refreshIsSignatureValid(false)
+      },
+    })
+  )
 
   console.log('===> trade history data', data)
 
