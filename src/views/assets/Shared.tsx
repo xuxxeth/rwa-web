@@ -25,9 +25,10 @@ export function AmountCell(props: { amount: string }) {
 }
 
 export function OrderTypeCell(props: { orderType: OrderType }) {
+  const { t } = useTranslation()
   const { orderType } = props
 
-  return <TextCell text={orderType === 0 ? 'Limit' : 'Market'} />
+  return <TextCell text={orderType === 0 ? t('assets.order.limit') : t('assets.order.market')} />
 }
 
 export function ValueCell(props: { value: string }) {
