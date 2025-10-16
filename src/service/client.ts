@@ -132,9 +132,9 @@ const client = {
         ...config
       })
     } catch (error) {
-      if (params.noError) {
-        return null
-      }
+      // if (params.noError) {
+      //   return null
+      // }
       throw error
     }
   },

@@ -150,7 +150,7 @@ export const useBaseStore = create<BaseStore>()(
       },
       getMarketState: async () => {
         const res = await baseApi.getMarketState()
-        if (res.code === RESPONSE_CODE.SUCCESS) {
+        if (res && res.code === RESPONSE_CODE.SUCCESS) {
           set({ marketState: res.data || [] })
         }
         return res
