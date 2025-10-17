@@ -8,28 +8,33 @@ import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
 import { TextCell, TokenCell } from './Shared'
 import { textPrefix, toFixed, formatWithCommas } from '@/utils/format'
+import type { IRwa } from '@/service/base/types'
+import { useBaseStore } from '@/stores/baseStore'
+import type { ITableConfig } from '@/components/table-header'
 
 type SortableField = 'value'
 function AssetsTable(props: { chainId: number; account: string; assetsList: IAssetItem[] }) {
   const { assetsList } = props
   const { sort, onSortChange } = useTableSort<SortableField>()
 
+  const rwaList = useBaseStore(state => state.rwaList)
+
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
     usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort)
 
   return (
     <>
-      <TableHeader<SortableField, IAssetItem, unknown>
+      <TableHeader<SortableField, IAssetItem, { rwaList: IRwa[] }>
         className='bg-[rgba(255,255,255,0.04)] rounded-lg border-none px-5'
         lngPrefix='assets.assetsTab'
         config={assetTableConfig}
         sort={sort}
         onSortChange={onSortChange}
       />
-      <TableBody<IAssetItem, unknown>
+      <TableBody<IAssetItem, { rwaList: IRwa[] }>
         data={paginatedData}
         config={assetTableConfig}
-        extra={{} as unknown}
+        extra={{ rwaList } as { rwaList: IRwa[] }}
         getKey={(item: IAssetItem) => item.symbol}
       />
       {totalPage > 1 && (
@@ -44,7 +49,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
   )
 }
 
-const assetTableConfig = [
+const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
   {
     key: 'token',
     sortable: false,
@@ -79,14 +84,16 @@ const assetTableConfig = [
   {
     key: 'actions',
     sortable: false,
-    render: (item: IAssetItem) =>
-      item.rwaState === undefined ? (
+    render: (item: IAssetItem, { rwaList }) => {
+      const rwa = rwaList.find(rwa => rwa.symbol === item.symbol)
+      return item.rwaState === undefined ? (
         '--'
-      ) : item.rwaState === 0 ? (
-        <BuyButton to={'/markets/trading'} />
+      ) : item.rwaState === 0 && rwa ? (
+        <BuyButton rwa={rwa} />
       ) : (
         <TradingHaltBtn />
-      ),
+      )
+    },
   },
 ]
 

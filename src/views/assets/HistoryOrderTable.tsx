@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useRef } from 'react'
-import { TableHeader, TableBody, type ITableConfnig } from '@/components/table-header'
+import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
 import { type IRwa } from '@/service/base/types'
 import { orderHistoryOptions, infiniteOrderHistoryOptions } from '@/queries'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
@@ -185,7 +185,7 @@ export default function HistoryOrderTable(props: {
   )
 }
 
-const orderHistoryTableConfig: ITableConfnig<IOrder, { rwaTokens: IRwa[] }> = [
+const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'side',
     sortable: false,
