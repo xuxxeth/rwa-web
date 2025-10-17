@@ -1,4 +1,4 @@
-import { TableHeader, TableBody, type ITableConfnig } from '@/components/table-header'
+import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { type IRwa } from '@/service/base/types'
@@ -155,7 +155,7 @@ export default function OpenOrderTable(props: {
 
 const Day = 1 * 60 * 60 * 24
 
-const openOrderTableConfig: ITableConfnig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> =
+const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> =
   [
     {
       key: 'side',

@@ -16,7 +16,7 @@ import { infiniteTradeHistoryOptions, tradeHistoryOptions } from '@/queries'
 import { noop, formatTimestamp, toFixed, textPrefix, textSuffix, divide } from '@/utils'
 import { type ITrade } from '@/service/scan/types'
 import { type IRwa } from '@/service/base/types'
-import { TableHeader, TableBody, type ITableConfnig } from '@/components/table-header'
+import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
 import { useOrderFilterStore, generateTradeHistoryFilterObj } from '@/stores/orderFilterStore'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from './SignatureVerify'
@@ -162,7 +162,7 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
   )
 }
 
-const tradeHistoryTableConfig: ITableConfnig<ITrade, { rwaTokens: IRwa[] }> = [
+const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[] }> = [
   {
     key: 'side',
     sortable: false,

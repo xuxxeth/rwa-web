@@ -205,6 +205,6 @@ const MarketQuotesList = [
     key: 'quickBuy',
     sortable: false,
     render: (item: IMarketQuote) =>
-      item.state === 0 ? <BuyButton to={'/markets/trading'} /> : <TradingHaltBtn />,
+      item.state === 0 ? <BuyButton rwa={item} /> : <TradingHaltBtn />,
   },
 ]

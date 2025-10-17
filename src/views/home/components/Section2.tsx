@@ -43,8 +43,6 @@ export const RwaPrice = (
   }
 )
 
-
-
 export default function Section2() {
   const _id = useId()
   const { t } = useTranslation()
