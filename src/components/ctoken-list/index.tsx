@@ -4,7 +4,6 @@ import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
-import Pagination from "../pagination";
 import { formatTokenAmountWithCommas } from "@/utils/format";
 import { multiply, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
@@ -140,7 +139,7 @@ const CTokenList = memo(
     const { sort, onSortChange } = useTableSort<SortableField>()
     
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
-    const [currentPage, setCurrentPage] = useState(1)
+    const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
 
     const _id = useId()
     const rwaList = useRwas()
@@ -148,10 +147,11 @@ const CTokenList = memo(
       return rwaList.map(rwa => {
         return {
           ...rwa,
-          ...tokenWithBalance[symbolToLower(rwa.symbol)]
+          ...tokenWithBalance[symbolToLower(rwa.symbol)],
+          ...tokenWithPrice[symbolToLower(rwa.symbol)]
         }
       })
-    }, [rwaList, tokenWithBalance])
+    }, [rwaList, tokenWithBalance, tokenWithPrice])
 
     const [filterHolding, setFilterHolding] = useState(false)
     const filterTokens = useMemo(() => {
@@ -161,13 +161,14 @@ const CTokenList = memo(
     const sortTokens = useMemo(() => {
       if (sort?.order) {
         return filterTokens.sort((token1, token2) => {
-          return sort.order === 'asc' ? Number(token1.price) - Number(token2.price) : Number(token2.price) - Number(token1.price)
+          const up1 = Math.abs(Number(token1.up))
+          const up2 = Math.abs(Number(token2.up))
+          return sort.order === 'asc' ? up1 - up2 : up2 - up1
         })
       }
       return filterTokens
     }, [sort, filterTokens])
 
-    const totalPage = useMemo(() => Math.ceil(filterTokens.length / 7), [filterTokens])
 
     return (
       <div className="min-w-[443px]">
@@ -189,18 +190,21 @@ const CTokenList = memo(
             </div>
             <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
-          {
-            sortTokens.slice((currentPage - 1) * 7, currentPage * 7).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
-          }
+          <div className="scroll-box h-[65vh] overflow-y-auto mt-2">
+            {
+              sortTokens.map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+            }
+          </div>
+          
         </div>
-        <Pagination currentPage={currentPage} totalPage={totalPage} 
+        {/* <Pagination currentPage={currentPage} totalPage={totalPage} 
           onPrevClick={() => { 
             if (currentPage > 0) {
               setCurrentPage(currentPage - 1)
             }
           }} 
           onNextClick={() => setCurrentPage(currentPage + 1)} 
-        />
+        /> */}
       </div>
     )
   }

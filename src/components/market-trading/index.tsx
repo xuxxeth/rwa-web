@@ -3,30 +3,29 @@ import { BoxCard } from "../BoxCard";
 import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
-
-type stateProps = 'pre' | 'after' | 'close' | 'lock' | 'open'
+import { useBaseStore } from "@/stores/baseStore";
+import { MARKET_STATUS } from "@/config/constants";
 
 type MarketTradingProps = {
-  state?: number
   align?: string
 }
 
 const MarketTrading = memo(
-  ({ state = 2, align = 'center' }: MarketTradingProps) => {
+  ({  align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
-    
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
     
     const marketInfo = useMemo(() => {
       let _icon = ''
       let _info = ''
-      if (state === 1) {
-        _icon = '/images/icons/market/market_pre.png'
-        _info = t('MarketPreInfo')
-      }
-      if (state === 3) {
-        _icon = '/images/icons/market/market_after.png'
-        _info = t('MarketAfterInfo')
-      }
+      // if (state === 1) {
+      //   _icon = '/images/icons/market/market_pre.png'
+      //   _info = t('MarketPreInfo')
+      // }
+      // if (state === 3) {
+      //   _icon = '/images/icons/market/market_after.png'
+      //   _info = t('MarketAfterInfo')
+      // }
       // if (state === 'close') {
       //   _icon = '/images/icons/market/market_close.png'
       //   _info = t('MarketCloseInfo')
@@ -35,16 +34,20 @@ const MarketTrading = memo(
       //   _icon = '/images/icons/market/market_lock.png'
       //   _info = t('MarketLockInfo')
       // }
-      if (state === 2) {
+      if (marketTradeState === MARKET_STATUS.OPEN) {
         _icon = '/images/icons/market/market_open.png'
         _info = t('MarketOpenInfo')
+      }
+      if (marketTradeState === MARKET_STATUS.CLOSE) {
+        _icon = '/images/icons/market/market_close.png'
+        _info = t('MarketCloseInfo')
       }
       return {
         icon: _icon,
         info: _info
       }
-    }, [state])
-    
+    }, [marketTradeState])
+    if (!marketInfo.info) return null
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center ",

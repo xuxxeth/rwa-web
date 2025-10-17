@@ -13,6 +13,7 @@ import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssOn } from './hooks/useWssOn'
 import { Loading } from './components/loading'
+import { useMarketState } from './hooks/useMarketState'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -39,7 +40,8 @@ function App() {
   useTokenBalances()
   // 获取Rwa余额
   // useRwaBalances()
-
+  useMarketState()
+  
   useEffect(() => {
     if (!chainId) return
     // 初始化baseStore
