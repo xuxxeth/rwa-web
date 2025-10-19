@@ -36,7 +36,7 @@ export function DialogController({
   openChange
 }: {
   children?: React.ReactNode;
-  title?: string
+  title?: React.ReactNode
   topFixed?: boolean
   top?: number
   open: boolean

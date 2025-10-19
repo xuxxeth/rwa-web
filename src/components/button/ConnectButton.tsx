@@ -11,7 +11,16 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
 import { cn } from '@/lib/utils'
-import { bscTestnet, useChainId, useChains, xLayerTestnet } from '@/hooks/useCaCommon'
+import {
+  bscTestnet,
+  useChainId,
+  useChains,
+  xLayerTestnet,
+  ConnectorType,
+  useQrCodeData,
+  type WalletConfig,
+} from '@/hooks/useCaCommon'
+// import { type DiscoveredWallet } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from '../image/LazyImage'
@@ -60,16 +69,16 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
   const { toastError } = useToast()
-  const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
+  const { wallets, chainId, account, handleConnect, handleDisConnect } = useActiveWeb3()
   const chains = [bscTestnet, xLayerTestnet]
   const walletDialog = useShowDialog()
   const showConnect = useBaseStore(state => state.showConnect)
   const setShowConnect = useBaseStore(state => state.setShowConnect)
 
-  const [open, setOpen] = useState(false)
   const currentWallet = useBaseStore(state => state.currentWallet)
   const setCurrentWallet = useBaseStore(state => state.setCurrentWallet)
   const hasConnected = useRef<boolean>(false)
+  const [connectorType, setConnectorType] = useState<ConnectorType | undefined>()
 
   const usdtToken = useUSDT()
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
@@ -79,10 +88,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (wallets.length > 0 && !account && !hasConnected.current) {
       const walletUUID = storage.getItem(WALLET_UUID)
       const connectorType = storage.getItem(CONNECTOR_TYPE)
-      if (walletUUID && connectorType) {
+      if (walletUUID && connectorType === ConnectorType.Injected) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
 
-        if (wallet) {
+        if (wallet && wallet.detected) {
           hasConnected.current = true
           setCurrentWallet(wallet)
           // @ts-ignore
@@ -93,7 +102,37 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (account) {
       storage.setItem(CONNECT_ACCOUNT, account)
     }
-  }, [wallets, chains, account, handleConnect])
+  }, [wallets, chainId, account, handleConnect])
+
+  useEffect(() => {
+    if (account && walletDialog.open) {
+      walletDialog.hide()
+    }
+    if (account && connectorType) {
+      setConnectorType(undefined)
+    }
+  }, [account])
+
+  useEffect(() => {
+    if (!walletDialog.open) {
+      setConnectorType(undefined)
+    }
+  }, [walletDialog.open])
+
+  const isShwoingQrCode = connectorType === ConnectorType.WalletConnect
+  const dialogTitle =
+    isShwoingQrCode && currentWallet ? (
+      <div className='flex items-center justify-center relative'>
+        <LazyImage
+          onClick={() => setConnectorType(undefined)}
+          className='w-6 h-6 absolute left-0 top-0 cursor-pointer'
+          src='/images/icons/back.png'
+        />
+        <span className='text-base/6 font-semibold'>{currentWallet.info.name}</span>
+      </div>
+    ) : (
+      <span className='text-base/6 font-semibold'>Connect wallet</span>
+    )
 
   const goTo = (action: string) => {
     if (action === 'assets') {
@@ -169,8 +208,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
               <Divide className='mt-[14px]' />
               <div
                 className=' flex items-center justify-center py-3 cursor-pointer'
-                onClick={() => {
-                  handleDisConnect()
+                onClick={async () => {
+                  await handleDisConnect()
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />
@@ -183,39 +222,76 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
       <DialogController
         topFixed
-        title='Connect wallet'
-        open={showConnect}
-        openChange={setShowConnect}
+        title={dialogTitle}
+        open={walletDialog.open}
+        openChange={walletDialog.setOpen}
       >
-        <div className='rounded-[8px] pt-4 text-white w-[450px]'>
-          <div className=' px-4'>
-            {wallets.map(wallet => {
-              return (
-                <WalletItem
-                  key={wallet.info.name}
-                  wallet={wallet}
-                  onClick={async () => {
-                    setOpen(false)
-                    // @ts-ignore
-                    const chainId = parseInt(wallet.provider.chainId, 16)
-                    const chain = chains.find(chain => Number(chain.id) === chainId)
-                    if (chain) {
-                      // @ts-ignore
-                      await handleConnect('inject', wallet)
+        <div className='rounded-[8px] pt-4 text-white w-[402px]'>
+          {connectorType === ConnectorType.WalletConnect ? (
+            <QrCodeView currentWallet={currentWallet} />
+          ) : (
+            <div className='px-4'>
+              {wallets.map(wallet => {
+                return (
+                  <WalletItem
+                    key={wallet.info.name}
+                    wallet={wallet}
+                    onClick={async () => {
                       setCurrentWallet(wallet)
-                      setShowConnect(false)
-                    } else {
-                      toastError({ title: 'Please switch your wallet to the bsc smart test chain' })
-                    }
 
-                    //
-                  }}
-                />
-              )
-            })}
-          </div>
+                      // 已检测到钱包，使用插件钱包直接连接
+                      if (wallet.detected) {
+                        // @ts-ignore
+                        const chainId = parseInt(wallet.provider.chainId, 16)
+                        const chain = chains.find(chain => Number(chain.id) === chainId)
+                        if (chain) {
+                          // @ts-ignore
+                          await handleConnect('inject', wallet)
+                          setCurrentWallet(wallet)
+                        } else {
+                          toastError({
+                            title: 'Please switch your wallet to the bsc smart test chain',
+                          })
+                        }
+                        setConnectorType(ConnectorType.Injected)
+                        await handleConnect(ConnectorType.Injected, wallet)
+                      }
+
+                      // 未检测到钱包，使用 WalletConnect 连接
+                      if (!wallet.detected) {
+                        setConnectorType(ConnectorType.WalletConnect)
+                        await handleConnect(ConnectorType.WalletConnect, wallet)
+                      }
+                    }}
+                  />
+                )
+              })}
+            </div>
+          )}
         </div>
       </DialogController>
+    </>
+  )
+}
+
+function QrCodeView(props: { currentWallet: WalletConfig }) {
+  const { t } = useTranslation()
+  const qrCodeData = useQrCodeData()
+
+  return (
+    <>
+      <div className='px-4'>
+        <div className='text-white items-center justify-center'>
+          <div className='relative m-auto w-[256px] h-[256px] border border-white/10 rounded-xl overflow-hidden'>
+            {qrCodeData.dataUrl ? (
+              <img src={qrCodeData.dataUrl} className='w-full h-full' alt='' />
+            ) : (
+              <div className='ami-shimmer w-full h-full bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.6)_50%,transparent_100%)]'></div>
+            )}
+          </div>
+          <div className='mt-4 text-base/6 text-center font-normal mt-4'>{t('scanCode')}</div>
+        </div>
+      </div>
     </>
   )
 }

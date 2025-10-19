@@ -53,7 +53,9 @@ export function ConverBody({
 
   console.log('orderValue: ', orderValue, approveAmount)
 
+  
   const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
+  console.log('approveAmount', approveAmount)
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)
@@ -83,6 +85,7 @@ export function ConverBody({
   const [buying, setBuying] = useState(false)
 
   const handlePlaceOrder = useCallback(async () => {
+    debugger
     const params = {
       stockId: String(inputToken?.stockId),
       tradeType: '0',

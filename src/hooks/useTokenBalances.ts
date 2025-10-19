@@ -1,5 +1,8 @@
 import { baseApi } from '@/service/base/api'
-import { useTokenBalances as useBalances, useChainId } from './useCaCommon'
+import {
+  useTokenBalances as useBalances,
+  useChainId,
+} from './useCaCommon'
 import { RESPONSE_CODE } from '@/config/constants'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
@@ -20,10 +23,14 @@ export function useTokenBalances() {
   const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
 
   const getTokensData = async (account: `0x${string}`, tokenList: Array<IToken | IToken>) => {
+    debugger
     const balancesRes = await getTokenBalances(
       account,
       tokenList.map(token => token.address as `0x${string}`)
     )
+    debugger
+    console.log('===>balancesRes', balancesRes)
+
     const tokenWithBalance = balancesRes.reduce(
       (acc, cur, index) => {
         acc[symbolToLower(tokenList[index].symbol)] = {
@@ -47,6 +54,7 @@ export function useTokenBalances() {
 
   useEffect(() => {
     if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0) {
+      debugger
       // @ts-ignore
       getTokensData(account, [...tokenList, ...rwaRwaList])
     }
@@ -57,12 +65,11 @@ export function useTokenBalances() {
   }
 }
 
-
 export const useTokenBalance = (symbol: string) =>
-  useBaseStore((state) => state.tokenWithBalance[symbolToLower(symbol)]);
+  useBaseStore(state => state.tokenWithBalance[symbolToLower(symbol)])
 
 export const useRwaPrice = (symbol: string) =>
-  useBaseStore((state) => state.tokenWithPrice[symbolToLower(symbol)]);
+  useBaseStore(state => state.tokenWithPrice[symbolToLower(symbol)])
 
 export const useStableRwaPrice = (symbol: string) =>
-  useWssStore((state) => state.stableTokenWithPrice[symbolToLower(symbol)]);
+  useWssStore(state => state.stableTokenWithPrice[symbolToLower(symbol)])
