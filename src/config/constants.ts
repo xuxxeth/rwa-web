@@ -54,6 +54,7 @@ export type ErrorHandlers = {
 
 export const MARKET_STATUS = {
   DEFAULT: -1,
+  CLOSE: 0,
   BEFORE: 1,
   OPEN: 2,
   AFTER: 3,

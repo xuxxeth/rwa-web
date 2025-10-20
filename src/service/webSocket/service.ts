@@ -119,7 +119,6 @@ class WebSocketService {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const pong = { request: 'pong', args: { ts: Date.now() } }
       this.ws.send(JSON.stringify(pong))
-      console.log('Pong replied:', pong)
     }
   }
 

@@ -9,9 +9,6 @@ import { Upload } from './components/Upload'
 function Identity() {
   const { step } = useParams<{ step: 'info' | 'identityUpload' | 'addressUpload' }>()
 
-  // 根据不同的 step 值显示不同的内容
-  console.log('当前步骤:', step) // 例如: "info",
-
   return (
     <>
       <Menus />

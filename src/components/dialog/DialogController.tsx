@@ -18,7 +18,6 @@ export const dialogController = {
 
 export function useShowDialog() {
   const [open, setOpen] = useState(false)
-
   return {
     open,
     setOpen,
@@ -26,6 +25,7 @@ export function useShowDialog() {
     hide: () => setOpen(false),
   }
 }
+
 
 export function DialogController({
   children,

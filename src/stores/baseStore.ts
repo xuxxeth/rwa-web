@@ -21,6 +21,7 @@ const CACHE_TIME = 1000 * 60 * 60 * 2
 export const useBaseStore = create<BaseStore>()(
   persist(
     (set, get) => ({
+      showConnect: false,
       currentWallet: null,
       lastChainId: null,
       lastInitTime: 0,
@@ -35,6 +36,9 @@ export const useBaseStore = create<BaseStore>()(
       // TODO: 使用 Map 可能性能更好?
       // token 余额
       tokenWithBalance: {},
+      setShowConnect: (show: boolean) => {
+        set({ showConnect: show })
+      },
       setCurrentWallet: (wallt: any) => {
         set({ currentWallet: wallt })
       },
@@ -131,18 +135,18 @@ export const useBaseStore = create<BaseStore>()(
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
           const marketInfo = { ...(res.data || {}) }
-          let marketState = MARKET_STATUS.DEFAULT
-          if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
-            const nowSecond = getEasternSecondsSinceMidnight();
-            if (nowSecond < marketInfo.tradingStartTime - marketInfo.preMarketMinutes) {
-              marketState = MARKET_STATUS.BEFORE;
-            } else if (nowSecond > marketInfo.tradingEndTime + marketInfo.afterMarketMinutes) {
-              marketState = MARKET_STATUS.AFTER;
-            } else {
-              marketState = MARKET_STATUS.OPEN
-            }
-          }
-          set({ marketTradeState: marketState })
+          // let marketState = MARKET_STATUS.DEFAULT
+          // if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
+          //   const nowSecond = getEasternSecondsSinceMidnight();
+          //   if (nowSecond < marketInfo.tradingStartTime - marketInfo.preMarketMinutes) {
+          //     marketState = MARKET_STATUS.BEFORE;
+          //   } else if (nowSecond > marketInfo.tradingEndTime + marketInfo.afterMarketMinutes) {
+          //     marketState = MARKET_STATUS.AFTER;
+          //   } else {
+          //     marketState = MARKET_STATUS.OPEN
+          //   }
+          // }
+          // set({ marketTradeState: marketState })
 
           set({ marketInfo: marketInfo })
         }
@@ -151,7 +155,12 @@ export const useBaseStore = create<BaseStore>()(
       getMarketState: async () => {
         const res = await baseApi.getMarketState()
         if (res && res.code === RESPONSE_CODE.SUCCESS) {
-          set({ marketState: res.data || [] })
+          const _data = res.data || {}
+          let marketState = MARKET_STATUS.CLOSE
+          if ((_data.tradingDayType === 4 || _data.tradingDayType === 5) && _data.status === 3) {
+            marketState = MARKET_STATUS.OPEN
+          }
+          set({ marketState: _data, marketTradeState: marketState })
         }
         return res
       },
@@ -173,7 +182,7 @@ export const useBaseStore = create<BaseStore>()(
           get().getBaseRwas(chainId),
           get().getStocks(),
           get().getMarket(),
-          get().getMarketState(),
+          // get().getMarketState(),
         ])
         set(() => ({
           lastChainId: chainId,

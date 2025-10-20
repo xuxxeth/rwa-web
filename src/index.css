@@ -301,3 +301,22 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* 全局滾動條樣式 */
+::-webkit-scrollbar {
+  width: 4px; /* 滾動條寬度 */
+  height: 4px; /* 橫向滾動條高度，可選 */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* 滾動條軌道背景 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5); /* 滾動條顏色 */
+  border-radius: 69px; /* 圓角 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.7); /* 滑過時顏色更亮 */
+}
