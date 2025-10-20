@@ -255,6 +255,16 @@
       "uploadAddressDesc6": "由政府發佈的任何帶有您姓名和地址的聲明、信函或信函（例如公積金帳單、IRA信函、市議會信函等）",
       "uploadAddressDesc7": "所有證明檔必須清楚地用英文標明您的的全名和完整地址。证明文件不得超过三个月",
       "addressProof": "Address Proof"
-    }
+    },
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "fullName": "Full Name",
+    "DOB": "DOB",
+    "gender": "Gender",
+    "issuingCountry": "Issuing country",
+    "documentType": "Document type",
+    "cardId": "Card ID",
+    "address": "Address",
+    "detailedAddress": "Detailed address"
   }
 }
