@@ -36,10 +36,12 @@ export function XFooter() {
           </div>
           <div>
             <div className=" font-semibold">{t('footer.text4')}</div>
+            <a href="mailto:contact@cyberalpha.cc">
             <div className="flex items-center mt-6">
               <img src="/images/icons/e_mail.png" className="w-6" alt="" />
               <div className="text-80 ml-2">contact@cyberalpha.cc</div>
             </div>
+            </a>
           </div>
         </div>
       </div>
