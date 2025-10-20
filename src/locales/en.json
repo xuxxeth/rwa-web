@@ -29,7 +29,7 @@
   "FAQ": "FAQ",
   "MarketPreInfo": "Pre-Market. No live prices; closing price for reference. Orders matched at order price.",
   "MarketAfterInfo": "After-Hours. No live prices; closing price for reference. Orders matched at order price.",
-  "MarketCloseInfo": "Markets Closed. No live prices; closing price for reference. Orders submitted next pre-market.",
+  "MarketCloseInfo": "Markets Closed. Orders will be submitted in the next trading session",
   "MarketLockInfo": "Trading Halt. This stock is currently unavailable for order placement.",
   "MarketOpenInfo": "Market Open. Orders execute in real time.",
   "Market open in": "Market open in",
@@ -232,7 +232,7 @@
       "tips": "Please ensure that all details on your submitted documents are clear and legible",
       "clearExample": "Clear Example",
       "uploadYourDoc": "Upload your document",
-      "uploadYourDocDesc": "Ensure your Resident Identity Card is clearly visible with all four corners intact. Avoid glare, obstructions, white backgrounds, or backgrounds with text.",
+      "uploadYourDocDesc": "Ensure your document is clearly visible with all four corners intact. Avoid glare, obstructions, white backgrounds, or backgrounds with text.",
       "glare": "Glare",
       "overcropped": "Overcropped",
       "blur": "Blur",
@@ -246,15 +246,15 @@
       "failed": "Failed, Upload again",
       "uploadDesc": "a photo or drag and drop",
       "supportedFileDesc": "Supported files: PNG/JPEG/JPG, up to 2 MB",
-      "uploadAddress": "Upload your address proof document",
-      "uploadAddressDesc1": "请提供您的地址证明，请确保您提供的地址信息与上方填写内容一致，有效地址证明包括：",
-      "uploadAddressDesc2": "銀行對帳單（銀行帳戶對帳單或信用卡對帳單）(或)",
-      "uploadAddressDesc3": "保單帳單、官方收據或保險公司的信函 (或)",
-      "uploadAddressDesc4": "證券公司的投資持有帳單、投資交易的合同帳單/發票、公司公告（如配股、認購、股息支付等）(或)",
-      "uploadAddressDesc5": "水電費帳單、電信帳單或帳單 (或)",
-      "uploadAddressDesc6": "由政府發佈的任何帶有您姓名和地址的聲明、信函或信函（例如公積金帳單、IRA信函、市議會信函等）",
-      "uploadAddressDesc7": "所有證明檔必須清楚地用英文標明您的的全名和完整地址。证明文件不得超过三个月",
-      "addressProof": "Address Proof"
+      "uploadAddress": "Upload your proof of address document",
+      "uploadAddressDesc1": "Please provide your proof of address to ensure it matches the address entered above. Valid proofs of address include:",
+      "uploadAddressDesc2": "Bank statement (bank account statement or credit card statement)",
+      "uploadAddressDesc3": "Insurance policy statement, official receipt, or letter from the insurance company",
+      "uploadAddressDesc4": "Investment holding statement from a securities company, contract statement/invoice for investment transactions, or company announcements (e.g., stock splits, subscriptions, dividend payments, etc.)",
+      "uploadAddressDesc5": "Utility bill, telecom bill, or other bills",
+      "uploadAddressDesc6": "Any statement or letter issued by a government authority containing your name and address (e.g., Social Security statement, IRA letter, city council letter, etc.)",
+      "uploadAddressDesc7": "All proof documents must clearly display your full name and complete address in English. Proof documents must not be older than three months.",
+      "addressProof": "Proof of Address"
     },
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -290,6 +290,5 @@
     "reVerify": "Re-verify",
     "state7": "Identity verification approved",
     "state8": "Your identity verification has been approved"
-
   }
 }
