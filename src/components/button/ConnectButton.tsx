@@ -19,6 +19,7 @@ import { useUSDT } from '@/hooks/useTokens'
 import CopyButton from './copyButton'
 import { useTokenBalance } from '@/hooks/useTokenBalances'
 import { useBaseStore } from '@/stores/baseStore'
+import { useRouter } from '@/hooks/useRouter'
 
 export function WalletItem({
   wallet,
@@ -57,6 +58,7 @@ export function WalletItem({
 
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
+  const router = useRouter()
   const { toastError } = useToast()
   const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
   const chains = [bscTestnet, xLayerTestnet]
@@ -92,6 +94,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       storage.setItem(CONNECT_ACCOUNT, account)
     }
   }, [wallets, chains, account, handleConnect])
+
+  const goTo = (action: string) => {
+    if (action === 'assets') {
+      router.push('/assets')
+    }
+  }
 
   return (
     <>
@@ -147,7 +155,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   </div>
                   <div className='text-[#6C86AD] text-sm leading-6'>{t('Total USDT Balance')}</div>
                 </div>
-                <div className='flex items-center py-3 cursor-pointer'>
+                <div className='flex items-center py-3 cursor-pointer'
+                  onClick={() => goTo('assets')}
+                >
                   <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
                 </div>
