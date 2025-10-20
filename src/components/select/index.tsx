@@ -2,7 +2,6 @@
 
 import { Select as SelectCom, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 
 export type ItemProps = {
@@ -14,6 +13,7 @@ export type CountrySelectProps = {
   defaultValue?: string;
   value?: string;
   data?: ItemProps[];
+  placeholder?: string
   onChange?: (item: ItemProps) => void;
   className?: string;
 }
@@ -23,6 +23,7 @@ const Select = memo(
     defaultValue,
     value, 
     data = [],
+    placeholder,
     onChange, 
     className
   }: CountrySelectProps) => {
@@ -63,7 +64,7 @@ const Select = memo(
             {currentItem ? (
               <span className=" font-normal md:text-[16px]">{currentItem?.label}</span>
             ) : (
-              <span className="md:text-[1.04vw] text-5">Select</span>
+              <span className="text-[16px] text-5 text-[rgba(255,255,255,0.3)]">{placeholder ?? ''}</span>
             )}
           </div>
         </SelectTrigger>

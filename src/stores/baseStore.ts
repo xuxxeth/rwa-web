@@ -21,6 +21,7 @@ const CACHE_TIME = 1000 * 60 * 60 * 2
 export const useBaseStore = create<BaseStore>()(
   persist(
     (set, get) => ({
+      showConnect: false,
       currentWallet: null,
       lastChainId: null,
       lastInitTime: 0,
@@ -35,6 +36,9 @@ export const useBaseStore = create<BaseStore>()(
       // TODO: 使用 Map 可能性能更好?
       // token 余额
       tokenWithBalance: {},
+      setShowConnect: (show: boolean) => {
+        set({ showConnect: show })
+      },
       setCurrentWallet: (wallt: any) => {
         set({ currentWallet: wallt })
       },

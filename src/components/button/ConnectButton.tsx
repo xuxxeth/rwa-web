@@ -9,7 +9,7 @@ import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from "@/config/constants
 import { cn } from "@/lib/utils";
 import { bscTestnet, useChainId, useChains, xLayerTestnet } from "@/hooks/useCaCommon";
 import { useToast } from "@/hooks/useToast";
-import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
+import { DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from "../image/LazyImage";
 import { useUSDT } from "@/hooks/useTokens";
 import CopyButton from "./copyButton";
@@ -53,7 +53,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { toastError } = useToast()
   const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
   const chains = [bscTestnet, xLayerTestnet]
-  const walletDialog = useShowDialog()
+  const showConnect = useBaseStore(state => state.showConnect)
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
 
   const [open, setOpen] = useState(false)
   const currentWallet = useBaseStore(state => state.currentWallet)
@@ -90,7 +91,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         !account ? 
           <div className={cn("h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer", props.connectBtnClassName)} 
             onClick={() => {
-              walletDialog.show()
+              setShowConnect(true)
             }}
           >
             {account || t('Connect Wallet')}
@@ -156,8 +157,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       <DialogController
           topFixed
           title="Connect wallet"
-          open={walletDialog.open}
-          openChange={walletDialog.setOpen}
+          open={showConnect}
+          openChange={(open) => {
+            setShowConnect(open)
+          }}
         > 
           <div 
             className="rounded-[8px] pt-4 text-white w-[450px]"
@@ -178,7 +181,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                           // @ts-ignore
                           await handleConnect('inject', wallet)
                           setCurrentWallet(wallet)
-                          walletDialog.hide()
+                          setShowConnect(false)
                         } else {
                           toastError({title: 'Please switch your wallet to the bsc smart test chain'})
                         }

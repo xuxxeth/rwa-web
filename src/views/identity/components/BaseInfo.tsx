@@ -1,6 +1,10 @@
 import { CheckBox, CheckBoxBySVG } from "@/components/check-box"
 import { CountrySelect } from "@/components/country-select"
+import { DatePicker } from "@/components/date-range-picker"
+import { DoctypeSelect } from "@/components/doctype-select"
+import { LazyImage } from "@/components/image/LazyImage"
 import { Select } from "@/components/select"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo } from "react"
@@ -24,7 +28,7 @@ const BaseInfo = memo(
     const { t } = useTranslation()
     
     return (
-      <div>
+      <form>
         <div className=" grid grid-cols-3 font-normal gap-x-6">
           <div>
             <div className="mb-2 text-[16px]">{t('identity.firstName')}</div>
@@ -57,14 +61,21 @@ const BaseInfo = memo(
         <div className=" grid grid-cols-2 gap-x-6 mt-8">
           <div>
             <div className="mb-2 text-[16px]">{t('identity.DOB')}</div>
-            <InputBox >
-              {''}
-            </InputBox>
+            <div className="bg-[rgba(255,255,255,0.08)] rounded-[6px]">
+              <DatePicker 
+                placeholder={t('identity.selectDate')}
+                userSelectedDate={new Date().getTime()} 
+                onUserSelectedDateChanged={() => {
+
+                }} 
+              />
+            </div>
+            
           </div>
           <div>
             <div className="mb-2 text-[16px]">{t('identity.gender')}</div>
             <Select 
-              
+              placeholder={t('identity.select')}
               data={genderList}
             />
           </div>
@@ -76,9 +87,7 @@ const BaseInfo = memo(
           </div>
           <div>
             <div className="mb-2 text-[16px]">{t('identity.documentType')}</div>
-            <InputBox >
-              {''}
-            </InputBox>
+            <DoctypeSelect />
           </div>
         </div>
         <div className="mt-8">
@@ -108,10 +117,22 @@ const BaseInfo = memo(
             <CheckBox />
           </div>
           <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
-            我已阅读并同意 <a href="" target="_blank" className="text-[rgba(26,133,255,1)]">《反洗钱与反恐怖融资政策（AML/CFT）》</a>，并同意为KYC/制裁筛查与合规审查之目的处理与共享必要信息。
+            {t('identity.aggree1')}<a href="" target="_blank" className="text-[rgba(26,133,255,1)]">{t('identity.aggree3')}</a>{t('identity.aggree2')}
           </div>
         </div>
-      </div>
+        <Button className="bg-white text-black w-full mt-8"
+          onClick={async () => {
+            
+          }}
+        >
+          { t('identity.continue') }
+          
+        </Button>
+        <div className=" flex items-center gap-x-2 mt-8 justify-center">
+          <LazyImage src="/images/icons/identity/secue.png" className="w-6 h-6" />
+          <div className="text-[rgba(255,255,255,0.6)] text-[16px] font-normal">{t('identity.infoVerification')}</div>
+        </div>
+      </form>
     )
   }
 )

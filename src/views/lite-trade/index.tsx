@@ -17,13 +17,15 @@ import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 
 const FAQ = lazy(() => import("../../components/markets/FAQ"));
 
 function LiteTrade() {
+  const { account } = useActiveWeb3()
   const { t } = useTranslation()
   const orderDialog = useShowDialog()
-  
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
   const setTokenWithPriceByWebSocketData = useBaseStore(
     state => state.setTokenWithPriceByWebSocketData
   )
@@ -58,6 +60,10 @@ function LiteTrade() {
                   <div className="flex items-center gap-x-5">
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
                       onClick={async () => {
+                        if (!account) {
+                          setShowConnect(true)
+                          return
+                        }
                         if (!(await validSignature())) {
                           const res = await signature()
                           if (res.signature) {

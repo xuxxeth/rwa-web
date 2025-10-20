@@ -19,11 +19,14 @@ import { useRequestSignature } from "@/hooks/useSignature";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
 import { useRouter } from "@/hooks/useRouter";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 
 function Markets() {
   const router = useRouter()
   const { t } = useTranslation()
+  const { account } = useActiveWeb3()
   const [action, setAction] = useState('buy')
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
   const inputToken = useTradeStore(state => state.inputToken)
   const orderDialog = useShowDialog()
   const { signature, validSignature } = useRequestSignature()
@@ -70,6 +73,10 @@ function Markets() {
                   <div className="flex items-center gap-x-5">
                     <button className=" hover:bg-[rgba(255,255,255,0.1)] w-7 h-7 rounded-[8px] overflow-hidden cursor-pointer"
                       onClick={async () => {
+                        if (!account) {
+                          setShowConnect(true)
+                          return
+                        }
                         if (!(await validSignature())) {
                           const res = await signature()
                           if (res.signature) {

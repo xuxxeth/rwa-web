@@ -265,6 +265,14 @@
     "documentType": "Document type",
     "cardId": "Card ID",
     "address": "Address",
-    "detailedAddress": "Detailed address"
+    "detailedAddress": "Detailed address",
+    "select": "Select",
+    "selectDate": "Select Date",
+    "identityCard": "National Identity Card",
+    "passport": "Passport",
+    "infoVerification": "Your information is only used for verification.",
+    "aggree1": "我已阅读并同意 ",
+    "aggree2": "，并同意为KYC/制裁筛查与合规审查之目的处理与共享必要信息。",
+    "aggree3": "《反洗钱与反恐怖融资政策（AML/CFT）》"
   }
 }
