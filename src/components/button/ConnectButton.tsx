@@ -61,6 +61,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { wallets, account, handleConnect, handleDisConnect } = useActiveWeb3()
   const chains = [bscTestnet, xLayerTestnet]
   const walletDialog = useShowDialog()
+  const showConnect = useBaseStore(state => state.showConnect)
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
 
   const [open, setOpen] = useState(false)
   const currentWallet = useBaseStore(state => state.currentWallet)
@@ -100,7 +102,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             props.connectBtnClassName
           )}
           onClick={() => {
-            walletDialog.show()
+            setShowConnect(true)
           }}
         >
           {account || t('Connect Wallet')}
@@ -172,8 +174,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       <DialogController
         topFixed
         title='Connect wallet'
-        open={walletDialog.open}
-        openChange={walletDialog.setOpen}
+        open={showConnect}
+        openChange={setShowConnect}
       >
         <div className='rounded-[8px] pt-4 text-white w-[450px]'>
           <div className=' px-4'>
@@ -191,7 +193,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                       // @ts-ignore
                       await handleConnect('inject', wallet)
                       setCurrentWallet(wallet)
-                      walletDialog.hide()
+                      setShowConnect(false)
                     } else {
                       toastError({ title: 'Please switch your wallet to the bsc smart test chain' })
                     }
