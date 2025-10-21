@@ -33,7 +33,7 @@ export function useRwaBalances() {
 
   useEffect(() => {
     if (chainId && account) {
-      getRwaData(chainId, account)
+      getRwaData(chainId, account as `0x${string}`)
     }
   }, [chainId, account])
 
