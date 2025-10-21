@@ -10,19 +10,18 @@ export const TVChartContainer = () => {
   useEffect(() => {
     let mounted = true;
     let initTimer: number | undefined;
+    console.log(tvWidgetRef.current, 22222222)
+    if (tvWidgetRef.current) {
+        // tvWidgetRef.current.remove();
+      return
+    }
+
     const initChart = () => {
       const elem = chartContainerRef.current;
       if (!mounted || !elem) {
         initTimer = window.setTimeout(initChart, 100);
         return;
       }
-      if (!chartContainerRef.current) {
-        return () => { };
-      }
-      if (tvWidgetRef.current) {
-          tvWidgetRef.current.remove();
-      }
-
       const widgetOptions: ChartingLibraryWidgetOptions = {
         symbol: 'Symbol',
         debug: false,
@@ -32,8 +31,8 @@ export const TVChartContainer = () => {
         container: elem,
         library_path: `/libraries/charting_library/`,
         loading_screen: {
-            backgroundColor: "#111114",
-            foregroundColor: "#111114",
+          backgroundColor: "#111114",
+          foregroundColor: "#111114",
         },
         enabled_features: enabledFeatures,
         disabled_features: disabledFeatures,
@@ -57,7 +56,13 @@ export const TVChartContainer = () => {
         tvWidgetRef.current?.onChartReady(function () {
             // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
             // priceScale?.setAutoScale(true)
-
+          // tvWidgetRef.current?.setDebugMode(true);
+          tvWidgetRef.current?.applyOverrides({
+            "paneProperties.background": "#06070A",
+            "paneProperties.backgroundType": "solid",
+            "paneProperties.backgroundGradientStartColor": "#06070A",
+            "paneProperties.backgroundGradientEndColor": "#06070A",
+          });
           const chart = tvWidgetRef.current?.activeChart();
           if (chart) {
             // 添加成交量指标，暂时不需要
@@ -73,7 +78,7 @@ export const TVChartContainer = () => {
             // MA5
             chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })
               .then(id => {
-                id && console.log(chart.getStudyById(id))
+                
               });
 
             // MA10
@@ -94,6 +99,7 @@ export const TVChartContainer = () => {
       if (initTimer) clearTimeout(initTimer);
       if (tvWidgetRef.current) {
         tvWidgetRef.current.remove();
+        tvWidgetRef.current = null
         // @ts-ignore
         window.initBar = true
       }

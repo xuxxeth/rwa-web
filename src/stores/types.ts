@@ -11,6 +11,7 @@ import type {
   ITokenWithPrice,
   IStockWithPrice
 } from "@/service/base/types";
+import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 
 export interface BaseStore {
   showConnect: boolean,
@@ -71,4 +72,5 @@ export interface WssStore {
   stableTokenWithPrice: Record<string, ITokenWithPrice>;
   tokenWithPrice: Record<string, ITokenWithPrice>;
   setStableTokenWithPrice: (data: IRwaPrice[]) => void;
+  getCandles: (params: ICandlesParams) => Promise<ApiResponse<ICandlesItem[]>>;
 }

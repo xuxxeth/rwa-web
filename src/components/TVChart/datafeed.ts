@@ -130,6 +130,7 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
+      console.log(1111111111)
       const currentTime = Date.now();
       // 防止过于频繁的请求
       // if (currentTime - lastRequestTime < requestInterval) {

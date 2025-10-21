@@ -5,6 +5,8 @@ import type { WssStore } from './types'
 import type { IRwa, IRwaPrice, IToken, ITokenWithPrice } from '@/service/base/types'
 import { checkSymbolEqual, symbolToLower, truncate } from '@/utils';
 import { useBaseStore } from './baseStore';
+import type { ICandlesParams } from '@/service/kline/types';
+import { klineApi } from '@/service/kline/api';
 
 export const useWssStore = create<WssStore>()(
   persist(
@@ -41,6 +43,13 @@ export const useWssStore = create<WssStore>()(
         set({ stableTokenWithPrice: tokenWithPrices, priceInitialized: true });
       },
       
+      getCandles: async (params: ICandlesParams) => {
+        
+        const res = klineApi.getCandles(params)
+        console.log(res, 11111)
+
+        return res
+      }
       
     }),
     {

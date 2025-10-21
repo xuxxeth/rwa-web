@@ -1,4 +1,5 @@
 import { useScript } from "@/hooks/useScript";
+import { useTradeStore } from "@/stores/tradeStore";
 import { lazy, useEffect, useState } from "react";
 
 const TVChartContainer = lazy(() => import("@/components/TVChart/TVChartContainer"))
@@ -7,6 +8,8 @@ export const TradingChart = () => {
   // const status = useScript("/libraries/datafeeds/udf/dist/bundle.js");
   const statusLibrary = useScript("/libraries/charting_library/charting_library.js");
   const [ready, setReady] = useState(false);
+  const inputToken = useTradeStore(state => state.inputToken)
+  console.log(inputToken, 222222)
 
   useEffect(() => {
     if (statusLibrary === "ready") {
