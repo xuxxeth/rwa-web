@@ -23,7 +23,7 @@
     "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
     "bignumber.js": "^9.3.1",
-    "ca-common-web": "link:../../Library/pnpm/global/5/node_modules/ca-common-web",
+    "ca-common-web": "^0.1.32",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

@@ -23,13 +23,10 @@ export function useTokenBalances() {
   const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
 
   const getTokensData = async (account: `0x${string}`, tokenList: Array<IToken | IToken>) => {
-    debugger
     const balancesRes = await getTokenBalances(
       account,
       tokenList.map(token => token.address as `0x${string}`)
     )
-    debugger
-    console.log('===>balancesRes', balancesRes)
 
     const tokenWithBalance = balancesRes.reduce(
       (acc, cur, index) => {
@@ -54,7 +51,6 @@ export function useTokenBalances() {
 
   useEffect(() => {
     if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0) {
-      debugger
       // @ts-ignore
       getTokensData(account, [...tokenList, ...rwaRwaList])
     }

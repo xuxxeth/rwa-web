@@ -12,10 +12,8 @@ export function useActiveWeb3() {
   const account = useAccount() as unknown as string | undefined
   const chainId = useChainId()
 
-  console.log('===>chainId', chainId)
-
   const handleConnect = useCallback(
-    async (connectorType: any, wallet: WalletConfig) => {
+    async (connectorType: ConnectorType, wallet: WalletConfig) => {
       storage.setItem(CONNECTOR_TYPE, connectorType)
       storage.setItem(WALLET_UUID, wallet.info.name)
       storage.setItem(LATEST_WALLET_UUID, wallet.info.name)

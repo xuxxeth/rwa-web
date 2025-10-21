@@ -20,7 +20,6 @@ import {
   useQrCodeData,
   type WalletConfig,
 } from '@/hooks/useCaCommon'
-// import { type DiscoveredWallet } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from '../image/LazyImage'
@@ -88,10 +87,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (wallets.length > 0 && !account && !hasConnected.current) {
       const walletUUID = storage.getItem(WALLET_UUID)
       const connectorType = storage.getItem(CONNECTOR_TYPE)
-      if (walletUUID && connectorType === ConnectorType.Injected) {
+      if (walletUUID && connectorType) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
-
-        if (wallet && wallet.detected) {
+        
+        if (wallet) {
           hasConnected.current = true
           setCurrentWallet(wallet)
           // @ts-ignore
@@ -105,8 +104,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [wallets, chainId, account, handleConnect])
 
   useEffect(() => {
-    if (account && walletDialog.open) {
-      walletDialog.hide()
+    if (account && showConnect) {
+      setShowConnect(false)
     }
     if (account && connectorType) {
       setConnectorType(undefined)
@@ -114,10 +113,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [account])
 
   useEffect(() => {
-    if (!walletDialog.open) {
+    if (!showConnect) {
       setConnectorType(undefined)
     }
-  }, [walletDialog.open])
+  }, [showConnect])
 
   const isShwoingQrCode = connectorType === ConnectorType.WalletConnect
   const dialogTitle =
@@ -194,7 +193,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   </div>
                   <div className='text-[#6C86AD] text-sm leading-6'>{t('Total USDT Balance')}</div>
                 </div>
-                <div className='flex items-center py-3 cursor-pointer'
+                <div
+                  className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('assets')}
                 >
                   <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
@@ -220,12 +220,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         </DropdownMenu>
       )}
 
-      <DialogController
-        topFixed
-        title={dialogTitle}
-        open={walletDialog.open}
-        openChange={walletDialog.setOpen}
-      >
+      <DialogController topFixed title={dialogTitle} open={showConnect} openChange={setShowConnect}>
         <div className='rounded-[8px] pt-4 text-white w-[402px]'>
           {connectorType === ConnectorType.WalletConnect ? (
             <QrCodeView currentWallet={currentWallet} />
@@ -246,21 +241,22 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                         const chain = chains.find(chain => Number(chain.id) === chainId)
                         if (chain) {
                           // @ts-ignore
-                          await handleConnect('inject', wallet)
+                          setConnectorType(ConnectorType.Injected)
+                          await handleConnect(ConnectorType.Injected, wallet)
+                          hasConnected.current = true
                           setCurrentWallet(wallet)
                         } else {
                           toastError({
                             title: 'Please switch your wallet to the bsc smart test chain',
                           })
                         }
-                        setConnectorType(ConnectorType.Injected)
-                        await handleConnect(ConnectorType.Injected, wallet)
                       }
 
                       // 未检测到钱包，使用 WalletConnect 连接
                       if (!wallet.detected) {
                         setConnectorType(ConnectorType.WalletConnect)
                         await handleConnect(ConnectorType.WalletConnect, wallet)
+                        hasConnected.current = true
                       }
                     }}
                   />
