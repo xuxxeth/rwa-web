@@ -9,8 +9,8 @@ function DisconnectButton(props: { className?: string }) {
   return (
     <div
       className="flex items-center justify-center py-2 px-3 cursor-pointer"
-      onClick={() => {
-        handleDisConnect();
+      onClick={async () => {
+        await handleDisConnect();
       }}
     >
       <img

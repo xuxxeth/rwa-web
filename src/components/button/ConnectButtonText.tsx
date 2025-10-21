@@ -22,7 +22,7 @@ const ConnectButtonText = memo(
             }
           }
           // @ts-ignore
-          await handleConnect('inject', wallet)
+          await handleConnect(ConnectorType.Injected, wallet)
         }}
       >
         { t('Connect Wallet') }
