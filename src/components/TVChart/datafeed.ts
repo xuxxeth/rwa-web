@@ -46,10 +46,10 @@ const configurationData: DatafeedConfiguration = {
     "1",
     "5",
     "15",
-    "45",
+    // "45",
     "60",
-    "240",
     "1440",
+    '1D', '1W', '1M'
   ] as ResolutionString[],
 
 };
@@ -82,9 +82,9 @@ export function getDataFeed({
 
       // Symbol information object
       const symbolInfo: LibrarySymbolInfo = {
-        ticker: name,
-        name: name,
-        description: name,
+        ticker: name || '',
+        name: name || '',
+        description: name || '',
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
@@ -140,7 +140,7 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const res = await klineApi.getCandles({ stock: token.stockId, interval: 1, endTime: to, limit: countBack })
+        const res = await klineApi.getCandles({ stock: token.stockId, interval: resolution as any || 15, endTime: to, limit: countBack })
         const _data = res?.data || []
         if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
@@ -156,25 +156,6 @@ export function getDataFeed({
             "volume": bar.volume ?? 0,
           }
         })
-        // const chartTable: any = await getChartTable({
-        //   token: token.symbol,
-        //   pairIndex,
-        //   from,
-        //   to,
-        //   range: +resolution,
-        //   countBack
-        // });
-
-        // if (!chartTable || !chartTable.table) {
-        //   onHistoryCallback([], { noData: true });
-        //   return;
-        // }
-
-        // let bars = chartTable.table.map((bar: any) => ({
-        //   ...bar,
-        //   volume: addRandomVolume(bar).volume,
-        //   time: bar.time * 1000, // Convert from seconds to milliseconds
-        // }));
 
         if (firstDataRequest) {
           lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
