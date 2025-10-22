@@ -46,7 +46,7 @@ const MarketTrading = memo(
         icon: _icon,
         info: _info
       }
-    }, [marketTradeState])
+    }, [marketTradeState, t])
     if (!marketInfo.info) return null
     return (
       <BoxCard className={cn(

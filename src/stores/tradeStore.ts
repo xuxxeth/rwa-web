@@ -9,8 +9,8 @@ export const useTradeStore = create<TradeStore>()(
     (set, get) => ({
       inputToken: null,
       outputToken: null,
-      limitPrice: '0',
-      inputSize: '0',
+      limitPrice: '',
+      inputSize: '',
       expires: 7,
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})

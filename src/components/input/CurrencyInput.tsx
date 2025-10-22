@@ -41,8 +41,8 @@ const CurrencyInput = memo(
         <NumberInput 
           className={cn(
             "flex-1 min-w-0",
-            from === 'markets' ? ' placeholder:text-[18px] text-[18px] flex-1' : '',
-            isInsufficient ? "text-[#FF593C]" : ""
+            from === 'markets' ? ' placeholder:text-[18px] text-[24px] flex-1' : '',
+            isInsufficient ? "text-[#F6465D]" : ""
           )}
           placeholder={placeholder}
           disabled={disabled}
@@ -58,7 +58,7 @@ const CurrencyInput = memo(
         {
           mode === 'price' &&
           <div className={cn(
-            "bg-[#131823] rounded-[8px] h-[32px] flex items-center justify-center px-[8px] text-[#6C86AD] text-[16px] font-normal",
+            "bg-[#131823] rounded-[8px] h-[29px] flex items-center justify-center px-[8px] text-[#6C86AD] text-[14px] font-normal",
             from === 'markets' ? 'h-[25px] text-[14px]' : ''
           )}>
             USD
@@ -78,7 +78,7 @@ const CurrencyInput = memo(
                 )} />
               }
               {/* @ts-ignore */}
-              <div className={cn(" text-[24px] font-medium ml-2 mr-1", from === 'markets' ? 'text-[16px]' : '')}>{selectedToken?.symbol || selectedToken?.rwa}</div>
+              <div className={cn(" text-[16px] font-medium ml-2 mr-1", from === 'markets' ? 'text-[16px]' : '')}>{selectedToken?.symbol || selectedToken?.rwa}</div>
               
               <LazyImage src="/images/convert/arrow-down.png" className="w-[24px] h-[24px]" />
               

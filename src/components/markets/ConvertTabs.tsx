@@ -29,8 +29,8 @@ const ConvertTabItem = memo(
         "flex-1 flex items-center justify-center h-[44px] rounded-[8px] cursor-pointer font-medium text-[16px]",
         
         {
-          'bg-[#21C95E] text-black': selected === tab.key,
-          'bg-[#FF593C] text-black': selected === tab.key
+          'bg-[#2EBD85] text-black': selected === tab.key,
+          'bg-[#F6465D] text-black': selected === tab.key
         }
       )}>
         { tab.label }
@@ -56,9 +56,9 @@ const ConvertTabs = memo(
             onChange && onChange(tabs[0])
           } }
           className={cn(
-          "flex-1 flex items-center justify-center  cursor-pointer font-medium text-[16px]",
+          "flex-1 flex items-center justify-center cursor-pointer font-medium text-[16px]",
           {
-            'bg-[#21C95E] text-black': selected === 'buy',
+            'bg-[#2EBD85] text-black': selected === 'buy',
             'h-[44px] rounded-[8px]': from !== 'markets',
             'h-[36px] rounded-[4px]': from === 'markets',
           }
@@ -73,7 +73,7 @@ const ConvertTabs = memo(
           className={cn(
           "flex-1 flex items-center justify-center h-[44px] rounded-[8px] cursor-pointer font-medium text-[16px]",
           {
-            'bg-[#FF593C] text-black': selected === 'sell',
+            'bg-[#F6465D] text-black': selected === 'sell',
             'h-[44px] rounded-[8px]': from !== 'markets',
             'h-[36px] rounded-[4px]': from === 'markets',
           }

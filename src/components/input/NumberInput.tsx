@@ -38,7 +38,7 @@ const NumberInput = memo(
       <Input
         disabled={disabled}
         className={cn(
-          "caret-[#9CFF3A] leading-tight flex-1 w-auto text-[28px] placeholder:text-[rgba(255,255,255,0.3)] placeholder:text-[20px] placeholder:font-medium disabled:opacity-100 text-white font-semibold h-[42px]",
+          "caret-[#9CFF3A] leading-tight flex-1 w-auto text-[28px] placeholder:text-[rgba(255,255,255,0.3)] placeholder:text-[20px] placeholder:font-medium disabled:opacity-100 text-white font-medium h-[42px]",
           className
         )}
         placeholder={placeholder || '0'}

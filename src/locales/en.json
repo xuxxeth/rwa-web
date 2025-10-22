@@ -291,5 +291,7 @@
     "state7": "Identity verification approved",
     "state8": "Your identity verification has been approved"
   },
-  "scanCode": "Scan this QR Code with your phone"
+  "scanCode": "Scan this QR Code with your phone",
+  "balance": "Balance",
+  "avbl": "Avbl"
 }

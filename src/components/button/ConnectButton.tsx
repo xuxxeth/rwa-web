@@ -131,7 +131,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         <span className='text-base/6 font-semibold'>{currentWallet.info.name}</span>
       </div>
     ) : (
-      <span className='text-base/6 font-semibold'>Connect wallet</span>
+      <span className='text-base/6 font-semibold'>{t('Connect Wallet')}</span>
     )
 
   const goTo = (action: string) => {

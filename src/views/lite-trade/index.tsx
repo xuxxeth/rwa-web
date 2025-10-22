@@ -18,6 +18,7 @@ import { useWssStore } from "@/stores/wssStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import IconOrder from "@/components/icons/order";
 
 const FAQ = lazy(() => import("../../components/markets/FAQ"));
 
@@ -37,7 +38,7 @@ function LiteTrade() {
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
 
-  const { signature, validSignature } = useRequestSignature()
+  const { signing, signature, validSignature } = useRequestSignature()
 
   useWssOn('summary', (data: any) => {
     setTokenWithPriceByWebSocketData(data || [])
@@ -49,24 +50,35 @@ function LiteTrade() {
     <>
       <Menus />
       <MainLayout>
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
+        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white px-[120px]">
           <MarketTrading/>
-          <div className="pt-5 flex gap-x-5">
-            <div className="w-[691px] shrink-0">
+          <div className="pt-5 flex gap-x-10">
+            <div className="w-[580px]">
+              <BoxCard className="min-h-[600px] rounded-[32px] p-6">
+                {
+                  showKline ? <KlineBody /> : <InvestBody /> 
+                }
+                
+              </BoxCard>
+            </div>
+            <div className="flex-1 shrink-0">
               <BoxCard className="min-h-[448px] rounded-[32px]">
                 <ConvertTabs onChange={(tab) => setAction(tab.key)} />
                 <div className="flex items-center justify-between mt-5">
-                  <div className="text-[24px] font-medium">{t('limit')}</div>
-                  <div className="flex items-center gap-x-5">
-                    <button className=" hover:bg-[rgba(255,255,255,0.1)] w-9 h-9 rounded-[8px] overflow-hidden cursor-pointer"
-                      onClick={async () => {
+                  <div className="text-[20px] font-medium">{t('limit')}</div>
+                  <div className="flex items-center gap-x-4">
+                    <button disabled={signing} className=" hover:bg-[rgba(255,255,255,0.1)] rounded-[8px] overflow-hidden cursor-pointer flex justify-center"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
                         if (!account) {
                           setShowConnect(true)
                           return
                         }
+                        if (signing) return
                         if (!(await validSignature())) {
                           const res = await signature()
-                          if (res.signature) {
+                          if (res?.signature) {
                             orderDialog.setOpen(true)
                           }
                         } else {
@@ -74,7 +86,7 @@ function LiteTrade() {
                         }
                       }}
                     >
-                      <LazyImage src="/images/convert/history.png" className="w-9 h-9 cursor-pointer" />
+                      <IconOrder />
                     </button>
                     <KlineSwitch onChange={show => setShowKline(show)} />
                   </div>
@@ -84,14 +96,7 @@ function LiteTrade() {
               <FAQ />
 
             </div>
-            <div className="flex-1">
-              <BoxCard className="min-h-[600px] rounded-[32px] p-8">
-                {
-                  showKline ? <KlineBody /> : <InvestBody /> 
-                }
-                
-              </BoxCard>
-            </div>
+            
           </div>
         </div>
 

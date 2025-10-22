@@ -75,7 +75,7 @@ const CurrencyInputPanel = memo(
       )}>
         <div className={cn(
           "text-[#6C86AD] font-light mb-[10px]",
-          from === 'markets' ? 'text-[14px]' : 'text-[16px]'
+          from === 'markets' ? 'text-[14px]' : 'text-[14px]'
         )}>{label || ''}</div>
         <CurrencyInput 
           isInsufficient={isInsufficient}
@@ -102,9 +102,9 @@ const CurrencyInputPanel = memo(
                 "truncate whitespace-nowrap text-ellipsis",
                 from === "markets" ? "w-[120px] overflow-hidden" : ""
               )}>≈ ${formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)}</div>
-              <div>Avbl: <span className={cn(
+              <div>{t('avbl')}: <span className={cn(
                 "",
-                isInsufficient ? "text-[#FF593C]" : ""
+                isInsufficient ? "text-[#F6465D]" : ""
               )}>{formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')} {inputToken?.symbol || ' '}</span></div>
             </div>
         }
@@ -118,9 +118,9 @@ const CurrencyInputPanel = memo(
                 "truncate whitespace-nowrap text-ellipsis",
                 from === "markets" ? "w-[120px] overflow-hidden" : ""
               )}>≈ ${formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)}</div>
-              <div>Avbl: <span className={cn(
+              <div>{t('avbl')}: <span className={cn(
                 "",
-                isInsufficient ? "text-[#FF593C]" : ""
+                isInsufficient ? "text-[#F6465D]" : ""
               )}>{formatTokenAmountWithCommas(outputTokenBalance?.balance || '0')} {outputToken?.symbol || ' '}</span></div>
             </div>
         }

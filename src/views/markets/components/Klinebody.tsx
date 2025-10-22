@@ -5,13 +5,13 @@ import { TradingChart } from "@/components/TVChart/TradingChart"
 import { memo } from "react"
 
 const KlineBody = memo(
-  () => {
+  ({ from }: { from?: string }) => {
 
     return (
       <div>
         <StockInfo from="pro-trading" />
         <div className="mt-4">
-          <TradingChart />
+          <TradingChart from={from} />
         </div>
         <Statistics />
         <Profile />

@@ -11,7 +11,7 @@ const FAQItem = memo(
 
     return (
       <div className="bg-[rgba(255,255,255,0.08)] rounded-[8px]">
-        <div className="h-[56px] p-4 text-white font-semibold text-[16px] flex items-center justify-between cursor-pointer"
+        <div className="h-[56px] p-4 text-white font-medium text-[16px] flex items-center justify-between cursor-pointer"
           onClick={() => {
             setExpand(!expand)
           }}
