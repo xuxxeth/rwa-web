@@ -9,7 +9,6 @@ export const TradingChart = () => {
   const statusLibrary = useScript("/libraries/charting_library/charting_library.js");
   const [ready, setReady] = useState(false);
   const inputToken = useTradeStore(state => state.inputToken)
-  console.log(inputToken, 222222)
 
   useEffect(() => {
     if (statusLibrary === "ready") {
@@ -25,6 +24,6 @@ export const TradingChart = () => {
     }
   }, [statusLibrary]);
 
-  return ready ? <TVChartContainer /> : <div className="h-[600px]"></div>
+  return ready && inputToken?.address ? <TVChartContainer token={inputToken} /> : <div className="h-[600px]"></div>
 
 }

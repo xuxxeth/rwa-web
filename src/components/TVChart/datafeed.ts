@@ -8,6 +8,8 @@ import type {
 } from "@/lib/charting_library/charting_library";
 
 import chartTable from './chartTable2.json'
+import { klineApi } from "@/service/kline/api";
+import { RESPONSE_CODE } from "@/config/constants";
 
 function addRandomVolume(bar: { time: number; open: number; high: number; low: number; close: number }) {
   const volatility = bar.high - bar.low // 波动范围
@@ -130,7 +132,6 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      console.log(1111111111)
       const currentTime = Date.now();
       // 防止过于频繁的请求
       // if (currentTime - lastRequestTime < requestInterval) {
@@ -146,25 +147,42 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const chartTable: any = await getChartTable({
-          token,
-          pairIndex,
-          from,
-          to,
-          range: +resolution,
-          countBack
-        });
-
-        if (!chartTable || !chartTable.table) {
+        const res = await klineApi.getCandles({ stock: token.stockId, interval: 1, endTime: to, limit: 400 })
+        console.log(res, 1111)
+        const _data = res?.data || []
+        if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
           return;
         }
+        let bars = _data.reverse().map((bar: any) => {
+          return {
+            "time": bar.t * 1000,
+            "open": bar.o,
+            "high": bar.h,
+            "low": bar.l,
+            "close": bar.c,
+            "volume": bar.volume ?? 0,
+          }
+        })
+        // const chartTable: any = await getChartTable({
+        //   token: token.symbol,
+        //   pairIndex,
+        //   from,
+        //   to,
+        //   range: +resolution,
+        //   countBack
+        // });
 
-        let bars = chartTable.table.map((bar: any) => ({
-          ...bar,
-          volume: addRandomVolume(bar).volume,
-          time: bar.time * 1000, // Convert from seconds to milliseconds
-        }));
+        // if (!chartTable || !chartTable.table) {
+        //   onHistoryCallback([], { noData: true });
+        //   return;
+        // }
+
+        // let bars = chartTable.table.map((bar: any) => ({
+        //   ...bar,
+        //   volume: addRandomVolume(bar).volume,
+        //   time: bar.time * 1000, // Convert from seconds to milliseconds
+        // }));
 
         if (firstDataRequest) {
           lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
@@ -176,6 +194,7 @@ export function getDataFeed({
         }
         return;
       } catch (error) {
+        console.log(error)
         // @ts-ignore
         onErrorCallback(error);
       }
