@@ -89,13 +89,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       const connectorType = storage.getItem(CONNECTOR_TYPE)
       if (walletUUID && connectorType) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
-        
-        if (wallet) {
-          hasConnected.current = true
-          setCurrentWallet(wallet)
-          // @ts-ignore
-          handleConnect(connectorType, wallet)
-        }
+
+        if(!wallet) return
+        if(connectorType === ConnectorType.Injected && !wallet.detected) return
+
+        hasConnected.current = true
+        setCurrentWallet(wallet)
+        // @ts-ignore
+        handleConnect(connectorType, wallet)
       }
     }
     if (account) {
