@@ -7,7 +7,6 @@ import type {
   PeriodParams,
 } from "@/lib/charting_library/charting_library";
 
-import chartTable from './chartTable2.json'
 import { klineApi } from "@/service/kline/api";
 import { RESPONSE_CODE } from "@/config/constants";
 
@@ -35,12 +34,6 @@ export function tagSession(item: any) {
   if (totalMin >= 570 && totalMin < 960) return "regular";  // 09:30 - 16:00
   if (totalMin >= 960 && totalMin < 1200) return "after";   // 16:00 - 20:00
   return "off"; // 非交易时段
-}
-
-
-const getChartTable = (data: any) => {
-  
-  return chartTable
 }
 
 const lastBarsCache = new Map<string, Bar>();
@@ -113,17 +106,17 @@ export function getDataFeed({
       setTimeout(() => onSymbolResolvedCallback(symbolInfo));
     },
     getMarks: async (symbolInfo, from, to, onDataCallback) => {
-      const data = await getChartTable({from: 'getMarks'});
-      const marks = data.table
-        .filter(d => tagSession(d) !== "regular") // 只标记盘前和盘后
-        .map(d => ({
-          id: d.time.toString(),
-          time: d.time,
-          color: tagSession(d) === "pre" ? "blue" : "purple",
-          text: tagSession(d).toUpperCase()
-        }));
+      // const data = await getChartTable({from: 'getMarks'});
+      // const marks = data.table
+      //   .filter(d => tagSession(d) !== "regular") // 只标记盘前和盘后
+      //   .map(d => ({
+      //     id: d.time.toString(),
+      //     time: d.time,
+      //     color: tagSession(d) === "pre" ? "blue" : "purple",
+      //     text: tagSession(d).toUpperCase()
+      //   }));
       // @ts-ignore
-      onDataCallback(marks);
+      onDataCallback([]);
     },
     getBars: async (
       symbolInfo,

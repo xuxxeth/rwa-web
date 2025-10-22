@@ -1,3 +1,4 @@
+import { TG_URL, X_URL } from "@/config/constants";
 import { useTranslation } from "@/hooks/useTranslation";
 import { MainLayout } from "@/layouts/main";
 
@@ -13,14 +14,18 @@ export function XFooter() {
         <div className="flex text-base text-white gap-x-[100px]">
           <div>
             <div className=" font-semibold">{t('footer.text5')}</div>
-            <div className="flex items-center mt-6">
-              <img src="/images/icons/x.png" className="w-6" alt="" />
-              <div className="text-80 ml-2">X Official</div>
-            </div>
-            <div className="flex items-center mt-8">
-              <img src="/images/icons/tg.png" className="w-6" alt="" />
-              <div className="text-80 ml-2">Telegram</div>
-            </div>
+            <a href={X_URL} target="_blank">
+              <div className="flex items-center mt-6">
+                <img src="/images/icons/x.png" className="w-6" alt="" />
+                <div className="text-80 ml-2">X Official</div>
+              </div>
+            </a>
+            <a href={TG_URL} target="_blank">
+              <div className="flex items-center mt-8">
+                <img src="/images/icons/tg.png" className="w-6" alt="" />
+                <div className="text-80 ml-2">Telegram</div>
+              </div>
+            </a>
           </div>
           <div>
             <div className=" font-semibold">{t('About')}</div>

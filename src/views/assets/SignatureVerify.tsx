@@ -6,7 +6,7 @@ import { useRequestSignature } from '@/hooks/useSignature'
 function SignatureVerify(props: { className?: string; refreshIsSignatureValid: () => void }) {
   const { className, refreshIsSignatureValid } = props
   const { t } = useTranslation()
-  const { signature } = useRequestSignature()
+  const { signing, signature } = useRequestSignature()
 
   const handleSignatureVerify = async () => {
     await signature()
@@ -24,6 +24,7 @@ function SignatureVerify(props: { className?: string; refreshIsSignatureValid: (
         <div className='w-[350px] m-auto'>{t('signatureVerifyDescBottom')}</div>
       </div>
       <button
+        disabled={signing}
         onClick={handleSignatureVerify}
         className='w-[314px] cursor-pointer bg-white rounded-[16px] text-base/6 py-4 mt-9  font-semibold text-black'
       >

@@ -38,7 +38,7 @@ function LiteTrade() {
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
 
-  const { signature, validSignature } = useRequestSignature()
+  const { signing, signature, validSignature } = useRequestSignature()
 
   useWssOn('summary', (data: any) => {
     setTokenWithPriceByWebSocketData(data || [])
@@ -67,15 +67,18 @@ function LiteTrade() {
                 <div className="flex items-center justify-between mt-5">
                   <div className="text-[20px] font-medium">{t('limit')}</div>
                   <div className="flex items-center gap-x-4">
-                    <button className=" hover:bg-[rgba(255,255,255,0.1)] rounded-[8px] overflow-hidden cursor-pointer flex justify-center"
-                      onClick={async () => {
+                    <button disabled={signing} className=" hover:bg-[rgba(255,255,255,0.1)] rounded-[8px] overflow-hidden cursor-pointer flex justify-center"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
                         if (!account) {
                           setShowConnect(true)
                           return
                         }
+                        if (signing) return
                         if (!(await validSignature())) {
                           const res = await signature()
-                          if (res.signature) {
+                          if (res?.signature) {
                             orderDialog.setOpen(true)
                           }
                         } else {

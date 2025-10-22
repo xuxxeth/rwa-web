@@ -140,3 +140,7 @@ export const enabledFeatures: ChartingLibraryFeatureset[] = [
   'study_overlay_compare_legend_option',
   "hide_left_toolbar_by_default", // 左侧工具栏隐藏
 ]
+
+export const  DISCORD_URL = 'https://discord.com/invite/J34YYjTh'
+export const  X_URL = 'https://x.com/CyberAlpha_x'
+export const  TG_URL = 'https://t.me/+SI2ZHu3_QDdlY2Zl'

@@ -24,17 +24,22 @@ export type CTokenProps = {
 
 export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
   const tokenPrice = useRwaPrice(symbol);
+  const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
   return (
     <div className="flex items-center gap-x-2">
       <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
       <div className="flex items-center gap-x-[4px]">
-        <img
-          src={Number(tokenPrice?.up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
-          className="w-[6px]"
-        />
+        {
+          up !== 0 && 
+            <img
+              src={up > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
+              className="w-[6px]"
+            />
+        }
+        
         <span
           className={
-            Number(tokenPrice?.up) > 0
+            up === 0 ? 'text-[#A1A1A1]' : up > 0
               ? "text-[#50E3C2] text-[12px]"
               : "text-[rgba(227,80,122,1)] text-[12px]"
           }

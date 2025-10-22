@@ -4,14 +4,23 @@ import { useCallback, useState } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 
 export function useRequestSignature() {
+  const [signing, setSigning] = useState(false)
   const { account } = useActiveWeb3()
   const { requestSignature } = useSignature()
 
   const signature = useCallback(async () => {
-    const res = await requestSignature(Math.floor(Date.now() / 1000 + 100 * 60))
-    storage.setItem(`signature_${res.account?.toLowerCase()}`, res)
-    return res
-  }, [requestSignature])
+    setSigning(true)
+    try {
+      const res = await requestSignature(Math.floor(Date.now() / 1000 + 100 * 60))
+      storage.setItem(`signature_${res.account?.toLowerCase()}`, res)
+      setSigning(false)
+      return res
+    } catch(error) {
+      setSigning(false)
+      return null
+    }
+    
+  }, [signing, requestSignature])
 
   // 浏览器原生的 localStorage API 是同步的? 所以这里不需要 async await
   const validSignature = useCallback(() => {
@@ -25,6 +34,7 @@ export function useRequestSignature() {
   }, [account])
 
   return {
+    signing,
     signature,
     validSignature,
   }
