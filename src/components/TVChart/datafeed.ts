@@ -143,12 +143,11 @@ export function getDataFeed({
       if (initialLoadComplete) {
         return
       }
-      console.log('get bar: ')      
+      console.log('get bar: ', resolution)      
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const res = await klineApi.getCandles({ stock: token.stockId, interval: 1, endTime: to, limit: 400 })
-        console.log(res, 1111)
+        const res = await klineApi.getCandles({ stock: token.stockId, interval: 1, endTime: to, limit: countBack })
         const _data = res?.data || []
         if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
@@ -187,12 +186,11 @@ export function getDataFeed({
         if (firstDataRequest) {
           lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
         }
-        onHistoryCallback(bars, { noData: false });
+        onHistoryCallback(bars, { noData: bars.length < countBack ? true : false });
 
-        if (!initialLoadComplete) {
-          initialLoadComplete = true;
-        }
-        return;
+        // if (!initialLoadComplete) {
+        //   initialLoadComplete = true;
+        // }
       } catch (error) {
         console.log(error)
         // @ts-ignore

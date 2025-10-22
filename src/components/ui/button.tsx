@@ -11,8 +11,8 @@ const buttonVariants = cva(
       variant: {
         default: "bg-[#FFFFFF] text-black",
         secondary: "bg-[#9CFF3A] text-black shadow-sm hover:bg-[#9CFF3A]/80",
-        primary: "bg-[#21C95E] text-black shadow-sm hover:bg-[#21C95E]/80",
-        warning: "bg-[#FF593C] text-black shadow-sm hover:bg-[#FF593C]/90",
+        primary: "bg-[#2EBD85] text-black shadow-sm hover:bg-[#2EBD85]/80",
+        warning: "bg-[#F6465D] text-black shadow-sm hover:bg-[#F6465D]/90",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },

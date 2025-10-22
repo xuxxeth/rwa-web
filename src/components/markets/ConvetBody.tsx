@@ -108,6 +108,7 @@ export function ConverBody({
       toastError({title: result?.data.name + ': ' + result?.data.errorCode})
     } else {
       freshTokenBalances()
+      updateInputSize('')
     }
  
   }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances])
@@ -152,6 +153,7 @@ export function ConverBody({
       />
       <div className="h-2"></div>
       <CurrencyInputPanel 
+        value={inputSize}
         regex="^\d*$"
         from={from}
         label={t('Quantity')}

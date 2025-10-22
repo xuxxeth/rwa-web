@@ -71,7 +71,7 @@ const TokenList = memo(
         <div className="mt-2">
           <div className=" flex items-center justify-between text-[12px] font-normal">
             <div>{t("Name")}</div>
-            <div>{t("Balance")}</div>
+            <div>{t("balance")}</div>
           </div>
           {
             filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token} onClick={onClick}  />)

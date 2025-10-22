@@ -63,7 +63,7 @@ function Markets() {
           <MarketTrading align="left" />
           <div className="pt-5 flex gap-x-5">
             <div className="flex-1">
-              <KlineBody />
+              <KlineBody from="market" />
             </div>
             <div className="w-[350px] shrink-0">
               <BoxCard className="min-h-[448px] rounded-[4px] p-4">

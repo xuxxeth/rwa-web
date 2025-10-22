@@ -3,10 +3,11 @@ import { getDataFeed, tagSession } from "./datafeed";
 import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
+import { cn } from "@/lib/utils";
 
 
 export const TVChartContainer = memo(
-  ({ token }: { token: IRwa}) => {
+  ({ token, from }: { token: IRwa, from?: string}) => {
     const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
     
@@ -51,6 +52,7 @@ export const TVChartContainer = memo(
             // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
             // "volume.volume.transparency": 30,   
           },
+         
 
         };
         if (window.TradingView?.widget) {
@@ -76,6 +78,7 @@ export const TVChartContainer = memo(
               //     volumePane.setHeight(100); // 单位是像素，高度随你调
               //   }
               // });
+              // tvWidgetRef.current?.activeChart().executeActionById("hideLeftToolbar");
               
               // MA5
               chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })
@@ -88,6 +91,18 @@ export const TVChartContainer = memo(
 
               // MA30
               chart.createStudy("Moving Average", false, false, { length: 30 }, { "plot.color.0": "rgba(0,128,0,0.5)" });
+
+              setTimeout(() => {
+                const iframe = chartContainerRef.current.querySelector('iframe') as HTMLIFrameElement;
+                const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                const toggler = innerDoc?.querySelector('.toggler-l31H9iuA') as HTMLDivElement ;
+                toggler?.click()
+              }, 300)
+              // 隐藏图例（防止出现 "MA5 close" 等）
+              // const panes = chart.getPanes?.();
+              // if (panes?.length) {
+              //   panes[0].getStudies().forEach((s: any) => s.setVisible(true));
+              // }
             }
             
           });
@@ -109,7 +124,10 @@ export const TVChartContainer = memo(
     }, []);
 
     return (
-      <div className=" relative h-[600px] text-white">
+      <div className={cn(
+        " relative text-white",
+        from === 'market' ? "h-[600px]" : "h-[300px]"
+      )}>
         <div
           className="h-full"
           ref={chartContainerRef}
