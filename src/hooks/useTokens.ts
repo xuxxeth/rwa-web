@@ -1,13 +1,18 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useChainId } from "./useCaCommon";
 import { useBaseStore } from "@/stores/baseStore";
 
 // 获取原生的 rwa 列表
-export function useRwaTokens() {
+export function useRwaTokens(includeDelisted: boolean = true) {
   // TODO: rwaList 就是根据 chainId 获取来的，还需要过滤吗？感觉不太需要了？
   const rwaList = useBaseStore(state => state.rwaList);
 
-  return rwaList
+  return useMemo(() => {
+    if (includeDelisted) {
+      return rwaList;
+    }
+    return rwaList.filter((rwa) => rwa.state !== 4);
+  }, [rwaList, includeDelisted]);
 }
 
 // 获取原生的 token 列表

@@ -8,7 +8,7 @@ import type { IAggregateData } from '@/service/webSocket/types'
 
 export function useAssetsList(chainId: number, account: string) {
   const tokenList = useTokens()
-  const rwaList = useRwaTokens()
+  const rwaList = useRwaTokens(false)
 
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
   const [tokenWithPrice, setTokenWithPrice] = useState<Record<string, { price: number }>>({})

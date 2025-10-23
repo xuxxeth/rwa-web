@@ -107,6 +107,8 @@
     "dailyHigh": "DAILY HIGH",
     "quickBuy": "QUICK BUY",
     "tradingHalt": "TRADING HALT",
+    "buyForbidden": "Sell only",
+    "sellForbidden": "Buy only",
     "quoteInfo": "*Cyberalpha's stock tokens do not include dividend or voting rights.",
     "networkError": {
       "title": "Network seems disconnected.",
