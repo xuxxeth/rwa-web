@@ -9,6 +9,7 @@ import type {
 
 import { klineApi } from "@/service/kline/api";
 import { RESPONSE_CODE } from "@/config/constants";
+import wsService from "@/service/webSocket/service";
 
 function addRandomVolume(bar: { time: number; open: number; high: number; low: number; close: number }) {
   const volatility = bar.high - bar.low // 波动范围
@@ -188,6 +189,20 @@ export function getDataFeed({
       //   lastBarsCache.get(symbolInfo.name)!,
       //   pairIndex,
       // );
+      console.log('symbolInfo: ', symbolInfo)
+      // wsService.on('summary', (data) => {
+      //   const bar = data.find(item => item.S === symbolInfo.ticker)
+      //   if (bar) {
+      //     onRealtimeCallback({
+      //       "time": Date.now(),
+      //       "open": bar.o,
+      //       "high": bar.h,
+      //       "low": bar.l,
+      //       "close": bar.c,
+      //       "volume": 0,
+      //     })
+      //   }
+      // })
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
