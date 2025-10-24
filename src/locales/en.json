@@ -148,6 +148,7 @@
     "order": {
       "openOrders": "Open Orders",
       "cancelOrder": "Cancel Order",
+      "cancelOrderFailed": "Order cancellation request failed.",
 
       "tableHeader": {
         "side": "SIDE",
@@ -295,5 +296,22 @@
   },
   "scanCode": "Scan this QR Code with your phone",
   "balance": "Balance",
-  "avbl": "Avbl"
+  "avbl": "Avbl",
+  "appErr": {
+    "orderDoesNotExist": "Order does not exist",
+    "operationTemporarilySuspended": "Operation temporarily suspended",
+    "insufficientNetworkFee": "Insufficient network fee",
+    "oraclePriceExpired": "Oracle price expired",
+    "priceError": "Price error",
+    "insufficientAmount": "Insufficient amount",
+    "parameterError": "Parameter error",
+    "priceFeedNotFoundWithinRange": "Price feed not found within range",
+    "invalidUpdateData": "Invalid update data",
+    "insufficientFee": "Insufficient fee",
+    "multipleNetworkFeesNotSupported": "Multiple network fees not supported",
+    "transactionAmountBelowMinimumLimit": "Transaction amount below minimum limit",
+    "settlementStatusError": "Settlement status error",
+    "settlementAmountError": "Settlement amount error",
+    "settlementStockQuantityError": "Settlement stock quantity error"
+  }
 }
