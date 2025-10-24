@@ -60,11 +60,13 @@ export interface TradeStore {
   limitPrice: string;
   inputSize: string;
   expires: number;
+  activeConvertTab: 'buy' | 'sell';
   updateInputToken: (rwa: IRwa) => void;
   updateOutputToken: (token: IToken) => void;
   updateLimitPrice: (price: string) => void;
   updateInputSize: (size: string) => void;
   updateExpires: (expires: number) => void;
+  updateActiveConvertTab: (tab: 'buy' | 'sell') => void;
 }
 
 export interface WssStore {
