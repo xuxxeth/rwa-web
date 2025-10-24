@@ -35,6 +35,7 @@ const OrderList = memo(
       const action = type === 'open' ? scanApi.getOpenOrders : scanApi.getOrderHistory
       // @ts-ignore
       const res = await action({ after, noError: true })
+
       setLoading(false)
       if (!res) {
 
@@ -53,12 +54,8 @@ const OrderList = memo(
         }
         return
       }
-      // 未签名，则关闭弹窗，拉起签名
-      if (res.code === RESPONSE_CODE.UNAUTHORIZED) {
-        toastError({title: t('Unauthorized')})
-        onClose && onClose()
-        return
-      }
+      
+      
     }, [])
 
     const filterOrderList = useMemo(() => {
@@ -76,10 +73,19 @@ const OrderList = memo(
         setIsCanceling(true)
         // TODO: 需要在 ca-common-web 里修复
         const result = await cancelOrder(orderId, { wait: true })
-        console.log(result)
         if (result && result?.code !== 9200) {
           // @ts-ignore
-          toastError({title: result?.data.name + ': ' + result?.data.errorCode})
+          const errorMessage = result.data?.message
+          if (errorMessage) {
+            toastError({
+              title: t(`appErr.${errorMessage}`),
+            })
+          } else {
+            toastError({
+              title: t('assets.order.cancelOrderFailed'),
+            })
+          }
+          
         } else {
           toastSuccess({
             title: t('assets.order.cancelOrderSuccess'),
@@ -91,7 +97,7 @@ const OrderList = memo(
       } finally {
         setIsCanceling(false)
       }
-    }, [])
+    }, [t])
 
     return (
       <div className="w-[510px]">

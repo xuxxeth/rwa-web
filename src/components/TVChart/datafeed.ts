@@ -9,14 +9,21 @@ import type {
 
 import { klineApi } from "@/service/kline/api";
 import { RESPONSE_CODE } from "@/config/constants";
+import wsService from "@/service/webSocket/service";
 
-function addRandomVolume(bar: { time: number; open: number; high: number; low: number; close: number }) {
-  const volatility = bar.high - bar.low // 波动范围
-  const base = 1000                     // 最小成交量
-  const multiplier = volatility * 50000 // 波动越大，基准越大
-  const volume = Math.floor(base + Math.random() * multiplier)
+export function keyToMinutes(key: string): number {
+  const map: Record<string, number> = {
+    "1": 1,
+    "5": 5,
+    "15": 15,
+    // "45",
+    "60": 60,
+    "1D": 24 * 60,        // 1 day = 1440 minutes
+    "1W": 7 * 24 * 60,    // 1 week = 10080 minutes
+    "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
+  };
 
-  return { ...bar, volume }
+  return map[key.toUpperCase()] ?? 15; // 未匹配返回 0
 }
 
 export function tagSession(item: any) {
@@ -48,7 +55,7 @@ const configurationData: DatafeedConfiguration = {
     "15",
     // "45",
     "60",
-    "1440",
+    // "1440",
     '1D', '1W', '1M'
   ] as ResolutionString[],
 
@@ -140,7 +147,7 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const res = await klineApi.getCandles({ stock: token.stockId, interval: resolution as any || 15, endTime: to, limit: countBack })
+        const res = await klineApi.getCandles({ stock: token.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
         const _data = res?.data || []
         if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
@@ -188,6 +195,20 @@ export function getDataFeed({
       //   lastBarsCache.get(symbolInfo.name)!,
       //   pairIndex,
       // );
+      console.log('symbolInfo: ', symbolInfo)
+      // wsService.on('summary', (data) => {
+      //   const bar = data.find(item => item.S === symbolInfo.ticker)
+      //   if (bar) {
+      //     onRealtimeCallback({
+      //       "time": Date.now(),
+      //       "open": bar.o,
+      //       "high": bar.h,
+      //       "low": bar.l,
+      //       "close": bar.c,
+      //       "volume": 0,
+      //     })
+      //   }
+      // })
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {

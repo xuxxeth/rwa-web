@@ -80,19 +80,19 @@ const CTokenItem = memo(
         _icon = '/images/icons/market/market_open.png'
         _info = t("Open")
       }
+      // if (state === 1) {
+      //   _icon = '/images/icons/market/market_pre.png'
+      //   _info = t("Pre-Market")
+      // }
+      // if (state === 2) {
+      //   _icon = '/images/icons/market/market_after.png'
+      //   _info = t("After Hours")
+      // }
+      // if (state === 3) {
+      //   _icon = '/images/icons/market/market_close.png'
+      //   _info = t("Market Closed")
+      // }
       if (state === 1) {
-        _icon = '/images/icons/market/market_pre.png'
-        _info = t("Pre-Market")
-      }
-      if (state === 2) {
-        _icon = '/images/icons/market/market_after.png'
-        _info = t("After Hours")
-      }
-      if (state === 3) {
-        _icon = '/images/icons/market/market_close.png'
-        _info = t("Market Closed")
-      }
-      if (state === 4) {
         _icon = '/images/icons/market/market_lock.png'
         _info = t("Trading Halt")
       }
@@ -120,8 +120,8 @@ const CTokenItem = memo(
         <div className="w-1/3 flex items-center gap-x-2">
           <CTokenPrice symbol={token.symbol} />
           {
-            token.state === 4 && 
-              <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
+            token.state === 1 && 
+              <div className="h-[15px] shrink-0 bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
                 <LazyImage src={marketInfo.icon} className="w-[12px]" />
                 <span className="text-[9px] font-medium">{marketInfo.info}</span>
               </div>
@@ -149,7 +149,7 @@ const CTokenList = memo(
     const _id = useId()
     const rwaList = useRwas()
     const rwaListWithBalance = useMemo(() => {
-      return rwaList.map(rwa => {
+      return rwaList.filter(rwa => rwa.state < 2).map(rwa => {
         return {
           ...rwa,
           ...tokenWithBalance[symbolToLower(rwa.symbol)],

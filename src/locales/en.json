@@ -297,7 +297,9 @@
   "scanCode": "Scan this QR Code with your phone",
   "balance": "Balance",
   "avbl": "Avbl",
+  "approve": "Approve",
   "appErr": {
+    "placeOrderFail": "Place order fail",
     "orderDoesNotExist": "Order does not exist",
     "operationTemporarilySuspended": "Operation temporarily suspended",
     "insufficientNetworkFee": "Insufficient network fee",
