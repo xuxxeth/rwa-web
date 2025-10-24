@@ -53,7 +53,7 @@ export function useToast() {
           
         </div>
       )
-    }, { duration: duration || 5000 })
+    }, { duration: duration || 3000 })
   }
   function toastSuccess({ title, btnText, onClick, duration }: CustomToastOptions) {
     toastFun({title, btnText, onClick, duration, type: 'success'})

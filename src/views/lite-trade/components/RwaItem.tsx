@@ -41,7 +41,7 @@ const RwaItem = memo(
         <div className=" flex justify-between">
           <img src={data.icon} className="w-[32px] h-[32px] rounded-full" alt={data.symbol} />
           {
-            data.lock ? 
+            data.state === 1 ? 
               <div className="flex items-center h-[20px] px-1 text-[12px] font-medium gap-x-1 bg-[rgba(255,255,255,0.1)] rounded-[4px]">
                 <LazyImage src="/images/convert/trade_lock.png" className="w-[16px] h-[16px]" />
                 <span>{t('Trading Halt')}</span>

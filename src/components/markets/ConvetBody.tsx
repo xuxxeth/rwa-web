@@ -48,13 +48,13 @@ export function ConverBody({
   const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
 
   const approveAmount = useMemo(() => {
-    return multiply(orderValue, inputTokenPrice?.price ?? '0')
+    return multiply(orderValue, 1)
   }, [orderValue, inputToken])
 
-  console.log('orderValue: ', orderValue, approveAmount)
+  console.log('orderValue: ', orderValue, parseAmount(approveAmount))
 
   
-  const { placeOrder, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
+  const { placeOrder, approve, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)
@@ -82,6 +82,25 @@ export function ConverBody({
   }, [limitPrice, inputSize])
 
   const [buying, setBuying] = useState(false)
+  const handleApprove = async () => {
+    setBuying(true)
+    const result = await approve()
+    setBuying(false)
+    if (result && result?.code !== 9200) {
+      // @ts-ignore
+      const errorMessage = result.data?.message
+      if (errorMessage) {
+        toastError({
+          title: t(`appErr.${errorMessage}`),
+        })
+      } else {
+        toastError({
+          // @ts-ignore
+          title: result.data?.name || t('assets.order.cancelOrderFailed'),
+        })
+      }
+    }
+  }
 
   const handlePlaceOrder = useCallback(async () => {
     const params = {
@@ -105,13 +124,23 @@ export function ConverBody({
     console.log(result)
     if (result && result?.code !== 9200) {
       // @ts-ignore
-      toastError({title: result?.data.name + ': ' + result?.data.errorCode})
+      const errorMessage = result.data?.message
+      if (errorMessage) {
+        toastError({
+          title: t(`appErr.${errorMessage}`),
+        })
+      } else {
+        toastError({
+          // @ts-ignore
+          title: result.data?.name || t('appErr.placeOrderFail'),
+        })
+      }
     } else {
       freshTokenBalances()
       updateInputSize('')
     }
  
-  }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances])
+  }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances, t])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
@@ -137,10 +166,10 @@ export function ConverBody({
     if (Number(orderValue) <= 0) return t('Enter an amount')
     if (isInsufficient) return t("Insufficient") + ' ' + outputToken?.symbol
     if (isSellInsufficient) return t("Insufficient") + ' ' + inputToken?.symbol
-    
+    if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient])
+  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState])
 
   return (
     <div className="mt-4">
@@ -192,7 +221,13 @@ export function ConverBody({
             from === 'markets' ? 'h-[52px]' : ''
           )}
           disabled={disabled || buying}
-          onClick={() => handlePlaceOrder()}
+          onClick={() => {
+            if (approvalState === 3) {
+              handlePlaceOrder()
+            } else {
+              handleApprove()
+            }
+          }}
         >
           { buttonText }
           
