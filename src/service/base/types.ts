@@ -22,6 +22,7 @@ export interface ITokenWithPrice  {
   "dailyHigh"?: string,
 }
 
+// 0 - 正常，1-禁止买入，2-禁止卖出，3-禁止买卖, 4-下架
 export type IRwaState = 0 | 1 | 2 | 3 | 4
 
 export interface IStockWithPrice {
@@ -73,7 +74,6 @@ export interface IRwa {
   "maxMarketTradeAmount": string
   "tokens": string[],
   "precision": number,
-  // 0 - 正常，1-禁止买入，2-禁止卖出，3-禁止买卖, 4-下架
   "state": IRwaState,
   "weight": number,
   "balance"?: string,

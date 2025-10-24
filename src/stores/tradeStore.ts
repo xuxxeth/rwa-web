@@ -12,6 +12,7 @@ export const useTradeStore = create<TradeStore>()(
       limitPrice: '',
       inputSize: '',
       expires: 7,
+      activeConvertTab: 'buy',
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})
       },
@@ -26,8 +27,10 @@ export const useTradeStore = create<TradeStore>()(
       },
       updateExpires: (expires: number) => {
         set({expires: expires})
+      },
+      updateActiveConvertTab: (tab: 'buy' | 'sell') => {
+        set({activeConvertTab: tab})
       }
-      
     }),
     {
       name: "CA_WEB_TRADE_INFO",
