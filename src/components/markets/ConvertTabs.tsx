@@ -1,6 +1,7 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
 import { memo, useState } from "react"
+import { useTradeStore } from "@/stores/tradeStore"
 
 type TabItemProps = {
   key: string,
@@ -42,9 +43,11 @@ const ConvertTabItem = memo(
 const ConvertTabs = memo(
   ({ onChange, from }: ConvertTabsProps) => {
     const { t } = useTranslation()
+    const activeConvertTab = useTradeStore(state => state.activeConvertTab)
+    const updateActiveConvertTab = useTradeStore(state => state.updateActiveConvertTab)
     
     const tabs: TabItemProps[] = [{key: 'buy', label: t('Buy')}, {key: 'sell', label: t('Sell')}]
-    const [selected, setSelected] = useState('buy')
+    // const [selected, setSelected] = useState('buy')
     return (
       <div className={cn(
         " flex items-center w-full  bg-[#131823] ",
@@ -52,13 +55,13 @@ const ConvertTabs = memo(
       )}>
         <div 
           onClick={() => {
-            setSelected('buy')
+            updateActiveConvertTab('buy')
             onChange && onChange(tabs[0])
           } }
           className={cn(
           "flex-1 flex items-center justify-center cursor-pointer font-medium text-[16px]",
           {
-            'bg-[#2EBD85] text-black': selected === 'buy',
+            'bg-[#2EBD85] text-black': activeConvertTab === 'buy',
             'h-[44px] rounded-[8px]': from !== 'markets',
             'h-[36px] rounded-[4px]': from === 'markets',
           }
@@ -67,13 +70,13 @@ const ConvertTabs = memo(
         </div>
         <div 
           onClick={() => {
-            setSelected('sell')
+            updateActiveConvertTab('sell')
             onChange && onChange(tabs[1])
           } }
           className={cn(
           "flex-1 flex items-center justify-center h-[44px] rounded-[8px] cursor-pointer font-medium text-[16px]",
           {
-            'bg-[#F6465D] text-black': selected === 'sell',
+            'bg-[#F6465D] text-black': activeConvertTab === 'sell',
             'h-[44px] rounded-[8px]': from !== 'markets',
             'h-[36px] rounded-[4px]': from === 'markets',
           }
