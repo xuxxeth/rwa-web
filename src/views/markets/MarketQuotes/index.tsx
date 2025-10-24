@@ -17,8 +17,7 @@ import {
   symbolToLower,
   multiply,
 } from '@/utils'
-import BuyButton from '@/components/button/BuyButton'
-import TradingHaltBtn from '@/components/button/TradingHaltBtn'
+import RwaStateButton from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import MarketQuoteError from './error'
@@ -38,7 +37,7 @@ export default function MarketQuotes() {
   const { t } = useTranslation()
   const { sort, onSortChange } = useTableSort<SortableField>()
 
-  const rwaList = useRwaTokens()
+  const rwaList = useRwaTokens(false)
 
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
@@ -60,7 +59,7 @@ export default function MarketQuotes() {
           acc[symbolToLower(item.S)] = {
             price: truncate(item.p, 2),
             // item.p 最新价 itme.o 今开价
-            // up = (最新价 - 金开价) - 1
+            // up = (最新价 - 今开价) - 1
             up:
               item.p && item.pc
                 ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
@@ -204,7 +203,6 @@ const MarketQuotesList = [
   {
     key: 'quickBuy',
     sortable: false,
-    render: (item: IMarketQuote) =>
-      item.state === 0 ? <BuyButton rwa={item} /> : <TradingHaltBtn />,
+    render: (item: IMarketQuote) => <RwaStateButton rwa={item} />,
   },
 ]
