@@ -1,8 +1,7 @@
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useTableSort, type Order } from '@/hooks/useTableHelper'
 import { type IAssetItem } from './assetsList'
-import BuyButton from '@/components/button/BuyButton'
-import TradingHaltBtn from '@/components/button/TradingHaltBtn'
+import RwaStateButton from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
@@ -86,13 +85,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     sortable: false,
     render: (item: IAssetItem, { rwaList }) => {
       const rwa = rwaList.find(rwa => rwa.symbol === item.symbol)
-      return item.rwaState === undefined ? (
-        '--'
-      ) : item.rwaState === 0 && rwa ? (
-        <BuyButton rwa={rwa} />
-      ) : (
-        <TradingHaltBtn />
-      )
+      return !rwa ? '--' : <RwaStateButton rwa={rwa} />
     },
   },
 ]

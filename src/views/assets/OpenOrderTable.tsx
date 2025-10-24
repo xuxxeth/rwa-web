@@ -155,85 +155,84 @@ export default function OpenOrderTable(props: {
 
 const Day = 1 * 60 * 60 * 24
 
-const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> =
-  [
-    {
-      key: 'side',
-      sortable: false,
-      render: (item: IOpenOrder) => <SideCell side={item.side} />,
-      width: 60,
+const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> = [
+  {
+    key: 'side',
+    sortable: false,
+    render: (item: IOpenOrder) => <SideCell side={item.side} />,
+    width: 60,
+  },
+  {
+    key: 'type',
+    sortable: false,
+    render: (item: IOpenOrder) => <OrderTypeCell orderType={item.orderType} />,
+    width: 60,
+  },
+  {
+    key: 'token',
+    sortable: false,
+    width: 150,
+    render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+      const rwa = rwaTokens.find(token => token.stockId === item.stockId)
+      return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
     },
-    {
-      key: 'type',
-      sortable: false,
-      render: (item: IOpenOrder) => <OrderTypeCell orderType={item.orderType} />,
-      width: 60,
+  },
+  {
+    key: 'orderPrice',
+    sortable: false,
+    breakOnSpace: true,
+    render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
+  },
+  {
+    key: 'orderAmount',
+    sortable: false,
+    breakOnSpace: true,
+    render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
+  },
+  {
+    key: 'filledAmount',
+    sortable: false,
+    breakOnSpace: true,
+    render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
+  },
+  {
+    key: 'filledValue',
+    sortable: false,
+    breakOnSpace: true,
+    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
+  },
+  {
+    key: 'orderTime',
+    sortable: false,
+    render: (item: IOpenOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
+  },
+  {
+    key: 'expiration',
+    sortable: false,
+    render: (item: IOpenOrder) => {
+      return <TextCell text={readableDuration(item.validDate * Day)} />
     },
-    {
-      key: 'token',
-      sortable: false,
-      width: 150,
-      render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
-        const rwa = rwaTokens.find(token => token.stockId === item.stockId)
-        return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
-      },
-    },
-    {
-      key: 'orderPrice',
-      sortable: false,
-      breakOnSpace: true,
-      render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
-    },
-    {
-      key: 'orderAmount',
-      sortable: false,
-      breakOnSpace: true,
-      render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
-    },
-    {
-      key: 'filledAmount',
-      sortable: false,
-      breakOnSpace: true,
-      render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
-    },
-    {
-      key: 'filledValue',
-      sortable: false,
-      breakOnSpace: true,
-      render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
-    },
-    {
-      key: 'orderTime',
-      sortable: false,
-      render: (item: IOpenOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
-    },
-    {
-      key: 'expiration',
-      sortable: false,
-      render: (item: IOpenOrder) => {
-        return <TextCell text={readableDuration(item.validDate * Day)} />
-      },
-    },
-    {
-      key: 'status',
-      sortable: false,
-      render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
-    },
-    {
-      key: 'action',
-      sortable: false,
-      render: (item: IOpenOrder, { refetch }) => (
-        <CancelOrderButton refetch={refetch} orderId={item.orderId} />
-      ),
-    },
-  ]
+  },
+  {
+    key: 'status',
+    sortable: false,
+    render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
+  },
+  {
+    key: 'action',
+    sortable: false,
+    render: (item: IOpenOrder, { refetch }) => (
+      <CancelOrderButton refetch={refetch} orderId={item.orderId} />
+    ),
+  },
+]
 
 function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
   const { refetch } = props
   const { t } = useTranslation()
   const { orderId } = props
   const { cancelOrder } = useTradeUtils()
-  const { toastSuccess } = useToast()
+  const { toastSuccess, toastError } = useToast()
   const [isCanceling, setIsCanceling] = useState(false)
   const maxRefetchCount = useRef(5)
 
@@ -241,14 +240,28 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
     try {
       setIsCanceling(true)
       // TODO: 需要在 ca-common-web 里修复
-      await cancelOrder(orderId as unknown as number, { wait: true })
-      toastSuccess({
-        title: t('assets.order.cancelOrderSuccess'),
-      })
-      while (maxRefetchCount.current > 0) {
-        maxRefetchCount.current--
-        refetch()
-        await sleep(1000)
+      const res = await cancelOrder(orderId as unknown as number, { wait: true })
+      if (res.code === 9200) {
+        toastSuccess({
+          title: t('assets.order.cancelOrderSuccess'),
+        })
+        while (maxRefetchCount.current > 0) {
+          maxRefetchCount.current--
+          refetch()
+          await sleep(1000)
+        }
+      } else {
+        // @ts-ignore
+        const errorMessage = res.data?.message
+        if (errorMessage) {
+          toastError({
+            title: t(`appErr.${errorMessage}`),
+          })
+        } else {
+          toastError({
+            title: t('assets.order.cancelOrderFailed'),
+          })
+        }
       }
     } catch (error) {
       console.log('cancel order error', error)
