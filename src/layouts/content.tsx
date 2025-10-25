@@ -10,7 +10,7 @@ function ConentLayout({
   return (
     <div
       className={cn(
-        "bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ",
+        "bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ",
         className
       )}
     >

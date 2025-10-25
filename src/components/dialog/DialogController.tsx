@@ -9,7 +9,6 @@ import {
   DialogClose
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-
 // 全局控制器
 export const dialogController = {
   open: () => {},
@@ -42,6 +41,9 @@ export function DialogController({
   open: boolean
   openChange: (open: boolean) => void
 }) {
+  
+  // useBodyScrollLock(open)
+
   return (
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(

@@ -314,6 +314,8 @@
     "transactionAmountBelowMinimumLimit": "Transaction amount below minimum limit",
     "settlementStatusError": "Settlement status error",
     "settlementAmountError": "Settlement amount error",
-    "settlementStockQuantityError": "Settlement stock quantity error"
-  }
+    "settlementStockQuantityError": "Settlement stock quantity error",
+    "UnknownErro": "合约调用失败"
+  },
+  "switchNetwork": "请切换网络至 {{network}}"
 }

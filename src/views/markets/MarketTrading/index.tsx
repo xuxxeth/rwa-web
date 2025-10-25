@@ -49,7 +49,7 @@ function Markets() {
     <>
       {/* <Menus /> */}
       <MainLayout>
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
+        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ">
           <div className="flex items-center text-[12px] font-normal my-3">
             <div 
               className=" cursor-pointer"

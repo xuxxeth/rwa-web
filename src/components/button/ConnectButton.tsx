@@ -12,16 +12,12 @@ import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
 import { cn } from '@/lib/utils'
 import {
-  bscTestnet,
-  useChainId,
-  useChains,
-  xLayerTestnet,
   ConnectorType,
   useQrCodeData,
   type WalletConfig,
 } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
-import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
+import { DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from '../image/LazyImage'
 import { useUSDT } from '@/hooks/useTokens'
 import CopyButton from './copyButton'
@@ -69,8 +65,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const router = useRouter()
   const { toastError } = useToast()
   const { wallets, chainId, account, handleConnect, handleDisConnect } = useActiveWeb3()
-  const chains = [bscTestnet, xLayerTestnet]
-  const walletDialog = useShowDialog()
+  const chains = useBaseStore(state => state.chainList)
   const showConnect = useBaseStore(state => state.showConnect)
   const setShowConnect = useBaseStore(state => state.setShowConnect)
 
@@ -82,6 +77,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const usdtToken = useUSDT()
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
+  const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains]) 
+  const connectInit = useRef<boolean>(false)
   // 默认执行一次连接钱包操作
   useEffect(() => {
     if (wallets.length > 0 && !account && !hasConnected.current) {
@@ -101,8 +98,25 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
     if (account) {
       storage.setItem(CONNECT_ACCOUNT, account)
+      setTimeout(() => {
+        connectInit.current = true
+      }, 1000)
     }
   }, [wallets, chainId, account, handleConnect])
+
+  useEffect(() => {
+    if (account && connectInit.current) {
+      // 判断chainId是不是支持的链
+      const chain = chains.find(chain => chain.id === chainId)
+      if (!chain) {
+        handleDisConnect()
+        // 请切换到支持的链
+        toastError({
+          title: t('switchNetwork', { network: network }),
+        })
+      }
+    }
+  }, [account, chainId, chains, handleDisConnect])
 
   useEffect(() => {
     if (account && showConnect) {
@@ -248,7 +262,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                           setCurrentWallet(wallet)
                         } else {
                           toastError({
-                            title: 'Please switch your wallet to the bsc smart test chain',
+                            title: t('switchNetwork', { network: network }),
                           })
                         }
                       }
