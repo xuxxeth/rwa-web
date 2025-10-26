@@ -63,7 +63,7 @@ export function WalletItem({
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
-  const { toastError } = useToast()
+  const { toastError, toastSuccess } = useToast()
   const { wallets, chainId, account, handleConnect, handleDisConnect } = useActiveWeb3()
   const chains = useBaseStore(state => state.chainList)
   const showConnect = useBaseStore(state => state.showConnect)
@@ -97,10 +97,17 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       }
     }
     if (account) {
+      // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
+      if (!connectInit.current) {
+        toastSuccess({
+          title: t('connectSuccess')
+        })
+        setTimeout(() => {
+          connectInit.current = true
+        }, 1000)
+      }
       storage.setItem(CONNECT_ACCOUNT, account)
-      setTimeout(() => {
-        connectInit.current = true
-      }, 1000)
+      
     }
   }, [wallets, chainId, account, handleConnect])
 
@@ -110,6 +117,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       const chain = chains.find(chain => chain.id === chainId)
       if (!chain) {
         handleDisConnect()
+        connectInit.current = false
         // 请切换到支持的链
         toastError({
           title: t('switchNetwork', { network: network }),

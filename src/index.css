@@ -63,15 +63,19 @@ body {
   min-height: 100vh;
   font-family: 'Inter';
 }
-/* [data-sonner-toaster] {
-  width: 500px !important;
+[data-sonner-toaster] {
+  width: 100% !important;
   min-width: 0 !important;
   max-width: none !important;
-} */
+  transform: translate(50%, 50%); /* 修正偏移，让中心对齐 */
+  align-items: center !important; /* 居中对齐多个 toast */
+  justify-content: center !important;
+  display: flex;
+}
+
 [data-sonner-toast] {
   background: transparent !important;
   box-shadow: none !important;
-  
 }
 @layer utilities {
 
