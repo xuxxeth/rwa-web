@@ -314,6 +314,11 @@
     "transactionAmountBelowMinimumLimit": "Transaction amount below minimum limit",
     "settlementStatusError": "Settlement status error",
     "settlementAmountError": "Settlement amount error",
-    "settlementStockQuantityError": "Settlement stock quantity error"
-  }
+    "settlementStockQuantityError": "Settlement stock quantity error",
+    "UnknownErro": "合约调用失败"
+  },
+  "connectSuccess": "钱包连接成功",
+  "switchNetwork": "请切换网络至 {{network}}",
+  "amountMin": "订单金额不得小于",
+  "amountMax": "订单金额不得大于"
 }

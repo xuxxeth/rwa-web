@@ -7,7 +7,7 @@ export default function MarketQuoteError() {
 
   return (
     <MainLayout>
-      <div className="bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white ">
+      <div className="bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ">
         <div className="flex flex-row mt-[133px] items-center justify-center">
           <LazyImage
             src="/images/convert/market-quote-err.png"

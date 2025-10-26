@@ -27,7 +27,7 @@ export function ConverBody({
   action = 'buy',
   from
 }: ConverBodyProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { toastError } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
   const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
@@ -147,6 +147,13 @@ export function ConverBody({
   const inputTokenBalance = useTokenBalance(inputToken?.symbol || '') 
   const outputTokenBalance = useTokenBalance(outputToken?.symbol || '') 
 
+  const isMinOrMax = useMemo(() => {
+    return {
+      min: isLess(orderValue, inputToken?.minLimitTradeAmount || '0'),
+      max: isGreater(orderValue, inputToken?.maxLimitTradeAmount || '0')
+    }
+  }, [inputToken, orderValue])
+
   const isInsufficient = useMemo(
     () => action === 'buy' && orderValue ? (isGreater(orderValue, outputTokenBalance?.balance || '0')) : false, 
     [orderValue, outputTokenBalance, action]
@@ -158,18 +165,21 @@ export function ConverBody({
   )
 
   const disabled = useMemo(
-    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) , 
-    [orderValue, isInsufficient, isSellInsufficient, action]
+    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || isMinOrMax.min || isMinOrMax.max , 
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, action]
   )
 
   const buttonText = useMemo(() => {
     if (Number(orderValue) <= 0) return t('Enter an amount')
-    if (isInsufficient) return t("Insufficient") + ' ' + outputToken?.symbol
-    if (isSellInsufficient) return t("Insufficient") + ' ' + inputToken?.symbol
+    // 判断有没有超出最大或最小金额
+    if (isMinOrMax.min) return t('amountMin') + ' ' + inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol
+    if (isMinOrMax.max) return t('amountMax') + ' ' + inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol
+    if (isInsufficient) return i18n.language === 'zh' ? outputToken?.symbol + ' ' + t("Insufficient") : t("Insufficient") + ' ' + outputToken?.symbol
+    if (isSellInsufficient) return i18n.language === 'zh' ? inputToken?.symbol + ' ' + t("Insufficient") :  t("Insufficient") + ' ' + inputToken?.symbol
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState])
+  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, i18n.language])
 
   return (
     <div className="mt-4">

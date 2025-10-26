@@ -16,7 +16,7 @@ const Profile = memo(
         </div>
         <div className=" text-[14px] font-normal leading-[24px] relative">
           Amazon.com, Inc. engages in the provision of online retail shopping services. It operates through the following business segments: North America, International, and Amazon Web Services (AWS). The North America segment includes retail sales of consumer products and subscriptions through International, and Amazon...
-          <div className="text-[#1A85FF] text-[16px] absolute bottom-0 right-0 cursor-pointer">{t('Read more')}</div>
+          {/* <div className="text-[#1A85FF] text-[16px] absolute bottom-0 right-0 cursor-pointer">{t('Read more')}</div> */}
         </div>
         {/* <div className="h-[200px]">
 

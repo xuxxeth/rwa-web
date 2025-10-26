@@ -3,6 +3,7 @@
 export interface IChain {
   "id": number,
   "name": string,
+  "displayName": string,
   "state": number, // 状态：0-不可用，1-可用
   "contract": string,
   "icon": string,

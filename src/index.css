@@ -6,32 +6,33 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins-Light.ttf');
+  font-family: 'Inter';
+  /* src: url('/fonts/Poppins-Light.ttf'); */
+  src: url('/fonts/Inter/Inter_24pt-Light.ttf');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins-Regular.ttf');
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter_24pt-Regular.ttf');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins-Medium.ttf');
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter_24pt-Medium.ttf');
   font-weight: 500;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins-SemiBold.ttf');
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter_24pt-SemiBold.ttf');
   font-weight: 600;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins-Bold.ttf');
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter_24pt-Bold.ttf');
   font-weight: 700;
   font-style: normal;
 }
@@ -60,17 +61,21 @@
 body {
   background-color: #06070A;
   min-height: 100vh;
-  font-family: 'Poppins';
+  font-family: 'Inter';
 }
 [data-sonner-toaster] {
-  width: 500px !important;
+  width: 100% !important;
   min-width: 0 !important;
   max-width: none !important;
+  transform: translate(50%, 50%); /* 修正偏移，让中心对齐 */
+  align-items: center !important; /* 居中对齐多个 toast */
+  justify-content: center !important;
+  display: flex;
 }
+
 [data-sonner-toast] {
   background: transparent !important;
   box-shadow: none !important;
-  
 }
 @layer utilities {
 

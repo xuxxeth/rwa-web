@@ -50,7 +50,7 @@ function LiteTrade() {
     <>
       <Menus />
       <MainLayout>
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] pt-[88px] text-white px-[120px]">
+        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white px-[120px]">
           <MarketTrading/>
           <div className="pt-5 flex gap-x-10">
             <div className="w-[580px]">

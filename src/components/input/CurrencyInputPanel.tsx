@@ -74,7 +74,7 @@ const CurrencyInputPanel = memo(
         inputFocus ? "border-[#FFFFFF]" : ""
       )}>
         <div className={cn(
-          "text-[#6C86AD] font-light mb-[10px]",
+          "text-[#6C86AD] font-normal mb-[10px]",
           from === 'markets' ? 'text-[14px]' : 'text-[14px]'
         )}>{label || ''}</div>
         <CurrencyInput 
@@ -95,7 +95,7 @@ const CurrencyInputPanel = memo(
         {
           mode === 'in' && 
             <div className={cn(
-              " mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between",
+              " mt-1 py-[6px] font-nomarl text-[#6C86AD] text-[14px] flex items-center justify-between",
               from === "markets" ? "text-[12px]" : ""
             )}>
               <div title={formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)} className={cn(
@@ -111,7 +111,7 @@ const CurrencyInputPanel = memo(
         {
           mode === 'out' && 
             <div className={cn(
-              " mt-1 py-[6px] font-light text-[#6C86AD] text-[14px] flex items-center justify-between",
+              " mt-1 py-[6px] font-nomarl text-[#6C86AD] text-[14px] flex items-center justify-between",
               from === "markets" ? "text-[12px]" : ""
             )}>
               <div title={formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)} className={cn(
