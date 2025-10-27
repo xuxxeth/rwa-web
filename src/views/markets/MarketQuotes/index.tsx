@@ -186,7 +186,7 @@ const MarketQuotesList = [
       <TextCellWithColor
         text={item.up ? textSuffix(item.up, '%', 0) : '--'}
         change={strOrNumToSign(item.up ?? 0)}
-        withIcon={true}
+        withIcon={false}
       />
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),

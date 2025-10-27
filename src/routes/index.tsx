@@ -41,6 +41,10 @@ const routes: RouteObject[] = [
         path: "trading",
         element: <MarketTrading />,
       },
+      {
+        path: "trading/:symbol",
+        element: <MarketTrading />,
+      },
     ],
   },
   {
