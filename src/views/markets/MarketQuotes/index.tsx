@@ -94,12 +94,14 @@ export default function MarketQuotes() {
             sort={sort}
             onSortChange={onSortChange}
           />
-          <TableBody<IMarketQuote, unknown>
-            data={paginatedData}
-            config={MarketQuotesList}
-            extra={{} as unknown}
-            getKey={(item: IMarketQuote) => item.symbol}
-          />
+          <div className='min-h-[350px]'>
+            <TableBody<IMarketQuote, unknown>
+              data={paginatedData}
+              config={MarketQuotesList}
+              extra={{} as unknown}
+              getKey={(item: IMarketQuote) => item.symbol}
+            />
+          </div>
           <div className='px-5 py-1 mt-2 text-sm/5.5'>{t('marketQuotes.quoteInfo')}</div>
           {totalPage > 1 && (
             <Pagination
@@ -186,7 +188,7 @@ const MarketQuotesList = [
       <TextCellWithColor
         text={item.up ? textSuffix(item.up, '%', 0) : '--'}
         change={strOrNumToSign(item.up ?? 0)}
-        withIcon={true}
+        withIcon={false}
       />
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),

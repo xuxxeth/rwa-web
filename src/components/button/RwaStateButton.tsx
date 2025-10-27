@@ -4,6 +4,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
 import type { IRwa, IRwaState } from '@/service/base/types'
+import { symbolToLower } from '@/utils'
 
 export default function RwaStateButton({ rwa }: { rwa: IRwa }) {
   if (rwa.state === 1) {
@@ -21,7 +22,7 @@ export function BuyButton({ rwa }: { rwa: IRwa }) {
     <button
       onClick={() => {
         updateInputToken(rwa)
-        router.push('/lite-trade')
+        router.push('/markets/trading/' + symbolToLower(rwa.symbol))
       }}
       className='flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium h-10 px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer'
     >

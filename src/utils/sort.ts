@@ -30,6 +30,15 @@ export function advancedSort(
     return order === 'asc' ? a - b : b - a
   }
 
+  if (options.numeric) {
+    const numA = typeof a === 'string' ? parseFloat(a) : a
+    const numB = typeof b === 'string' ? parseFloat(b) : b
+
+    if(!isNaN(numA) && !isNaN(numB)) {
+      return order === 'asc' ? numA - numB : numB - numA
+    }
+  }
+
   return (
     (order === 'asc' ? 1 : -1) *
     String(a).localeCompare(String(b), i18n.language, {
