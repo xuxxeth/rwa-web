@@ -18,7 +18,7 @@ export function LanguageItem({
     <div 
       onClick={() => onClick && onClick()}
       className={cn(
-      "flex items-center justify-between py-4 cursor-pointer font-semibold",
+      "flex items-center justify-between py-4 cursor-pointer font-medium",
       selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
     )}>
       <span className="text-[14px]">{title}</span>
@@ -29,13 +29,13 @@ export function LanguageItem({
   )
 }
 
-export function SubMenus() {
+export function LngSubMenus() {
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng: string) => {
     storage.setItem('CA_LANGUAGE', lng)
     i18n.changeLanguage(lng);
   };
-  const [currentSub, setCurrentSub] = useState(0)
+  const [currentSub, setCurrentSub] = useState(1)
   
   return (
     <DropdownMenu
@@ -50,7 +50,7 @@ export function SubMenus() {
       <DropdownMenuTrigger asChild>
         <div className=" flex items-center">
           <button className="cursor-pointer">
-            <img src="/images/icons/menu.png" className="w-10 h-10" alt="" />
+            <img src="/images/icons/language.png" className="w-10 h-10" alt="" />
           </button>
         </div>
       </DropdownMenuTrigger>
@@ -77,12 +77,12 @@ export function SubMenus() {
           {
             currentSub === 1 &&
               <div>
-                <div className=" px-4 flex items-center cursor-pointer py-2"
+                {/* <div className=" px-4 flex items-center cursor-pointer py-2"
                   onClick={() => setCurrentSub(0)}
                 >
                   <img src="/images/icons/back.png" className="w-6" alt="" />
                   <span className="text-sm font-medium ml-2">{t('Back')}</span>
-                </div>
+                </div> */}
                 <div className=" px-4">
                   <LanguageItem title="English"  
                     onClick={() => changeLanguage('en')}

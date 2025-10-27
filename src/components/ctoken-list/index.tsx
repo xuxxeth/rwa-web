@@ -29,13 +29,13 @@ export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
     <div className="flex items-center gap-x-2">
       <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
       <div className="flex items-center gap-x-[4px]">
-        {
-          up !== 0 && 
+        {/* {
+          up !== 0 &&
             <img
               src={up > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
               className="w-[6px]"
             />
-        }
+        } */}
         
         <span
           className={
@@ -44,6 +44,7 @@ export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
               : "text-[rgba(227,80,122,1)] text-[12px]"
           }
         >
+          {up !== 0 && up > 0 ? '+' : '-'}
           {Math.abs(Number(tokenPrice?.up || "0"))}%
         </span>
       </div>

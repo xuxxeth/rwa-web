@@ -1,9 +1,10 @@
 import { ConnectButton } from "@/components/button/ConnectButton";
 import { MenusItem } from "./MenuItem";
-import { SubMenus } from "../button/SubMenus";
+import { LngSubMenus } from "../button/LangSubMenus";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SwitchButton } from "../button/SwitchChainButton";
 import { useRouter } from "@/hooks/useRouter";
+import { SubMenus } from "./SubMenus";
 
 export function Menus() {
   const { t } = useTranslation();
@@ -23,17 +24,15 @@ export function Menus() {
           />
           <MenusItem
             title={t("Markets")}
-            active={router.location.pathname.startsWith("/markets")}
+            active={router.location.pathname.startsWith("/markets/quotes")}
             onClick={() => {
               router.push("/markets");
             }}
           />
-          <MenusItem
-            title={t("Lite Trade")}
+          <SubMenus
+            title={t("Trade")}
             active={router.location.pathname === "/lite-trade"}
-            onClick={() => {
-              router.push("/lite-trade");
-            }}
+            
           />
           <MenusItem
             title={t("Assets")}
@@ -47,7 +46,7 @@ export function Menus() {
       <div className="flex items-center gap-x-2">
         <SwitchButton />
         <ConnectButton />
-        <SubMenus />
+        <LngSubMenus />
       </div>
     </div>
   );

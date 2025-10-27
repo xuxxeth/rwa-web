@@ -17,28 +17,24 @@ export const RwaPrice = (
   ({
     rwaData
   }: {rwaData: IRwa}) => {
-
-    const marketTradeState = useBaseStore(state => state.marketTradeState)
     const rwaPrice = useRwaPrice(rwaData.symbol)
-
+    const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
     if (!rwaPrice) return null
     return (
-      <>
-        {
-          marketTradeState === MARKET_STATUS.OPEN ?
-          <>
-            <img src={Number(rwaPrice.up) > 0 ? '/images/home/rate_up.png' : '/images/home/rate_down.png'} className="w-[16px]" alt="" />
-            <span className={cn(
-              "",
-              Number(rwaPrice.up) > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-            )}>{rwaPrice.up || '--'}%</span>
-          </> : 
-          <span className={cn(
-              "",
-            Number(rwaPrice.up || '--') > 0 ? "text-[#34C759]" : "text-[#FF383C]"
-          )}>{rwaPrice.price} $</span>
-        }
-      </>
+      <div className="flex items-center">
+        <span className="text-[20px] text-white">{rwaPrice.price || '--'}</span>
+        <span
+          className={cn(
+            "text-[14px] font-medium ml-4 w-[68px] h-[25px] flex items-center justify-center bg-[rgba(255,255,255,0.1)] rounded-[8px]",
+            up === 0 ? 'text-[#A1A1A1]' : up > 0
+              ? "text-[#50E3C2] "
+              : "text-[rgba(227,80,122,1)] text-[14px]"
+          )}
+        >
+          {up !== 0 && up > 0 ? '+' : '-'}
+          {Math.abs(Number(rwaPrice?.up || "0"))}%
+        </span>
+      </div>
     )
   }
 )
@@ -48,49 +44,37 @@ export default function Section2() {
   const { t } = useTranslation()
   const router = useRouter()
   const rwaList = useBaseStore(state => state.rwaList)
-  const [filterStocks, setFilterStocks] = useState<IRwa[]>([])
   const updateInputToken = useTradeStore(state => state.updateInputToken)
-
-  useEffect(() => {
-    let rwas: IRwa[] = []
-    showStocks.forEach(code => {
-      const rwa = rwaList.find(rwa => rwa.symbol.startsWith(code))
-      if (rwa) {
-        rwas.push({
-          ...rwa,
-        })
-      }
-    })
-    setFilterStocks(rwas)
-  }, [rwaList])
 
   return (
     <MainLayout>
-      <div className="h-[1066px] bg-[#06070A] relative text-white">
+      <div className="h-[640px] bg-[#06070A] relative text-white">
         <img src="/images/icons/star/8.png" className=" absolute top-0 right-[221px]" alt="" />
         <img src="/images/home/section2_bg.png" className="w-[600px] h-[600px] absolute left-[50%] -translate-x-[300px] top-[180px]" alt="" />
         <div className=" relative z-10">
-          <div className=" font-semibold text-[44px] pt-[72px] text-center">{t('home.text4')}</div>
+          <div className=" font-medium text-[36px] pt-[72px] text-center">{t('home.text4')}</div>
           <div className=" flex justify-center">
             <div className="text-[18px] text-[rgba(255,255,255,0.8)] w-[790px] mt-6 text-center">{t('home.text5')}</div>
           </div>
           <div className="flex justify-center mt-[64px]">
-            <div className=" grid grid-cols-2 gap-[88px]">
+            <div className=" grid grid-cols-3 gap-[40px]">
               {
-                filterStocks.map((item, index) => {
+                rwaList.slice(0, 6).map((item, index) => {
                   return (
                     <RwaCard key={`${_id}-${index}`}>
-                      <div className=" absolute -right-[26px] -top-[29px] 
-                      w-[95px] h-[95px] rounded-full flex justify-center items-center backdrop-blur-[20px]">
-                        <img src={item.icon} className=" w-full rounded-full" alt="" />
-                      </div>
-                      <div className="p-[56px] text-white">
-                        <div className="text-[45px] font-semibold">{item.symbol}</div>
-                        <div className="text-[25px] font-semibold text-[rgba(255,255,255,0.6)]">{item.name}</div>
-                        <div className="text-[32px] font-medium flex items-center justify-between mt-14">
+                      <div className="px-[32px] text-white flex flex-col justify-center h-full">
+                        <div className="flex items-center gap-x-[10px]">
+                          <div className="w-[43px] h-[43px] rounded-full flex justify-center items-center">
+                            <img src={item.icon} className=" w-full rounded-full" alt="" />
+                          </div>
+                          <div>
+                            <div className="text-[18px] font-medium">{item.symbol}</div>
+                            <div className="text-[16px] font-medium text-[rgba(255,255,255,0.6)]">{item.name}</div>
+                          </div>
+                        </div>
+                        
+                        <div className=" font-medium flex items-center justify-between mt-3">
                           <div className="flex items-center gap-x-2">
-                            <span>24 hours</span> 
-                            
                             <RwaPrice rwaData={item} />
                           </div>
                           <GoButton 

@@ -19,7 +19,7 @@ export function MenusItem({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className={cn(
-      " text-base font-normal text-[rgba(255,255,255,0.6)] cursor-pointer h-10 flex flex-col items-center pt-1",
+      " text-base font-normal text-[rgba(255,255,255,0.6)] cursor-pointer h-10 flex flex-col items-center leading-[40px]",
       active ? " font-semibold text-white" : ""
     )}
       onClick={() => {

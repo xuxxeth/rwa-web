@@ -14,6 +14,7 @@ import type {
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 
 export interface BaseStore {
+  connectInit: boolean,
   showConnect: boolean,
   currentWallet: any,
   lastChainId: number | null;
@@ -28,6 +29,7 @@ export interface BaseStore {
   tokenWithBalance: Record<string, ITokenWithBalance>;
   freshTokenBalancesCount: number;
   stockWithPrice: Record<string, IStockWithPrice>;
+  setConnectInit: (init: boolean) => void;
   setShowConnect: (show: boolean) => void;
   setCurrentWallet: (wallet: any) => void;
   setStockWithPrice: (

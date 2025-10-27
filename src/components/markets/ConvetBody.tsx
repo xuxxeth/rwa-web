@@ -28,7 +28,7 @@ export function ConverBody({
   from
 }: ConverBodyProps) {
   const { t, i18n } = useTranslation()
-  const { toastError } = useToast()
+  const { toastError, toastSuccess } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
   const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
   const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
@@ -86,17 +86,19 @@ export function ConverBody({
     setBuying(true)
     const result = await approve()
     setBuying(false)
-    if (result && result?.code !== 9200) {
+    if (result && result?.code === 9200) {
+      toastSuccess({title: t('approveSuccess')})
+    } else {
       // @ts-ignore
       const errorMessage = result.data?.message
       if (errorMessage) {
         toastError({
-          title: t(`appErr.${errorMessage}`),
+          title: t('appErr.approveError') + t(`appErr.${errorMessage}`),
         })
       } else {
         toastError({
           // @ts-ignore
-          title: result.data?.name || t('assets.order.cancelOrderFailed'),
+          title: result.data?.name || t('appErr.UnknownErro'),
         })
       }
     }
@@ -122,12 +124,17 @@ export function ConverBody({
     const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true})
     setBuying(false)
     console.log(result)
-    if (result && result?.code !== 9200) {
+    if (result && result?.code === 9200) {
+      freshTokenBalances()
+      updateInputSize('')
+      toastSuccess({title: t('orderSuccess')})
+    } else {
+      
       // @ts-ignore
       const errorMessage = result.data?.message
       if (errorMessage) {
         toastError({
-          title: t(`appErr.${errorMessage}`),
+          title:  t('appErr.signError') + t(`appErr.${errorMessage}`),
         })
       } else {
         toastError({
@@ -135,9 +142,7 @@ export function ConverBody({
           title: result.data?.name || t('appErr.placeOrderFail'),
         })
       }
-    } else {
-      freshTokenBalances()
-      updateInputSize('')
+      
     }
  
   }, [limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances, t])
@@ -165,12 +170,14 @@ export function ConverBody({
   )
 
   const disabled = useMemo(
-    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || isMinOrMax.min || isMinOrMax.max , 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, action]
+    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || isMinOrMax.min || isMinOrMax.max || inputToken?.state === 1, 
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, action]
   )
 
   const buttonText = useMemo(() => {
     if (Number(orderValue) <= 0) return t('Enter an amount')
+    // 先判断当前资产是否可交易
+    if (inputToken?.state === 1) return t('tradingHalt')
     // 判断有没有超出最大或最小金额
     if (isMinOrMax.min) return t('amountMin') + ' ' + inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol
     if (isMinOrMax.max) return t('amountMax') + ' ' + inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol

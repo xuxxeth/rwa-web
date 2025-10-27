@@ -11,7 +11,7 @@ export function GoButton({ onClick }: { onClick?: () => void }) {
       onClick={() => onClick && onClick()}
     >
       <img src="/images/icons/go.png" className={cn(
-        "w-[50px] h-[50px]",
+        "w-[24px] h-[24px]",
         hover ? 'drop-shadow': ''
       )} alt="" />
     </button>
