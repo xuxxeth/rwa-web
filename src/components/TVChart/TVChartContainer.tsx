@@ -5,12 +5,14 @@ import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/cons
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
 
+let initChart: any
 
 export const TVChartContainer = memo(
   ({ token, from }: { token: IRwa, from?: string}) => {
     const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
     const dataFeedRef = useRef<IBasicDataFeed | null>(null)
+    const tvWidgetReady = useRef(false)
     
     useEffect(() => {
       let mounted = true;
@@ -20,17 +22,17 @@ export const TVChartContainer = memo(
         return
       }
 
-      const initChart = () => {
+      initChart = (rwa?: IRwa) => {
         const elem = chartContainerRef.current;
         if (!mounted || !elem) {
           initTimer = window.setTimeout(initChart, 100);
           return;
         }
         if (!dataFeedRef.current) {
-          dataFeedRef.current = getDataFeed({ name: token.symbol, token })
+          dataFeedRef.current = getDataFeed({ name: rwa?.symbol || token.symbol, token: rwa || token })
         }
         const widgetOptions: ChartingLibraryWidgetOptions = {
-          symbol: token.symbol,
+          symbol: rwa?.symbol || token.symbol,
           debug: false,
           datafeed: dataFeedRef.current,
           theme: "dark",
@@ -62,6 +64,7 @@ export const TVChartContainer = memo(
         if (window.TradingView?.widget) {
           tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
           tvWidgetRef.current?.onChartReady(function () {
+            tvWidgetReady.current = true
               // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
               // priceScale?.setAutoScale(true)
             // tvWidgetRef.current?.setDebugMode(true);
@@ -126,6 +129,28 @@ export const TVChartContainer = memo(
         }
       };
     }, []);
+
+        // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
+    useEffect(() => {
+      if (tvWidgetRef.current && token?.symbol && tvWidgetReady.current ) {
+        tvWidgetRef.current.remove(); // 或 chartRef.current.dispose() 视库而定
+        tvWidgetRef.current = null;
+        dataFeedRef.current = null
+        initChart && initChart(token)
+        // const chart = tvWidgetRef.current?.activeChart();
+        // if (chart) {
+        //   console.log("[TradingView] setSymbol:", token.symbol);
+        //   chart.resetData?.();         // 清除 TradingView 自身缓存
+        //   // ✅ 重新生成 datafeed
+        //   const newFeed = getDataFeed({ name: token.symbol, token })
+        //   dataFeedRef.current = newFeed
+        //   // @ts-ignore
+        //   chart?.setSymbol(token.symbol, "15", () => {
+        //     console.log("symbol updated");
+        //   });
+        // }
+      }
+    }, [token?.symbol])
 
     return (
       <div className={cn(
