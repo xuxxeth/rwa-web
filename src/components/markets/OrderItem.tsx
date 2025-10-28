@@ -1,4 +1,4 @@
-import { memo, useState } from "react"
+import { memo, useMemo, useState } from "react"
 import { LazyImage } from "../image/LazyImage"
 import { useTranslation } from "@/hooks/useTranslation"
 import React from "react"
@@ -24,14 +24,17 @@ type OrderItemProps = {
   order: IOpenOrder,
   type: string,
   expand?: boolean,
-  cancelOrder?: (orderId: number) => void
+  canceling?: boolean,
+  cancelOrder?: (orderId: string) => void
   onExpand?: (orderId: string) => void
 }
 
 const OrderItem = memo(
-  ({ order, type, expand, cancelOrder, onExpand }: OrderItemProps) => {
+  ({ order, type, expand, canceling, cancelOrder, onExpand }: OrderItemProps) => {
+
     const { t } = useTranslation()
     const rwaToken = useRwaByStockId(order.stockId)
+    const disableCancel = useMemo(() => order.state === 8, [order.state])
     return (
       <div className="mt-2 p-2">
         <OrderItemWRap>
@@ -76,7 +79,12 @@ const OrderItem = memo(
             {toFixed(order.size, 0)}
           </div>
         </OrderItemWRap>
-        
+        <OrderItemWRap>
+          <div className="text-[14px] flex items-center gap-x-1">
+            {t('assets.order.orderStatus')}
+          </div>
+          <OrderStatusCell state={order.state} />
+        </OrderItemWRap>
         {
           expand && 
           <>
@@ -116,15 +124,7 @@ const OrderItem = memo(
                 </OrderItemWRap>
             }
             
-            <OrderItemWRap>
-              <div className="text-[14px] flex items-center gap-x-1">
-                {t('assets.order.orderStatus')}
-              </div>
-              {/* <div className=" h-[21px] px-2 flex items-center rounded-[4px] bg-[rgba(38,192,226,0.1)] text-[rgba(38,192,226,1)] font-medium text-[10px]">
-                10 {t('days')}
-              </div> */}
-              <OrderStatusCell state={order.state} />
-            </OrderItemWRap>
+            
             {
               type === 'history' && 
               <>
@@ -157,12 +157,15 @@ const OrderItem = memo(
               <div className="text-[14px] flex items-center gap-x-1">
                 {t('Actions')}
               </div>
-              <button className=" h-[21px] px-4 flex items-center rounded-[4px] bg-[rgba(255,255,255,0.1)] text-[#1A85FF] font-medium text-[14px] cursor-pointer"
+              <button disabled={disableCancel} className={cn(
+                " h-[21px] px-4 flex items-center rounded-[4px] bg-[rgba(255,255,255,0.1)] text-[#1A85FF] font-medium text-[14px] cursor-pointer",
+                disableCancel || canceling ? "opacity-60" : ""
+              )}
                 onClick={() => {
-                  cancelOrder && cancelOrder(Number(order.orderId))
+                  cancelOrder && cancelOrder(order.orderId)
                 }}
               >
-                {t('assets.order.cancelOrder')}
+                {canceling ? t('assets.order.cancelOrdering') : t('assets.order.cancelOrder')}
               </button>
             </OrderItemWRap>
         }

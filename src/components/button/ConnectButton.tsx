@@ -24,6 +24,7 @@ import CopyButton from './copyButton'
 import { useTokenBalance } from '@/hooks/useTokenBalances'
 import { useBaseStore } from '@/stores/baseStore'
 import { useRouter } from '@/hooks/useRouter'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 
 export function WalletItem({
   wallet,
@@ -68,8 +69,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const chains = useBaseStore(state => state.chainList)
   const showConnect = useBaseStore(state => state.showConnect)
   const setShowConnect = useBaseStore(state => state.setShowConnect)
-  const connectInit = useBaseStore(state => state.connectInit)
-  const setConnectInit = useBaseStore(state => state.setConnectInit)
+  // const connectInit = useBaseStore(state => state.connectInit)
+  // const setConnectInit = useBaseStore(state => state.setConnectInit)
 
   const currentWallet = useBaseStore(state => state.currentWallet)
   const setCurrentWallet = useBaseStore(state => state.setCurrentWallet)
@@ -80,6 +81,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
   const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains]) 
+
+  const disconnectInit = useRef(false)
+  const connectInit = useRef(false)
 
   // 默认执行一次连接钱包操作
   useEffect(() => {
@@ -100,12 +104,13 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
     if (account) {
       // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
-      if (!connectInit) {
+      if (!connectInit.current) {
         toastSuccess({
           title: t('connectSuccess')
         })
         setTimeout(() => {
-          setConnectInit(true)
+          connectInit.current = true
+          disconnectInit.current = false
         }, 1000)
       }
       storage.setItem(CONNECT_ACCOUNT, account)
@@ -114,12 +119,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [wallets, chainId, account, handleConnect])
 
   useEffect(() => {
-    if (account && connectInit) {
+    if (account && connectInit.current) {
       // 判断chainId是不是支持的链
       const chain = chains.find(chain => chain.id === chainId)
       if (!chain) {
         handleDisConnect()
-        setConnectInit(false)
+        connectInit.current = false
         // 请切换到支持的链
         toastError({
           title: t('switchNetwork', { network: network }),
@@ -127,14 +132,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       }
     }
   }, [account, chainId, chains, handleDisConnect])
-
   useEffect(() => {
-    if (connectInit && !account) {
+    if (!account && !disconnectInit.current) {
+      disconnectInit.current = true
       toastError({
         title: t('walletDisconnect'),
       })
       setTimeout(() => {
-        setConnectInit(false)
+        connectInit.current = false
       }, 1000)
     }
   }, [account])
@@ -146,7 +151,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (account && connectorType) {
       setConnectorType(undefined)
     }
-  }, [account])
+  }, [account, showConnect])
 
   useEffect(() => {
     if (!showConnect) {
@@ -190,8 +195,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           {account || t('Connect Wallet')}
         </div>
       ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <HoverCard>
+          <HoverCardTrigger asChild>
             <div
               className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'
               onClick={() => {}}
@@ -203,10 +208,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 {shortenAddress(account)}
               </div>
             </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
+          </HoverCardTrigger>
+          <HoverCardContent
             align='end'
-            className='bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2'
+            className='bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2 -mr-[16px]'
           >
             <div
               className='bg-[#131823] rounded-[8px] pt-4 text-white'
@@ -253,8 +258,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 <div className='ml-2 text-sm font-semibold'>{t('Disconnect')}</div>
               </div>
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </HoverCardContent>
+        </HoverCard>
       )}
 
       <DialogController topFixed title={dialogTitle} open={showConnect} openChange={setShowConnect}>

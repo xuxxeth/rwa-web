@@ -37,7 +37,7 @@ function Assets() {
 
   return (
     <>
-      <Menus />
+      {/* <Menus /> */}
       <MainLayout>
         <ContentLayout>
           {walltedConnected ? (

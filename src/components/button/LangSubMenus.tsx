@@ -4,6 +4,7 @@ import { languages } from "@/i18n";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
 import { lazy, useState } from "react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export function LanguageItem({
   title,
@@ -18,7 +19,7 @@ export function LanguageItem({
     <div 
       onClick={() => onClick && onClick()}
       className={cn(
-      "flex items-center justify-between py-4 cursor-pointer font-medium",
+      "flex items-center justify-between py-3 cursor-pointer font-medium",
       selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
     )}>
       <span className="text-[14px]">{title}</span>
@@ -36,31 +37,30 @@ export function LngSubMenus() {
     i18n.changeLanguage(lng);
   };
   const [currentSub, setCurrentSub] = useState(1)
+  const [open, setOpen] = useState(false)
   
   return (
-    <DropdownMenu
+    <HoverCard
+      open={open}
       onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          setTimeout(() => {
-            setCurrentSub(0)
-          }, 300)
-        }
+        setOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger asChild>
+      <HoverCardTrigger asChild>
         <div className=" flex items-center">
           <button className="cursor-pointer">
             <img src="/images/icons/language.png" className="w-10 h-10" alt="" />
           </button>
         </div>
-      </DropdownMenuTrigger>
-       <DropdownMenuContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[220px] border-none pt-2"
+      </HoverCardTrigger>
+       <HoverCardContent align="end" 
+          className="bg-[rgba(0,0,0,0)] w-[220px] border-none pt-2 -mr-[16px]"
        >
         <div 
-          className="bg-[#131823] rounded-[8px] text-white"
+          className="bg-[#131823] rounded-[8px] text-white relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
+          <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           {
             currentSub === 0 && 
             <div className=" px-4">
@@ -83,13 +83,19 @@ export function LngSubMenus() {
                   <img src="/images/icons/back.png" className="w-6" alt="" />
                   <span className="text-sm font-medium ml-2">{t('Back')}</span>
                 </div> */}
-                <div className=" px-4">
+                <div className=" px-4 py-2">
                   <LanguageItem title="English"  
-                    onClick={() => changeLanguage('en')}
+                    onClick={() => {
+                      changeLanguage('en')
+                      setOpen(false)
+                    }}
                     selected={i18n.language === 'en'}
                   />
                   <LanguageItem title="繁体中文" 
-                    onClick={() => changeLanguage('zh')}
+                    onClick={() => {
+                      changeLanguage('zh')
+                      setOpen(false)
+                    }}
                     selected={i18n.language === 'zh'}
                   />
                   
@@ -100,8 +106,8 @@ export function LngSubMenus() {
           
         </div>
         
-      </DropdownMenuContent>
+      </HoverCardContent>
       
-    </DropdownMenu>
+    </HoverCard>
   )
 }

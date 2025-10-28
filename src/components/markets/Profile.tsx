@@ -1,20 +1,37 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo } from "react"
 import { StatisticsItem } from "./StatisticsItem"
+import { cn } from "@/lib/utils"
 
 const Profile = memo(
-  () => {
+  ({ from }: {from?: string}) => {
     const { t } = useTranslation()
+    const itemClass = from === 'market' ? 'text-[16px]' : ''
     return (
       <div className=" text-white mt-8">
         <div className=" font-medium text-[18px] mb-2">{t('Profile')}</div>
         <div className=" grid grid-cols-4 gap-x-4 mb-2">
-          <StatisticsItem className="border-t" label={t('Company name')}>{'Amazon'}</StatisticsItem>
-          <StatisticsItem className="border-t" label={t('Listing date')}>{'29 Jun, 1994'}</StatisticsItem>
-          <StatisticsItem className="border-t" label={t('Chairman')}>{'Jeffrey P. Bezos'}</StatisticsItem>
-          <StatisticsItem className="border-t" label={t('Industry')}>{'Multiline Retail'}</StatisticsItem>
+          <StatisticsItem className={cn(
+            "border-t",
+            itemClass
+          )} label={t('Company name')}>{'Amazon'}</StatisticsItem>
+          <StatisticsItem className={cn(
+            "border-t",
+            itemClass
+          )} label={t('Listing date')}>{'29 Jun, 1994'}</StatisticsItem>
+          <StatisticsItem className={cn(
+            "border-t",
+            itemClass
+          )} label={t('Chairman')}>{'Jeffrey P. Bezos'}</StatisticsItem>
+          <StatisticsItem className={cn(
+            "border-t",
+            itemClass
+          )} label={t('Industry')}>{'Multiline Retail'}</StatisticsItem>
         </div>
-        <div className=" text-[14px] font-normal leading-[24px] relative">
+        <div className={cn(
+          " text-[14px] font-normal leading-[24px] relative",
+          itemClass
+        )}>
           Amazon.com, Inc. engages in the provision of online retail shopping services. It operates through the following business segments: North America, International, and Amazon Web Services (AWS). The North America segment includes retail sales of consumer products and subscriptions through International, and Amazon...
           {/* <div className="text-[#1A85FF] text-[16px] absolute bottom-0 right-0 cursor-pointer">{t('Read more')}</div> */}
         </div>

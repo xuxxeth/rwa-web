@@ -14,6 +14,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssOn } from './hooks/useWssOn'
 import { Loading } from './components/loading'
 import { useMarketState } from './hooks/useMarketState'
+import { Menus } from './components/menu'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -62,6 +63,7 @@ function App() {
       <Suspense fallback={<div className=' text-white flex justify-center items-center h-screen '><Loading /></div>}>
         <BrowserRouter>
           <ScrollToTop />
+          <Menus />
           <RoutesWrapper />
         </BrowserRouter>
         <Toaster position='top-center' />

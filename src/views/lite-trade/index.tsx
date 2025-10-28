@@ -48,7 +48,7 @@ function LiteTrade() {
 
   return (
     <>
-      <Menus />
+      {/* <Menus /> */}
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white px-[120px]">
           <MarketTrading/>
