@@ -22,7 +22,7 @@ export const RwaPrice = (
     if (!rwaPrice) return null
     return (
       <div className="flex items-center">
-        <span className="text-[20px] text-white">{rwaPrice.price || '--'}</span>
+        <span className="text-[20px] text-white">${rwaPrice.price || '--'}</span>
         <span
           className={cn(
             "text-[14px] font-medium ml-4 w-[68px] h-[25px] flex items-center justify-center bg-[rgba(255,255,255,0.1)] rounded-[8px]",

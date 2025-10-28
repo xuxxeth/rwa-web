@@ -5,14 +5,17 @@ import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import storage from "@/utils/storage";
 import { LATEST_WALLET_UUID } from "@/config/constants";
 import { useBaseStore } from "@/stores/baseStore";
+import { cn } from "@/lib/utils";
 
 const ConnectButtonText = memo(
-  () => {
+  ({ className }: {className?: string}) => {
     const { t } = useTranslation();
-    const { wallets, handleConnect} = useActiveWeb3()
     const setShowConnect = useBaseStore(state => state.setShowConnect)
     return (
-      <Button className="bg-white text-black w-full"
+      <Button className={cn(
+        "bg-white text-black w-full",
+        className
+      )}
         onClick={async () => {
           setShowConnect(true)
           // const latestWalletUUID = storage.getItem(LATEST_WALLET_UUID)

@@ -1,7 +1,5 @@
-import { Menus } from "@/components/menu";
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
-import { LazyImage } from "@/components/image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ConverBody } from "../../components/markets/ConvetBody";
 import { InvestBody } from "../../components/markets/InvestBody";
@@ -48,7 +46,6 @@ function LiteTrade() {
 
   return (
     <>
-      {/* <Menus /> */}
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white px-[120px]">
           <MarketTrading/>
