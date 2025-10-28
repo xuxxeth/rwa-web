@@ -1,6 +1,6 @@
 import { LazyImage } from "@/components/image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
-import { ConnectButton } from "@/components/button/ConnectButton";
+import { ConnectButtonText } from "../button/ConnectButtonText";
 
 function WalletNotConnected() {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ function WalletNotConnected() {
         <div className="text-60 text-base/6 font-normal mb-8">
           {t("assets.connectWalletTip")}
         </div>
-        <ConnectButton connectBtnClassName="bg-white rounded-2xl text-black mx-1 justify-center text-base/6 w-full py-2 h-14" />
+        <ConnectButtonText className="bg-white rounded-2xl text-black mx-1 justify-center text-base/6 w-full py-2 h-14" />
       </div>
     </div>
   );

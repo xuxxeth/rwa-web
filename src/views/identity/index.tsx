@@ -1,4 +1,3 @@
-import { Menus } from '@/components/menu'
 import { MainLayout } from '@/layouts/main'
 import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
@@ -13,7 +12,6 @@ function Identity() {
 
   return (
     <>
-      {/* <Menus /> */}
       <MainLayout>
         <IdentityLayout>
           <div className='mt-8'>

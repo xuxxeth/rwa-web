@@ -1,5 +1,4 @@
 
-import { Menus } from "@/components/menu";
 import { XFooter } from "@/components/footer";
 import { lazy } from "react";
 import { Section1 } from "./components/Section1";
@@ -21,7 +20,6 @@ function Home() {
 
   return (
     <div className=" font-normal">
-      {/* <Menus /> */}
       <Section1 />
       <Section2 />
       <Section3 />

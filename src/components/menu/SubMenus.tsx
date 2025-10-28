@@ -89,7 +89,7 @@ export function SubMenus({
               }}
               selected={isPro}
             />
-            <SubMenuItem title={t('instantTrade')}
+            <SubMenuItem title={t('Lite Trade')}
               onClick={() => {
                 router.push('/lite-trade')
                 setOpen(false)

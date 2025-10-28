@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef } from "react";
 import { getDataFeed, tagSession } from "./datafeed";
-import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
+import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IBasicDataFeed, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ export const TVChartContainer = memo(
   ({ token, from }: { token: IRwa, from?: string}) => {
     const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
+    const dataFeedRef = useRef<IBasicDataFeed | null>(null)
     
     useEffect(() => {
       let mounted = true;
@@ -25,10 +26,13 @@ export const TVChartContainer = memo(
           initTimer = window.setTimeout(initChart, 100);
           return;
         }
+        if (!dataFeedRef.current) {
+          dataFeedRef.current = getDataFeed({ name: token.symbol, token })
+        }
         const widgetOptions: ChartingLibraryWidgetOptions = {
           symbol: token.symbol,
           debug: false,
-          datafeed: getDataFeed({ name: token.symbol, token }),
+          datafeed: dataFeedRef.current,
           theme: "dark",
           locale:"en",
           container: elem,
@@ -46,7 +50,7 @@ export const TVChartContainer = memo(
           custom_css_url: "/libraries/charting_library/tradingview-chart.css",
           timezone:"Asia/Hong_Kong",
           overrides: chartOverrides,
-          interval: "1" as ResolutionString,
+          interval: "15" as ResolutionString,
           studies_overrides: {
             // "volume.volume.color.0": "rgba(255, 0, 0, 0.5)",  // 下跌柱颜色
             // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色

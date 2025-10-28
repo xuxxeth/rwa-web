@@ -1,4 +1,3 @@
-import { Menus } from "@/components/menu";
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "@/components/BoxCard";
 import { LazyImage } from "@/components/image/LazyImage";
@@ -48,7 +47,6 @@ function Markets() {
 
   return (
     <>
-      {/* <Menus /> */}
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ">
           <div className="flex items-center text-[12px] font-normal my-3">

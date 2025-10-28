@@ -64,6 +64,9 @@ const configurationData: DatafeedConfiguration = {
 let lastRequestTime = 0;
 const requestInterval = 1500; // 设置请求时间间隔，单位：毫秒
 let hasLoadedInitialData = false;
+let subscribeBarOn = ''
+let subscribeBarFn: any = undefined
+const wsListeners = new Map<string, any>()
 
 export function getDataFeed({
   pairIndex,
@@ -186,33 +189,37 @@ export function getDataFeed({
       subscriberUID,
       onResetCacheNeededCallback,
     ) => {
-      // subscribeOnStream(
-      //   symbolInfo,
-      //   resolution,
-      //   onRealtimeCallback,
-      //   subscriberUID,
-      //   onResetCacheNeededCallback,
-      //   lastBarsCache.get(symbolInfo.name)!,
-      //   pairIndex,
-      // );
-      console.log('symbolInfo: ', symbolInfo)
-      // wsService.on('summary', (data) => {
-      //   const bar = data.find(item => item.S === symbolInfo.ticker)
-      //   if (bar) {
-      //     onRealtimeCallback({
-      //       "time": Date.now(),
-      //       "open": bar.o,
-      //       "high": bar.h,
-      //       "low": bar.l,
-      //       "close": bar.c,
-      //       "volume": 0,
-      //     })
-      //   }
-      // })
+
+      console.log('symbolInfo: ', symbolInfo, resolution)
+      let _resolution = `${resolution}m`
+      if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
+        _resolution = resolution.toLowerCase()
+      }
+      const key = `candle.${symbolInfo.name}_${_resolution}`
+      const listener = (data: any) => { 
+        if (data.c > 0) {
+          onRealtimeCallback({
+            "time": data.E,
+            "open": data.o,
+            "high": data.h,
+            "low": data.l,
+            "close": data.c,
+            "volume": 0,
+          })
+        }
+      }
+      wsListeners.set(subscriberUID, { key, listener })
+      // @ts-ignore
+      wsService.on(key, listener)
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
-      // unsubscribeFromStream(subscriberUID);
+      
+      const sub = wsListeners.get(subscriberUID)
+      if (sub) {
+        wsService.off(sub.key, sub.listener)
+        wsListeners.delete(subscriberUID)
+      }
     },
   };
 }

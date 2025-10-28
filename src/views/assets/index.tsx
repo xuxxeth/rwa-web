@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Menus } from '@/components/menu'
 import { XFooter } from '@/components/footer'
 import { MainLayout } from '@/layouts/main'
 import ContentLayout from '@/layouts/content'
@@ -37,7 +36,6 @@ function Assets() {
 
   return (
     <>
-      {/* <Menus /> */}
       <MainLayout>
         <ContentLayout>
           {walltedConnected ? (
