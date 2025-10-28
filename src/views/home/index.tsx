@@ -21,7 +21,7 @@ function Home() {
 
   return (
     <div className=" font-normal">
-      <Menus />
+      {/* <Menus /> */}
       <Section1 />
       <Section2 />
       <Section3 />

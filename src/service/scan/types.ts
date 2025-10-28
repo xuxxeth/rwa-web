@@ -3,7 +3,7 @@ export type OrderType = 0 | 1;
 // 0 买单 1 卖单
 export type OrderSide = 0 | 1;
 // 0 等待提交 1 部分成交 2 下单失败（无成交） 3 撤单（无成交） 4 部分撤单  5 全部成交 6 废单 7 收市撤单（无成交）
-export type OrderState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type OrderState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 // 0 未风控 1已风控
 export type RiskState = 0 | 1;
 

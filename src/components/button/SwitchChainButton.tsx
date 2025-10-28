@@ -5,6 +5,7 @@ import storage from "@/utils/storage";
 import { getChainIconById } from "@/utils/chains";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export function ChainItem({
   title,
@@ -61,13 +62,13 @@ export function SwitchButton() {
   }, [chains])
 
   return (
-    <DropdownMenu
+    <HoverCard
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger asChild
+      <HoverCardTrigger asChild
       >
         {
           selected ? 
@@ -83,14 +84,15 @@ export function SwitchButton() {
           </div> : null
         }
         
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2"
+      </HoverCardTrigger>
+      <HoverCardContent align="end" 
+          className="bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2 -mr-[16px]"
        >
         <div 
-          className="bg-[#131823] rounded-[8px] py-4 text-white"
+          className="bg-[#131823] rounded-[8px] py-4 text-white relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
+          <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           <div className=" px-4">
             {
               chains.map((chain) => {
@@ -113,8 +115,8 @@ export function SwitchButton() {
           
         </div>
         
-      </DropdownMenuContent>
+      </HoverCardContent>
       
-    </DropdownMenu>
+    </HoverCard>
   )
 }

@@ -33,7 +33,7 @@ const RwaItem = memo(
   ({ data, onClick }: { data: IRwa, onClick?: (data: IRwa) => void}) => {
     const { t } = useTranslation()
     return (
-      <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white cursor-pointer rwa-card"
+      <div className="bg-[rgba(255,255,255,0.04)] rounded-[8px] p-8 text-white cursor-pointer transition-all hover:bg-[rgba(255,255,255,0.1)]"
         onClick={() => {
           onClick && onClick(data)
         }}

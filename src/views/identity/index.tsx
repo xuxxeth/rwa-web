@@ -13,7 +13,7 @@ function Identity() {
 
   return (
     <>
-      <Menus />
+      {/* <Menus /> */}
       <MainLayout>
         <IdentityLayout>
           <div className='mt-8'>

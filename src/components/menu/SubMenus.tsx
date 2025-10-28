@@ -6,6 +6,7 @@ import storage from "@/utils/storage";
 import { lazy, useMemo, useState } from "react";
 import { IconArrowDown } from "../icons/ArrowDown";
 import { useRouter } from "@/hooks/useRouter";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 
 export function SubMenuItem({
   title,
@@ -51,28 +52,35 @@ export function SubMenus({
   const isLite = useMemo(() => router.location.pathname === "/lite-trade", [router])
 
   return (
-    <DropdownMenu
+    <HoverCard
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen)
       }}
     >
-      <DropdownMenuTrigger asChild>
+      <HoverCardTrigger asChild>
         <div className={cn(
           "text-base font-normal text-[rgba(255,255,255,0.6)] cursor-pointer h-10 flex items-center leading-[40px]",
           isPro || isLite ? " font-semibold text-white" : ""
-        )}>
+        )}
+          onClick={e => {
+            e.stopPropagation()
+            e.preventDefault()
+            console.log(open)
+          }}
+        >
           { title }
           <IconArrowDown open={open} />
         </div>
-      </DropdownMenuTrigger>
-       <DropdownMenuContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[190px] border-none pt-0"
+      </HoverCardTrigger>
+       <HoverCardContent align="end" 
+          className="bg-[rgba(0,0,0,0)] w-[190px] border-none pt-0 -mr-[16px]"
        >
         <div 
-          className="bg-[#131823] rounded-[8px] text-white py-2"
+          className="bg-[#131823] rounded-[8px] text-white py-2 relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
+          <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           <div className=" px-4">
             <SubMenuItem title={t('proTrade')}
               onClick={() => {
@@ -93,8 +101,8 @@ export function SubMenus({
           
         </div>
         
-      </DropdownMenuContent>
+      </HoverCardContent>
       
-    </DropdownMenu>
+    </HoverCard>
   )
 }

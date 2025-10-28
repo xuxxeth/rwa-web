@@ -5,7 +5,7 @@ import { XFooter } from "@/components/footer";
 function Markets() {
   return (
     <>
-      <Menus />
+      {/* <Menus /> */}
       <Outlet />
       <XFooter />
     </>

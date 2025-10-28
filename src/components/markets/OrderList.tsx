@@ -22,6 +22,7 @@ const OrderList = memo(
     const { cancelOrder } = useTradeUtils()
     const { toastSuccess, toastError } = useToast()
     const [isCanceling, setIsCanceling] = useState(false)
+    const [cancelOrderId, setCancelOrderId] = useState('')
     const [loading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const [currentTab, setCurrentTab] = useState('open')
@@ -38,7 +39,6 @@ const OrderList = memo(
 
       setLoading(false)
       if (!res) {
-
         return
       }
       if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -68,10 +68,13 @@ const OrderList = memo(
       }
     }, [show])
 
-    const handleCancelOrder = useCallback(async (orderId: number) => {
+    const handleCancelOrder = useCallback(async (orderId: string) => {
       try {
+        if (isCanceling) return
         setIsCanceling(true)
+        setCancelOrderId(String(orderId))
         // TODO: 需要在 ca-common-web 里修复
+        // @ts-ignore
         const result = await cancelOrder(orderId, { wait: true })
         if (result && result?.code !== 9200) {
           // @ts-ignore
@@ -87,6 +90,12 @@ const OrderList = memo(
           }
           
         } else {
+          // 本地更新订单状态
+          const _orderIndex = openOrderList.findIndex(order => order.orderId === orderId)
+          if (_orderIndex > -1) {
+            openOrderList[_orderIndex].state = 8
+          }
+          setOpenOrderList([...openOrderList])
           toastSuccess({
             title: t('assets.order.cancelOrderSuccess'),
           })
@@ -97,7 +106,7 @@ const OrderList = memo(
       } finally {
         setIsCanceling(false)
       }
-    }, [t])
+    }, [t, isCanceling, openOrderList])
 
     return (
       <div className="w-[510px]">
@@ -118,6 +127,7 @@ const OrderList = memo(
                   cancelOrder={handleCancelOrder}
                   type={currentTab}
                   expand={currentOrderId === order.orderId}
+                  canceling={isCanceling && (cancelOrderId === order.orderId)}
                   onExpand={orderId => {
                     setCurrentOrderId(orderId)
                   }}

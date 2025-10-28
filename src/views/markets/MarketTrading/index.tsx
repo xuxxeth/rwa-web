@@ -20,6 +20,7 @@ import { DialogController, useShowDialog } from "@/components/dialog/DialogContr
 import { OrderList } from "@/components/markets/OrderList";
 import { useRouter } from "@/hooks/useRouter";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import IconOrder from "@/components/icons/order";
 
 function Markets() {
   const router = useRouter()
@@ -71,7 +72,7 @@ function Markets() {
                 <div className="flex items-center justify-between mt-5">
                   <div className="text-[16px] font-medium flex-1 border-b border-[rgba(255,255,255,0.1)] leading-6">{t('limit')}</div>
                   <div className="flex items-center gap-x-5">
-                    <button disabled={signing} className=" hover:bg-[rgba(255,255,255,0.1)] w-7 h-7 rounded-[8px] overflow-hidden cursor-pointer"
+                    <button disabled={signing} className=" hover:bg-[rgba(255,255,255,0.1)] rounded-[8px] overflow-hidden cursor-pointer"
                       onClick={async (e) => {
                         e.stopPropagation()
                         e.preventDefault()
@@ -90,7 +91,7 @@ function Markets() {
                         }
                       }}
                     >
-                      <LazyImage src="/images/convert/history.png" className="w-7 h-7 cursor-pointer" />
+                      <IconOrder />
                     </button>
                   </div>
                 </div>
