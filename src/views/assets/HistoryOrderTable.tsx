@@ -241,7 +241,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'executionTime',
     sortable: false,
     breakOnSpace: true,
-    render: (item: IOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
+    render: (item: IOrder) => <TextCell text={formatTimestamp(item.tradeTime)} />,
   },
   {
     key: 'status',

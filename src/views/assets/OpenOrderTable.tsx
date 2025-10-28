@@ -222,13 +222,13 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'action',
     sortable: false,
     render: (item: IOpenOrder, { refetch }) => (
-      <CancelOrderButton refetch={refetch} orderId={item.orderId} />
+      <CancelOrderButton refetch={refetch} orderId={item.orderId} disabled={item.state === 8} />
     ),
   },
 ]
 
-function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
-  const { refetch } = props
+function CancelOrderButton(props: { orderId: string; refetch: () => void; disabled: boolean }) {
+  const { refetch, disabled } = props
   const { t } = useTranslation()
   const { orderId } = props
   const { cancelOrder } = useTradeUtils()
@@ -272,11 +272,11 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void }) {
 
   return (
     <button
-      disabled={isCanceling}
+      disabled={isCanceling || disabled}
       onClick={handleCancelOrder}
       className={cn(
         'cursor-pointer text-sm/5.5 font-medium text-[rgba(26,133,255,1)]',
-        isCanceling && 'opacity-50 cursor-not-allowed'
+        (isCanceling || disabled) && 'opacity-50 cursor-not-allowed'
       )}
     >
       {isCanceling ? t('assets.order.cancelOrdering') : t('assets.order.cancelOrder')}

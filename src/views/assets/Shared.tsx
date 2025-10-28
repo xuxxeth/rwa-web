@@ -112,7 +112,7 @@ export const filledStatus = {
 export const pendingCancelStatus = {
   value: [8], //8 待撤单
   text: 'pendingCancel',
-  className: '',
+  className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
 }
 
 const ORDER_STATUS: { [key: number]: { text: string; className: string } } = [
