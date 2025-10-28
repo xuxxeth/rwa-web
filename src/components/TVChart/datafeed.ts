@@ -62,6 +62,7 @@ const configurationData: DatafeedConfiguration = {
 };
 
 let lastRequestTime = 0;
+let currentSymbol = ''
 const requestInterval = 1500; // 设置请求时间间隔，单位：毫秒
 let hasLoadedInitialData = false;
 let subscribeBarOn = ''
@@ -89,12 +90,11 @@ export function getDataFeed({
       _onResolveErrorCallback,
       _extension,
     ) => {
-
       // Symbol information object
       const symbolInfo: LibrarySymbolInfo = {
-        ticker: name || '',
-        name: name || '',
-        description: name || '',
+        ticker: symbolName || name || '',
+        name: symbolName || name || '',
+        description: symbolName || name || '',
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
@@ -102,7 +102,7 @@ export function getDataFeed({
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 10000,
-        exchange: "",
+        exchange: "RWA",
         has_intraday: true,
         visible_plots_set: 'ohlc',
         has_weekly_and_monthly: true,
@@ -143,10 +143,14 @@ export function getDataFeed({
       // }
       // 更新最后请求时间
       lastRequestTime = currentTime;
-      if (initialLoadComplete) {
-        return
-      }
-      console.log('get bar: ', resolution)      
+      // if (initialLoadComplete) {
+      //   return
+      // }
+      console.log('get bar: ', resolution)     
+      if (symbolInfo.name !== currentSymbol) {
+        currentSymbol = symbolInfo.name;
+        lastBarsCache.delete(symbolInfo.name);
+      } 
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
