@@ -68,6 +68,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const chains = useBaseStore(state => state.chainList)
   const showConnect = useBaseStore(state => state.showConnect)
   const setShowConnect = useBaseStore(state => state.setShowConnect)
+  const connectInit = useBaseStore(state => state.connectInit)
+  const setConnectInit = useBaseStore(state => state.setConnectInit)
 
   const currentWallet = useBaseStore(state => state.currentWallet)
   const setCurrentWallet = useBaseStore(state => state.setCurrentWallet)
@@ -78,7 +80,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
   const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains]) 
-  const connectInit = useRef<boolean>(false)
+
   // 默认执行一次连接钱包操作
   useEffect(() => {
     if (wallets.length > 0 && !account && !hasConnected.current) {
@@ -98,12 +100,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
     if (account) {
       // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
-      if (!connectInit.current) {
+      if (!connectInit) {
         toastSuccess({
           title: t('connectSuccess')
         })
         setTimeout(() => {
-          connectInit.current = true
+          setConnectInit(true)
         }, 1000)
       }
       storage.setItem(CONNECT_ACCOUNT, account)
@@ -112,12 +114,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [wallets, chainId, account, handleConnect])
 
   useEffect(() => {
-    if (account && connectInit.current) {
+    if (account && connectInit) {
       // 判断chainId是不是支持的链
       const chain = chains.find(chain => chain.id === chainId)
       if (!chain) {
         handleDisConnect()
-        connectInit.current = false
+        setConnectInit(false)
         // 请切换到支持的链
         toastError({
           title: t('switchNetwork', { network: network }),
@@ -125,6 +127,17 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       }
     }
   }, [account, chainId, chains, handleDisConnect])
+
+  useEffect(() => {
+    if (connectInit && !account) {
+      toastError({
+        title: t('walletDisconnect'),
+      })
+      setTimeout(() => {
+        setConnectInit(false)
+      }, 1000)
+    }
+  }, [account])
 
   useEffect(() => {
     if (account && showConnect) {
@@ -233,6 +246,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
                   await handleDisConnect()
+                  
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />

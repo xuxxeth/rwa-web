@@ -95,7 +95,8 @@
     "text2": "Privacy Policy",
     "text3": "Terms of Service",
     "text4": "Contact",
-    "text5": "Social"
+    "text5": "Social",
+    "text6": "Docs"
   },
   "marketQuotes": {
     "name": "NAME",
@@ -315,10 +316,20 @@
     "settlementStatusError": "Settlement status error",
     "settlementAmountError": "Settlement amount error",
     "settlementStockQuantityError": "Settlement stock quantity error",
-    "UnknownErro": "合约调用失败"
+    "UnknownErro": "合约调用失败",
+    "userReject": "请求被拒",
+    "approveError": "授权失败，请重新授权。失败原因：",
+    "signError": "交易签名失败。失败原因："
   },
+  "approveSuccess": "授权成功",
   "connectSuccess": "钱包连接成功",
+  "walletDisconnect": "钱包连接已断开",
   "switchNetwork": "请切换网络至 {{network}}",
   "amountMin": "订单金额不得小于",
-  "amountMax": "订单金额不得大于"
+  "amountMax": "订单金额不得大于",
+  "tradingHalt": "当前资产暂停交易",
+  "orderSuccess": "交易签名成功",
+  "Trade": "Trade",
+  "proTrade": "Pro Trade",
+  "instantTrade": "Instant Trade"
 }

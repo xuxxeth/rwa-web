@@ -27,9 +27,9 @@ export default function Section4() {
 
   return (
     <div className=" mt-[130px] text-white relative overflow-hidden pb-[130px]">
-      <div className="text-[44px] font-semibold capitalize text-center">{t('home.text8')}</div>
+      <div className="text-[36px] font-medium capitalize text-center">{t('home.text8')}</div>
       <div className="flex justify-center">
-        <div className=" text-center text-[#D4D4D4] text-[18px] capitalize w-[906px] mt-6">{t('home.text9')}</div>
+        <div className=" font-normal text-center text-[#D4D4D4] text-[18px] capitalize w-[906px] mt-6">{t('home.text9')}</div>
       </div>
       <div className="mt-[46px] flex justify-center">
         <div className=" grid grid-cols-2 gap-x-[87px]">

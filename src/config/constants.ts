@@ -144,3 +144,4 @@ export const enabledFeatures: ChartingLibraryFeatureset[] = [
 export const  DISCORD_URL = 'https://discord.com/invite/J34YYjTh'
 export const  X_URL = 'https://x.com/CyberAlpha_x'
 export const  TG_URL = 'https://t.me/+SI2ZHu3_QDdlY2Zl'
+export const  GITBOOK_URL = 'https://cyberalpha.gitbook.io/cyberalpha-docs'
