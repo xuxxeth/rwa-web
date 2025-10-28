@@ -16,6 +16,10 @@ import {
   ScrollLoadMore,
   AmountCell,
   ValueCell,
+  filledStatus,
+  partiallyFilledStatus,
+  failedStatus,
+  canceledStatus,
 } from './Shared'
 import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
@@ -131,19 +135,19 @@ export default function HistoryOrderTable(props: {
           items={[
             {
               key: 'filled',
-              value: '5',
+              value: filledStatus.value.join(','),
             },
             {
               key: 'partiallyFilled',
-              value: '1',
+              value: partiallyFilledStatus.value.join(','),
             },
             {
               key: 'canceled',
-              value: '3',
+              value: canceledStatus.value.join(','),
             },
             {
               key: 'failed',
-              value: '2',
+              value: failedStatus.value.join(','),
             },
           ]}
         />
