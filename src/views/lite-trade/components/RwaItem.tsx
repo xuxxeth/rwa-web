@@ -21,7 +21,7 @@ const RwaItemPrice = memo(
           {/* {
             up !== 0 && <LazyImage src={up > 0 ? '/images/convert/price_up.png' : '/images/convert/price_down.png'} className="w-[6px] mr-1" />
           } */}
-          {up !== 0 && up > 0 ? '+' : '-'}
+          {up !== 0 && (up > 0 ? '+' : '-')}
           {Math.abs(Number(rwaPrice.up))}%
         </div>
       </div>

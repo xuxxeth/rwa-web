@@ -60,7 +60,7 @@ export function LngSubMenus() {
           className="bg-[#131823] rounded-[8px] text-white relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
-          <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
+          <div className="h-[50px] w-[50px] absolute right-0 -top-[50px] bg-[rgba(0,0,0,1)]"></div>
           {
             currentSub === 0 && 
             <div className=" px-4">

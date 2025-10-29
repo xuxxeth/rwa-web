@@ -31,7 +31,7 @@ export const RwaPrice = (
               : "text-[rgba(227,80,122,1)] text-[14px]"
           )}
         >
-          {up !== 0 && up > 0 ? '+' : '-'}
+          {up !== 0 && (up > 0 ? '+' : '-')}
           {Math.abs(Number(rwaPrice?.up || "0"))}%
         </span>
       </div>

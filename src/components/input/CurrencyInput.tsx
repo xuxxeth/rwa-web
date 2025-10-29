@@ -41,7 +41,7 @@ const CurrencyInput = memo(
         <NumberInput 
           className={cn(
             "flex-1 min-w-0",
-            from === 'markets' ? ' placeholder:text-[18px] text-[24px] flex-1' : '',
+            from === 'markets' ? ' placeholder:text-[16px] text-[24px] flex-1' : '',
             isInsufficient ? "text-[#F6465D]" : ""
           )}
           placeholder={placeholder}
