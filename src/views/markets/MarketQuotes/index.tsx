@@ -46,10 +46,9 @@ export default function MarketQuotes() {
 
     return {
       ...rwa,
-      price: quote?.price || rwa.price,
-      up: quote?.up || rwa.up,
-      // @ts-ignore
-      dailyHigh: quote?.dailyHigh || rwa.dailyHigh,
+      price: quote?.price,
+      up: quote?.up,
+      dailyHigh: quote?.dailyHigh,
     }
   })
 
@@ -71,7 +70,10 @@ export default function MarketQuotes() {
         },
         {} as Record<string, IQuote>
       )
-      setTokenWithQuote(obj)
+      if (data.length > 10) {
+        setTokenWithQuote(obj)
+      }
+      
     }
 
     wsService.on('summary', listener)
