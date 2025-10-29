@@ -70,7 +70,10 @@ export default function MarketQuotes() {
         },
         {} as Record<string, IQuote>
       )
-      setTokenWithQuote(obj)
+      if (data.length > 10) {
+        setTokenWithQuote(obj)
+      }
+      
     }
 
     wsService.on('summary', listener)
