@@ -62,7 +62,12 @@ export default function Section2() {
                 rwaList.slice(0, 6).map((item, index) => {
                   return (
                     <RwaCard key={`${_id}-${index}`}>
-                      <div className="px-[32px] text-white flex flex-col justify-center h-full">
+                      <div className="px-[32px] text-white flex flex-col justify-center h-full"
+                        onClick={() => {
+                          updateInputToken(item)
+                          router.push('/lite-trade')
+                        }}
+                      >
                         <div className="flex items-center gap-x-[10px]">
                           <div className="w-[43px] h-[43px] rounded-full flex justify-center items-center">
                             <img src={item.icon} className=" w-full rounded-full" alt="" />
@@ -78,10 +83,7 @@ export default function Section2() {
                             <RwaPrice rwaData={item} />
                           </div>
                           <GoButton 
-                            onClick={() => {
-                              updateInputToken(item)
-                              router.push('/lite-trade')
-                            }}
+                            
                           />
                         </div>
                       </div>
