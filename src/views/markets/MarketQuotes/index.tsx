@@ -46,9 +46,10 @@ export default function MarketQuotes() {
 
     return {
       ...rwa,
-      price: quote?.price,
-      up: quote?.up,
-      dailyHigh: quote?.dailyHigh,
+      price: quote?.price || rwa.price,
+      up: quote?.up || rwa.up,
+      // @ts-ignore
+      dailyHigh: quote?.dailyHigh || rwa.dailyHigh,
     }
   })
 
