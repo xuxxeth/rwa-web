@@ -19,11 +19,15 @@ export function TableBody<T, Extra>(props: {
   config: ITableConfig<T, Extra>
   extra: Extra
   getKey: (item: T) => string | number
+  className?: string
 }) {
   const { data, config, extra, getKey } = props
   return data.map((item: T) => {
     return (
-      <div key={getKey(item)} className='flex flex-row px-4 border-b border-white/10'>
+      <div
+        key={getKey(item)}
+        className={cn('flex flex-row px-4 border-b border-white/10', props.className)}
+      >
         {config.map(({ render, width, key }) => {
           const style = width ? { flexBasis: width } : { flex: 1 }
           return (

@@ -111,7 +111,7 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
           ]}
           title='orderSide'
         />
-        <DropDownFilter
+        {/* <DropDownFilter
           data={tradeHistoryFilters.orderType}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
             updateTradeHistoryFilters({
@@ -123,7 +123,7 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             { key: 'market', value: '1' },
           ]}
           title={'orderType'}
-        />
+        /> */}
         <DatePickerWithRange
           userSelectedDateRange={{
             from: tradeHistoryFilters.startTime,

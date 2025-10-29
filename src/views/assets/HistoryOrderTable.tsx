@@ -111,7 +111,7 @@ export default function HistoryOrderTable(props: {
           ]}
           title={'orderSide'}
         />
-        <DropDownFilter
+        {/* <DropDownFilter
           data={orderHistoryFilters.orderType}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
             updateOrderHistoryFilters({
@@ -123,7 +123,7 @@ export default function HistoryOrderTable(props: {
             { key: 'market', value: '1' },
           ]}
           title={'orderType'}
-        />
+        /> */}
         <DropDownFilter
           data={orderHistoryFilters.states}
           onDataChange={(reduce: (prev: string[]) => string[]) =>

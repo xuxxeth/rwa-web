@@ -35,6 +35,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
         config={assetTableConfig}
         extra={{ rwaList } as { rwaList: IRwa[] }}
         getKey={(item: IAssetItem) => item.symbol}
+        className='cursor-pointer hover:bg-white/10 rounded-lg border-none'
       />
       {totalPage > 1 && (
         <Pagination
