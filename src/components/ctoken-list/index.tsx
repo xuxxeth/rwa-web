@@ -44,7 +44,7 @@ export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
               : "text-[rgba(227,80,122,1)] text-[12px]"
           }
         >
-          {up !== 0 && up > 0 ? '+' : '-'}
+          {up !== 0 && (up > 0 ? '+' : '-')}
           {Math.abs(Number(tokenPrice?.up || "0"))}%
         </span>
       </div>
