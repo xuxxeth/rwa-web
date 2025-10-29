@@ -1,12 +1,13 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
-import { memo } from "react"
+import { memo, useEffect } from "react"
 import { StatisticsItem } from "./StatisticsItem"
 import { useTradeStore } from "@/stores/tradeStore"
 import { shortenAddress } from "@/utils"
 import CopyButton from "../button/copyButton"
 import { useChainById } from "@/hooks/useChain"
 import { LazyImage } from "../image/LazyImage"
+import { baseApi } from "@/service/base/api"
 
 const Statistics = memo(
   ({ from }: {from?: string}) => {
@@ -14,6 +15,16 @@ const Statistics = memo(
     const itemClass = from === 'market' ? 'text-[16px]' : ''
     const inputToken = useTradeStore(state => state.inputToken)
     const chain = useChainById(inputToken?.chainId)
+
+    useEffect(() => {
+      if (inputToken) {
+        baseApi.getStatistic(inputToken.stockId)
+          .then(res => {
+            console.log(res, 22222222)
+          })
+      }
+      
+    }, [inputToken])
 
     return (
       <div>

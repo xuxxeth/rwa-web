@@ -130,7 +130,7 @@
     "assetsTab": {
       "token": "Token",
       "holdings": "Holdings",
-      "price": "Prive",
+      "price": "Price",
       "value": "Value(USD)",
       "actions": "Actions"
     },

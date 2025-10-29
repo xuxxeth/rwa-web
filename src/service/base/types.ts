@@ -124,3 +124,32 @@ export interface IRwaPrice {
   "pc": number, // 昨日收盘价
   "T": number  // 时间戳(秒)
 }
+
+export interface IStatistic {
+  "stockId": number,
+  "marketCap": number,
+  "totalShare": number,
+  "circShare": number,
+  "circCap": number,
+  "peTtm": number,
+  "peStatic": number,
+  "pb": number,
+  "onchainAddr": string
+}
+
+export interface IToptenshareholder {
+  "investor": string,
+  "heldSharesVolume": number,
+  "proportion": number,
+  "shareHoldingChange": number
+}
+
+export interface IProfile {
+  "stockId": number,
+  "companyName": string,
+  "listingDate": string,
+  "industry": string,
+  "chairman": string,
+  "intruduction": string,
+  "toptenshareholders": IToptenshareholder[]
+}
