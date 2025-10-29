@@ -109,7 +109,7 @@ export function ConverBody({
       stockId: String(inputToken?.stockId),
       tradeType: '0',
       side: action === 'buy' ? '0' : '1',
-      tif: '1',
+      tif: '0',
       sessionType: '0',
       paymentToken: outputToken?.address || '', // address
       validDate: String(expires), // D
@@ -175,6 +175,7 @@ export function ConverBody({
   )
 
   const buttonText = useMemo(() => {
+    if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
     if (inputToken?.state === 1) return t('tradingHalt')
@@ -186,10 +187,10 @@ export function ConverBody({
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, i18n.language])
 
   return (
-    <div className="mt-4">
+    <div className="mt-2">
       <CurrencyInputPanel
         value={limitPrice}
         from={from}
@@ -234,7 +235,7 @@ export function ConverBody({
         <Button variant={buttonVariant} 
           loading={buying}
           className={cn(
-            "w-full mt-8",
+            "w-full mt-4 ",
             from === 'markets' ? 'h-[52px]' : ''
           )}
           disabled={disabled || buying}

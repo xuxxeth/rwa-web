@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { LazyImage } from "../image/LazyImage"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[16px] text-[16px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#324054] disabled:bg-[#324054] disabled:text-[#6C86AD] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[16px] text-[16px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#324054] disabled:bg-[#324054] disabled:text-[#6C86AD] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {

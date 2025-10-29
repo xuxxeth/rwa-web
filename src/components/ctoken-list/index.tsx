@@ -10,6 +10,7 @@ import { useBaseStore } from "@/stores/baseStore";
 import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
+import { cn } from "@/lib/utils";
 
 export type CTokenProps = {
   stock: string,
@@ -26,7 +27,7 @@ export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
   const tokenPrice = useRwaPrice(symbol);
   const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="">
       <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
       <div className="flex items-center gap-x-[4px]">
         {/* {
@@ -140,7 +141,7 @@ const CTokenItem = memo(
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
 const CTokenList = memo(
-  ({ onClick }: { onClick?: (token: IRwa) => void}) => {
+  ({ from, onClick }: { from?: string, onClick?: (token: IRwa) => void}) => {
     const { t } = useTranslation()
     const { sort, onSortChange } = useTableSort<SortableField>()
     
@@ -185,7 +186,7 @@ const CTokenList = memo(
           }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal">
+          <div className=" flex items-center justify-between text-[12px] font-normal pr-2">
             <div className="w-1/3">{t("Name")}</div>
             <div className="flex items-center w-1/3 cursor-pointer"
               onClick={() => {
@@ -196,7 +197,10 @@ const CTokenList = memo(
             </div>
             <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
-          <div className="scroll-box h-[65vh] overflow-y-auto mt-2">
+          <div className={cn(
+            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-2",
+            from === "StockSelect" ? "h-[50vh]" : ""
+          )}>
             {
               sortTokens.map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
             }

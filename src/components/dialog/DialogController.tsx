@@ -32,6 +32,7 @@ export function DialogController({
   topFixed,
   top,
   open,
+  className,
   openChange
 }: {
   children?: React.ReactNode;
@@ -39,6 +40,7 @@ export function DialogController({
   topFixed?: boolean
   top?: number
   open: boolean
+  className?: string
   openChange: (open: boolean) => void
 }) {
   
@@ -48,7 +50,8 @@ export function DialogController({
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(
         'rounded-[16px]',
-        topFixed ? 'top-[10%] translate-y-[0]' : ''
+        topFixed ? 'top-[10%] translate-y-[0]' : '',
+        className
       )}
       >
         <DialogHeader>

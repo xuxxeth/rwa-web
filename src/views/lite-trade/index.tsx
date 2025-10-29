@@ -61,7 +61,7 @@ function LiteTrade() {
             <div className="flex-1 shrink-0">
               <BoxCard className="min-h-[448px] rounded-[32px]">
                 <ConvertTabs onChange={(tab) => setAction(tab.key)} />
-                <div className="flex items-center justify-between mt-5">
+                <div className="flex items-center justify-between mt-2">
                   <div className="text-[20px] font-medium">{t('limit')}</div>
                   <div className="flex items-center gap-x-4">
                     <button disabled={signing} className=" hover:bg-[rgba(255,255,255,0.1)] rounded-[8px] overflow-hidden cursor-pointer flex justify-center"
