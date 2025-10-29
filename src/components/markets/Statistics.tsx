@@ -20,7 +20,7 @@ const Statistics = memo(
       if (inputToken) {
         baseApi.getStatistic(inputToken.stockId)
           .then(res => {
-            console.log(res, 22222222)
+            console.log(res)
           })
       }
       
