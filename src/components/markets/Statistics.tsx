@@ -2,15 +2,26 @@ import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
 import { memo } from "react"
 import { StatisticsItem } from "./StatisticsItem"
+import { useTradeStore } from "@/stores/tradeStore"
+import { shortenAddress } from "@/utils"
+import CopyButton from "../button/copyButton"
+import { useChainById } from "@/hooks/useChain"
+import { LazyImage } from "../image/LazyImage"
 
 const Statistics = memo(
   ({ from }: {from?: string}) => {
     const { t } = useTranslation()
     const itemClass = from === 'market' ? 'text-[16px]' : ''
+    const inputToken = useTradeStore(state => state.inputToken)
+    const chain = useChainById(inputToken?.chainId)
+
     return (
       <div>
         <div className=" mt-6 font-medium text-[18px] mb-2">{t('Statistics')}</div>
-        <div className=" grid grid-cols-4 gap-x-8">
+        <div className={cn(
+          " grid gap-x-4",
+          from === 'market' ? " grid-cols-4" : "grid-cols-[1fr_1fr_1fr_1.5fr]"
+        )}>
           <StatisticsItem className={cn(
             "border-t",
             itemClass
@@ -36,6 +47,14 @@ const Statistics = memo(
           <StatisticsItem className={cn(
             itemClass
           )} label={t('P/B')}>{'17.75'}</StatisticsItem>
+          <StatisticsItem className={cn(
+            itemClass
+          )} label={t('Onchain Address')}>
+            <div className="flex items-center gap-x-2">
+              {chain && <LazyImage src={chain.icon} className="w-[16px] h-[16px]" />}
+              {shortenAddress(inputToken?.address || '') }
+              <CopyButton copyText={inputToken?.address || ''} />  
+            </div></StatisticsItem>
         </div>
       </div>
       

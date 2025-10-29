@@ -74,7 +74,7 @@ const CurrencyInputPanel = memo(
         inputFocus ? "border-[#FFFFFF]" : ""
       )}>
         <div className={cn(
-          "text-[#6C86AD] font-normal mb-[10px]",
+          "text-[#6C86AD] font-normal",
           from === 'markets' ? 'text-[14px]' : 'text-[14px]'
         )}>{label || ''}</div>
         <CurrencyInput 
@@ -125,6 +125,7 @@ const CurrencyInputPanel = memo(
             </div>
         }
         <DialogController
+          className="pr-4"
           topFixed
           title={t("Select a token")}
           open={tokenDialog.open}

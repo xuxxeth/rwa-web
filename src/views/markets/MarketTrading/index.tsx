@@ -2,11 +2,9 @@ import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "@/components/BoxCard";
 import { LazyImage } from "@/components/image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
-import { XFooter } from "@/components/footer";
 import { useEffect, useState } from "react";
 import { MarketTrading } from "@/components/market-trading";
 import { ConvertTabs } from "@/components/markets/ConvertTabs";
-import { KlineSwitch } from "@/components/markets/KlineSwitch";
 import { ConverBody } from "@/components/markets/ConvetBody";
 import { FAQ } from "@/components/markets/FAQ";
 import { KlineBody } from "../components/Klinebody";
@@ -49,7 +47,7 @@ function Markets() {
     <>
       <MainLayout>
         <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ">
-          <div className="flex items-center text-[12px] font-normal my-3">
+          {/* <div className="flex items-center text-[12px] font-normal my-3">
             <div 
               className=" cursor-pointer"
               onClick={() => {
@@ -58,7 +56,7 @@ function Markets() {
             >{t('Markets')}</div>
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
             <div>{inputToken?.symbol || '--'}</div>
-          </div>
+          </div> */}
           <MarketTrading align="left" />
           <div className="pt-5 flex gap-x-5">
             <div className="flex-1">

@@ -331,5 +331,6 @@
   "orderSuccess": "Transaction signed successfully.",
   "Trade": "Trade",
   "proTrade": "Pro Trade",
-  "instantTrade": "Instant Trade"
+  "instantTrade": "Instant Trade",
+  "Onchain Address": "Onchain Address"
 }

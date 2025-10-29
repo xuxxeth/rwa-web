@@ -18,7 +18,7 @@ const EstimatedInfo = memo(
     const { t } = useTranslation()
     const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
     return (
-      <div className="bg-[rgba(6,7,10,0.3)] rounded-[16px] p-4 mt-4 text-white font-normal text-[14px] flex flex-col gap-y-2">
+      <div className="bg-[rgba(6,7,10,0.3)] rounded-[16px] p-4 mt-2 text-white font-normal text-[14px] flex flex-col gap-y-2">
         {/* <BetweenText 
           left={<div className="flex items-center">
                 {t('Rete')}
