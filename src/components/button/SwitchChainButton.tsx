@@ -104,8 +104,11 @@ export function SwitchButton() {
                     disabled={chain.state === 0}
                     selected={selected?.id === chain.id} 
                     onClick={() => {
-                      setOpen(false)
-                      setSelected(chain)
+                      if (chain.state !== 0) {
+                        setOpen(false)
+                        setSelected(chain)
+                      }
+                      
                     }}
                   />
                 )
