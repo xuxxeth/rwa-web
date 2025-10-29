@@ -73,7 +73,6 @@ export default function MarketQuotes() {
       if (data.length > 10) {
         setTokenWithQuote(obj)
       }
-      
     }
 
     wsService.on('summary', listener)
@@ -103,6 +102,7 @@ export default function MarketQuotes() {
               config={MarketQuotesList}
               extra={{} as unknown}
               getKey={(item: IMarketQuote) => item.symbol}
+              className='cursor-pointer hover:bg-white/4'
             />
           </div>
           <div className='px-5 py-1 mt-2 text-sm/5.5'>{t('marketQuotes.quoteInfo')}</div>
@@ -187,13 +187,16 @@ const MarketQuotesList = [
   {
     key: 'change',
     sortable: true,
-    render: (item: IMarketQuote) => (
-      <TextCellWithColor
-        text={item.up ? textSuffix(item.up, '%', 0) : '--'}
-        change={strOrNumToSign(item.up ?? 0)}
-        withIcon={false}
-      />
-    ),
+    render: (item: IMarketQuote) => {
+      const change = strOrNumToSign(item.up ?? 0)
+      return (
+        <TextCellWithColor
+          text={item.up ? textPrefix(textSuffix(item.up, '%', 0), change === 1 ? '+' : '') : '--'}
+          change={change}
+          withIcon={false}
+        />
+      )
+    },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),
   },
   {
