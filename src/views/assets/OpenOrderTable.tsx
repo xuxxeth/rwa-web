@@ -15,6 +15,7 @@ import {
   OrderTypeCell,
   DropDownFilter,
   ScrollLoadMore,
+  TokenFilterItem,
 } from './Shared'
 import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, sleep } from '@/utils'
 import { useTradeUtils } from '@/hooks/useCaCommon'
@@ -97,6 +98,24 @@ export default function OpenOrderTable(props: {
     <>
       <div className='flex flex-row gap-4'>
         <DropDownFilter
+          data={openOrderFilters.stockIds}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOpenOrderFilters({
+              stockIds: reduce(openOrderFilters.stockIds),
+            })
+          }
+          itemRender={item => {
+            const token = rwaTokens.find(token => token.stockId.toString() === item.value)
+            return <TokenFilterItem icon={token?.icon} symbol={token?.symbol} name={token?.name} />
+          }}
+          items={rwaTokens.map(token => ({
+            key: token.stockId.toString(),
+            value: token.stockId.toString(),
+            label: token?.symbol || token?.name,
+          }))}
+          title={'token'}
+        />
+        <DropDownFilter
           data={openOrderFilters.side}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
             updateOpenOrderFilters({
@@ -137,6 +156,7 @@ export default function OpenOrderTable(props: {
             config={openOrderTableConfig}
             extra={{ rwaTokens, refetch }}
             getKey={(item: IOpenOrder) => item.id}
+            className='border-none hover:bg-white/10 rounded-lg'
           />
           <ScrollLoadMore<IOpenOrder>
             isFetchingNextPage={isFetchingNextPage}

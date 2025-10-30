@@ -1,4 +1,4 @@
-import { useState, type RefObject } from 'react'
+import { useState, type ReactNode, type RefObject } from 'react'
 import { LazyImage } from '@/components/image/LazyImage'
 import { cn, shortenAddress } from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -69,8 +69,8 @@ export function TokenCell(props: {
   name: string | undefined
 }) {
   return (
-    <div className='flex flex-row gap-2'>
-      {props.icon && <LazyImage className='w-10 h-10 rounded-[50%]' src={props.icon} />}
+    <div className={'flex flex-row gap-2'}>
+      {props.icon && <LazyImage className={'w-10 h-10 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col'>
         <div className='text-sm/6'>{props.token}</div>
         <div className='text-60 text-xs/4.5'>{props.name}</div>
@@ -163,11 +163,12 @@ export function OrderStatusCell(props: { state: number }) {
 export function DropDownFilter(props: {
   data: string[]
   onDataChange: (reduce: (prev: string[]) => string[]) => void
-  items: { key: string; value: string }[]
+  items: { key: string; value: string; label?: string }[]
   title: string
+  itemRender?: (item: { key: string; value: string }) => ReactNode
 }) {
   const { t } = useTranslation()
-  const { items } = props
+  const { items, itemRender } = props
   const [open, setOpen] = useState(false)
 
   const selectedTypes = props.data
@@ -212,7 +213,7 @@ export function DropDownFilter(props: {
                 {selectedTypes
                   .map(value => {
                     const item = items.find(item => item.value === value)
-                    return t(`assets.order.${item?.key}`)
+                    return item?.label || t(`assets.order.${item?.key}`)
                   })
                   .join(', ')}
               </span>
@@ -222,7 +223,7 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='bg-[rgba(19,24,35,1)] border-none w-[211px] py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='bg-[rgba(19,24,35,1)] border-none w-[211px] max-h-[280px] py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
             {[
@@ -256,7 +257,7 @@ export function DropDownFilter(props: {
                         checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
                       )}
                     >
-                      {t(`assets.order.${key}`)}
+                      {itemRender?.({ key, value }) || t(`assets.order.${key}`)}
                     </span>
                   </DropdownMenuItem>
                 )
@@ -322,4 +323,16 @@ export function formatAssetMount(amount: string | number) {
   }
   // 四舍五入取整
   return bnAmount.toFixed(0, BigNumber.ROUND_HALF_UP)
+}
+
+export function TokenFilterItem(props: { icon?: string; symbol?: string; name?: string }) {
+  return (
+    <div className={'flex flex-row gap-1.5'}>
+      <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props?.icon || ''} />
+      <div className='w-[64px] w-max-[64px] flex flex-col'>
+        <div className='text-sm/[17px]'>{props?.symbol}</div>
+        <div className='text-60 text-xs/[15px] truncate'>{props?.name}</div>
+      </div>
+    </div>
+  )
 }

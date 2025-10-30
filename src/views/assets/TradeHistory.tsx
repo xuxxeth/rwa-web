@@ -10,6 +10,7 @@ import {
   ScrollLoadMore,
   AmountCell,
   ValueCell,
+  TokenFilterItem,
 } from './Shared'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteTradeHistoryOptions, tradeHistoryOptions } from '@/queries'
@@ -99,6 +100,24 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
     <>
       <div className='flex flex-row gap-4'>
         <DropDownFilter
+          data={tradeHistoryFilters.stockIds}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateTradeHistoryFilters({
+              stockIds: reduce(tradeHistoryFilters.stockIds),
+            })
+          }
+          itemRender={item => {
+            const token = rwaTokens.find(token => token.stockId.toString() === item.value)
+            return <TokenFilterItem icon={token?.icon} symbol={token?.symbol} name={token?.name} />
+          }}
+          items={rwaTokens.map(token => ({
+            key: token.stockId.toString(),
+            value: token.stockId.toString(),
+            label: token?.symbol || token?.name,
+          }))}
+          title={'token'}
+        />
+        <DropDownFilter
           data={tradeHistoryFilters.side}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
             updateTradeHistoryFilters({
@@ -146,6 +165,7 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             config={tradeHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
+            className='border-none hover:bg-white/10 rounded-lg mt-1'
           />
           <ScrollLoadMore<ITrade>
             isFetchingNextPage={isFetchingNextPage}

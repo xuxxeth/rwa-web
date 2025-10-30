@@ -188,6 +188,7 @@
       "side": "Side",
       "orderType": "Order Type",
       "orderSide": "Order Side",
+      "token": "Token",
       "orderStatus": "Status",
       "all": "All",
       "buy": "Buy",
