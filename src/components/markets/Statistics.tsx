@@ -1,6 +1,6 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
-import { memo, useEffect } from "react"
+import { memo, useEffect, useRef } from "react"
 import { StatisticsItem } from "./StatisticsItem"
 import { useTradeStore } from "@/stores/tradeStore"
 import { shortenAddress } from "@/utils"
@@ -15,16 +15,17 @@ const Statistics = memo(
     const itemClass = from === 'market' ? 'text-[16px]' : ''
     const inputToken = useTradeStore(state => state.inputToken)
     const chain = useChainById(inputToken?.chainId)
-
+    const initRef = useRef(false)
     useEffect(() => {
-      if (inputToken) {
+      if (inputToken?.stockId && !initRef.current) {
+        initRef.current = true
         baseApi.getStatistic(inputToken.stockId)
           .then(res => {
             console.log(res)
           })
       }
       
-    }, [inputToken])
+    }, [inputToken?.stockId])
 
     return (
       <div>
