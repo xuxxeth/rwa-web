@@ -135,7 +135,6 @@
       "actions": "Actions"
     },
     "tradeHistory": {
-      "rk": "Risk Lock",
       "tableHeader": {
         "side": "Side",
         "type": "Type",
@@ -151,6 +150,7 @@
       "openOrders": "Open Orders",
       "cancelOrder": "Cancel Order",
       "cancelOrderFailed": "Order cancellation failed.",
+      "rk": "Risk Lock",
 
       "tableHeader": {
         "side": "Side",

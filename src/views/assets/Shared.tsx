@@ -335,7 +335,7 @@ export function RiskLockFlag(props: { riskType: RiskType }) {
     <div className='absolute top-[4px] left-[5px] '>
       <button className='flex flex-row items-center cursor-pointer justify-center gap-1 bg-[rgba(246,70,93,0.1)] font-medium text-[10px]/3 rounded-lg w-[80px] px-1 h-4'>
         <img className='w-2 h-2' src='/images/icons/assets/issue.png' />
-        {t('assets.tradeHistory.rk')}
+        {t('assets.order.rk')}
       </button>
     </div>
   )

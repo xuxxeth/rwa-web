@@ -64,9 +64,11 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     req.headers.set('Authorization', auth)
   }
   const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
+  const lng = storage.getItem('CA_LANGUAGE') || 'en'
   
   req.headers.set('D11-Chain-Id', chainId)
   req.headers.set('CA-Chain-Id', chainId)
+  req.headers.set('Accept-Language', lng)
   
   return req
 })
