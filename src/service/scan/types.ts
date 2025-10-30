@@ -1,68 +1,72 @@
 // 0 限价单 1 市价单
-export type OrderType = 0 | 1;
+export type OrderType = 0 | 1
 // 0 买单 1 卖单
-export type OrderSide = 0 | 1;
+export type OrderSide = 0 | 1
 // 0 等待提交 1 部分成交 2 下单失败（无成交） 3 撤单（无成交） 4 部分撤单  5 全部成交 6 废单 7 收市撤单（无成交） // 8 待撤单
-export type OrderState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-// 0 未风控 1已风控
-export type RiskState = 0 | 1;
+export type OrderState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+// 0 未风控 1 已风控
+export type RiskType = 0 | 1
 
 export interface IOpenOrder {
-  id: number;
-  chainId: number;
-  orderId: string;
-  stockId: number;
-  orderType: OrderType;
-  side: OrderSide;
-  validDate: number;
-  amount: string;
-  size: string;
-  price: string;
-  state: OrderState;
-  settledAmount: string;
-  settledSize: string;
-  txTime: number;
-  txHash: string;
-  riskState: RiskState;
+  id: number
+  chainId: number
+  orderId: string
+  stockId: number
+  orderType: OrderType
+  side: OrderSide
+  validDate: number
+  amount: string
+  size: string
+  price: string
+  state: OrderState
+  settledAmount: string
+  settledSize: string
+  txTime: number
+  txHash: string
+  riskType: RiskType
+  reason: string
 }
 
 export interface IOrder {
-  id: number;
-  orderId: string;
-  chainId: number;
-  stockId: number;
-  orderType: OrderType;
-  side: OrderSide;
-  validDate: number;
+  id: number
+  orderId: string
+  chainId: number
+  stockId: number
+  orderType: OrderType
+  side: OrderSide
+  validDate: number
   // 委托金额
-  amount: string;
+  amount: string
   // 委托数量
-  size: string;
+  size: string
   // 委托价格
-  price: string;
+  price: string
   // 订单状态
-  state: OrderState;
+  state: OrderState
   // 成交金额
-  settledAmount: string;
+  settledAmount: string
   // 成交数量
-  settledSize: string;
-  riskState: RiskState;
-  txTime: number;
-  tradeTime: number;
-  txHash: string;
+  settledSize: string
+  riskType: RiskType
+  reason: string
+  txTime: number
+  tradeTime: number
+  txHash: string
 }
 
 export interface ITrade {
   // 成交金额
-  amount: string;
-  chainId: number;
-  id: string;
-  orderId: string;
-  orderType: OrderType;
-  side: OrderSide;
+  amount: string
+  chainId: number
+  id: string
+  orderId: string
+  orderType: OrderType
+  side: OrderSide
   // 成交数量
-  size: string;
-  stockId: number;
-  txHash: string;
-  txTime: number;
+  size: string
+  stockId: number
+  txHash: string
+  txTime: number
+  riskType: RiskType
+  reason: string
 }

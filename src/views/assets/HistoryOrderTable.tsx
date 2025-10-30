@@ -21,6 +21,9 @@ import {
   partiallyFilledStatus,
   failedStatus,
   canceledStatus,
+  TokenFilterItem,
+  isRiskLocked,
+  RiskLockFlag,
 } from './Shared'
 import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
@@ -108,15 +111,7 @@ export default function HistoryOrderTable(props: {
           }
           itemRender={item => {
             const token = rwaTokens.find(token => token.stockId.toString() === item.value)
-            return (
-              <div className={'flex flex-row gap-1.5'}>
-                <LazyImage className={'w-8 h-8 rounded-[50%]'} src={token?.icon || ''} />
-                <div className='w-[64px] w-max-[64px] flex flex-col'>
-                  <div className='text-sm/[17px]'>{token?.symbol}</div>
-                  <div className='text-60 text-xs/[15px] truncate'>{token?.name}</div>
-                </div>
-              </div>
-            )
+            return <TokenFilterItem icon={token?.icon} symbol={token?.symbol} name={token?.name} />
           }}
           items={rwaTokens.map(token => ({
             key: token.stockId.toString(),
@@ -200,7 +195,15 @@ export default function HistoryOrderTable(props: {
             config={orderHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
-            className='border-none hover:bg-white/10 rounded-lg'
+            className='border-none rounded-lg mt-1'
+            dynamicClassName={(item: IOrder) =>
+              isRiskLocked(item.riskType)
+                ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+                : 'hover:bg-white/10'
+            }
+            ExtraComponent={({ item }: { item: IOrder }) =>
+              isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+            }
           />
           <ScrollLoadMore<IOrder>
             isFetchingNextPage={isFetchingNextPage}

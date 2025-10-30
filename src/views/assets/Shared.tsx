@@ -13,7 +13,7 @@ import {
 import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed } from '@/utils'
-import type { OrderType } from '@/service/scan/types'
+import type { OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 
 export function TextCell(props: { text: string | number; className?: string }) {
@@ -323,6 +323,22 @@ export function formatAssetMount(amount: string | number) {
   }
   // 四舍五入取整
   return bnAmount.toFixed(0, BigNumber.ROUND_HALF_UP)
+}
+
+export function isRiskLocked(riskType: RiskType) {
+  return riskType === 1
+}
+
+export function RiskLockFlag(props: { riskType: RiskType }) {
+  const { t } = useTranslation()
+  return (
+    <div className='absolute top-[4px] left-[5px] '>
+      <button className='flex flex-row items-center cursor-pointer justify-center gap-1 bg-[rgba(246,70,93,0.1)] font-medium text-[10px]/3 rounded-lg w-[80px] px-1 h-4'>
+        <img className='w-2 h-2' src='/images/icons/assets/issue.png' />
+        {t('assets.tradeHistory.rk')}
+      </button>
+    </div>
+  )
 }
 
 export function TokenFilterItem(props: { icon?: string; symbol?: string; name?: string }) {
