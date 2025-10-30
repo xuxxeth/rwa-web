@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useRef } from 'react'
+import { LazyImage } from '@/components/image/LazyImage'
 import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
 import { type IRwa } from '@/service/base/types'
 import { orderHistoryOptions, infiniteOrderHistoryOptions } from '@/queries'
@@ -99,6 +100,32 @@ export default function HistoryOrderTable(props: {
     <>
       <div className='flex flex-row gap-4'>
         <DropDownFilter
+          data={orderHistoryFilters.stockIds}
+          onDataChange={(reduce: (prev: string[]) => string[]) =>
+            updateOrderHistoryFilters({
+              stockIds: reduce(orderHistoryFilters.stockIds),
+            })
+          }
+          itemRender={item => {
+            const token = rwaTokens.find(token => token.stockId.toString() === item.value)
+            return (
+              <div className={'flex flex-row gap-1.5'}>
+                <LazyImage className={'w-8 h-8 rounded-[50%]'} src={token?.icon || ''} />
+                <div className='w-[64px] w-max-[64px] flex flex-col'>
+                  <div className='text-sm/[17px]'>{token?.symbol}</div>
+                  <div className='text-60 text-xs/[15px] truncate'>{token?.name}</div>
+                </div>
+              </div>
+            )
+          }}
+          items={rwaTokens.map(token => ({
+            key: token.stockId.toString(),
+            value: token.stockId.toString(),
+            label: token?.symbol || token?.name,
+          }))}
+          title={'token'}
+        />
+        <DropDownFilter
           data={orderHistoryFilters.side}
           onDataChange={(reduce: (prev: string[]) => string[]) =>
             updateOrderHistoryFilters({
@@ -173,6 +200,7 @@ export default function HistoryOrderTable(props: {
             config={orderHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
+            className='border-none hover:bg-white/10 rounded-lg'
           />
           <ScrollLoadMore<IOrder>
             isFetchingNextPage={isFetchingNextPage}

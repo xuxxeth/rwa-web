@@ -15,10 +15,12 @@ function generateDefaultEndTime() {
 
 export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
   openOrderFilters: {
+    stockIds: ['all'],
     side: ['all'],
     states: ['all'],
   },
   orderHistoryFilters: {
+    stockIds: ['all'],
     side: ['all'],
     states: ['all'],
     orderType: ['all'],
@@ -26,6 +28,7 @@ export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
     endTime: generateDefaultEndTime(),
   },
   tradeHistoryFilters: {
+    stockIds: ['all'],
     side: ['all'],
     states: ['all'],
     orderType: ['all'],
@@ -48,6 +51,7 @@ export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
 }))
 
 export interface IOpenOrderFilter {
+  stockIds?: string
   side?: string
   after?: string
 }
@@ -57,10 +61,14 @@ export function generateOpenOrderFilterObj(filters: OrderFilterStore['openOrderF
   if (!filters.side.includes('all') && filters.side.length > 0 && filters.side.length < 2) {
     filterObj.side = filters.side.join(',')
   }
+  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
+    filterObj.stockIds = filters.stockIds.join(',')
+  }
   return filterObj
 }
 
 export interface IOpenOrderHistoryFilter {
+  stockIds?: string
   side?: string
   states?: string
   orderType?: string
@@ -76,6 +84,9 @@ export function generateOrderHistoryFilterObj(filters: OrderFilterStore['orderHi
   }
   if (!filters.states.includes('all') && filters.states.length > 0) {
     filterObj.states = filters.states.join(',')
+  }
+  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
+    filterObj.stockIds = filters.stockIds.join(',')
   }
   if (
     !filters.orderType.includes('all') &&
@@ -94,6 +105,7 @@ export function generateOrderHistoryFilterObj(filters: OrderFilterStore['orderHi
 }
 
 export interface ITradeHistoryFilter {
+  stockIds?: string
   side?: string
   after?: string
   startTime?: number
@@ -113,6 +125,9 @@ export function generateTradeHistoryFilterObj(filters: OrderFilterStore['tradeHi
   ) {
     filterObj.orderType = filters.orderType.join(',')
   }
+  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
+    filterObj.stockIds = filters.stockIds.join(',')
+  }
   if (filters.startTime) {
     filterObj.startTime = filters.startTime
   }
@@ -124,10 +139,12 @@ export function generateTradeHistoryFilterObj(filters: OrderFilterStore['tradeHi
 
 interface OrderFilterStore {
   openOrderFilters: {
+    stockIds: string[]
     side: string[]
     states: string[]
   }
   orderHistoryFilters: {
+    stockIds: string[]
     side: string[]
     orderType: string[]
     states: string[]
@@ -135,6 +152,7 @@ interface OrderFilterStore {
     endTime: number
   }
   tradeHistoryFilters: {
+    stockIds: string[]
     side: string[]
     states: string[]
     orderType: string[]
