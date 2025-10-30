@@ -11,6 +11,8 @@ import {
   AmountCell,
   ValueCell,
   TokenFilterItem,
+  isRiskLocked,
+  RiskLockFlag,
 } from './Shared'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteTradeHistoryOptions, tradeHistoryOptions } from '@/queries'
@@ -22,6 +24,7 @@ import { useOrderFilterStore, generateTradeHistoryFilterObj } from '@/stores/ord
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from './SignatureVerify'
 import { DatePickerWithRange } from '@/components/date-range-picker'
+import { LazyImage } from '@/components/image/LazyImage'
 
 function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa[] }) {
   const { chainId, account, rwaTokens } = props
@@ -165,7 +168,15 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             config={tradeHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
-            className='border-none hover:bg-white/10 rounded-lg mt-1'
+            className='border-none rounded-lg mt-1'
+            dynamicClassName={(item: ITrade) =>
+              isRiskLocked(item.riskType)
+                ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+                : 'hover:bg-white/10'
+            }
+            ExtraComponent={({ item }: { item: ITrade }) =>
+              isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+            }
           />
           <ScrollLoadMore<ITrade>
             isFetchingNextPage={isFetchingNextPage}

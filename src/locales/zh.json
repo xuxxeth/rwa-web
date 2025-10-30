@@ -144,6 +144,8 @@
     "order": {
       "openOrders": "當前委託",
       "cancelOrder": "取消訂單",
+      "cancelOrderFailed": "取消訂單失敗。",
+      "rk": "風險鎖定",
 
       "tableHeader": {
         "side": "方向",
@@ -182,6 +184,7 @@
       "side": "方向",
       "orderType": "訂單類型",
       "orderSide": "買賣方向",
+      "token": "代幣",
       "orderStatus": "狀態",
       "all": "全部",
       "buy": "買入",
