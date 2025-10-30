@@ -150,6 +150,6 @@ export interface IProfile {
   "listingDate": string,
   "industry": string,
   "chairman": string,
-  "intruduction": string,
-  "toptenshareholders": IToptenshareholder[]
+  "introduction": string,
+  "topTenShareholders": IToptenshareholder[]
 }
