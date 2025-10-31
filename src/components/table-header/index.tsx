@@ -20,13 +20,25 @@ export function TableBody<T, Extra>(props: {
   extra: Extra
   getKey: (item: T) => string | number
   className?: string
+  dynamicClassName?: (item: T) => string
+  ExtraComponent?: (props: { item: T }) => ReactNode
+  onClick?: (item: T) => void
 }) {
-  const { data, config, extra, getKey } = props
+  const { data, config, extra, getKey, ExtraComponent, onClick } = props
   return data.map((item: T) => {
     return (
       <div
         key={getKey(item)}
-        className={cn('flex flex-row px-4 border-b border-white/10', props.className)}
+        className={cn(
+          'flex flex-row px-4 border-b border-white/10',
+          props.className,
+          props.dynamicClassName?.(item) || ''
+        )}
+        onClick={() => {
+          if (onClick) {
+            onClick(item)
+          }
+        }}
       >
         {config.map(({ render, width, key }) => {
           const style = width ? { flexBasis: width } : { flex: 1 }
@@ -36,6 +48,7 @@ export function TableBody<T, Extra>(props: {
             </div>
           )
         })}
+        {ExtraComponent && <ExtraComponent item={item} />}
       </div>
     )
   })
