@@ -49,7 +49,7 @@ const TopTen = memo(
           <TopHeader />
           {
             topTen.map((top, index) => {
-              return <TopItem top={top} className={`${index % 2 === 0 ? "bg-[rgba(255,255,255,0.04)]" : ""}`}/>
+              return <TopItem key={top.investor} top={top} className={`${index % 2 === 0 ? "bg-[rgba(255,255,255,0.04)]" : ""}`}/>
             })
           }
           

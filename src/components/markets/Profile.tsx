@@ -33,7 +33,7 @@ const Profile = memo(
       <>
         <div className=" text-white mt-8">
           <ProfileTitle title={t('Profile')} className=" my-6" />
-          <div className=" grid grid-cols-4 gap-x-4 mb-2">
+          <div className=" grid grid-cols-4 gap-x-4 mb-2 items-start">
             <StatisticsItem className={cn(
               "border-t",
               itemClass
@@ -62,7 +62,6 @@ const Profile = memo(
           <div className={cn(
             " text-[14px] font-normal leading-[22px] relative pt-2 px-2",
             itemClass,
-            from === 'market' ? 'pt-6' : ''
           )}>
             <NumberText text={profileData?.introduction} />
             {/* <div className="text-[#1A85FF] text-[16px] absolute bottom-0 right-0 cursor-pointer">{t('Read more')}</div> */}
