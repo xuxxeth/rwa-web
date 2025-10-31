@@ -16,12 +16,10 @@ export default function RwaStateButton({ rwa }: { rwa: IRwa }) {
 export function BuyButton({ rwa }: { rwa: IRwa }) {
   const { t } = useTranslation()
   const router = useRouter()
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   return (
     <button
       onClick={() => {
-        updateInputToken(rwa)
         router.push('/markets/trading/' + symbolToLower(rwa.symbol))
       }}
       className='flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium h-10 px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer'

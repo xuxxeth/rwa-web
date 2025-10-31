@@ -30,12 +30,14 @@ import { type ISummaryData } from '@/service/webSocket/types'
 import { type IQuote } from '@/service/quote/types'
 import { useEffect, useState } from 'react'
 import { truncate, divide, subtract } from '@/utils'
+import { useRouter } from '@/hooks/useRouter'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
 export default function MarketQuotes() {
   const { t } = useTranslation()
   const { sort, onSortChange } = useTableSort<SortableField>()
+  const router = useRouter()
 
   const rwaList = useRwaTokens(false)
 
@@ -103,6 +105,9 @@ export default function MarketQuotes() {
               extra={{} as unknown}
               getKey={(item: IMarketQuote) => item.symbol}
               className='cursor-pointer hover:bg-white/4'
+              onClick={(item: IMarketQuote) => {
+                router.push('/markets/trading/' + symbolToLower(item.symbol))
+              }}
             />
           </div>
           <div className='px-5 py-1 mt-2 text-sm/5.5'>{t('marketQuotes.quoteInfo')}</div>
