@@ -80,13 +80,13 @@ export function TokenCell(props: {
 }
 
 export const openStatus = {
-  value: [0],
+  value: [0, 9], // 0 待提交 // 9 待成交
   text: 'open',
   className: 'text-[rgba(38,192,226,1)] bg-[rgba(38,192,226,0.1)]',
 }
 
 export const partiallyFilledStatus = {
-  value: [1, 4], // 1 部分成交 4 部成撤单
+  value: [1], // 1 部分成交
   text: 'partiallyFilled',
   className: 'text-[rgba(242,147,57,1)] bg-[rgba(242,147,57,0.1)]',
 }
@@ -98,13 +98,13 @@ export const failedStatus = {
 }
 
 export const canceledStatus = {
-  value: [3, 6, 7], // 3 撤单 6 废单 7 市场关闭撤单
+  value: [3], // 3 已撤销
   text: 'canceled',
   className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
 }
 
 export const filledStatus = {
-  value: [5], // 5 完全成交
+  value: [5], // 5 全部成交
   text: 'filled',
   className: 'text-[rgba(58,151,76,1)] bg-[rgba(58,151,76,0.1)]',
 }
@@ -128,27 +128,6 @@ const ORDER_STATUS: { [key: number]: { text: string; className: string } } = [
   })
   return acc
 }, {})
-
-// const ORDER_STATUS: { [key: number]: { text: string; className: string } } = {
-//   // 0 等待提交
-//   0: openStatus,
-//   // 1 部分成交
-//   1: partiallyFilledStatus,
-//   // 2 下单失败
-//   2: failedStatus,
-//   // 3 撤单
-//   3: canceledStatus,
-//   // 4 部成撤单
-//   4: partiallyFilledStatus,
-//   // 5 完全成交
-//   5: filledStatus,
-//   // 6 废单
-//   6: canceledStatus,
-//   // 7 市场关闭撤单
-//   7: canceledStatus,
-//   // 8 待撤单
-//   8: pendingCancelStatus,
-// }
 
 export function OrderStatusCell(props: { state: number }) {
   const { t } = useTranslation()
@@ -257,7 +236,9 @@ export function DropDownFilter(props: {
                         checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
                       )}
                     >
-                      {itemRender?.({ key, value }) || t(`assets.order.${key}`)}
+                      {key !== 'all' && itemRender
+                        ? itemRender?.({ key, value })
+                        : t(`assets.order.${key}`)}
                     </span>
                   </DropdownMenuItem>
                 )
