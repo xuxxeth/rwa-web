@@ -11,6 +11,7 @@ import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
+import { ScrollBox } from "../scroll-box";
 
 export type CTokenProps = {
   stock: string,

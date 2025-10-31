@@ -15,6 +15,7 @@ import { useWssOn } from './hooks/useWssOn'
 import { Loading } from './components/loading'
 import { useMarketState } from './hooks/useMarketState'
 import { Menus } from './components/menu'
+import { riskApi } from './service/risk/api'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -45,6 +46,8 @@ function App() {
   
   useEffect(() => {
     if (!chainId) return
+    riskApi.getUserConfig()
+
     // 初始化baseStore
     initBaseStore(chainId)
   }, [chainId])

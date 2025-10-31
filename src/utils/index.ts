@@ -134,3 +134,15 @@ export function openUrlInNewWindow(url: string) {
   }
   window.open(url, '_blank', 'noopener,noreferrer')
 }
+
+export function formatToQuarterLabel(dateStr: string | number) {
+  const year = Number(String(dateStr).slice(0, 4))
+  const month = Number(String(dateStr).slice(4, 6))
+
+  let quarter = 1
+  if (month >= 4 && month <= 6) quarter = 2
+  else if (month >= 7 && month <= 9) quarter = 3
+  else if (month >= 10 && month <= 12) quarter = 4
+
+  return `Q${quarter} ’${String(year).slice(2)}`
+}

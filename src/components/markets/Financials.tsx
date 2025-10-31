@@ -16,6 +16,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { baseApi } from "@/service/base/api";
 import type { IIndicators } from "@/service/base/types";
 import { formatLargeNumber } from "@/utils/format";
+import { formatToQuarterLabel } from "@/utils";
 
 const data = [
   { quarter: "Q2 '24", bar1: 10.6, bar2: 9.1, line: 50 },
@@ -105,10 +106,10 @@ const Financials = memo(
       const yoyKey = annualKey + '_yoy' as string
 
       let _data: any[] = []
-      indicatorsData.forEach(item => {
+      indicatorsData.sort((a, b) => a.report_period - b.report_period).forEach(item => {
 
         _data.push({
-          quarter: item.report_period, 
+          quarter: formatToQuarterLabel(item.report_period) , 
           // @ts-ignore
           bar1: item[annualKey], 
           
