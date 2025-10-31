@@ -1,6 +1,6 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
-import { memo, useEffect, useRef } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import { StatisticsItem } from "./StatisticsItem"
 import { useTradeStore } from "@/stores/tradeStore"
 import { shortenAddress } from "@/utils"
@@ -8,20 +8,25 @@ import CopyButton from "../button/copyButton"
 import { useChainById } from "@/hooks/useChain"
 import { LazyImage } from "../image/LazyImage"
 import { baseApi } from "@/service/base/api"
+import type { IStatistic } from "@/service/base/types"
+import { NumberText } from "../number-text"
+import { ProfileTitle } from "./ProfileTitle"
 
 const Statistics = memo(
   ({ from }: {from?: string}) => {
     const { t } = useTranslation()
-    const itemClass = from === 'market' ? 'text-[16px]' : ''
+    const itemClass = from === 'market' ? 'text-[16px] py-4' : ''
     const inputToken = useTradeStore(state => state.inputToken)
     const chain = useChainById(inputToken?.chainId)
     const initRef = useRef(false)
+    const [statisticData, setStatisticData] = useState<IStatistic>()
+
     useEffect(() => {
       if (inputToken?.stockId && !initRef.current) {
         initRef.current = true
         baseApi.getStatistic(inputToken.stockId)
           .then(res => {
-            console.log(res)
+            setStatisticData(res?.data || {})
           })
       }
       
@@ -29,7 +34,7 @@ const Statistics = memo(
 
     return (
       <div>
-        <div className=" mt-6 font-medium text-[18px] mb-2">{t('Statistics')}</div>
+        <ProfileTitle title={t('Statistics')} className=" my-6" />
         <div className={cn(
           " grid gap-x-4",
           from === 'market' ? " grid-cols-4" : "grid-cols-[1fr_1fr_1fr_1.5fr]"
@@ -37,28 +42,42 @@ const Statistics = memo(
           <StatisticsItem className={cn(
             "border-t",
             itemClass
-          )} label={t('Mkt Cap')}>{'1372.35B'}</StatisticsItem>
+          )} label={t('Mkt Cap')}>
+            <NumberText text={statisticData?.marketCap} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",
             itemClass
-          )} label={t('Total Share')}>{'3.22B'}</StatisticsItem>
+          )} label={t('Total Share')}>
+            <NumberText text={statisticData?.totalShare} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",
             itemClass
-          )} label={t('Circ. Shares')}>{'2.80B'}</StatisticsItem>
+          )} label={t('Circ. Shares')}>
+            <NumberText text={statisticData?.circShare} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",
             itemClass
-          )} label={t('Circ. Cap')}>{'1194.40B'}</StatisticsItem>
+          )} label={t('Circ. Cap')}>
+            <NumberText text={statisticData?.circCap} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
-          )} label={t('P/E (TTM)')}>{'230.96'}</StatisticsItem>
+          )} label={t('P/E (TTM)')}>
+            <NumberText text={statisticData?.peTtm} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
-          )} label={t('P/E (Static)')}>{'191.86'}</StatisticsItem>
+          )} label={t('P/E (Static)')}>
+            <NumberText text={statisticData?.peStatic} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
-          )} label={t('P/B')}>{'17.75'}</StatisticsItem>
+          )} label={t('P/B')}>
+            <NumberText text={statisticData?.pb} />
+          </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
           )} label={t('Onchain Address')}>

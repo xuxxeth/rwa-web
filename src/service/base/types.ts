@@ -150,6 +150,28 @@ export interface IProfile {
   "listingDate": string,
   "industry": string,
   "chairman": string,
-  "intruduction": string,
-  "toptenshareholders": IToptenshareholder[]
+  "introduction": string,
+  "topTenShareholders": IToptenshareholder[]
+}
+
+export interface IIndicators {
+  "report_period": number,
+  "year": number,
+  "crncy_code": number,
+  "roa_annual": number,
+  "roe_annual": number,
+  "pe_annual": number,
+  "pb_annual": number,
+  "eps_annual": number,
+  "bps_annual": number,
+  "ocfps_annual": number,
+  "grps_annual": number,
+  "roa_annual_yoy": number,
+  "roe_annual_yoy": number,
+  "pe_annual_yoy": number,
+  "pb_annual_yoy": number,
+  "eps_annual_yoy": number,
+  "bps_annual_yoy": number,
+  "ocfps_annual_yoy": number,
+  "grps_annual_yoy": number
 }

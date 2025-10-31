@@ -1,3 +1,4 @@
+import { Financials } from "@/components/markets/Financials"
 import { StockInfo } from "@/components/markets/Klinebody"
 import { Profile } from "@/components/markets/Profile"
 import { Statistics } from "@/components/markets/Statistics"
@@ -15,6 +16,7 @@ const KlineBody = memo(
         </div>
         <Statistics from={from} />
         <Profile from={from} />
+        <Financials />
       </div>
     )
   }

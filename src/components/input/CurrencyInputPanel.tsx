@@ -125,7 +125,7 @@ const CurrencyInputPanel = memo(
             </div>
         }
         <DialogController
-          className="pr-4"
+          className="pr-2"
           topFixed
           title={t("Select a token")}
           open={tokenDialog.open}

@@ -39,21 +39,26 @@ const units = [
 ]
 
 export function formatLargeNumber(val: string | number, precision: number = 2): string {
-  const num = typeof val === 'string' ? parseFloat(val.replace(/,/g, '')) : val
+  if (val == null || val === '') return (0).toFixed(precision)
 
-  if (isNaN(num) || num === 0 || Object.is(num, -0)) return (0).toFixed(precision)
+  // 转数字
+  let num = typeof val === 'string' ? parseFloat(val.replace(/,/g, '')) : val
+  if (isNaN(num)) return (0).toFixed(precision)
 
-  const matchedUnit = units.find(item => num >= item.threshold) || {
-    unit: '',
-    divisor: 1,
-  }
+  // 处理负数：记录符号
+  const sign = num < 0 ? '-' : ''
+  num = Math.abs(num)
+
+  if (num === 0) return (0).toFixed(precision)
+
+  // 匹配单位
+  const matchedUnit = units.find(item => num >= item.threshold) || { unit: '', divisor: 1 }
 
   let convertedValue = num / matchedUnit.divisor
 
-  // 动态进位处理
+  // 动态进位处理，例如 999.995K → 1.00M
   if (convertedValue >= 999.995) {
     const upperUnit = units.find(u => u.divisor === matchedUnit.divisor * 1000)
-
     if (upperUnit) {
       convertedValue = convertedValue / 1e3
       matchedUnit.unit = upperUnit.unit
@@ -61,13 +66,15 @@ export function formatLargeNumber(val: string | number, precision: number = 2): 
     }
   }
 
+  // 格式化数值
   const formatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: precision, // 强制保留最小小数位数
-    maximumFractionDigits: precision, // 严格限制最大小数位数
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
   })
 
-  return `${formatter.format(convertedValue)}${matchedUnit.unit}`
+  return `${sign}${formatter.format(convertedValue)}${matchedUnit.unit}`
 }
+
 
 export type Change = 0 | 1 | -1
 // 将一个字符串或者数字转换为 1, -1, 0

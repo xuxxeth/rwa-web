@@ -345,3 +345,8 @@ body {
  animation: 3s linear 0s infinite reverse none running shimmer;
  background-size: 250%;
 }
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+.recharts-layer:focus {
+  outline: none !important;
+}

@@ -11,6 +11,7 @@ import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
+import { ScrollBox } from "../scroll-box";
 
 export type CTokenProps = {
   stock: string,
@@ -186,7 +187,7 @@ const CTokenList = memo(
           }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal pr-2">
+          <div className=" flex items-center justify-between text-[12px] font-normal pr-4">
             <div className="w-1/3">{t("Name")}</div>
             <div className="flex items-center w-1/3 cursor-pointer"
               onClick={() => {
@@ -198,7 +199,7 @@ const CTokenList = memo(
             <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
           <div className={cn(
-            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-2",
+            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-4",
             from === "StockSelect" ? "h-[50vh]" : ""
           )}>
             {

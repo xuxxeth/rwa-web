@@ -7,7 +7,8 @@ import type {
   IToken,
   IRwa,
   IStatistic,
-  IProfile
+  IProfile,
+  IIndicators
 } from "./types"
 
 
@@ -22,4 +23,5 @@ export const baseApi = {
   // 公司财务相关接口
   getStatistic: (stockId: number) => client.get<ApiResponse<IStatistic>>('/v1/base/stock/statistic', { stockId }),
   getProfile: (stockId: number) => client.get<ApiResponse<IProfile>>('/v1/base/stock/profile', { stockId }),
+  getIndicators: (stockId: number) => client.get<ApiResponse<IIndicators[]>>('/v1/base/stock/indicators', { stockId }),
 };
