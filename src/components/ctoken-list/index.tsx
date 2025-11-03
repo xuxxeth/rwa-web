@@ -5,13 +5,14 @@ import { LazyImage } from "../image/LazyImage"
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
 import { formatTokenAmountWithCommas } from "@/utils/format";
-import { multiply, symbolToLower } from "@/utils";
+import { multiply, sortByBalanceAndPrice, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
 import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
 import { ScrollBox } from "../scroll-box";
+import { NoData } from "../markets/NoData";
 
 export type CTokenProps = {
   stock: string,
@@ -163,7 +164,7 @@ const CTokenList = memo(
 
     const [filterHolding, setFilterHolding] = useState(false)
     const filterTokens = useMemo(() => {
-      return filterHolding ? rwaListWithBalance.filter(token => Number(token.balance) > 0) : rwaListWithBalance
+      return filterHolding ? sortByBalanceAndPrice(rwaListWithBalance.filter(token => Number(token.balance) > 0)) : rwaListWithBalance
     }, [rwaListWithBalance, filterHolding])
 
     const sortTokens = useMemo(() => {
@@ -204,6 +205,9 @@ const CTokenList = memo(
           )}>
             {
               sortTokens.map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+            }
+            {
+              sortTokens.length <= 0 && <div className="py-[100px]"><NoData /></div>
             }
           </div>
           

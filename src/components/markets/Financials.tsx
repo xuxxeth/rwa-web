@@ -18,13 +18,6 @@ import type { IIndicators } from "@/service/base/types";
 import { formatLargeNumber } from "@/utils/format";
 import { formatToQuarterLabel } from "@/utils";
 
-const data = [
-  { quarter: "Q2 '24", bar1: 10.6, bar2: 9.1, line: 50 },
-  { quarter: "Q3 '24", bar1: 10.5, bar2: 9.4, line: 90 },
-  { quarter: "Q4 '24", bar1: 10.9, bar2: 10.6, line: 150 },
-  { quarter: "Q1 '25", bar1: 10.7, bar2: 10.8, line: 180 },
-  { quarter: "Q2 '25", bar1: 10.8, bar2: 10.7, line: 160 },
-];
 const CustomDot = (props: { cx: any; cy: any; stroke: string }) => {
   const { cx, cy, stroke } = props;
   const [hovered, setHovered] = useState(false);
@@ -56,7 +49,7 @@ const FilterItem = memo(
   }) => {
     return (
       <div className={cn(
-        "h-[33px] px-4 flex items-center justify-center bg-[#131823] rounded-[8px] text-[rgba(255,255,255,0.6)] text-[14px] font-medium min-w-[94px] cursor-pointer",
+        "h-[33px] px-4 flex items-center justify-center shrink-0 bg-[#131823] rounded-[8px] text-[rgba(255,255,255,0.6)] text-[14px] font-medium min-w-[94px] cursor-pointer",
         selected ? "bg-[#324054] text-white" : ""
       )}
         onClick={() => {
@@ -122,8 +115,6 @@ const Financials = memo(
 
     }, [current, indicatorsData])
 
-    console.log(filterData)
-
     return (
       <div>
         <ProfileTitle title="Financials" className=" mt-10 mb-6" />
@@ -153,8 +144,8 @@ const Financials = memo(
                 />
 
                 <YAxis
+                  dataKey="bar1"
                   yAxisId="left"
-                  
                   interval="preserveStartEnd"
                   allowDecimals={true}
                   tickFormatter={(v) => `${formatLargeNumber(v)}`}
@@ -165,9 +156,10 @@ const Financials = memo(
                 />
 
                 <YAxis
+                  dataKey="line"
                   yAxisId="right"
                   orientation="right"
-                  tickFormatter={(v) => `${(v * 100).toFixed(2)}$`}
+                  tickFormatter={(v) => `${(v).toFixed(2)}$`}
                   tick={({ x, y, payload }) => (
                     <text
                       x={x + 70} 
@@ -177,7 +169,7 @@ const Financials = memo(
                       fontSize={12}
                       dy={4}
                     >
-                      {`${(payload.value * 100).toFixed(2)}%`}
+                      {`${(payload.value).toFixed(2)}%`}
                     </text>
                   )}
                   axisLine={false}

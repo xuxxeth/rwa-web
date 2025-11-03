@@ -6,6 +6,7 @@ import type { IToken } from "@/service/base/types"
 import { formatTokenAmountWithCommas, symbolToLower } from "@/utils"
 import { useTranslation } from "@/hooks/useTranslation"
 import { useBaseStore } from "@/stores/baseStore"
+import { NoData } from "../markets/NoData"
 
 export type TokenProps = {
   name: string,
@@ -61,7 +62,7 @@ const TokenList = memo(
       return filterHolding ? tokenListWithBalance.filter(token => Number(token.balance) > 0) : tokenListWithBalance
     }, [tokenListWithBalance, filterHolding])
     return (
-      <div className="w-[300px]">
+      <div className="w-[300px] min-h-[400px]">
         <div className=" flex items-center">
           <CheckBox onChange={setFilterHolding} checked={filterHolding} />
           <span onClick={() => {
@@ -75,6 +76,9 @@ const TokenList = memo(
           </div>
           {
             filterTokens.map((token, index) => <TokenItem key={`${_id}-${index}`} token={token} onClick={onClick}  />)
+          }
+          {
+            filterTokens.length <= 0 && <div className="py-[100px]"><NoData /></div>
           }
         </div>
       </div>
