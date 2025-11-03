@@ -59,7 +59,7 @@ function Markets() {
           </div> */}
           <MarketTrading align="left" />
           <div className="pt-5 flex gap-x-5">
-            <div className="flex-1">
+            <div className="flex-1 pl-4">
               <KlineBody from="market" />
             </div>
             <div className="w-[350px] shrink-0">

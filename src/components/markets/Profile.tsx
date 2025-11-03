@@ -8,6 +8,7 @@ import type { IProfile } from "@/service/base/types"
 import { NumberText } from "../number-text"
 import { TopTen } from "./TopTen"
 import { ProfileTitle } from "./ProfileTitle"
+import { formatDateToShortEN } from "@/utils/format"
 
 const Profile = memo(
   ({ from }: {from?: string}) => {
@@ -44,7 +45,7 @@ const Profile = memo(
               "border-t",
               itemClass
             )} label={t('Listing date')}>
-              <NumberText text={profileData?.listingDate} />
+              <NumberText text={formatDateToShortEN(profileData?.listingDate || '')} />
             </StatisticsItem>
             <StatisticsItem className={cn(
               "border-t",

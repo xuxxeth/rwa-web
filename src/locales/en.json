@@ -143,7 +143,7 @@
         "tradeValue": "Trade Value",
         "avgPrice": "Avg. Price",
         "time": "Time",
-        "txHash": "TX HASH"
+        "txHash": "TX Hash"
       }
     },
     "order": {
@@ -334,5 +334,24 @@
   "Trade": "Trade",
   "proTrade": "Pro Trade",
   "instantTrade": "Instant Trade",
-  "Onchain Address": "Onchain Address"
+  "Onchain Address": "Onchain Address",
+  "financials": {
+    "top10": "Top Ten Shareholders",
+    "h1": "Investment Institution / Natural Person",
+    "h2": "Shareholding (Share)",
+    "h3": "Ratio",
+    "h4": "Shareholding Change (Share)",
+    "t1": "Financials",
+    "t2": "Main Indicators",
+    "roe": "ROE",
+    "roa": "ROA",
+    "pe": "PE",
+    "pb": "PB",
+    "eps": "EPS",
+    "bps": "NAV / Share",
+    "ocfps": "Cash Flow",
+    "grps": "Revenue",
+    "yoy": "YOY"
+  }
+  
 }

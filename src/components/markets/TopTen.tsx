@@ -3,14 +3,16 @@ import type { IToptenshareholder } from "@/service/base/types"
 import { memo } from "react"
 import { ProfileTitle } from "./ProfileTitle"
 import { formatLargeNumber, toFixed } from "@/utils/format"
+import { useTranslation } from "@/hooks/useTranslation"
 
 const TopHeader = () => {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center h-[41px] text-[rgba(255,255,255,0.6)] text-[14px] font-medium gap-x-4 px-5">
-      <div className="flex-1">Investment Institution / Natural Person</div>
-      <div className="w-[185px] text-right">Shareholding (Share)</div>
-      <div className="w-[94px] text-right">Ratio</div>
-      <div className="w-[213px] text-right">Shareholding Change (Share)</div>
+      <div className="flex-1">{t('financials.h1')}</div>
+      <div className="w-[185px] text-right">{t('financials.h2')}</div>
+      <div className="w-[94px] text-right">{t('financials.h3')}</div>
+      <div className="w-[213px] text-right">{t('financials.h4')}</div>
     </div>
   )
 }
@@ -41,10 +43,11 @@ const TopTen = memo(
   }: {
     topTen: IToptenshareholder[]
   }) => {
-
+    const { t } = useTranslation()
+    
     return (
       <div className="mt-[24px] text-white">
-        <ProfileTitle title="Top Ten Shareholders" />
+        <ProfileTitle title={t('financials.top10')} />
         <div className="mt-6 border border-[rgba(255,255,255,0.1)] rounded-[4px]">
           <TopHeader />
           {

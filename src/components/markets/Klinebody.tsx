@@ -1,5 +1,4 @@
 import { SmallButton } from "@/components/button/SmallButton"
-import { LazyImage } from "@/components/image/LazyImage"
 import { TradingChart } from "@/components/TVChart/TradingChart"
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo, useMemo } from "react"
@@ -81,8 +80,6 @@ export const StockInfo = memo(
 
 const KlineBody = memo(
   () => {
-    const { t } = useTranslation()
-    
     return (
       <div>
         <StockInfo />
