@@ -70,7 +70,10 @@ const Profile = memo(
 
           </div> */}
         </div>
-        <TopTen topTen={profileData?.topTenShareholders || []} />
+        {
+          from === 'market' && <TopTen topTen={profileData?.topTenShareholders || []} />
+        }
+        
       </>
       
     )
