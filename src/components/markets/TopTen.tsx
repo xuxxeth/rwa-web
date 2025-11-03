@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import type { IToptenshareholder } from "@/service/base/types"
 import { memo } from "react"
 import { ProfileTitle } from "./ProfileTitle"
-import { formatLargeNumber } from "@/utils/format"
+import { formatLargeNumber, toFixed } from "@/utils/format"
 
 const TopHeader = () => {
   return (
@@ -29,7 +29,7 @@ const TopItem = ({
     )}>
       <div className="flex-1">{top.investor}</div>
       <div className="w-[185px] text-right">{formatLargeNumber(top.heldSharesVolume)}</div>
-      <div className="w-[94px] text-right">{top.proportion}%</div>
+      <div className="w-[94px] text-right">{toFixed(top.proportion)}%</div>
       <div className="w-[213px] text-right">{formatLargeNumber(top.shareHoldingChange)}</div>
     </div>
   )
