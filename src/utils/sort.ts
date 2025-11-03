@@ -60,10 +60,20 @@ export function sortByBalanceAndPrice(arr: IRwa[]): IRwa[] {
     const aValue = aBalance * aPrice
     const bValue = bBalance * bPrice
 
-    // 先按 balance * price 排序（从大到小）
-    if (bValue !== aValue) return bValue - aValue
+    // 1. 优先按用户持有价值（balance * price）排序（降序）
+    if (aValue !== bValue) return bValue - aValue
 
-    // 若相等，再按 balance 排序（从大到小）
-    return bBalance - aBalance
+    // 2. 若持有价值相同或都为 0，则按后台配置的 weight 排序（降序）
+    if (aValue === 0 && bValue === 0 && a.weight !== b.weight) {
+      return b.weight - a.weight
+    }
+
+    // 3. 若价格相同，再按 balance 多者优先
+    if (aPrice === bPrice && aBalance !== bBalance) {
+      return bBalance - aBalance
+    }
+
+    // 默认保持稳定
+    return 0
   })
 }

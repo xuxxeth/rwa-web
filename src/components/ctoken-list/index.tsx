@@ -178,7 +178,6 @@ const CTokenList = memo(
       return filterTokens
     }, [sort, filterTokens])
 
-
     return (
       <div className="min-w-[443px]">
         <div className=" flex items-center">
