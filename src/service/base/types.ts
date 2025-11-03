@@ -77,11 +77,7 @@ export interface IRwa {
   "precision": number,
   "state": IRwaState,
   "weight": number,
-  "balance"?: string,
-  "origin"?: string,
-  "price"?: string , 
-  "up"?: string, 
-  "lock"?: number, 
+
 }
 
 export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice
