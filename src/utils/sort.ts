@@ -1,3 +1,4 @@
+import type { IRwa } from '@/service/base/types'
 import i18n from '../i18n'
 export function advancedSort(
   a: string | number | undefined,
@@ -46,4 +47,23 @@ export function advancedSort(
       sensitivity: options.sensitivity || 'variant',
     })
   )
+}
+
+export function sortByBalanceAndPrice(arr: IRwa[]): IRwa[] {
+  return arr.sort((a, b) => {
+    // 将字符串转为数字，若无效则为 0
+    const aBalance = parseFloat(a.balance ?? '0')
+    const bBalance = parseFloat(b.balance ?? '0')
+    const aPrice = parseFloat(a.price ?? '0')
+    const bPrice = parseFloat(b.price ?? '0')
+
+    const aValue = aBalance * aPrice
+    const bValue = bBalance * bPrice
+
+    // 先按 balance * price 排序（从大到小）
+    if (bValue !== aValue) return bValue - aValue
+
+    // 若相等，再按 balance 排序（从大到小）
+    return bBalance - aBalance
+  })
 }
