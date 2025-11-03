@@ -13,18 +13,37 @@ import type { ITableConfig } from '@/components/table-header'
 import { symbolToLower } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
+import { useCallback } from 'react'
 
 type SortableField = 'value'
+
 function AssetsTable(props: { chainId: number; account: string; assetsList: IAssetItem[] }) {
   const { assetsList } = props
+
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
   const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   const rwaList = useBaseStore(state => state.rwaList)
 
+  const defaultSort = useCallback((item1: IAssetItem, item2: IAssetItem) => {
+    const isItem1Rwa = Boolean(item1.rwaId)
+    const isItem2Rwa = Boolean(item2.rwaId)
+
+    if (!isItem1Rwa && isItem2Rwa) return -1
+    if (isItem1Rwa && !isItem2Rwa) return 1
+
+    if (item1.value !== item2.value) {
+      return advancedSort(item1.value, item2.value, 'desc')
+    } else if (item1.holdings !== item2.holdings) {
+      return advancedSort(item1.holdings, item2.holdings, 'desc')
+    } else {
+      return advancedSort(item1.weight, item2.weight, 'desc')
+    }
+  }, [])
+
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
-    usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort)
+    usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort, defaultSort)
 
   return (
     <>
@@ -40,7 +59,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
         config={assetTableConfig}
         extra={{ rwaList } as { rwaList: IRwa[] }}
         getKey={(item: IAssetItem) => item.symbol}
-        className='hover:bg-white/10 rounded-lg border-none'
+        className='hover:bg-white/10 rounded-lg border-none cursor-pointer'
         onClick={(item: IAssetItem) => {
           if (item.rwaId) {
             const rwa = rwaList.find(rwa => rwa.id === item.rwaId)
