@@ -61,6 +61,7 @@ const TokenList = memo(
     const filterTokens = useMemo(() => {
       return filterHolding ? tokenListWithBalance.filter(token => Number(token.balance) > 0) : tokenListWithBalance
     }, [tokenListWithBalance, filterHolding])
+
     return (
       <div className="w-[300px] min-h-[400px]">
         <div className=" flex items-center">
