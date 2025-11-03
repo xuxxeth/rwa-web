@@ -10,11 +10,16 @@ import { textPrefix, toFixed, formatWithCommas } from '@/utils/format'
 import type { IRwa } from '@/service/base/types'
 import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
+import { symbolToLower } from '@/utils'
+import { useRouter } from '@/hooks/useRouter'
+import { useTradeStore } from '@/stores/tradeStore'
 
 type SortableField = 'value'
 function AssetsTable(props: { chainId: number; account: string; assetsList: IAssetItem[] }) {
   const { assetsList } = props
   const { sort, onSortChange } = useTableSort<SortableField>()
+  const router = useRouter()
+  const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   const rwaList = useBaseStore(state => state.rwaList)
 
@@ -36,6 +41,15 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
         extra={{ rwaList } as { rwaList: IRwa[] }}
         getKey={(item: IAssetItem) => item.symbol}
         className='hover:bg-white/10 rounded-lg border-none'
+        onClick={(item: IAssetItem) => {
+          if (item.rwaId) {
+            const rwa = rwaList.find(rwa => rwa.id === item.rwaId)
+            if (rwa) {
+              updateInputToken(rwa)
+            }
+            router.push('/markets/trading/' + symbolToLower(item.symbol))
+          }
+        }}
       />
       {totalPage > 1 && (
         <Pagination
