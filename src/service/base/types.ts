@@ -84,6 +84,8 @@ export interface IRwa {
   "lock"?: number, 
 }
 
+export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice
+
 // 市场信息
 export interface IMarket {
   "tradingStartTime": number,

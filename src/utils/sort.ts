@@ -1,4 +1,4 @@
-import type { IRwa } from '@/service/base/types'
+import type { IRwa, IRwaWithBalancePrice } from '@/service/base/types'
 import i18n from '../i18n'
 export function advancedSort(
   a: string | number | undefined,
@@ -49,7 +49,7 @@ export function advancedSort(
   )
 }
 
-export function sortByBalanceAndPrice(arr: IRwa[]): IRwa[] {
+export function sortByBalanceAndPrice(arr: IRwaWithBalancePrice[]): IRwaWithBalancePrice[] {
   return arr.sort((a, b) => {
     // 将字符串转为数字，若无效则为 0
     const aBalance = parseFloat(a.balance ?? '0')
