@@ -266,3 +266,18 @@ export function isLessOrEqual(
 export async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+export function formatDateToShortEN(dateStr: string): string {
+  if (!dateStr) return '';
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+
+  const day = date.getDate();
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${day} ${month}, ${year}`;
+}

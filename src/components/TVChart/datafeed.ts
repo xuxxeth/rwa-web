@@ -146,7 +146,6 @@ export function getDataFeed({
       // if (initialLoadComplete) {
       //   return
       // }
-      console.log('get bar: ', resolution)     
       if (symbolInfo.name !== currentSymbol) {
         currentSymbol = symbolInfo.name;
         lastBarsCache.delete(symbolInfo.name);

@@ -128,10 +128,9 @@ export interface IStatistic {
   "marketCap": number,
   "totalShare": number,
   "circShare": number,
-  "circCap": number,
-  "peTtm": number,
-  "peStatic": number,
-  "pb": number,
+  "netIncomeLtm": number,
+  "netIncomeLastYear": number,
+  "netAsset": number,
   "onchainAddr": string
 }
 

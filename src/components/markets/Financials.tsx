@@ -62,20 +62,21 @@ const FilterItem = memo(
   }
 )
 
-const annualList = [
-  { label: 'ROE', value: 'roe' }, 
-  { label: 'ROA', value: 'roa'}, 
-  { label: 'PE', value: 'pe'}, 
-  { label: 'PB', value: 'pb'}, 
-  { label: 'EPS', value: 'eps'}, 
-  { label: 'NAV / Share', value: 'bps'}, 
-  { label: 'Cash Flow', value: 'ocfps'}, 
-  { label: 'Revenue', value: 'grps'}
-]
 
 const Financials = memo(
   () => {
     const { t } = useTranslation()
+    const annualList = [
+      { label: t('financials.roe'), value: 'roe' }, 
+      { label: t('financials.roa'), value: 'roa'}, 
+      { label: t('financials.pe'), value: 'pe'}, 
+      { label: t('financials.pb'), value: 'pb'}, 
+      { label: t('financials.eps'), value: 'eps'}, 
+      { label: t('financials.bps'), value: 'bps'}, 
+      { label: t('financials.ocfps'), value: 'ocfps'}, 
+      { label: t('financials.grps'), value: 'grps'}
+    ]
+
     const [current, setCurrent] = useState('roe')
     const inputToken = useTradeStore(state => state.inputToken)
     const initRef = useRef(false)
@@ -117,13 +118,13 @@ const Financials = memo(
 
     return (
       <div>
-        <ProfileTitle title="Financials" className=" mt-10 mb-6" />
-        <div className="text-[14px] font-medium mb-6 px-2">Main Indicators</div>
+        <ProfileTitle title={t('financials.t1')} className=" mt-10 mb-6" />
+        <div className="text-[14px] font-medium mb-6 px-2">{t('financials.t2')}</div>
         <div className="px-[43px]">
           <div className="flex items-center gap-x-2 pl-14 mb-10">
             {
               annualList.map(item => {
-                return <FilterItem selected={current === item.value} itemData={item} onClick={item => setCurrent(item)} />
+                return <FilterItem key={item.value} selected={current === item.value} itemData={item} onClick={item => setCurrent(item)} />
               })
             }
             
@@ -185,24 +186,27 @@ const Financials = memo(
                   dy={10}
                 />
 
-                {/* <Tooltip
+                <Tooltip
                   contentStyle={{
                     backgroundColor: "#222",
                     border: "none",
                     color: "#fff",
+                    fontSize: 12
                   }}
-                  formatter={(value, name) =>
-                    typeof value === "number"
-                      ? name === "line"
-                        ? `${value.toFixed(2)} B`
-                        : `${value.toFixed(2)}%`
+                  formatter={(value, name) => {
+                    return typeof value === "number"
+                      ? name === "YOY"
+                        ? `${value.toFixed(2)}%`
+                        : `${formatLargeNumber(value)}`
                       : value
                   }
-                /> */}
+                    
+                  }
+                />
                 <Bar
                   yAxisId="left"
                   dataKey="bar1"
-                  name="Bar 1"
+                  name="ROE"
                   barSize={35}
                   radius={[2, 2, 0, 0]}
                   fill="#578CF9"
@@ -221,7 +225,7 @@ const Financials = memo(
                   yAxisId="right"
                   type="linear"
                   dataKey="line"
-                  name="Line"
+                  name="YOY"
                   stroke="#f28c38"
                   strokeWidth={2}
                   strokeLinecap="round"           // ✅ 圆角收尾，避免穿过

@@ -1,9 +1,9 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
-import { memo, useEffect, useRef, useState } from "react"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
 import { StatisticsItem } from "./StatisticsItem"
 import { useTradeStore } from "@/stores/tradeStore"
-import { shortenAddress } from "@/utils"
+import { divide, formatLargeNumber, multiply, shortenAddress } from "@/utils"
 import CopyButton from "../button/copyButton"
 import { useChainById } from "@/hooks/useChain"
 import { LazyImage } from "../image/LazyImage"
@@ -11,15 +11,37 @@ import { baseApi } from "@/service/base/api"
 import type { IStatistic } from "@/service/base/types"
 import { NumberText } from "../number-text"
 import { ProfileTitle } from "./ProfileTitle"
+import { useRwaPrice } from "@/hooks/useTokenBalances"
 
 const Statistics = memo(
   ({ from }: {from?: string}) => {
     const { t } = useTranslation()
     const itemClass = from === 'market' ? 'text-[16px] py-4' : ''
     const inputToken = useTradeStore(state => state.inputToken)
+    const rwaPrice = useRwaPrice(inputToken?.symbol || '')
+
     const chain = useChainById(inputToken?.chainId)
     const initRef = useRef(false)
     const [statisticData, setStatisticData] = useState<IStatistic>()
+
+    const capData = useMemo(() => {
+      let _data = {
+        marketCap: '--',
+        circCap: '--',
+        peTtm: '--',
+        peStatic: '--',
+        pb: '--'
+      }
+      if (statisticData?.totalShare && rwaPrice?.price) {
+        _data.marketCap = formatLargeNumber(multiply(statisticData.totalShare, rwaPrice.price))
+        _data.circCap = formatLargeNumber(multiply(statisticData.circShare, rwaPrice.price))
+        _data.peTtm = formatLargeNumber(divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netIncomeLtm))
+        _data.peStatic = formatLargeNumber(divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netIncomeLastYear))
+        _data.pb = formatLargeNumber(divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netAsset))
+      }
+
+      return _data
+    }, [statisticData, rwaPrice?.price])
 
     useEffect(() => {
       if (inputToken?.stockId && !initRef.current) {
@@ -43,7 +65,7 @@ const Statistics = memo(
             "border-t",
             itemClass
           )} label={t('Mkt Cap')}>
-            <NumberText text={statisticData?.marketCap} />
+            <NumberText text={capData?.marketCap} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",
@@ -61,22 +83,22 @@ const Statistics = memo(
             "border-t",
             itemClass
           )} label={t('Circ. Cap')}>
-            <NumberText text={statisticData?.circCap} />
+            <NumberText text={capData?.circCap} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
           )} label={t('P/E (TTM)')}>
-            <NumberText text={statisticData?.peTtm} />
+            <NumberText text={capData?.peTtm} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
           )} label={t('P/E (Static)')}>
-            <NumberText text={statisticData?.peStatic} />
+            <NumberText text={capData?.peStatic} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass
           )} label={t('P/B')}>
-            <NumberText text={statisticData?.pb} />
+            <NumberText text={capData?.pb} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             itemClass

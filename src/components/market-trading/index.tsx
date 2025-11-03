@@ -50,7 +50,7 @@ const MarketTrading = memo(
     if (!marketInfo.info) return null
     return (
       <BoxCard className={cn(
-        "rounded-[4px] h-[48px] py-0 flex items-center ",
+        "rounded-[4px] h-[48px] py-0 flex items-center pl-4",
         align === 'left' ? 'justify-start' : 'justify-center'
       )}>
         <div className="flex items-center gap-x-2">
