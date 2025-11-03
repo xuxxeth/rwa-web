@@ -31,6 +31,7 @@ import { type IQuote } from '@/service/quote/types'
 import { useEffect, useState } from 'react'
 import { truncate, divide, subtract } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
+import { useTradeStore } from '@/stores/tradeStore'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -38,6 +39,7 @@ export default function MarketQuotes() {
   const { t } = useTranslation()
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
+  const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   const rwaList = useRwaTokens(false)
 
@@ -106,6 +108,7 @@ export default function MarketQuotes() {
               getKey={(item: IMarketQuote) => item.symbol}
               className='cursor-pointer hover:bg-white/4'
               onClick={(item: IMarketQuote) => {
+                updateInputToken(item)
                 router.push('/markets/trading/' + symbolToLower(item.symbol))
               }}
             />
