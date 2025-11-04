@@ -28,7 +28,6 @@ type ConverBodyProps = {
 }
 
 export function ConverBody({
-  action = 'buy',
   from
 }: ConverBodyProps) {
   const { t, i18n } = useTranslation()
@@ -45,7 +44,7 @@ export function ConverBody({
   const outputToken = useTradeStore(state => state.outputToken)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
-
+  const action = useTradeStore(state => state.activeConvertTab)
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
