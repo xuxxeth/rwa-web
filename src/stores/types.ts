@@ -64,12 +64,14 @@ export interface TradeStore {
   inputSize: string;
   expires: number;
   activeConvertTab: 'buy' | 'sell';
+  isSignatureValid: boolean;
   updateInputToken: (rwa: IRwa) => void;
   updateOutputToken: (token: IToken) => void;
   updateLimitPrice: (price: string) => void;
   updateInputSize: (size: string) => void;
   updateExpires: (expires: number) => void;
   updateActiveConvertTab: (tab: 'buy' | 'sell') => void;
+  setIsSignatureValid: (valid: boolean) => void
 }
 
 export interface WssStore {

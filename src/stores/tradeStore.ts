@@ -13,6 +13,7 @@ export const useTradeStore = create<TradeStore>()(
       inputSize: '',
       expires: 7,
       activeConvertTab: 'buy',
+      isSignatureValid: false,
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})
       },
@@ -30,6 +31,9 @@ export const useTradeStore = create<TradeStore>()(
       },
       updateActiveConvertTab: (tab: 'buy' | 'sell') => {
         set({activeConvertTab: tab})
+      },
+      setIsSignatureValid: (valid: boolean) => {
+        set({isSignatureValid: valid})
       }
     }),
     {

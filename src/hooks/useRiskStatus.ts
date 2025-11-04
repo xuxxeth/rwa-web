@@ -3,15 +3,17 @@ import { useRiskStore } from "@/stores/riskStore";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { riskApi } from "@/service/risk/api";
+import { useTradeStore } from "@/stores/tradeStore";
 
 export function useRiskUserConfig() {
   const { chainId, account } = useActiveWeb3()  
   const getUserConfig = useRiskStore(state => state.getUserConfig)
+  const isSignatureValid = useTradeStore(state => state.isSignatureValid)
   useEffect(() => {
-    if (chainId && account) {
+    if (chainId && account || isSignatureValid) {
       getUserConfig()
     }
-  }, [chainId, account])
+  }, [chainId, account, isSignatureValid])
 }
 
 export function useRiskStatus() {
