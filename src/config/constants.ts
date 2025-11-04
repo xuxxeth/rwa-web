@@ -60,6 +60,14 @@ export const MARKET_STATUS = {
   AFTER: 3,
 }
 
+export const RISK_STATUS = {
+  DEFAULT: -1,
+  NOTVERIFIED: 0,
+  ISSUE: 1,
+  VERIFIED: 2,
+  NOTSIGN: 3
+}
+
 const RED = '#FF6767'
 const GREEN = '#47D0A5'
 export const DEFAULT_PERIOD = '4h'

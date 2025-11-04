@@ -15,6 +15,10 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
 import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { useSignatureValidStatus } from "@/hooks/useSignature";
+import SignButton from "../button/SignButton";
+import { useRiskStatus } from "@/hooks/useRiskStatus";
+import { RISK_STATUS } from "@/config/constants";
 
 const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
 
@@ -39,6 +43,8 @@ export function ConverBody({
   const expires = useTradeStore(state => state.expires)
   const inputToken = useTradeStore(state => state.inputToken)
   const outputToken = useTradeStore(state => state.outputToken)
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+  const { riskStatus } = useRiskStatus()
 
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
@@ -170,11 +176,16 @@ export function ConverBody({
   )
 
   const disabled = useMemo(
-    () => Number(orderValue) <= 0 || (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || isMinOrMax.min || isMinOrMax.max || inputToken?.state === 1, 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, action]
+    () => Number(orderValue) <= 0 || 
+          (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || 
+          isMinOrMax.min || isMinOrMax.max || 
+          inputToken?.state === 1 ||
+          riskStatus !== RISK_STATUS.VERIFIED, 
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action]
   )
 
   const buttonText = useMemo(() => {
+    if (riskStatus === RISK_STATUS.NOTVERIFIED) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
@@ -187,7 +198,7 @@ export function ConverBody({
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, riskStatus, i18n.language])
 
   return (
     <div className="mt-2">
@@ -231,25 +242,30 @@ export function ConverBody({
       }
       
       {
-        !account ? <div className="mt-4"><ConnectButtonText /></div> :
-        <Button variant={buttonVariant} 
-          loading={buying}
-          className={cn(
-            "w-full mt-4 ",
-            from === 'markets' ? 'h-[52px]' : ''
-          )}
-          disabled={disabled || buying}
-          onClick={() => {
-            if (approvalState === 3) {
-              handlePlaceOrder()
-            } else {
-              handleApprove()
-            }
-          }}
-        >
-          { buttonText }
-          
-        </Button>
+        !account ? 
+          <div className="mt-4"><ConnectButtonText /></div> :
+          !isSignatureValid ?
+          <SignButton className="mt-4 w-full h-[56px] rounded-[16px] text-[16px]" refreshIsSignatureValid={() => {
+            refreshIsSignatureValid()
+          }} /> :
+          <Button variant={buttonVariant} 
+            loading={buying}
+            className={cn(
+              "w-full mt-4 ",
+              from === 'markets' ? 'h-[52px]' : ''
+            )}
+            disabled={disabled || buying}
+            onClick={() => {
+              if (approvalState === 3) {
+                handlePlaceOrder()
+              } else {
+                handleApprove()
+              }
+            }}
+          >
+            { buttonText }
+            
+          </Button>
       }
       <DialogController
         title={t("Expires in")}

@@ -16,6 +16,8 @@ import { Loading } from './components/loading'
 import { useMarketState } from './hooks/useMarketState'
 import { Menus } from './components/menu'
 import { riskApi } from './service/risk/api'
+import { useRiskStore } from './stores/riskStore'
+import { useRiskUserConfig } from './hooks/useRiskStatus'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -31,6 +33,7 @@ function App() {
   const { t, i18n } = useTranslation()
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
+  const getUserConfig = useRiskStore(state => state.getUserConfig)
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -44,13 +47,15 @@ function App() {
   // useRwaBalances()
   useMarketState()
   
+  useRiskUserConfig()
+
   useEffect(() => {
     if (!chainId) return
-    riskApi.getUserConfig()
-
     // 初始化baseStore
     initBaseStore(chainId)
   }, [chainId])
+
+  
 
   const { wsService } = useWssOn()
 

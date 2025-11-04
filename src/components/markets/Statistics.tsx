@@ -71,13 +71,13 @@ const Statistics = memo(
             "border-t",
             itemClass
           )} label={t('Total Share')}>
-            <NumberText text={statisticData?.totalShare} />
+            <NumberText text={formatLargeNumber(statisticData?.totalShare || '')} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",
             itemClass
           )} label={t('Circ. Shares')}>
-            <NumberText text={statisticData?.circShare} />
+            <NumberText text={formatLargeNumber(statisticData?.circShare || '')} />
           </StatisticsItem>
           <StatisticsItem className={cn(
             "border-t",

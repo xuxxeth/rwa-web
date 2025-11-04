@@ -1,6 +1,6 @@
 import { useSignature } from '@/hooks/useCaCommon'
 import storage from '@/utils/storage'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 
 export function useRequestSignature() {
@@ -43,6 +43,11 @@ export function useRequestSignature() {
 export function useSignatureValidStatus(): [boolean, (isValid?: boolean) => void] {
   const { validSignature } = useRequestSignature()
   const [isSignatureValid, setIsSignatureValid] = useState(!!validSignature())
+
+  const { account, chainId } = useActiveWeb3()
+  useEffect(() => {
+    setIsSignatureValid(!!validSignature())
+  }, [account, chainId])
 
   const refreshIsSignatureValid = (isValid?: boolean) => {
     if (isValid !== undefined) {

@@ -232,6 +232,8 @@
   "Unauthorized": "Unauthorized Access",
   "No records found": "No Records Found",
   "identity": {
+    "verifyID": "Verify Identity",
+    "verify": "Verifying",
     "Identity_verification": "Identity verification",
     "continue": "Continue",
     "identityUpload": {

@@ -1,6 +1,10 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import { LazyImage } from "../image/LazyImage";
 import { cn } from "@/utils";
+import SignButton from "../button/SignButton";
+import { useSignatureValidStatus } from "@/hooks/useSignature";
+import { useRiskStatus } from "@/hooks/useRiskStatus";
+import { RISK_STATUS } from "@/config/constants";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
   if (!verified) {
@@ -56,19 +60,45 @@ export function VerificationStatus(props: {
 
 export function Verification(props: { verified: boolean; issued: boolean }) {
   const { verified, issued } = props;
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+  const { riskStatus, verifying, startVerification } = useRiskStatus()
+
   return (
-    <div className="flex flex-row gap-4">
-      <VerificationStatus verified={verified} issued={issued} />
-      {!verified && !issued && <StartVerificationButton />}
-    </div>
+    <>
+    {
+      riskStatus === RISK_STATUS.DEFAULT ? null :
+      isSignatureValid && riskStatus !== RISK_STATUS.NOTSIGN ? 
+        <div className="flex flex-row gap-4">
+          <VerificationStatus verified={riskStatus === RISK_STATUS.VERIFIED} issued={riskStatus === RISK_STATUS.ISSUE} />
+          {riskStatus === RISK_STATUS.NOTVERIFIED && <StartVerificationButton verifying={verifying} onClick={startVerification} />}
+        </div> :
+        <SignButton refreshIsSignatureValid={() => {
+          refreshIsSignatureValid()
+        }} />
+    }
+    </>
+    
   );
 }
 
-export function StartVerificationButton() {
+export function StartVerificationButton({
+  verifying,
+  onClick
+}: {
+  verifying?: boolean
+  onClick?: () => void
+}) {
   const { t } = useTranslation();
   return (
-    <button className="cursor-pointer px-4 py-2 text-sm/4  font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)]">
-      {t("startVerification")}
+    <button disabled={verifying} className={cn(
+      "cursor-pointer px-4 py-2 text-sm/4 font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)]",
+      verifying ? "opacity-60" : ""
+    )}
+    onClick={() => {
+      onClick && onClick()
+    }}
+    >
+      {verifying ? t('identity.verify') + '...' : t("startVerification")}
     </button>
   );
 }

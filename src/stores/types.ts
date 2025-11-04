@@ -12,6 +12,7 @@ import type {
   IStockWithPrice
 } from "@/service/base/types";
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
+import type { IUserCofnig } from "@/service/risk/types";
 
 export interface BaseStore {
   connectInit: boolean,
@@ -77,4 +78,9 @@ export interface WssStore {
   tokenWithPrice: Record<string, ITokenWithPrice>;
   setStableTokenWithPrice: (data: IRwaPrice[]) => void;
   getCandles: (params: ICandlesParams) => Promise<ApiResponse<ICandlesItem[]>>;
+}
+
+export interface RiskSTore {
+  riskUserConfig: IUserCofnig | null
+  getUserConfig: () => Promise<ApiResponse<IUserCofnig>>;
 }
