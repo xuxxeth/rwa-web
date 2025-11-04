@@ -143,8 +143,8 @@
     },
     "order": {
       "openOrders": "當前委託",
-      "cancelOrder": "取消訂單",
-      "cancelOrderFailed": "取消訂單失敗。",
+      "cancelOrder": "撤單",
+      "cancelOrderFailed": "撤單失敗。",
       "rk": "風險鎖定",
 
       "tableHeader": {
@@ -169,11 +169,9 @@
         "open": "委託中",
         "partiallyFilled": "部分成交",
         "orderFailed": "下單失敗",
-        "canceled": "已取消",
+        "canceled": "已撤單",
         "filled": "完全成交",
-        "partiallyFilledAndCancelled": "部分成交後取消",
         "rejected": "已拒絕",
-        "marketCloseCanceled": "收盤自動取消",
         "pendingCancel": "撤單中"
       },
 
@@ -192,9 +190,9 @@
       "partiallyFilled": "部分成交",
       "open": "委託中",
       "failed": "下單失敗",
-      "canceled": "已取消",
+      "canceled": "已撤單",
       "filled": "完全成交",
-      "cancelOrderSuccess": "取消訂單請求已成功提交。",
+      "cancelOrderSuccess": "撤單請求已成功提交。",
       "cancelOrdering": "正在撤單...",
       "intraday": "當日"
     },
