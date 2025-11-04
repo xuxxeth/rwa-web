@@ -27,10 +27,10 @@ export function useRiskStatus() {
       const query = () => {
         getUserConfig()
         .then(res => {
-          if (!res.data && getCount++ < 5) {
+          if ((!res.data || res.data.actions !== 1) && getCount++ < 10) {
             setTimeout(() => {
               query()
-            }, 3000)
+            }, 5000)
           } else {
             resolve(res)
           }
