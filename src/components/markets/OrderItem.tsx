@@ -5,7 +5,7 @@ import React from "react"
 import type { IOpenOrder } from "@/service/scan/types"
 import { cn } from "@/lib/utils"
 import { formatNumberWithCommas, formatTimestamp, textPrefix, textSuffix, toFixed } from "@/utils/format"
-import {  OrderStatusCell } from "@/views/assets/Shared"
+import { OrderStatusCell } from "@/views/assets/Shared"
 import { useRwaByStockId } from "@/hooks/useRwaBalances"
 import { shortenAddress } from "@/utils"
 import CopyButton from "../button/copyButton"
@@ -86,7 +86,7 @@ const OrderItem = memo(
           <OrderStatusCell state={order.state} />
         </OrderItemWRap>
         {
-          expand && 
+          expand &&
           <>
             <OrderItemWRap>
               <div className="text-[14px] flex items-center gap-x-1">
@@ -113,20 +113,20 @@ const OrderItem = memo(
               </div>
             </OrderItemWRap>
             {
-              type === 'open' && 
-                <OrderItemWRap>
-                  <div className="text-[14px] flex items-center gap-x-1">
-                    {t('Expiration')}
-                  </div>
-                  <div className=" text-white">
-                    {order.validDate} {t('days')}
-                  </div>
-                </OrderItemWRap>
+              type === 'open' &&
+              <OrderItemWRap>
+                <div className="text-[14px] flex items-center gap-x-1">
+                  {t('Expiration')}
+                </div>
+                <div className=" text-white">
+                  {order.tif === 0 ? t('assets.order.intraday') : `${order.validDate} ${t('days')}`}
+                </div>
+              </OrderItemWRap>
             }
-            
-            
+
+
             {
-              type === 'history' && 
+              type === 'history' &&
               <>
                 <OrderItemWRap>
                   <div className="text-[14px] flex items-center gap-x-1">
@@ -152,27 +152,27 @@ const OrderItem = memo(
           </>
         }
         {
-          type === 'open' && 
-            <OrderItemWRap>
-              <div className="text-[14px] flex items-center gap-x-1">
-                {t('Actions')}
-              </div>
-              <button disabled={disableCancel} className={cn(
-                " h-[21px] px-4 flex items-center rounded-[4px] bg-[rgba(255,255,255,0.1)] text-[#1A85FF] font-medium text-[14px] cursor-pointer",
-                disableCancel || canceling ? "opacity-60" : ""
-              )}
-                onClick={() => {
-                  cancelOrder && cancelOrder(order.orderId)
-                }}
-              >
-                {canceling ? t('assets.order.cancelOrdering') : t('assets.order.cancelOrder')}
-              </button>
-            </OrderItemWRap>
+          type === 'open' &&
+          <OrderItemWRap>
+            <div className="text-[14px] flex items-center gap-x-1">
+              {t('Actions')}
+            </div>
+            <button disabled={disableCancel} className={cn(
+              " h-[21px] px-4 flex items-center rounded-[4px] bg-[rgba(255,255,255,0.1)] text-[#1A85FF] font-medium text-[14px] cursor-pointer",
+              disableCancel || canceling ? "opacity-60" : ""
+            )}
+              onClick={() => {
+                cancelOrder && cancelOrder(order.orderId)
+              }}
+            >
+              {canceling ? t('assets.order.cancelOrdering') : t('assets.order.cancelOrder')}
+            </button>
+          </OrderItemWRap>
         }
-        
+
         <div className="h-[13px] flex justify-center items-center mt-1 bg-[rgba(255,255,255,0.1)] cursor-pointer"
           onClick={() => {
-            onExpand && onExpand( expand ? '' : order.orderId)
+            onExpand && onExpand(expand ? '' : order.orderId)
           }}
         >
           <LazyImage src="/images/icons/down-arrow.png" className={cn(

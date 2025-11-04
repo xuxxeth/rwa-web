@@ -119,7 +119,7 @@
     "estimatedBalance": "預估餘額",
     "tabList": {
       "assets": "資產",
-      "orderHistory": "訂單記錄",
+      "orderHistory": "委託記錄",
       "tradeHistory": "成交紀錄"
     },
     "assetsTab": {
@@ -170,15 +170,15 @@
         "partiallyFilled": "部分成交",
         "orderFailed": "下單失敗",
         "canceled": "已取消",
-        "filled": "已全部成交",
+        "filled": "完全成交",
         "partiallyFilledAndCancelled": "部分成交後取消",
         "rejected": "已拒絕",
         "marketCloseCanceled": "收盤自動取消",
-        "pendingCancel": "取消中"
+        "pendingCancel": "撤單中"
       },
 
       "action": "操作",
-      "orderHistory": "訂單記錄",
+      "orderHistory": "歷史委託",
       "market": "市價單",
       "limit": "限價單",
       "side": "方向",
@@ -193,9 +193,10 @@
       "open": "委託中",
       "failed": "下單失敗",
       "canceled": "已取消",
-      "filled": "已成交",
+      "filled": "完全成交",
       "cancelOrderSuccess": "取消訂單請求已成功提交。",
-      "cancelOrdering": "正在取消..."
+      "cancelOrdering": "正在撤單...",
+      "intraday": "當日"
     },
     "loading": "載入中...",
     "scrollToLoadMore": "向下滾動以載入更多",
