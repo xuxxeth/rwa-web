@@ -9,7 +9,7 @@ import { MarketTrading } from "@/components/market-trading";
 import { ConvertTabs } from "../../components/markets/ConvertTabs";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
 import { KlineBody } from "../../components/markets/Klinebody";
-import { useRequestSignature } from "@/hooks/useSignature";
+import { useRequestSignature, useSignatureValidStatus } from "@/hooks/useSignature";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
@@ -32,7 +32,7 @@ function LiteTrade() {
     (state) => state.setStockWithPriceByWebSocketData
   );
   const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
-  
+  const [ isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
 
@@ -76,6 +76,7 @@ function LiteTrade() {
                         if (!(await validSignature())) {
                           const res = await signature()
                           if (res?.signature) {
+                            refreshIsSignatureValid(true)
                             orderDialog.setOpen(true)
                           }
                         } else {

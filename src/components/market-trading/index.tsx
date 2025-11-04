@@ -4,7 +4,9 @@ import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import { useBaseStore } from "@/stores/baseStore";
-import { MARKET_STATUS } from "@/config/constants";
+import { MARKET_STATUS, RISK_STATUS } from "@/config/constants";
+import { VerifyIdentity } from "./VerifyIdentity";
+import { useRiskStatus } from "@/hooks/useRiskStatus";
 
 type MarketTradingProps = {
   align?: string
@@ -14,6 +16,7 @@ const MarketTrading = memo(
   ({  align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
+    const { riskStatus } = useRiskStatus()
     
     const marketInfo = useMemo(() => {
       let _icon = ''
@@ -48,6 +51,7 @@ const MarketTrading = memo(
       }
     }, [marketTradeState, t])
     if (!marketInfo.info) return null
+    if (riskStatus === RISK_STATUS.NOTVERIFIED) return <VerifyIdentity />
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center pl-4",

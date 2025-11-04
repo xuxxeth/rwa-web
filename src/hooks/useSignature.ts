@@ -1,7 +1,8 @@
 import { useSignature } from '@/hooks/useCaCommon'
 import storage from '@/utils/storage'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
+import { useTradeStore } from '@/stores/tradeStore'
 
 export function useRequestSignature() {
   const [signing, setSigning] = useState(false)
@@ -42,7 +43,13 @@ export function useRequestSignature() {
 
 export function useSignatureValidStatus(): [boolean, (isValid?: boolean) => void] {
   const { validSignature } = useRequestSignature()
-  const [isSignatureValid, setIsSignatureValid] = useState(!!validSignature())
+  const isSignatureValid = useTradeStore(state => state.isSignatureValid)
+  const setIsSignatureValid = useTradeStore(state => state.setIsSignatureValid)
+
+  const { account, chainId } = useActiveWeb3()
+  useEffect(() => {
+    setIsSignatureValid(!!validSignature())
+  }, [account, chainId])
 
   const refreshIsSignatureValid = (isValid?: boolean) => {
     if (isValid !== undefined) {

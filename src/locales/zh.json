@@ -226,6 +226,8 @@
   "Unauthorized": "未授權",
   "No records found": "未找到記錄",
   "identity": {
+    "verifyID": "驗證身分",
+    "verify": "驗證中",     
     "Identity_verification": "身份驗證",
     "continue": "繼續",
     "identityUpload": {
@@ -330,5 +332,23 @@
   "proTrade": "專業交易",
   "liteTrade": "簡易交易",
   "Enter Limit Price": "請輸入委託價格",
-  "Onchain Address": "鏈上地址"
+  "Onchain Address": "鏈上地址",
+  "financials": {
+    "top10": "主要股東",
+    "h1": "投資機構/自然人",
+    "h2": "持股數(股)",
+    "h3": "佔比",
+    "h4": "持股變動(股)",
+    "t1": "財務",
+    "t2": "主要指標",
+    "roe": "ROE",
+    "roa": "ROA",
+    "pe": "PE",
+    "pb": "PB",
+    "eps": "EPS",
+    "bps": "每股淨資產",
+    "ocfps": "現金流",
+    "grps": "收入",
+    "yoy": "同比增長率"
+  }
 }

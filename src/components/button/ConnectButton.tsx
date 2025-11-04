@@ -241,7 +241,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
                 </div>
-                <div className='flex items-center py-3 cursor-pointer'>
+                <div className='flex items-center py-3 cursor-pointer'
+                  onClick={() => goTo('assets')}
+                >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('ID Verification')}</span>
                 </div>
@@ -327,7 +329,7 @@ function QrCodeView(props: { currentWallet: WalletConfig }) {
               <div className='ami-shimmer w-full h-full bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.6)_50%,transparent_100%)]'></div>
             )}
           </div>
-          <div className='mt-4 text-base/6 text-center font-normal mt-4'>{t('scanCode')}</div>
+          <div className='text-base/6 text-center font-normal mt-4'>{t('scanCode')}</div>
         </div>
       </div>
     </>

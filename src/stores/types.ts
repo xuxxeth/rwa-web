@@ -12,6 +12,7 @@ import type {
   IStockWithPrice
 } from "@/service/base/types";
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
+import type { IUserCofnig } from "@/service/risk/types";
 
 export interface BaseStore {
   connectInit: boolean,
@@ -63,12 +64,14 @@ export interface TradeStore {
   inputSize: string;
   expires: number;
   activeConvertTab: 'buy' | 'sell';
+  isSignatureValid: boolean;
   updateInputToken: (rwa: IRwa) => void;
   updateOutputToken: (token: IToken) => void;
   updateLimitPrice: (price: string) => void;
   updateInputSize: (size: string) => void;
   updateExpires: (expires: number) => void;
   updateActiveConvertTab: (tab: 'buy' | 'sell') => void;
+  setIsSignatureValid: (valid: boolean) => void
 }
 
 export interface WssStore {
@@ -77,4 +80,9 @@ export interface WssStore {
   tokenWithPrice: Record<string, ITokenWithPrice>;
   setStableTokenWithPrice: (data: IRwaPrice[]) => void;
   getCandles: (params: ICandlesParams) => Promise<ApiResponse<ICandlesItem[]>>;
+}
+
+export interface RiskSTore {
+  riskUserConfig: IUserCofnig | null
+  getUserConfig: () => Promise<ApiResponse<IUserCofnig>>;
 }
