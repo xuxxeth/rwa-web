@@ -7,12 +7,16 @@ export type OrderState = 0 | 1 | 2 | 3 | 5 | 8 | 9
 // 0 未风控 1 已风控
 export type RiskType = 0 | 1
 
+// 0 Day(当日有效) 1 GTD(指定日期有效) 2 GTC(一直有效)
+export type Tif = 0 | 1 | 2
+
 export interface IOpenOrder {
   id: number
   chainId: number
   orderId: string
   stockId: number
   orderType: OrderType
+  tif: Tif
   side: OrderSide
   validDate: number
   amount: string

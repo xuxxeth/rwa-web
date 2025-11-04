@@ -160,10 +160,6 @@ export default function HistoryOrderTable(props: {
               value: filledStatus.value.join(','),
             },
             {
-              key: 'partiallyFilled',
-              value: partiallyFilledStatus.value.join(','),
-            },
-            {
               key: 'canceled',
               value: canceledStatus.value.join(','),
             },
