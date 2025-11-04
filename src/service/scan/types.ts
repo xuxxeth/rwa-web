@@ -38,6 +38,7 @@ export interface IOrder {
   stockId: number
   orderType: OrderType
   side: OrderSide
+  tif: Tif
   validDate: number
   // 委托金额
   amount: string
