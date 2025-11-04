@@ -230,7 +230,8 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'expiration',
     sortable: false,
     render: (item: IOpenOrder) => {
-      return <TextCell text={readableDuration(item.validDate * Day)} />
+      const { t } = useTranslation()
+      return <TextCell text={item.tif === 0 ? t('assets.order.intraday') : readableDuration(item.validDate * Day)} />
     },
   },
   {

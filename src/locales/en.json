@@ -200,7 +200,8 @@
       "canceled": "Canceled",
       "filled": "Filled",
       "cancelOrderSuccess": "Order cancellation submitted successfully.",
-      "cancelOrdering": "Canceling..."
+      "cancelOrdering": "Canceling...",
+      "intraday": "Intraday"
     },
     "loading": "Loading...",
     "scrollToLoadMore": "Scroll To Load More",
