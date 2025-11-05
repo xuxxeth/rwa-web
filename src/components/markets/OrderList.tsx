@@ -10,6 +10,7 @@ import { Loading } from "../loading"
 import { NoData } from "./NoData"
 import Pagination from "../pagination"
 import { RESPONSE_CODE } from "@/config/constants"
+import { ScrollBox } from "../scroll-box"
 
 
 
@@ -116,7 +117,8 @@ const OrderList = memo(
           setCurrentTab(tab.key)
           getOpenOrders(tab.key)
         }} />
-        <div className=" min-h-[320px] max-h-[65vh] overflow-auto">
+        <ScrollBox p={24} top={0} className="min-h-[320px] max-h-[65vh]">
+        
           {
             filterOrderList.map(order => {
               return (
@@ -140,8 +142,7 @@ const OrderList = memo(
           {
             !loading && filterOrderList.length <= 0 && <div className="py-[100px]"><NoData /></div>
           }
-          
-        </div>
+        </ScrollBox> 
         {
           (filterOrderList.length >= 10 || after) &&
             <Pagination

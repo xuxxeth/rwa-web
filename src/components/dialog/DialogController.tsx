@@ -33,6 +33,7 @@ export function DialogController({
   top,
   open,
   className,
+  headerClassName,
   openChange
 }: {
   children?: React.ReactNode;
@@ -41,6 +42,7 @@ export function DialogController({
   top?: number
   open: boolean
   className?: string
+  headerClassName?: string
   openChange: (open: boolean) => void
 }) {
   
@@ -54,7 +56,10 @@ export function DialogController({
         className
       )}
       >
-        <DialogHeader>
+        <DialogHeader className={cn(
+          "",
+          headerClassName
+        )}>
           <DialogTitle>{title || ''}</DialogTitle>
         </DialogHeader>
         

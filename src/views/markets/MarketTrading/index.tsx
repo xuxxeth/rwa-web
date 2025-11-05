@@ -12,7 +12,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
-import { useRequestSignature } from "@/hooks/useSignature";
+import { useRequestSignature, useSignatureValidStatus } from "@/hooks/useSignature";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { OrderList } from "@/components/markets/OrderList";
 import { useRouter } from "@/hooks/useRouter";
@@ -28,7 +28,7 @@ function Markets() {
   const inputToken = useTradeStore(state => state.inputToken)
   const orderDialog = useShowDialog()
   const { signing, signature, validSignature } = useRequestSignature()
-
+  const [ isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const setTokenWithPriceByWebSocketData = useBaseStore(
     state => state.setTokenWithPriceByWebSocketData
   )
@@ -81,6 +81,7 @@ function Markets() {
                           const res = await signature()
                           if (res?.signature) {
                             orderDialog.setOpen(true)
+                            refreshIsSignatureValid(true)
                           }
                         } else {
                           orderDialog.setOpen(true)
@@ -102,6 +103,8 @@ function Markets() {
 
       </MainLayout>
       <DialogController
+        className="px-0"
+        headerClassName="px-6"
         topFixed
         top={30}
         title={t("assets.tabList.orderHistory")}
