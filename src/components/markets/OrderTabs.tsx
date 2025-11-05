@@ -47,7 +47,7 @@ const OrderTabs = memo(
     const [selected, setSelected] = useState('open')
     
     return (
-      <div className="py-[8px] h-[44px] flex items-center">
+      <div className="py-[8px] h-[44px] flex items-center px-6">
         <div className=" flex items-center w-full gap-x-6 border-b border-[rgba(255,255,255,0.1)] pb-1">
           {
             tabs.map(tab => (<OrderTabItem key={tab.key} tab={tab} selected={selected} onClick={tab => {

@@ -13,7 +13,7 @@ import CopyButton from "../button/copyButton"
 const OrderItemWRap = memo(
   ({ children }: { children: React.ReactNode }) => {
     return (
-      <div className="flex items-center justify-between mb-[6px] text-[rgba(255,255,255,0.6)] text-[14px]">
+      <div className="flex items-center px-2 justify-between mb-[6px] text-[rgba(255,255,255,0.6)] text-[14px]">
         {children}
       </div>
     )
@@ -36,7 +36,7 @@ const OrderItem = memo(
     const rwaToken = useRwaByStockId(order.stockId)
     const disableCancel = useMemo(() => order.state === 8, [order.state])
     return (
-      <div className="mt-2 p-2">
+      <div className="mt-2 py-2">
         <OrderItemWRap>
           <div className=" text-[14px] flex items-center gap-x-1">
             <div className="w-5 h-5 rounded-full shrink-0">
