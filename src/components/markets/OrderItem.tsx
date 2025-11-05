@@ -39,12 +39,12 @@ const OrderItem = memo(
       <div className="mt-2 py-2">
         <OrderItemWRap>
           <div className=" text-[14px] flex items-center gap-x-1">
-            <div className="w-5 h-5 rounded-full shrink-0">
+            {/* <div className="w-5 h-5 rounded-full shrink-0">
               {
                 rwaToken?.icon && <LazyImage src={rwaToken?.icon} className="w-5 h-5 rounded-full" />
               }
 
-            </div>
+            </div> */}
             <span className=" text-white font-normal">{rwaToken?.symbol}</span>
             <span className=" font-normal text-[14px]">{rwaToken?.name}</span>
           </div>

@@ -16,6 +16,7 @@ import { textSuffix, toFixed } from '@/utils'
 import type { OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 import { ScrollBox } from '@/components/scroll-box'
+import { NoData } from '@/components/markets/NoData'
 
 export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
@@ -71,7 +72,7 @@ export function TokenCell(props: {
 }) {
   return (
     <div className={'flex flex-row gap-2'}>
-      {props.icon && <LazyImage className={'w-10 h-10 rounded-[50%]'} src={props.icon} />}
+      {/* {props.icon && <LazyImage className={'w-10 h-10 rounded-[50%]'} src={props.icon} />} */}
       <div className='flex flex-col'>
         <div className='text-sm/6'>{props.token}</div>
         <div className='text-60 text-xs/4.5'>{props.name}</div>
@@ -206,7 +207,7 @@ export function DropDownFilter(props: {
             className='bg-[rgba(19,24,35,1)] border-none py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
-            <ScrollBox p={16} className=' w-[211px] max-h-[280px]'>
+            <ScrollBox p={16} pt={4} pb={4} className=' w-[191px] h-auto max-h-[300px]'>
             {[
               {
                 key: 'all',
@@ -289,7 +290,8 @@ export function ScrollLoadMore<TData>(props: {
         <div className='py-8 text-center text-gray-500'>{t('assets.loading')}...</div>
       )}
       {!isLoading && data.length === 0 && (
-        <div className='py-8 text-center text-gray-400'>{t('assets.noDataAvailable')}</div>
+        <div className='py-[90px] text-center text-gray-400'><NoData /></div>
+        
       )}
     </>
   )

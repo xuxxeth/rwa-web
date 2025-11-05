@@ -101,6 +101,8 @@ function LiteTrade() {
       </MainLayout>
       <XFooter />
       <DialogController
+        className="p-0"
+        headerClassName="px-6 pt-6"
         topFixed
         top={30}
         title={t("assets.tabList.orderHistory")}
