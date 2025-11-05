@@ -224,7 +224,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'orderTime',
     sortable: false,
-    render: (item: IOpenOrder) => <TextCell text={formatTimestamp(item.txTime)} />,
+    render: (item: IOpenOrder) => <TextCell className='w-[80px]' text={formatTimestamp(item.txTime)} />,
   },
   {
     key: 'expiration',
