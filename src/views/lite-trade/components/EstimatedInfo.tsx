@@ -47,11 +47,11 @@ const EstimatedInfo = memo(
           right={
             <div className="h-[32px] flex justify-center rounded-[8px] items-center px-2 bg-[rgba(0,149,255,0.1)] text-[#0095FF] text-[14px] font-normal cursor-pointer"
               onClick={() => {
-                onEdit && onEdit()
+                // onEdit && onEdit()
               }}
             >
-              {expires} {t("days")}
-              <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" />
+              {t('assets.order.intraday')} 
+              {/* <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" /> */}
             </div>
           }
         />
