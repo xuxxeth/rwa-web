@@ -12,7 +12,7 @@ const KlineSwitch = memo(
           onChange && onChange(_show)
         }}
       >
-        <IconKline />
+        <IconKline show={show} />
       </button>
     )
   }

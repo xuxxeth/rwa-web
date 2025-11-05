@@ -21,7 +21,7 @@ const ScrollBox = memo(
           "scroll-box h-[50vh] overflow-y-auto",
           className
         )}
-        style={{paddingRight: p * 2 + 'px'}}
+        style={{paddingRight: p / 2 + 'px'}}
         >
           { children }
         </div>
