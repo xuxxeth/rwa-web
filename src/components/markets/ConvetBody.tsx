@@ -20,7 +20,7 @@ import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
 
-const trading = '0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9'
+const trading = '0x6c5A81eC1D8cF4A389F6Cc9498A3096CF823cb88'
 
 type ConverBodyProps = {
   action?: string
