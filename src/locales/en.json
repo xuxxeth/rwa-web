@@ -332,7 +332,7 @@
   "switchNetwork": "Please switch network to {{network}}.",
   "amountMin": "Order amount must not be less than",
   "amountMax": "Order amount must not exceed",
-  "tradingHalt": "Trading for this token is currently suspended.",
+  "tradingHalt": "Trading Halt",
   "orderSuccess": "Transaction signed successfully.",
   "Trade": "Trade",
   "proTrade": "Pro Trade",

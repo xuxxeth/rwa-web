@@ -326,7 +326,7 @@
   "switchNetwork": "請切換網路至 {{network}}",
   "amountMin": "訂單金額不得低於",
   "amountMax": "訂單金額不得高於",
-  "tradingHalt": "當前資產交易暫停",
+  "tradingHalt": "交易暫停",
   "orderSuccess": "交易签名成功",
   "Trade": "交易",
   "proTrade": "專業交易",
