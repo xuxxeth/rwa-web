@@ -54,8 +54,6 @@ const OrderList = memo(
         }
         return
       }
-      
-      
     }, [])
 
     const filterOrderList = useMemo(() => {
@@ -112,6 +110,7 @@ const OrderList = memo(
       <div className="w-[510px]">
         <OrderTabs onChange={tab => {
           afterList.current = ['']
+          setAfter('')
           setOpenOrderList([])
           setNextDisabled(false)
           setCurrentTab(tab.key)
@@ -144,7 +143,7 @@ const OrderList = memo(
           
         </div>
         {
-          filterOrderList.length >= 10 &&
+          (filterOrderList.length >= 10 || after) &&
             <Pagination
               className="mt-1"
               currentPage={currentPage}

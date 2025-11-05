@@ -15,6 +15,7 @@ import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed } from '@/utils'
 import type { OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
+import { ScrollBox } from '@/components/scroll-box'
 
 export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
@@ -202,9 +203,10 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='bg-[rgba(19,24,35,1)] border-none w-[211px] max-h-[280px] py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='bg-[rgba(19,24,35,1)] border-none py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
+            <ScrollBox p={16} className=' w-[211px] max-h-[280px]'>
             {[
               {
                 key: 'all',
@@ -224,10 +226,10 @@ export function DropDownFilter(props: {
               }) => {
                 const checked = selectedTypes.includes(value)
                 const mentItem = (
-                  <DropdownMenuItem
+                  <div
                     key={key}
                     onClick={e => e.preventDefault()}
-                    className='px-4 py-3 flex flex-row justify-between'
+                    className=' py-3 flex flex-row justify-between w-full hover:bg-none'
                   >
                     <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
                     <span
@@ -240,7 +242,7 @@ export function DropDownFilter(props: {
                         ? itemRender?.({ key, value })
                         : t(`assets.order.${key}`)}
                     </span>
-                  </DropdownMenuItem>
+                  </div>
                 )
 
                 if (hasSeperator) {
@@ -255,6 +257,7 @@ export function DropDownFilter(props: {
                 }
               }
             )}
+            </ScrollBox>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

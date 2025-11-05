@@ -25,7 +25,7 @@ export function BuyButton({ rwa }: { rwa: IRwa }) {
         updateInputToken(rwa);
         router.push('/markets/trading/' + symbolToLower(rwa.symbol))
       }}
-      className='flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium h-10 px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer'
+      className='text-[14px] flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium h-10 px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer'
     >
       <span>{t('Trade')}</span>
       <ArrowRight2SVG className='w-4 h-4 ml-2' />
