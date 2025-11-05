@@ -46,7 +46,7 @@ function Markets() {
   return (
     <>
       <MainLayout>
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white ">
+        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white">
           {/* <div className="flex items-center text-[12px] font-normal my-3">
             <div 
               className=" cursor-pointer"
@@ -57,9 +57,11 @@ function Markets() {
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
             <div>{inputToken?.symbol || '--'}</div>
           </div> */}
-          <MarketTrading align="left" />
-          <div className="pt-5 flex gap-x-5">
-            <div className="flex-1 pl-4">
+          <div className="px-5">
+            <MarketTrading align="left" />
+          </div>
+          <div className="pt-5 flex gap-x-5 pr-5">
+            <div className="flex-1 pl-5">
               <KlineBody from="market" />
             </div>
             <div className="w-[350px] shrink-0">
