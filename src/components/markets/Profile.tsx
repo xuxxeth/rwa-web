@@ -19,7 +19,7 @@ const Profile = memo(
     const [profileData, setProfileData] = useState<IProfile>()
 
     useEffect(() => {
-      if (inputToken?.stockId && !initRef.current) {
+      if (inputToken?.stockId) {
         initRef.current = true
         baseApi.getProfile(inputToken.stockId)
           .then(res => {

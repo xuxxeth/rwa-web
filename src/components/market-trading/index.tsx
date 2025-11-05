@@ -55,7 +55,7 @@ const MarketTrading = memo(
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center pl-4",
-        align === 'left' ? 'justify-start' : 'justify-center'
+        align === 'left' ? 'justify-start h-[40px]' : 'justify-center'
       )}>
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">

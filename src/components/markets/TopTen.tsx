@@ -26,7 +26,7 @@ const TopItem = ({
 }) => {
   return (
     <div className={cn(
-      "flex items-center h-[35px] text-[rgba(255,255,255,0.6)] text-[14px] font-medium gap-x-4 px-5 my-2",
+      "flex items-center h-[35px] text-white  text-[14px] font-medium gap-x-4 px-5 my-2",
       className
     )}>
       <div className="flex-1">{top.investor}</div>
