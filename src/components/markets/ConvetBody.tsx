@@ -190,8 +190,8 @@ export function ConverBody({
     // 先判断当前资产是否可交易
     if (inputToken?.state === 1) return t('tradingHalt')
     // 判断有没有超出最大或最小金额
-    if (isMinOrMax.min) return t('amountMin') + ' ' + inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol
-    if (isMinOrMax.max) return t('amountMax') + ' ' + inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol
+    if (isMinOrMax.min) return t('amountMin', { amount: inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol })
+    if (isMinOrMax.max) return t('amountMax', { amount: inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol })
     if (isInsufficient) return i18n.language === 'zh' ? outputToken?.symbol + ' ' + t("Insufficient") : t("Insufficient") + ' ' + outputToken?.symbol
     if (isSellInsufficient) return i18n.language === 'zh' ? inputToken?.symbol + ' ' + t("Insufficient") :  t("Insufficient") + ' ' + inputToken?.symbol
     if (approvalState !== 3) return t("approve")

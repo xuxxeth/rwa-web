@@ -81,6 +81,14 @@ const OrderItem = memo(
         </OrderItemWRap>
         <OrderItemWRap>
           <div className="text-[14px] flex items-center gap-x-1">
+            {t('Filled Amount')}
+          </div>
+          <div className=" text-white">
+            {toFixed(order.settledSize, 0)}
+          </div>
+        </OrderItemWRap>
+        <OrderItemWRap>
+          <div className="text-[14px] flex items-center gap-x-1">
             {t('assets.order.orderStatus')}
           </div>
           <OrderStatusCell state={order.state} />
@@ -88,14 +96,7 @@ const OrderItem = memo(
         {
           expand &&
           <>
-            <OrderItemWRap>
-              <div className="text-[14px] flex items-center gap-x-1">
-                {t('Filled Amount')}
-              </div>
-              <div className=" text-white">
-                {toFixed(order.settledSize, 0)}
-              </div>
-            </OrderItemWRap>
+            
             <OrderItemWRap>
               <div className="text-[14px] flex items-center gap-x-1">
                 {t('Filled Value')}
