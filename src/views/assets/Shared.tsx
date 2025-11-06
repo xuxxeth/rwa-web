@@ -22,6 +22,11 @@ export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
 }
 
+export function TextCellWithTranslation(props: { text: string; className?: string }) {
+  const { t } = useTranslation()
+  return <div className={cn('text-sm/5.5 font-normal', props.className)}>{t(props.text)}</div>
+}
+
 export function AmountCell(props: { amount: string }) {
   return <TextCell text={formatAssetMount(props.amount)} />
 }
@@ -57,7 +62,7 @@ export function SideCell(props: { side: 0 | 1 }) {
 export function TxHashCell({ hash }: { hash: string }) {
   return (
     <div className='flex flex-row items-center gap-2 cursor-pointer'>
-      <span className='text-sm font-medium text-[rgba(26,133,255,1)]'>
+      <span className='text-sm font-medium text-[rgba(26,133,255,1)] font-mono'>
         {shortenAddress(hash, 4, 4)}
       </span>
       <CopyButton copyText={hash} />
@@ -99,9 +104,9 @@ export const failedStatus = {
   className: 'text-[rgba(209,26,42,1)] bg-[rgba(209,26,42,0.1)]',
 }
 
-export const canceledStatus = {
+export const cancelledStatus = {
   value: [3], // 3 已撤销
-  text: 'canceled',
+  text: 'cancelled',
   className: 'text-[rgba(130,134,145,1)] bg-[rgba(130,134,145,0.1)]',
 }
 
@@ -121,7 +126,7 @@ const ORDER_STATUS: { [key: number]: { text: string; className: string } } = [
   openStatus,
   partiallyFilledStatus,
   failedStatus,
-  canceledStatus,
+  cancelledStatus,
   filledStatus,
   pendingCancelStatus,
 ].reduce((acc: { [key: number]: { text: string; className: string } }, cur) => {
@@ -204,66 +209,55 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='bg-[rgba(19,24,35,1)] border-none py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='w-[211px] bg-[rgba(19,24,35,1)] border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
-            <ScrollBox p={16} pt={0} pb={4} className=' w-[191px] h-auto max-h-[300px]'>
-              {[
-                {
-                  key: 'all',
-                  value: 'all',
-                  hasSeperator: true,
-                },
-                ...items,
-              ].map(
-                ({
-                  key,
-                  value,
-                  hasSeperator = false,
-                }: {
-                  key: string
-                  hasSeperator?: boolean
-                  value: string
-                }) => {
-                  const checked = selectedTypes.includes(value)
-                  const mentItem = (
-                    <div
-                      key={key}
-                      onClick={e => e.preventDefault()}
-                      className=' py-3 flex flex-row justify-between w-full hover:bg-none'
-                    >
-                      <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
-                      <span
-                        className={cn(
-                          'text-base/6  font-medium',
-                          checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
-                        )}
-                      >
-                        {key !== 'all' && itemRender
-                          ? itemRender?.({ key, value })
-                          : t(`assets.order.${key}`)}
-                      </span>
-                    </div>
-                  )
-
-                  if (hasSeperator) {
-                    return (
-                      <>
-                        {mentItem}
-                        <DropdownMenuSeparator className='bg-white/10' />
-                      </>
-                    )
-                  } else {
-                    return mentItem
+            <div>
+              <MenuItem keyAlias="all" checked={selectedTypes.includes('all')} handleItemClick={handleItemClick} value="all" hasSeperator={true} />
+              <div className='max-h-[224px] overflow-auto mr-1'>
+                {items.map(
+                  (item: { key: string; value: string; hasSeperator?: boolean }) => {
+                    const checked = selectedTypes.includes(item.value)
+                    return <MenuItem checked={checked} handleItemClick={handleItemClick} value={item.value} keyAlias={item.key} itemRender={itemRender} />
                   }
-                }
-              )}
-            </ScrollBox>
+                )}
+              </div>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </div >
   )
+}
+
+interface MentItemProps {
+  keyAlias: string
+  hasSeperator?: boolean
+  value: string,
+  checked: boolean
+  handleItemClick: (value: string) => void
+  itemRender?: (item: { key: string; value: string }) => ReactNode
+}
+
+function MenuItem({ keyAlias, checked, handleItemClick, value, hasSeperator, itemRender }: MentItemProps) {
+  const { t } = useTranslation()
+  return <div
+    key={keyAlias}
+    onClick={e => e.preventDefault()}
+    className={cn('px-4 py-3 flex flex-row justify-between items-center w-full hover:bg-none', hasSeperator ? 'border-b border-white/10' : '')}
+  >
+    <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
+    <span
+      className={cn(
+        'text-base/6  font-medium',
+        checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
+      )}
+    >
+      {keyAlias !== 'all' && itemRender
+        ? itemRender?.({ key: keyAlias, value })
+        : t(`assets.order.${keyAlias}`)}
+    </span>
+  </div>
 }
 
 export function ScrollLoadMore<TData>(props: {
@@ -330,8 +324,8 @@ export function RiskLockFlag(props: { riskType: RiskType }) {
 export function TokenFilterItem(props: { icon?: string; symbol?: string; name?: string }) {
   return (
     <div className={'flex flex-row gap-1.5'}>
-      <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props?.icon || ''} />
-      <div className='w-[64px] w-max-[64px] flex flex-col'>
+      {/* <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props?.icon || ''} /> */}
+      <div className='w-[64px] w-max-[64px] flex flex-col font-normal'>
         <div className='text-sm/[17px]'>{props?.symbol}</div>
         <div className='text-60 text-xs/[15px] truncate'>{props?.name}</div>
       </div>

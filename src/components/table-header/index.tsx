@@ -91,11 +91,11 @@ export function TableHeader<SortableField extends string, Item, Extra>({
               <span className='mr-0.5 text-sm/3.5 font-medium text-left'>
                 {breakOnSpace && text.includes(' ')
                   ? text.split(' ').map((part, index) => (
-                      <Fragment key={index}>
-                        {index > 0 && <br />}
-                        {part}
-                      </Fragment>
-                    ))
+                    <Fragment key={index}>
+                      {index > 0 && <br />}
+                      {part}
+                    </Fragment>
+                  ))
                   : text}
               </span>
               {sortable && (

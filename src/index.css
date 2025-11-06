@@ -37,6 +37,17 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('/fonts/SourceCodePro/SourceCodePro-Regular.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-mono {
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 400;
+}
 /* .font-light {
   font-family: 'Poppins-Light', sans-serif;
   font-weight: 300;

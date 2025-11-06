@@ -219,6 +219,6 @@ const MarketQuotesList = [
   {
     key: 'quickBuy',
     sortable: false,
-    render: (item: IMarketQuote) => <RwaStateButton rwa={item} />,
+    render: (item: IMarketQuote) => <RwaStateButton rwa={item} className='text-base/[19px]' />,
   },
 ]
