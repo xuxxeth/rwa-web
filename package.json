@@ -24,7 +24,7 @@
     "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
     "bignumber.js": "^9.3.1",
-    "ca-common-web": "^0.1.47",
+    "ca-common-web": "^0.1.48",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -46,6 +46,7 @@
     "tailwindcss": "^4.1.13",
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.3.8",
+    "viem": "^2.38.6",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

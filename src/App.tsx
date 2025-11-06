@@ -18,6 +18,7 @@ import { Menus } from './components/menu'
 import { riskApi } from './service/risk/api'
 import { useRiskStore } from './stores/riskStore'
 import { useRiskUserConfig } from './hooks/useRiskStatus'
+import { Updater } from './components/Updater'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -72,6 +73,7 @@ function App() {
         <BrowserRouter>
           <ScrollToTop />
           <Menus />
+          <Updater />
           <RoutesWrapper />
         </BrowserRouter>
         <Toaster position='top-center' />

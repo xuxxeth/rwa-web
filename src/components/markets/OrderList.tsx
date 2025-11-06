@@ -30,16 +30,23 @@ const OrderList = memo(
     const [currentOrderId, setCurrentOrderId] = useState('')
     const [nextDisabled, setNextDisabled] = useState(false)
     const afterList = useRef<string[]>([''])
+    const preTab = useRef<string>('open')
 
-    const getOpenOrders = useCallback(async (type: string, after?: string) => {
+    const getOpenOrders = useCallback(async (_type?: string, _after?: string, from?: string) => {
       // getOrderHistory
       setLoading(true)
-      const action = type === 'open' ? scanApi.getOpenOrders : scanApi.getOrderHistory
+      const actionType = _type
+      const afterId = _after || undefined
+      const action = actionType === 'open' ? scanApi.getOpenOrders : scanApi.getOrderHistory
       // @ts-ignore
-      const res = await action({ after, noError: true })
+      const res = await action({ after: afterId, noError: true })
 
       setLoading(false)
       if (!res) {
+        return
+      }
+      if (preTab.current !== currentTab && from === 'interval') {
+        preTab.current = currentTab
         return
       }
       if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -55,7 +62,7 @@ const OrderList = memo(
         }
         return
       }
-    }, [])
+    }, [currentTab])
 
     const filterOrderList = useMemo(() => {
       return openOrderList
@@ -107,13 +114,44 @@ const OrderList = memo(
       }
     }, [t, isCanceling, openOrderList])
 
+    const pollingRef = useRef<NodeJS.Timeout | null>(null)
+    useEffect(() => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current)
+        pollingRef.current = null
+      }
+      if (!pollingRef.current) {
+        pollingRef.current = setInterval(() => {
+          console.log(currentPage, afterList, 1111)
+          if (currentPage > 0) {
+            const _page = currentPage
+            let _afterId = afterList.current[_page - 1]
+            getOpenOrders(currentTab, _afterId, 'interval')
+          } else {
+            getOpenOrders(currentTab, undefined, 'interval')
+          }
+        }, 10000)
+      }
+
+      return () => {
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current)
+          pollingRef.current = null
+        }
+      }
+    }, [getOpenOrders, currentTab, currentPage, afterList])
+
+
     return (
       <div className="w-[510px]">
-        <OrderTabs onChange={tab => {
+        <OrderTabs 
+          disabled={loading}
+          onChange={tab => {
           afterList.current = ['']
           setAfter('')
           setOpenOrderList([])
           setNextDisabled(false)
+          preTab.current = tab.key
           setCurrentTab(tab.key)
           getOpenOrders(tab.key)
         }} />

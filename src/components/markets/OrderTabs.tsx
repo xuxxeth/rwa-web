@@ -15,6 +15,7 @@ type OrderTabItemProps = {
 type OrderTabsProps = {
   onChange?: (tab: TabItemProps) => void
   from?: string
+  disabled?: boolean
 }
 
 
@@ -40,7 +41,7 @@ const OrderTabItem = memo(
 )
 
 const OrderTabs = memo(
-  ({ onChange, from }: OrderTabsProps) => {
+  ({ onChange, disabled }: OrderTabsProps) => {
     const { t } = useTranslation()
     
     const tabs: TabItemProps[] = [{key: 'open', label: t('assets.order.openOrders')}, {key: 'history', label: t('assets.order.orderHistory')}]
@@ -51,6 +52,7 @@ const OrderTabs = memo(
         <div className=" flex items-center w-full gap-x-6 border-b border-[rgba(255,255,255,0.1)] pb-1">
           {
             tabs.map(tab => (<OrderTabItem key={tab.key} tab={tab} selected={selected} onClick={tab => {
+              if (disabled) return
               setSelected(tab.key)
               onChange && onChange(tab)
             }} />))
