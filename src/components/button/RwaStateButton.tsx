@@ -4,17 +4,17 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
 import type { IRwa, IRwaState } from '@/service/base/types'
-import { symbolToLower } from '@/utils'
+import { symbolToLower, cn } from '@/utils'
 
 
-export default function RwaStateButton({ rwa }: { rwa: IRwa }) {
+export default function RwaStateButton({ rwa, className }: { rwa: IRwa, className?: string }) {
   if (rwa.state === 1) {
-    return <TradingHaltBtn />
+    return <TradingHaltBtn className={className} />
   }
-  return <BuyButton rwa={rwa} />
+  return <BuyButton rwa={rwa} className={className} />
 }
 
-export function BuyButton({ rwa }: { rwa: IRwa }) {
+export function BuyButton({ rwa, className }: { rwa: IRwa, className?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
   const updateInputToken = useTradeStore(state => state.updateInputToken)
@@ -25,7 +25,7 @@ export function BuyButton({ rwa }: { rwa: IRwa }) {
         updateInputToken(rwa);
         router.push('/markets/trading/' + symbolToLower(rwa.symbol))
       }}
-      className='text-[14px] flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium h-10 px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer'
+      className={cn('text-sm/4.5 flex flex-row hover:bg-[rgba(33,201,94,1)] text-[rgba(33,201,94,1)] hover:text-black items-center font-medium px-3 py-2  bg-[rgba(33,201,94,0.1)] rounded-[5px] cursor-pointer', className)}
     >
       <span>{t('Trade')}</span>
       <ArrowRight2SVG className='w-4 h-4 ml-2' />
@@ -33,16 +33,16 @@ export function BuyButton({ rwa }: { rwa: IRwa }) {
   )
 }
 
-export function TradingHaltBtn() {
+export function TradingHaltBtn({ className }: { className?: string }) {
   const { t } = useTranslation()
   return (
-    <button className='flex flex-row gap-2 items-center justify-center py-2 px-3 bg-[rgba(238,68,63,0.1)] rounded-[5px]'>
-      <LazyImage
+    <button className={'flex flex-row gap-2 items-center justify-center py-2 px-3 bg-[rgba(238,68,63,0.1)] rounded-[5px]'}>
+      {/* <LazyImage
         className='w-4 h-4'
         src='/images/convert/lock.png'
         alt={t('marketQuotes.tradingHalt')}
-      />
-      <span className='text-xs/3.5 font-medium'>{t('marketQuotes.tradingHalt')}</span>
+      /> */}
+      <span className={cn('text-sm/4.5 text-[rgba(238,68,63,1)] font-medium', className)}>{t('marketQuotes.tradingHalt')}</span>
     </button>
   )
 }

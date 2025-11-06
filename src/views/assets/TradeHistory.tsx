@@ -209,7 +209,6 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[] }> = [
   {
     key: 'token',
     sortable: false,
-    width: 150,
     render: (item: ITrade, { rwaTokens }: { rwaTokens: IRwa[] }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
@@ -238,7 +237,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[] }> = [
     key: 'time',
     sortable: false,
     breakOnSpace: true,
-    render: (item: ITrade) => <TextCell text={formatTimestamp(item.txTime)} />,
+    render: (item: ITrade) => <TextCell className='w-[80px]' text={formatTimestamp(item.txTime)} />,
   },
   {
     key: 'txHash',

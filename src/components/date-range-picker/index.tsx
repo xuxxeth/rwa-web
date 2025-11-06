@@ -220,7 +220,7 @@ export function DatePicker({
             classNames={{
               root: cn(
                 defaultClassNames.root,
-                'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4'
+                'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4 [--cell-size:36px]'
               ),
               nav: cn(
                 defaultClassNames.nav,

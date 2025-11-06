@@ -169,7 +169,7 @@
         "open": "委託中",
         "partiallyFilled": "部分成交",
         "orderFailed": "下單失敗",
-        "canceled": "已撤單",
+        "cancelled": "已撤單",
         "filled": "完全成交",
         "rejected": "已拒絕",
         "pendingCancel": "撤單中"
@@ -190,7 +190,7 @@
       "partiallyFilled": "部分成交",
       "open": "委託中",
       "failed": "下單失敗",
-      "canceled": "已撤單",
+      "cancelled": "已撤單",
       "filled": "完全成交",
       "cancelOrderSuccess": "撤單請求已成功提交。",
       "cancelOrdering": "正在撤單...",

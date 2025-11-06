@@ -62,7 +62,6 @@
   "Listing date": "Listing Date",
   "Chairman": "Chairman",
   "Industry": "Industry",
-
   "startVerification": "Start Verification",
   "verified": "Verified",
   "notVerified": "Not Verified",
@@ -151,7 +150,6 @@
       "cancelOrder": "Cancel Order",
       "cancelOrderFailed": "Order cancellation failed.",
       "rk": "Risk Lock",
-
       "tableHeader": {
         "side": "Side",
         "type": "Type",
@@ -169,19 +167,17 @@
         "status": "Status",
         "action": "Action"
       },
-
       "state": {
         "open": "Open",
         "partiallyFilled": "Partially Filled",
         "orderFailed": "Order Failed",
-        "canceled": "Canceled",
+        "cancelled": "Cancelled",
         "filled": "Filled",
-        "partiallyFilledAndCancelled": "Partially Filled & Canceled",
+        "partiallyFilledAndCancelled": "Partially Filled & Cancelled",
         "rejected": "Rejected",
-        "marketCloseCanceled": "Market Close Canceled",
-        "pendingCancel": "Canceling"
+        "marketCloseCancelled": "Market Close Cancelled",
+        "pendingCancel": "Cancelling"
       },
-
       "action": "Action",
       "orderHistory": "Order History",
       "market": "Market",
@@ -197,10 +193,10 @@
       "partiallyFilled": "Partially Filled",
       "open": "Open",
       "failed": "Order Failed",
-      "canceled": "Canceled",
+      "cancelled": "Cancelled",
       "filled": "Filled",
       "cancelOrderSuccess": "Order cancellation submitted successfully.",
-      "cancelOrdering": "Canceling...",
+      "cancelOrdering": "Cancelling...",
       "intraday": "Intraday"
     },
     "loading": "Loading...",
@@ -211,7 +207,6 @@
   "signatureVerify": "Signature Verification",
   "signatureVerifyDescTop": "To protect your personal information,",
   "signatureVerifyDescBottom": "please sign with your wallet to view order and trade history.",
-
   "gotoSignature": "Sign Now",
   "Coming Soon": "Coming Soon",
   "Holdings Only": "Holdings Only",
@@ -356,5 +351,4 @@
     "grps": "Revenue",
     "yoy": "YOY"
   }
-  
 }

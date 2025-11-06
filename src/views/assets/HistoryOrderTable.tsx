@@ -20,7 +20,7 @@ import {
   filledStatus,
   partiallyFilledStatus,
   failedStatus,
-  canceledStatus,
+  cancelledStatus,
   TokenFilterItem,
   isRiskLocked,
   RiskLockFlag,
@@ -160,8 +160,8 @@ export default function HistoryOrderTable(props: {
               value: filledStatus.value.join(','),
             },
             {
-              key: 'canceled',
-              value: canceledStatus.value.join(','),
+              key: 'cancelled',
+              value: cancelledStatus.value.join(','),
             },
             {
               key: 'failed',
@@ -232,7 +232,6 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'token',
     sortable: false,
-    width: 150,
     render: (item: IOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
@@ -241,33 +240,32 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'orderPrice',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: IOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
   },
   {
     key: 'orderAmount',
     sortable: false,
-    breakOnSpace: true,
-    width: 100,
+    breakOnSpace: false,
     render: (item: IOrder) => <AmountCell amount={item.size} />,
   },
   {
     key: 'filledAmount',
     sortable: false,
-    breakOnSpace: true,
-    width: 100,
+    breakOnSpace: false,
     render: (item: IOrder) => <AmountCell amount={item.settledSize} />,
   },
   {
     key: 'filledValue',
-    breakOnSpace: true,
+    breakOnSpace: false,
     sortable: false,
     render: (item: IOrder) => <ValueCell value={item.settledAmount} />,
   },
   {
     key: 'executionTime',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
+    width: 103,
     render: (item: IOrder) => <TextCell className='w-[100px]' text={formatTimestamp(item.tradeTime)} />,
   },
   {
@@ -278,7 +276,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'txHash',
     sortable: false,
-    width: 125,
+    width: 130,
     render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
   {

@@ -1,3 +1,11 @@
+.rdp-root {
+  --rdp-day-width: 36px;
+  --rdp-day-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-day_button-height: 36px;
+  --rdp-day-font-size: 14px;
+}
+
 .rdp-weekday {
   color: rgba(108, 134, 173, 1);
   font-weight: 400;
@@ -8,7 +16,7 @@
 
 .rdp-caption_label {
   font-weight: 500;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .rdp-range_start {
@@ -33,9 +41,21 @@
 }
 
 .rdp-range_start .rdp-day_button {
-  background-color: rgba(69, 122, 255, 1)
+  background-color: rgba(69, 122, 255, 1);
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 
 .rdp-range_end .rdp-day_button {
-  background-color: rgba(69, 122, 255, 1)
+  background-color: rgba(69, 122, 255, 1);
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.rdp-day_button {
+  font-size: 15px;
 }
