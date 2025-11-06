@@ -187,7 +187,7 @@ export function DropDownFilter(props: {
                 <span className='flex-1 text-left text-sm font-medium'>
                   {t(`assets.order.${props.title}`)}
                 </span>
-                <span>{t('assets.order.all')}</span>
+                <span className='text-sm'>{t('assets.order.all')}</span>
               </>
             ) : (
               <span className='flex-1 text-left text-sm font-medium truncate'>
@@ -207,57 +207,57 @@ export function DropDownFilter(props: {
             className='bg-[rgba(19,24,35,1)] border-none py-1 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
-            <ScrollBox p={16} pt={4} pb={4} className=' w-[191px] h-auto max-h-[300px]'>
-            {[
-              {
-                key: 'all',
-                value: 'all',
-                hasSeperator: true,
-              },
-              ...items,
-            ].map(
-              ({
-                key,
-                value,
-                hasSeperator = false,
-              }: {
-                key: string
-                hasSeperator?: boolean
-                value: string
-              }) => {
-                const checked = selectedTypes.includes(value)
-                const mentItem = (
-                  <div
-                    key={key}
-                    onClick={e => e.preventDefault()}
-                    className=' py-3 flex flex-row justify-between w-full hover:bg-none'
-                  >
-                    <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
-                    <span
-                      className={cn(
-                        'text-base/6  font-medium',
-                        checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
-                      )}
+            <ScrollBox p={16} pt={0} pb={4} className=' w-[191px] h-auto max-h-[300px]'>
+              {[
+                {
+                  key: 'all',
+                  value: 'all',
+                  hasSeperator: true,
+                },
+                ...items,
+              ].map(
+                ({
+                  key,
+                  value,
+                  hasSeperator = false,
+                }: {
+                  key: string
+                  hasSeperator?: boolean
+                  value: string
+                }) => {
+                  const checked = selectedTypes.includes(value)
+                  const mentItem = (
+                    <div
+                      key={key}
+                      onClick={e => e.preventDefault()}
+                      className=' py-3 flex flex-row justify-between w-full hover:bg-none'
                     >
-                      {key !== 'all' && itemRender
-                        ? itemRender?.({ key, value })
-                        : t(`assets.order.${key}`)}
-                    </span>
-                  </div>
-                )
-
-                if (hasSeperator) {
-                  return (
-                    <>
-                      {mentItem}
-                      <DropdownMenuSeparator className='bg-white/10' />
-                    </>
+                      <CheckBoxBySVG checked={checked} onChange={() => handleItemClick(value)} />
+                      <span
+                        className={cn(
+                          'text-base/6  font-medium',
+                          checked ? 'text-white' : 'text-[rgba(108,134,173,1)]'
+                        )}
+                      >
+                        {key !== 'all' && itemRender
+                          ? itemRender?.({ key, value })
+                          : t(`assets.order.${key}`)}
+                      </span>
+                    </div>
                   )
-                } else {
-                  return mentItem
+
+                  if (hasSeperator) {
+                    return (
+                      <>
+                        {mentItem}
+                        <DropdownMenuSeparator className='bg-white/10' />
+                      </>
+                    )
+                  } else {
+                    return mentItem
+                  }
                 }
-              }
-            )}
+              )}
             </ScrollBox>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -291,7 +291,7 @@ export function ScrollLoadMore<TData>(props: {
       )}
       {!isLoading && data.length === 0 && (
         <div className='py-[90px] text-center text-gray-400'><NoData /></div>
-        
+
       )}
     </>
   )

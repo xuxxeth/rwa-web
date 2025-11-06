@@ -4,7 +4,6 @@ import { useBaseStore } from '@/stores/baseStore'
 
 // 获取原生的 rwa 列表
 export function useRwaTokens(includeDelisted: boolean = true) {
-  // TODO: rwaList 就是根据 chainId 获取来的，还需要过滤吗？感觉不太需要了？
   const rwaList = useBaseStore(state => state.rwaList)
 
   return useMemo(() => {

@@ -100,7 +100,7 @@ export default function MarketQuotes() {
             sort={sort}
             onSortChange={onSortChange}
           />
-          <div className='min-h-[350px]'>
+          <div className='min-h-[550px]'>
             <TableBody<IMarketQuote, unknown>
               data={paginatedData}
               config={MarketQuotesList}
