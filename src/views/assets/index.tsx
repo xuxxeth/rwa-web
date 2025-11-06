@@ -13,8 +13,11 @@ import OrderHistory from './OrderHistory'
 import TradeHistory from './TradeHistory'
 import { useRwaTokens } from '@/hooks/useTokens'
 import { useBaseStore } from '@/stores/baseStore'
+import { useAppStore } from '@/stores/appStore'
 
 function Assets() {
+  const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
+
   const account = useAccount()
   const chainId = useChainId()
   const autoInitialize = useBaseStore(state => state.init)
@@ -22,6 +25,8 @@ function Assets() {
   const { t } = useTranslation()
 
   const walltedConnected = account && chainId
+
+  console.log('===>isWalletConnecting', isWalletConnecting, account)
 
   const [activeTab, setActiveTab] = useState('assets')
 
@@ -69,7 +74,7 @@ function Assets() {
                 </TabsContent>
               </Tabs>
             </div>
-          ) : (
+          ) : isWalletConnecting ? null : (
             <WalletNotConnected />
           )}
         </ContentLayout>

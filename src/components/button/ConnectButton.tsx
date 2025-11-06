@@ -25,6 +25,7 @@ import { useTokenBalance } from '@/hooks/useTokenBalances'
 import { useBaseStore } from '@/stores/baseStore'
 import { useRouter } from '@/hooks/useRouter'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
+import { useAppStore } from '@/stores/appStore'
 
 export function WalletItem({
   wallet,
@@ -80,10 +81,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const usdtToken = useUSDT()
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
-  const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains]) 
+  const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains])
 
   const disconnectInit = useRef(false)
   const connectInit = useRef(false)
+
+  const setIsWalletConnecting = useAppStore(state => state.setIsWalletConnecting)
 
   // 默认执行一次连接钱包操作
   useEffect(() => {
@@ -93,16 +96,22 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       if (walletUUID && connectorType) {
         const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
 
-        if(!wallet) return
-        if(connectorType === ConnectorType.Injected && !wallet.detected) return
+        if (!wallet) return
+        if (connectorType === ConnectorType.Injected && !wallet.detected) return
 
         hasConnected.current = true
         setCurrentWallet(wallet)
         // @ts-ignore
         handleConnect(connectorType, wallet)
+      } else {
+        setIsWalletConnecting(false)
       }
+    } else if (!hasConnected.current) {
+      setIsWalletConnecting(false)
     }
+
     if (account) {
+      setIsWalletConnecting(false)
       // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
       if (!connectInit.current) {
         toastSuccess({
@@ -114,7 +123,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         }, 1000)
       }
       storage.setItem(CONNECT_ACCOUNT, account)
-      
+
     }
   }, [wallets, chainId, account, handleConnect])
 
@@ -199,7 +208,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           <HoverCardTrigger asChild>
             <div
               className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'
-              onClick={() => {}}
+              onClick={() => { }}
             >
               {currentWallet?.info?.icon && (
                 <img src={currentWallet?.info?.icon} className='w-6 mr-2' alt='' />
@@ -253,7 +262,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
                   await handleDisConnect()
-                  
+
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />

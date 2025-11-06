@@ -16,6 +16,7 @@ import {
   DropDownFilter,
   ScrollLoadMore,
   TokenFilterItem,
+  TextCellWithTranslation
 } from './Shared'
 import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, sleep } from '@/utils'
 import { useToast } from '@/hooks/useToast'
@@ -142,6 +143,7 @@ export default function OpenOrderTable(props: {
           title={"orderStatus"}
         /> */}
       </div>
+
       <TableHeader<'', IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }>
         lngPrefix='assets.order.tableHeader'
         config={openOrderTableConfig}
@@ -191,7 +193,6 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'token',
     sortable: false,
-    width: 150,
     render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return <TokenCell icon={rwa?.icon} token={rwa?.symbol} name={rwa?.name} />
@@ -200,38 +201,41 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'orderPrice',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
   },
   {
     key: 'orderAmount',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: IOpenOrder) => <AmountCell amount={item.size} />,
   },
   {
     key: 'filledAmount',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: IOpenOrder) => <AmountCell amount={item.settledSize} />,
   },
   {
     key: 'filledValue',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
   },
   {
     key: 'orderTime',
     sortable: false,
-    render: (item: IOpenOrder) => <TextCell className='w-[80px]' text={formatTimestamp(item.txTime)} />,
+    render: (item: IOpenOrder) => <TextCell className='w-[80px] text-sm/[17px]' text={formatTimestamp(item.txTime)} />,
   },
   {
     key: 'expiration',
     sortable: false,
     render: (item: IOpenOrder) => {
-      const { t } = useTranslation()
-      return <TextCell text={item.tif === 0 ? t('assets.order.intraday') : readableDuration(item.validDate * Day)} />
+      if (item.tif === 0) {
+        return <TextCellWithTranslation text="assets.order.intraday" />
+      }
+
+      return <TextCell text={readableDuration(item.validDate * Day)} />
     },
   },
   {
@@ -245,6 +249,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     render: (item: IOpenOrder, { refetch }) => (
       <CancelOrderButton refetch={refetch} orderId={item.orderId} disabled={item.state === 8} />
     ),
+    width: 90,
   },
 ]
 
