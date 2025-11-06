@@ -3,7 +3,6 @@ import { OrderTabs } from "./OrderTabs"
 import { useTranslation } from "@/hooks/useTranslation"
 import { scanApi } from "@/service/scan/api"
 import type { IOpenOrder } from "@/service/scan/types"
-import { useTradeUtils } from "@/hooks/useCaCommon"
 import { useToast } from "@/hooks/useToast"
 import { OrderItem } from "./OrderItem"
 import { Loading } from "../loading"
@@ -11,6 +10,7 @@ import { NoData } from "./NoData"
 import Pagination from "../pagination"
 import { RESPONSE_CODE } from "@/config/constants"
 import { ScrollBox } from "../scroll-box"
+import { useTradeUtils } from "@/hooks/useTrading"
 
 
 

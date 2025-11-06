@@ -9,7 +9,6 @@ import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
 import { compareBigNumber, isGreater, isLess, multiply, parseAmount } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
-import { useTrading } from "@/hooks/useCaCommon";
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
@@ -19,8 +18,7 @@ import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
-
-const trading = '0x6c5A81eC1D8cF4A389F6Cc9498A3096CF823cb88'
+import { useTrading } from "@/hooks/useTrading";
 
 type ConverBodyProps = {
   action?: string
@@ -59,7 +57,7 @@ export function ConverBody({
   console.log('orderValue: ', orderValue, parseAmount(approveAmount))
 
   
-  const { placeOrder, approve, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, trading, BigInt(parseAmount(approveAmount)))
+  const { placeOrder, approve, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, BigInt(parseAmount(approveAmount)))
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)

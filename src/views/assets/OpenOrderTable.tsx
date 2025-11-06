@@ -18,11 +18,11 @@ import {
   TokenFilterItem,
 } from './Shared'
 import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, sleep } from '@/utils'
-import { useTradeUtils } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
 import { useOrderFilterStore, generateOpenOrderFilterObj } from '@/stores/orderFilterStore'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from './SignatureVerify'
+import { useTradeUtils } from '@/hooks/useTrading'
 
 export default function OpenOrderTable(props: {
   chainId: number

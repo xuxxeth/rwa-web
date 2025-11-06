@@ -68,6 +68,8 @@ export const RISK_STATUS = {
   NOTSIGN: 3
 }
 
+export type Address = `0x${string}`
+
 const RED = '#FF6767'
 const GREEN = '#47D0A5'
 export const DEFAULT_PERIOD = '4h'
