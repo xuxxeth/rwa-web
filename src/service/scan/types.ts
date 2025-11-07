@@ -27,7 +27,6 @@ export interface IOpenOrder {
   settledSize: string
   txTime: number
   txHash: string
-  riskType: RiskType
   reason: string
 }
 
@@ -52,7 +51,6 @@ export interface IOrder {
   settledAmount: string
   // 成交数量
   settledSize: string
-  riskType: RiskType
   reason: string
   txTime: number
   tradeTime: number
@@ -72,6 +70,5 @@ export interface ITrade {
   stockId: number
   txHash: string
   txTime: number
-  riskType: RiskType
   reason: string
 }

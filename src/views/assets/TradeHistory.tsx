@@ -168,15 +168,15 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             config={tradeHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
-            className='border-none rounded-lg mt-1'
-            dynamicClassName={(item: ITrade) =>
-              isRiskLocked(item.riskType)
-                ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
-                : 'hover:bg-white/10'
-            }
-            ExtraComponent={({ item }: { item: ITrade }) =>
-              isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
-            }
+            className='border-none rounded-lg hover:bg-white/10'
+            // dynamicClassName={(item: ITrade) =>
+            //   isRiskLocked(item.riskType)
+            //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+            //     : 'hover:bg-white/10'
+            // }
+            // ExtraComponent={({ item }: { item: ITrade }) =>
+            //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+            // }
           />
           <ScrollLoadMore<ITrade>
             isFetchingNextPage={isFetchingNextPage}
