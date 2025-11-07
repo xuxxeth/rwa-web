@@ -51,13 +51,13 @@ export function ConverBody({
   const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
 
   const approveAmount = useMemo(() => {
-    return multiply(orderValue, 1)
+    return orderValue ? parseAmount(orderValue) : '0'
   }, [orderValue, inputToken])
 
-  console.log('orderValue: ', orderValue, parseAmount(approveAmount))
+  console.log('orderValue: ', orderValue, approveAmount)
 
   
-  const { placeOrder, approve, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, BigInt(parseAmount(approveAmount)))
+  const { placeOrder, approve, refetchAllowance, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, BigInt(approveAmount))
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)
@@ -85,12 +85,23 @@ export function ConverBody({
   }, [limitPrice, inputSize])
 
   const [buying, setBuying] = useState(false)
-  const handleApprove = async () => {
+  const [approveInsufficient, setApproveInsufficient] = useState(false)
+  const handleApprove = useCallback(async () => {
     setBuying(true)
     const result = await approve()
-    setBuying(false)
+    
     if (result && result?.code === 9200) {
-      toastSuccess({title: t('approveSuccess')})
+      // toastSuccess({title: t('approveSuccess')})
+      // 这里再查询下授权额度？
+      const _allowance = await refetchAllowance()
+      if (isLess(_allowance.toString(), approveAmount)) {
+        setApproveInsufficient(false)
+        toastError({
+          title: t('appErr.apIns')
+        })
+      } else {
+        toastSuccess({title: t('approveSuccess')})
+      }
     } else {
       // @ts-ignore
       const errorMessage = result.data?.message
@@ -105,7 +116,9 @@ export function ConverBody({
         })
       }
     }
-  }
+    setBuying(false)
+    setApproveInsufficient(true)
+  }, [approveAmount]) 
 
   const handlePlaceOrder = useCallback(async () => {
     const params = {
