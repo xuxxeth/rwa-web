@@ -12,7 +12,7 @@ import { RESPONSE_CODE } from "@/config/constants"
 import { ScrollBox } from "../scroll-box"
 import { useTradeUtils } from "@/hooks/useTrading"
 
-
+const limit = 4
 
 const OrderList = memo(
   ({ show, onClose }: { show: Boolean, onClose?: () => void}) => {
@@ -39,7 +39,7 @@ const OrderList = memo(
       const afterId = _after || undefined
       const action = actionType === 'open' ? scanApi.getOpenOrders : scanApi.getOrderHistory
       // @ts-ignore
-      const res = await action({ after: afterId, noError: true })
+      const res = await action({ after: afterId, noError: true, limit: limit })
 
       setLoading(false)
       if (!res) {
@@ -51,11 +51,11 @@ const OrderList = memo(
       }
       if (res.code === RESPONSE_CODE.SUCCESS) {
         const _data = res.data || []
-        if (_data.length < 10) {
+        if (_data.length < limit) {
           setNextDisabled(true)
         }
         setOpenOrderList(_data)
-        if (_data.length >= 10) {
+        if (_data.length >= limit) {
           setAfter(_data[_data.length - 1].orderId)
           afterList.current.push(_data[_data.length - 1].orderId)
           setNextDisabled(false)
@@ -122,7 +122,6 @@ const OrderList = memo(
       }
       if (!pollingRef.current) {
         pollingRef.current = setInterval(() => {
-          console.log(currentPage, afterList, 1111)
           if (currentPage > 0) {
             const _page = currentPage
             let _afterId = afterList.current[_page - 1]
@@ -155,7 +154,7 @@ const OrderList = memo(
           setCurrentTab(tab.key)
           getOpenOrders(tab.key)
         }} />
-        <ScrollBox p={24} top={0} className="min-h-[320px] max-h-[65vh]">
+        <ScrollBox p={24} top={0} className="min-h-[320px] max-h-[65vh] h-auto">
         
           {
             filterOrderList.map(order => {
@@ -182,7 +181,7 @@ const OrderList = memo(
           }
         </ScrollBox> 
         {
-          (filterOrderList.length >= 10 || after) &&
+          (filterOrderList.length >= limit || after) &&
             <Pagination
               className="mt-1"
               currentPage={currentPage}

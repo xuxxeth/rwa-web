@@ -104,7 +104,7 @@ function LiteTrade() {
         className="p-0"
         headerClassName="px-6 pt-6"
         topFixed
-        top={30}
+        top={1}
         title={t("assets.tabList.orderHistory")}
         open={orderDialog.open}
         openChange={orderDialog.setOpen}
