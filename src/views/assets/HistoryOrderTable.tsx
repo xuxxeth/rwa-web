@@ -191,15 +191,15 @@ export default function HistoryOrderTable(props: {
             config={orderHistoryTableConfig}
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
-            className='border-none rounded-lg mt-1'
-            dynamicClassName={(item: IOrder) =>
-              isRiskLocked(item.riskType)
-                ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
-                : 'hover:bg-white/10'
-            }
-            ExtraComponent={({ item }: { item: IOrder }) =>
-              isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
-            }
+            className='border-none rounded-lg hover:bg-white/10'
+          // dynamicClassName={(item: IOrder) =>
+          //   isRiskLocked(item.riskType)
+          //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+          //     : 'hover:bg-white/10'
+          // }
+          // ExtraComponent={({ item }: { item: IOrder }) =>
+          //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+          // }
           />
           <ScrollLoadMore<IOrder>
             isFetchingNextPage={isFetchingNextPage}
