@@ -327,7 +327,7 @@
   "walletDisconnect": "Wallet disconnected.",
   "switchNetwork": "Unsupported network detected. Please switch to {{network}}.",
   "amountMin": "Less Than {{amount}} Limit",
-  "amountMax": "Exceeds {{amount}} Limit",
+  "amountMax": "Order limit: {{amount}} USDT",
   "tradingHalt": "Trading Halt",
   "orderSuccess": "Transaction signed and submitted successfully.",
   "orderSuccess2": "{{orderType}} {{orderSide}} order placed successfully. Order quantity: {{orderAmount}} {{tokenName}}.",
