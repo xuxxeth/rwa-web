@@ -329,6 +329,8 @@
   "amountMax": "訂單金額不得高於",
   "tradingHalt": "交易暫停",
   "orderSuccess": "交易簽名成功並提交",
+  "orderSuccess2": "{{orderType}}{{orderSide}}單委託成功，委託數量：{{orderAmount}} {{tokenName}}",
+  "orderFail": "{{orderType}}{{orderSide}}委託失敗，請重試",
   "Trade": "交易",
   "proTrade": "專業交易",
   "liteTrade": "簡易交易",

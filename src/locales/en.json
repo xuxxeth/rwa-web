@@ -330,6 +330,8 @@
   "amountMax": "Exceeds {{amount}} Limit",
   "tradingHalt": "Trading Halt",
   "orderSuccess": "Transaction signed and submitted successfully.",
+  "orderSuccess2": "{{orderType}} {{orderSide}} order placed successfully. Order quantity: {{orderAmount}} {{tokenName}}.",
+  "orderFail": "{{orderType}} {{orderSide}} order failed. Please try again.",
   "Trade": "Trade",
   "proTrade": "Pro Trade",
   "instantTrade": "Instant Trade",
