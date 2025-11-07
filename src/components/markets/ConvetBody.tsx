@@ -146,25 +146,25 @@ export function ConverBody({
     if (result && result?.code === 9200) {
       freshTokenBalances()
       updateInputSize('')
-      const message = t('orderSuccess2', { orderType, orderSide, orderAmount: orderValue, tokenName: inputToken?.name })
-      toastSuccess({title: message})
+      // const message = t('orderSuccess2', { orderType, orderSide, orderAmount: orderValue, tokenName: inputToken?.name })
+      // toastSuccess({title: message})
 
-      // toastSuccess({title: t('orderSuccess')})
+      toastSuccess({title: t('orderSuccess')})
     } else {
-      const message = t('orderFail', { orderType, orderSide: orderSide.toLowerCase()})
-      toastError({title: message})
+      // const message = t('orderFail', { orderType, orderSide: orderSide.toLowerCase()})
+      // toastError({title: message})
       // @ts-ignore
-      // const errorMessage = result.data?.message
-      // if (errorMessage) {
-      //   toastError({
-      //     title:  t('appErr.signError') + t(`appErr.${errorMessage}`),
-      //   })
-      // } else {
-      //   toastError({
-      //     // @ts-ignore
-      //     title: result.data?.name || t('appErr.placeOrderFail'),
-      //   })
-      // }
+      const errorMessage = result.data?.message
+      if (errorMessage) {
+        toastError({
+          title:  t('appErr.signError') + t(`appErr.${errorMessage}`),
+        })
+      } else {
+        toastError({
+          // @ts-ignore
+          title: result.data?.name || t('appErr.placeOrderFail'),
+        })
+      }
       
     }
  
