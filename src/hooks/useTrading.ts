@@ -14,11 +14,12 @@ export function useTrading(token: Address, amount: BigInt) {
 
   console.log('chain trading: ', trading)
 
-  const { placeOrder, approve, approvalState, allowance } = useTradingCommon(token, trading, amount)
+  const { placeOrder, approve, refetchAllowance, approvalState, allowance } = useTradingCommon(token, trading, amount)
 
   return {
     placeOrder,
     approve,
+    refetchAllowance,
     approvalState,
     allowance
   }
