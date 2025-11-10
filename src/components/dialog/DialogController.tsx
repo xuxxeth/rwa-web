@@ -52,7 +52,7 @@ export function DialogController({
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(
         'rounded-[16px]',
-        topFixed ? 'top-[10%] translate-y-[0]' : '',
+        topFixed ? 'top-[4vh] translate-y-[0]' : '',
         className
       )}
       >
