@@ -12,7 +12,7 @@ import { RESPONSE_CODE } from "@/config/constants"
 import { ScrollBox } from "../scroll-box"
 import { useTradeUtils } from "@/hooks/useTrading"
 
-const limit = 4
+const limit = 3
 
 const OrderList = memo(
   ({ show, onClose }: { show: Boolean, onClose?: () => void}) => {
@@ -154,7 +154,7 @@ const OrderList = memo(
           setCurrentTab(tab.key)
           getOpenOrders(tab.key)
         }} />
-        <ScrollBox p={24} top={0} className="min-h-[320px] max-h-[65vh] h-auto">
+        <ScrollBox p={24} top={0} className="min-h-[320px] max-h-[80vh] h-auto">
         
           {
             filterOrderList.map(order => {
