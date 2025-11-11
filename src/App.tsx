@@ -1,7 +1,7 @@
 import { BrowserRouter, useRoutes } from 'react-router-dom'
 import BigNumber from 'bignumber.js'
 import routes from './routes'
-import { ErrorBoundary } from './components/ErrorBoundary'
+import { ErrorBoundary } from './components/error/ErrorBoundary'
 import { Suspense, useEffect, useRef } from 'react'
 import storage from './utils/storage'
 import { useTranslation } from './hooks/useTranslation'
@@ -19,6 +19,8 @@ import { riskApi } from './service/risk/api'
 import { useRiskStore } from './stores/riskStore'
 import { useRiskUserConfig } from './hooks/useRiskStatus'
 import { Updater } from './components/Updater'
+import { ErrorChildren } from './components/error/ErrorChildren'
+import { SuspenseLoading } from './components/loading/SuspenseLoading'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -68,8 +70,8 @@ function App() {
   }, [])
 
   return (
-    <ErrorBoundary fallback={<h2>{t('pageError')}</h2>}>
-      <Suspense fallback={<div className=' text-white flex justify-center items-center h-screen '><Loading /></div>}>
+    <ErrorBoundary fallback={<ErrorChildren />}>
+      <Suspense fallback={<SuspenseLoading />}>
         <BrowserRouter>
           <ScrollToTop />
           <Menus />

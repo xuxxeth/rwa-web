@@ -3,6 +3,7 @@ import storage from '@/utils/storage'
 import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { useTradeStore } from '@/stores/tradeStore'
+import { SIGNATURE_EXPIRES } from '@/config/constants'
 
 export function useRequestSignature() {
   const [signing, setSigning] = useState(false)
@@ -12,7 +13,7 @@ export function useRequestSignature() {
   const signature = useCallback(async () => {
     setSigning(true)
     try {
-      const res = await requestSignature(Math.floor(Date.now() / 1000 + 100 * 60))
+      const res = await requestSignature(Math.floor(Date.now() / 1000) + SIGNATURE_EXPIRES)
       storage.setItem(`signature_${res.account?.toLowerCase()}`, res)
       setSigning(false)
       return res
