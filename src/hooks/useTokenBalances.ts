@@ -12,6 +12,7 @@ import type { IToken, ITokenWithBalance } from '@/service/base/types'
 
 import { useTokens, useRwaTokens } from './useTokens'
 import { useWssStore } from '@/stores/wssStore'
+import { TEN_MINUTES } from '@/utils/index'
 
 export function useTokenBalances() {
   const { getTokenBalances } = useBalances()
@@ -21,6 +22,7 @@ export function useTokenBalances() {
   const rwaRwaList = useRwaTokens()
   const setTokenWithBalance = useBaseStore(state => state.setTokenWithBalance)
   const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
+  const autoRefreshTokenBalances = useBaseStore(state => state.autoRefreshTokenBalances)
 
   const getTokensData = async (account: `0x${string}`, tokenList: Array<IToken | IToken>) => {
     const balancesRes = await getTokenBalances(
@@ -55,6 +57,23 @@ export function useTokenBalances() {
       getTokensData(account, [...tokenList, ...rwaRwaList])
     }
   }, [chainId, account, tokenList.length, rwaRwaList.length, freshTokenBalancesCount])
+
+  // 控制是否自动刷新 token balances
+  // 在 autoRefreshTokenBalances为true 时，开启自动刷新 token balances
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+    if (autoRefreshTokenBalances) {
+      // 10 分钟刷新一次 token balances
+      interval = setInterval(() => {
+        refreshTokenBalances()
+      }, TEN_MINUTES)
+    }
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [autoRefreshTokenBalances, refreshTokenBalances])
 
   return {
     refreshTokenBalances: refreshTokenBalances,
