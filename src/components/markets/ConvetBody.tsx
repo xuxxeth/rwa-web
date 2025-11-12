@@ -67,6 +67,10 @@ export function ConverBody({
   }, [])
 
   useEffect(() => {
+    updateInputSize('')
+  }, [action, updateInputSize])
+  
+  useEffect(() => {
     if (inputTokenPrice) {
       updateLimitPrice(inputTokenPrice.price ?? '0')
     }
