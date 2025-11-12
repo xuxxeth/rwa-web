@@ -20,24 +20,16 @@ function Assets() {
 
   const account = useAccount()
   const chainId = useChainId()
-  const autoInitialize = useBaseStore(state => state.init)
 
   const { t } = useTranslation()
 
   const walltedConnected = account && chainId
-
-  console.log('===>isWalletConnecting', isWalletConnecting, account)
 
   const [activeTab, setActiveTab] = useState('assets')
 
   const { assetsList, estimatedBalance } = useAssetsList(chainId!, account)
 
   const rwaTokens = useRwaTokens()
-
-  useEffect(() => {
-    if (!chainId) return
-    autoInitialize(chainId)
-  }, [chainId])
 
   return (
     <>

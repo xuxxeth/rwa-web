@@ -13,7 +13,7 @@ import type { ITableConfig } from '@/components/table-header'
 import { symbolToLower } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 type SortableField = 'value'
 
@@ -23,6 +23,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
   const updateInputToken = useTradeStore(state => state.updateInputToken)
+  const setAutoRefreshTokenBalances = useBaseStore(state => state.setAutoRefreshTokenBalances)
 
   const rwaList = useBaseStore(state => state.rwaList)
 
@@ -44,6 +45,15 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
 
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
     usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort, defaultSort)
+
+
+  useEffect(() => {
+    // 开启自动刷新 token balances
+    setAutoRefreshTokenBalances(true)
+    return () => {
+      setAutoRefreshTokenBalances(false)
+    }
+  }, [])
 
   return (
     <>
@@ -102,7 +112,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     sortable: false,
     render: (item: IAssetItem) => {
       const price = item.tokenPrice ?? item.rwaPrice
-      return <TextCell text={price ? textPrefix(toFixed(price, 2), '$') : '--'} />
+      return <TextCell text={price ? textPrefix(toFixed(price, item.precision), '$') : '--'} />
     },
   },
   {

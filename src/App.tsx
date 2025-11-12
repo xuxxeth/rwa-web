@@ -36,7 +36,6 @@ function App() {
   const { t, i18n } = useTranslation()
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
-  const getUserConfig = useRiskStore(state => state.getUserConfig)
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'

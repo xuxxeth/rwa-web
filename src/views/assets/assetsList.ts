@@ -64,6 +64,7 @@ function getAssetItemFromToken(token: IToken): IAssetItem {
     decimals: token.decimals,
     icon: token.icon,
     address: token.address,
+    precision: 2,
   }
 }
 
@@ -77,6 +78,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     icon: rwa.icon,
     rwaState: rwa.state,
     weight: rwa.weight,
+    precision: rwa.precision
   }
 }
 
@@ -96,4 +98,5 @@ export interface IAssetItem {
   icon?: string
   address: string
   weight?: number
+  precision: number
 }
