@@ -36,7 +36,11 @@ export const useBaseStore = create<BaseStore>()(
       freshTokenBalancesCount: 1,
       // TODO: 使用 Map 可能性能更好?
       // token 余额
+      autoRefreshTokenBalances: false,
       tokenWithBalance: {},
+      setAutoRefreshTokenBalances: (autoRefresh: boolean) => {
+        set({ autoRefreshTokenBalances: autoRefresh })
+      },
       setConnectInit: (init: boolean) => {
         set({ connectInit: init })
       },
@@ -139,19 +143,6 @@ export const useBaseStore = create<BaseStore>()(
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
           const marketInfo = { ...(res.data || {}) }
-          // let marketState = MARKET_STATUS.DEFAULT
-          // if (marketInfo.tradingStartTime && marketInfo.tradingEndTime) {
-          //   const nowSecond = getEasternSecondsSinceMidnight();
-          //   if (nowSecond < marketInfo.tradingStartTime - marketInfo.preMarketMinutes) {
-          //     marketState = MARKET_STATUS.BEFORE;
-          //   } else if (nowSecond > marketInfo.tradingEndTime + marketInfo.afterMarketMinutes) {
-          //     marketState = MARKET_STATUS.AFTER;
-          //   } else {
-          //     marketState = MARKET_STATUS.OPEN
-          //   }
-          // }
-          // set({ marketTradeState: marketState })
-
           set({ marketInfo: marketInfo })
         }
         return res
@@ -186,7 +177,6 @@ export const useBaseStore = create<BaseStore>()(
           get().getBaseRwas(chainId),
           get().getStocks(),
           get().getMarket(),
-          // get().getMarketState(),
         ])
         set(() => ({
           lastChainId: chainId,
@@ -224,15 +214,13 @@ export const useBaseStore = create<BaseStore>()(
       name: 'CA_WEB_BASE_INFO',
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
-        // tokenList: state.tokenList,
-        // rwaList: state.rwaList,
-        // chainList: state.chainList,
-        // stocksList: state.stocksList,
-        // marketInfo: state.marketInfo,
-        // marketState: state.marketState,
-        // marketTradeState: state.marketTradeState,
-        // lastInitTime: state.lastInitTime,
-        // lastChainId: state.lastChainId,
+        tokenList: state.tokenList,
+        rwaList: state.rwaList,
+        chainList: state.chainList,
+        stocksList: state.stocksList,
+        marketInfo: state.marketInfo,
+        lastInitTime: state.lastInitTime,
+        lastChainId: state.lastChainId,
       }),
     }
   )

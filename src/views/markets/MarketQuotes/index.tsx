@@ -184,7 +184,7 @@ const MarketQuotesList = [
     sortable: true,
     render: (item: IMarketQuote) => (
       <TextCellWithColor
-        text={item.price ? textPrefix(toFixed(item.price), '$') : '--'}
+        text={item.price ? textPrefix(toFixed(item.price, item.precision), '$') : '--'}
         change={strOrNumToSign(item.up ?? '0')}
         withIcon={false}
       />

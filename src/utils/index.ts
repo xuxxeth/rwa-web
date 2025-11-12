@@ -146,3 +146,6 @@ export function formatToQuarterLabel(dateStr: string | number) {
 
   return `Q${quarter} ’${String(year).slice(2)}`
 }
+
+export const TEN_MINUTES = 10 * 60 * 1000
+export const TEN_SECONDS = 10 * 1000
