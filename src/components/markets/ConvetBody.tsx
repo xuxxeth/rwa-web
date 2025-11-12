@@ -46,7 +46,7 @@ export function ConverBody({
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
-  const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken, outputToken])
+  const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken?.address, outputToken?.address])
 
   const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
 
@@ -55,8 +55,8 @@ export function ConverBody({
   }, [orderValue, inputToken])
 
   console.log('orderValue: ', orderValue, approveAmount)
+  console.log('approveToken: ', paymentToken)
 
-  
   const { placeOrder, approve, refetchAllowance, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, BigInt(approveAmount))
   console.log(approvalState, allowance)
   const hanleInputPrice = useCallback(async (value: string) => {
@@ -66,6 +66,10 @@ export function ConverBody({
     updateInputSize(value)
   }, [])
 
+  useEffect(() => {
+    updateInputSize('')
+  }, [action, updateInputSize])
+  
   useEffect(() => {
     if (inputTokenPrice) {
       updateLimitPrice(inputTokenPrice.price ?? '0')
@@ -89,7 +93,6 @@ export function ConverBody({
   const handleApprove = useCallback(async () => {
     setBuying(true)
     const result = await approve()
-    
     if (result && result?.code === 9200) {
       // toastSuccess({title: t('approveSuccess')})
       // 这里再查询下授权额度？
@@ -118,7 +121,7 @@ export function ConverBody({
     }
     setBuying(false)
     setApproveInsufficient(true)
-  }, [approveAmount]) 
+  }, [approveAmount, approve, refetchAllowance]) 
 
   const handlePlaceOrder = useCallback(async () => {
     const params = {
