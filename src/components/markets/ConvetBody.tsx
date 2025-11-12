@@ -89,7 +89,6 @@ export function ConverBody({
   const handleApprove = useCallback(async () => {
     setBuying(true)
     const result = await approve()
-    
     if (result && result?.code === 9200) {
       // toastSuccess({title: t('approveSuccess')})
       // 这里再查询下授权额度？
@@ -118,7 +117,7 @@ export function ConverBody({
     }
     setBuying(false)
     setApproveInsufficient(true)
-  }, [approveAmount]) 
+  }, [approveAmount, approve, refetchAllowance]) 
 
   const handlePlaceOrder = useCallback(async () => {
     const params = {
