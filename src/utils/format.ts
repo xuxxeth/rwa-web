@@ -103,6 +103,17 @@ export function truncate(value: number | string, decimals: number): string {
 }
 
 /**
+ * 小数，向上入
+ * @param value 要处理的数值
+ * @param decimals 保留的小数位数
+ */
+export function truncateUP(value: number | string, decimals: number): string {
+  const bn = new BigNumber(value)
+  if (bn.isNaN()) return '0'
+  return bn.decimalPlaces(decimals, BigNumber.ROUND_UP).toFixed(decimals)
+}
+
+/**
  * 股票代币价格显示：精确到后3位（截断）
  */
 export function formatStockPrice(value: number | string): string {

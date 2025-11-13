@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { compareBigNumber, isGreater, isLess, multiply, parseAmount } from "@/utils";
+import { compareBigNumber, isGreater, isLess, multiply, parseAmount, truncateUP } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
@@ -135,7 +135,7 @@ export function ConverBody({
       // networkFee: parseAmount(marketInfo.networkFeeInNative, 18), // 0.002
       networkFee: '0', // 0.002
       amount: '0', // 10 usdt
-      price: parseAmount(limitPrice),   // 1 usdt
+      price: parseAmount(truncateUP(limitPrice, 2)),   // 1 usdt
       size: parseAmount(inputSize)    // 10
     }
     console.log(params)
