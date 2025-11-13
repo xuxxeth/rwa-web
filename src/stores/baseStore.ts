@@ -14,7 +14,7 @@ import type {
 } from '@/service/base/types'
 import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight } from '@/utils'
 
-const ENABLE_CACHE = true
+const ENABLE_CACHE = false
 // 缓存时间，2小时
 const CACHE_TIME = 1000 * 60 * 60 * 2
 
