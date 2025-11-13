@@ -21,15 +21,12 @@ export const useNetworkStore = create<NetworkState>((set, get) => ({
     try {
       // 使用 publicClient 获取区块号来检测网络状态
       const blockNumber = publicClient && await publicClient.getBlockNumber();
-      
       set({ 
         isOnline: true,
         blockNumber: Number(blockNumber),
         lastCheckTime: new Date(),
         error: null
       });
-      
-      console.log('Network check passed, block number:', blockNumber);
     } catch (error) {
       set({ 
         isOnline: false,

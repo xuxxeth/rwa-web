@@ -7,18 +7,19 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { compareBigNumber, isGreater, isLess, multiply, parseAmount, truncateUP } from "@/utils";
+import { isGreater, isLess, parseAmount, truncateUP } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
-import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
 import { useTrading } from "@/hooks/useTrading";
+import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 
 type ConverBodyProps = {
   action?: string
@@ -126,13 +127,12 @@ export function ConverBody({
   const handlePlaceOrder = useCallback(async () => {
     const params = {
       stockId: String(inputToken?.stockId),
-      tradeType: '0',
-      side: action === 'buy' ? '0' : '1',
-      tif: '0',
-      sessionType: '0',
+      tradeType: TradeType.LIMIT,
+      side: action === 'buy' ? SideType.BUYLIMIT : SideType.SELL,
+      tif: TifType.DAY,
+      sessionType: SessionType.DEFAULT,
       paymentToken: outputToken?.address || '', // address
       validDate: String(expires), // D
-      // networkFee: parseAmount(marketInfo.networkFeeInNative, 18), // 0.002
       networkFee: '0', // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(truncateUP(limitPrice, 2)),   // 1 usdt
@@ -143,9 +143,9 @@ export function ConverBody({
     const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true})
     setBuying(false)
     console.log(result)
-    const orderType = params.tradeType === '0' ? t('limit') : t('market')
-    const orderSide = params.side === '0' ? t('Buy') : t('Sell')
-
+    const orderType = params.tradeType === TradeType.MARKET ? t('limit') : t('market')
+    const orderSide = params.side === SideType.BUYLIMIT ? t('Buy') : t('Sell')
+    
     if (result && result?.code === 9200) {
       freshTokenBalances()
       updateInputSize('')
