@@ -12,7 +12,7 @@ import type { IToken, ITokenWithBalance } from '@/service/base/types'
 
 import { useTokens, useRwaTokens } from './useTokens'
 import { useWssStore } from '@/stores/wssStore'
-import { TEN_MINUTES } from '@/utils/index'
+import { ONE_MINUTE } from '@/utils/index'
 
 export function useTokenBalances() {
   const { getTokenBalances } = useBalances()
@@ -66,7 +66,7 @@ export function useTokenBalances() {
       // 10 分钟刷新一次 token balances
       interval = setInterval(() => {
         refreshTokenBalances()
-      }, TEN_MINUTES)
+      }, ONE_MINUTE)
     }
     return () => {
       if (interval) {
