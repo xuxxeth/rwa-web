@@ -103,7 +103,7 @@ export function truncate(value: number | string, decimals: number): string {
 }
 
 /**
- * 截断小数（不四舍五入）
+ * 小数，向上入
  * @param value 要处理的数值
  * @param decimals 保留的小数位数
  */
