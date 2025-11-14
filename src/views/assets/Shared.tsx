@@ -325,7 +325,7 @@ export function TokenFilterItem(props: { icon?: string; symbol?: string; name?: 
   return (
     <div className={'flex flex-row gap-1.5'}>
       {/* <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props?.icon || ''} /> */}
-      <div className='w-[64px] w-max-[64px] flex flex-col font-normal'>
+      <div className='w-[82px] w-max-[82px] flex flex-col font-normal'>
         <div className='text-sm/[17px]'>{props?.symbol}</div>
         <div className='text-60 text-xs/[15px] truncate'>{props?.name}</div>
       </div>
