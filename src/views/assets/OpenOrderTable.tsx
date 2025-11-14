@@ -265,8 +265,7 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
   const handleCancelOrder = async () => {
     try {
       setIsCanceling(true)
-      // TODO: 需要在 ca-common-web 里修复
-      const res = await cancelOrder(orderId as unknown as number, { wait: true })
+      const res = await cancelOrder(orderId, { wait: true })
       if (res.code === 9200) {
         toastSuccess({
           title: t('assets.order.cancelOrderSuccess'),
