@@ -13,7 +13,7 @@ export function Menus() {
     <div className="h-[88px] flex items-center justify-between px-5 sticky left-0 top-0 w-full bg-[#06070A] z-[49] header-menu">
       <div className="flex items-center">
         {/* <img src="./images/logo_text.png" className="w-[206px]" alt="" /> */}
-        <img src="/images/logo_text.png" className="w-[206px]" alt="" />
+        <img onClick={() => router.push('/')} src="/images/logo_text.png" className="w-[206px] cursor-pointer" alt="" />
         <div className=" flex items-center gap-x-[80px] ml-20">
           <MenusItem
             title={t("Homepage")}

@@ -30,7 +30,9 @@ export function LanguageItem({
   )
 }
 
-export function LngSubMenus() {
+export function LngSubMenus({
+  from
+}: {from?: string}) {
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng: string) => {
     storage.setItem('CA_LANGUAGE', lng)
@@ -47,9 +49,12 @@ export function LngSubMenus() {
       }}
     >
       <HoverCardTrigger asChild>
-        <div className=" flex items-center">
+        <div className=" flex items-center shrink-0">
           <button className="cursor-pointer">
-            <img src="/images/icons/language.png" className="w-10 h-10" alt="" />
+            <img src="/images/icons/language.png" className={cn(
+              "w-10 h-10",
+              from === 'home' ? ' rounded-full' : ''
+            )} alt="" />
           </button>
         </div>
       </HoverCardTrigger>

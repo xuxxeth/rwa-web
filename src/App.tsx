@@ -1,8 +1,7 @@
-import { BrowserRouter, useRoutes } from 'react-router-dom'
+import { useRoutes } from 'react-router-dom'
 import BigNumber from 'bignumber.js'
 import routes from './routes'
-import { ErrorBoundary } from './components/error/ErrorBoundary'
-import { Suspense, useEffect, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import storage from './utils/storage'
 import { useTranslation } from './hooks/useTranslation'
 
@@ -12,15 +11,12 @@ import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { useWssOn } from './hooks/useWssOn'
-import { Loading } from './components/loading'
 import { useMarketState } from './hooks/useMarketState'
 import { Menus } from './components/menu'
-import { riskApi } from './service/risk/api'
-import { useRiskStore } from './stores/riskStore'
 import { useRiskUserConfig } from './hooks/useRiskStatus'
 import { Updater } from './components/Updater'
-import { ErrorChildren } from './components/error/ErrorChildren'
-import { SuspenseLoading } from './components/loading/SuspenseLoading'
+import { useRouter } from './hooks/useRouter'
+import { HomeMenus } from './components/menu/HomeMenus'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -28,14 +24,18 @@ BigNumber.config({
   EXPONENTIAL_AT: 1e9, // 禁止科学计数法
 })
 
-function RoutesWrapper() {
+export function RoutesWrapper() {
   return useRoutes(routes)
 }
 
+const HOME_MENUS_PATH = ['/']
+
 function App() {
   const { t, i18n } = useTranslation()
+  const router = useRouter()
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
+  const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -57,8 +57,6 @@ function App() {
     initBaseStore(chainId)
   }, [chainId])
 
-  
-
   const { wsService } = useWssOn()
 
   useEffect(() => {
@@ -69,17 +67,16 @@ function App() {
   }, [])
 
   return (
-    <ErrorBoundary fallback={<ErrorChildren />}>
-      <Suspense fallback={<SuspenseLoading />}>
-        <BrowserRouter>
-          <ScrollToTop />
-          <Menus />
-          <Updater />
-          <RoutesWrapper />
-        </BrowserRouter>
-        <Toaster position='top-center' />
-      </Suspense>
-    </ErrorBoundary>
+    <>
+      <ScrollToTop />
+      {
+        isHomeMenus ? <HomeMenus /> : <Menus />
+      }
+      
+      <Updater />
+      <RoutesWrapper />
+      <Toaster position='top-center' />
+    </>
   )
 }
 

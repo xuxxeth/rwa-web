@@ -154,6 +154,17 @@ body {
     );
     backdrop-filter: blur(200px); 
   }
+  .new-circle-bg4 {
+    width: 1107px;
+    height: 707px;
+    border-radius: 50%;
+    background: radial-gradient(
+      50% 50% at 50% 50%, 
+      rgba(106, 252, 223, 0.25) 0%,       
+      rgba(106, 252, 223, 0) 100% 
+    );
+    backdrop-filter: blur(1000px); 
+  }
 
   .scale-quarter {
     transform: scale(0.25); /* 1/4 = 缩小4倍 */
@@ -205,6 +216,9 @@ body {
     box-shadow:
       0 0 10px rgba(157, 255, 58, 0.12),
       0 0 20px rgba(157, 255, 58, 0.15);
+  }
+  .pause-on-hover:hover {
+    animation-play-state: paused !important;
   }
 }
 
@@ -353,11 +367,39 @@ body {
 }
 
 .ami-shimmer {
- animation: 3s linear 0s infinite reverse none running shimmer;
- background-size: 250%;
+  animation: 3s linear 0s infinite reverse none running shimmer;
+  background-size: 250%;
 }
 .recharts-wrapper:focus,
 .recharts-surface:focus,
 .recharts-layer:focus {
   outline: none !important;
 }
+.title-primary {
+  background: linear-gradient(90deg, #BEFF6E 30.55%, #6AFCDF 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* for some browsers */
+  color: transparent;
+}
+
+.irregular-square {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  mix-blend-mode: normal;
+  border-radius: 6px;
+  clip-path: polygon(
+    0 0,
+    171px 0,
+    100% 66px,
+    100% 100%,
+    0 100%
+  );
+}
+
+  
+
+

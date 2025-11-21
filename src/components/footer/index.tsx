@@ -2,8 +2,13 @@ import { DISCORD_URL, GITBOOK_URL, TG_URL, X_URL } from '@/config/constants'
 import { useTranslation } from '@/hooks/useTranslation'
 import { MainLayout } from '@/layouts/main'
 import { openUrlInNewWindow } from '@/utils/index'
+import { LazyImage } from '../image/LazyImage'
 
-export function XFooter() {
+export function XFooter({
+  from
+}: {
+  from?: string
+}) {
   const { t } = useTranslation()
   return (
     <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] mt-[130px]'>
@@ -11,7 +16,7 @@ export function XFooter() {
     <MainLayout>
       <div className='flex justify-between px-5 font-normal'>
         <div>
-          <img src='/images/logo_text.png' className='w-[182px]' alt='' />
+          <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' />
           <a href='mailto:contact@cyberalpha.cc'>
             <div className='flex items-center my-4'>
               <img src='/images/icons/e_mail.png' className='w-6' alt='' />
