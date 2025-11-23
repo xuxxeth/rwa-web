@@ -1,6 +1,6 @@
 import { motion, useAnimation, useMotionValue } from "framer-motion"
-import { memo, useEffect, useRef, useState } from "react"
-import { TokenBox } from "./Section4_3"
+import { memo, useEffect, useMemo, useRef, useState } from "react"
+import { TokenBox, type SectionProps } from "./Section4_3"
 
 const duration = 30
 
@@ -15,8 +15,14 @@ const box1: React.CSSProperties = {
 }
 
 const Section4_1 = memo(
-  () => {
+  ({
+    rwaList = [],
+    onClick
+  }: SectionProps) => {
     const [showTip, setShowTip] = useState(false)
+    const [showTip2, setShowTip2] = useState(false)
+    const [showTip3, setShowTip3] = useState(false)
+    const [showTip4, setShowTip4] = useState(false)
     const [rectPos, setRectPos] = useState<any>({})
 
     const controls1_1 = useAnimation();
@@ -82,7 +88,10 @@ const Section4_1 = memo(
       runAnimation1_4();
     }, [])
 
-
+    const rwa1 = useMemo(() => rwaList && rwaList[0], [rwaList])
+    const rwa2 = useMemo(() => rwaList && rwaList[1], [rwaList])
+    const rwa3 = useMemo(() => rwaList && rwaList[2], [rwaList])
+    const rwa4 = useMemo(() => rwaList && rwaList[3], [rwaList])
 
 
     return (
@@ -126,7 +135,12 @@ const Section4_1 = memo(
             runAnimation1_4(); 
           }} 
         >
-          <img src="/images/tokens/META.png" className="w-[60px] h-[60px] rounded-full" alt="" />
+          {
+            rwa4 && 
+            <div onClick={() => onClick && onClick(rwa4)}>
+              <img src={rwa4.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
+            </div>
+          }
         </motion.div>
         <motion.div
           style={{
@@ -158,7 +172,12 @@ const Section4_1 = memo(
             runAnimation1_4(); 
           }} 
         >
-          <img src="/images/tokens/NVDA.png" className="w-[60px] h-[60px] rounded-full" alt="" />
+          {
+            rwa3 && 
+            <div onClick={() => onClick && onClick(rwa3)}>
+              <img src={rwa3.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
+            </div>
+          }
         </motion.div>
         <motion.div
           style={{
@@ -190,7 +209,12 @@ const Section4_1 = memo(
             runAnimation1_4(); 
           }} 
         >
-          <img src="/images/tokens/HOOD.png" className="w-[60px] h-[60px] rounded-full" alt="" />
+          {
+            rwa2 && 
+            <div onClick={() => onClick && onClick(rwa2)}>
+              <img src={rwa2.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
+            </div>
+          }
         </motion.div>
         <motion.div
           style={{
@@ -220,10 +244,30 @@ const Section4_1 = memo(
             runAnimation1_4(); 
           }} 
         >
-          <img src="/images/tokens/GOOGL.png" className="w-[60px] h-[60px] rounded-full" alt="" />
+          {
+            rwa1 && 
+            <div onClick={() => onClick && onClick(rwa1)}>
+              <img src={rwa1.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
+            </div>
+          }
         </motion.div>
         {
-          showTip && <TokenBox 
+          showTip && <TokenBox rwa={rwa1} 
+            style={{ left: rectPos.x, top: rectPos.y - 70 }}
+          />
+        }
+        {
+          showTip2 && <TokenBox rwa={rwa2} 
+            style={{ left: rectPos.x, top: rectPos.y - 70 }}
+          />
+        }
+        {
+          showTip3 && <TokenBox rwa={rwa3} 
+            style={{ left: rectPos.x, top: rectPos.y - 70 }}
+          />
+        }
+        {
+          showTip4 && <TokenBox rwa={rwa4} 
             style={{ left: rectPos.x, top: rectPos.y - 70 }}
           />
         }

@@ -11,8 +11,6 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { cn } from "@/utils";
 import { useEffect, useId, useMemo, useState } from "react";
 
-const showStocks = ['AAPL', 'TSLA', 'COIN', 'NVDA']
-
 export const RwaPrice = (
   ({
     rwaData

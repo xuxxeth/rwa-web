@@ -25,7 +25,7 @@ const VideoPlayer = memo(
   }: Props) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [coverVisible, setCoverVisible] = useState(Boolean(poster));
+    const [coverVisible, setCoverVisible] = useState(true);
     const [triedMutedPlay, setTriedMutedPlay] = useState(false);
 
     // 检查 buffered 是否已经包含整个媒体（完全部署到本地缓存/下载完毕）
@@ -62,7 +62,9 @@ const VideoPlayer = memo(
             setTriedMutedPlay(true);
             await v.play();
             setIsPlaying(true);
-            setCoverVisible(false);
+            setTimeout(() => {
+              setCoverVisible(false);
+            }, 500)
             onPlay?.();
           } catch (err2) {
             // 最终无法自动播放：保持封面，report error optionally
@@ -103,7 +105,9 @@ const VideoPlayer = memo(
 
       const onPlayHandler = () => {
         setIsPlaying(true);
-        setCoverVisible(false);
+        setTimeout(() => {
+          setCoverVisible(false);
+        }, 500)
         onPlay?.();
       };
 
@@ -152,7 +156,6 @@ const VideoPlayer = memo(
 
     // 如果外部改变 src，重置状态
     useEffect(() => {
-      setCoverVisible(Boolean(poster));
       setIsPlaying(false);
       setTriedMutedPlay(false);
       const v = videoRef.current;
@@ -163,7 +166,7 @@ const VideoPlayer = memo(
         // reload resource
         v.load();
       }
-    }, [src, poster, muted]);
+    }, [src, muted]);
 
     return (
       <div className={className} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
@@ -183,10 +186,10 @@ const VideoPlayer = memo(
         />
 
         {/* 自定义封面层：在未播放前显示，播放后隐藏 */}
-        {poster && coverVisible && (
+        {poster && (
           <div
             aria-hidden
-            className="video-cover"
+            className="video-cover transition-all "
             style={{
               position: "absolute",
               inset: 0,
@@ -200,6 +203,7 @@ const VideoPlayer = memo(
               justifyContent: "center",
               cursor: "pointer",
               zIndex: 10,
+              opacity: coverVisible ? 1 : 0
             }}
             // 点击封面尝试手动播放（用户交互可解除 autoplay 限制）
             onClick={() => {

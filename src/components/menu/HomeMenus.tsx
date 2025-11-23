@@ -14,7 +14,7 @@ export function HomeMenus() {
         
       </div>
       <div className="flex items-center gap-x-2 shrink-0">
-        <HomeButton onClick={() => router.push('/lite-trade')} type="launch" className="h-[41px]" >Launch App</HomeButton>
+        <HomeButton onClick={() => router.push('/lite-trade')} type="launch" className="h-[41px]" >{t('newHome.btn1')}</HomeButton>
         <LngSubMenus from="home" />
       </div>
     </div>

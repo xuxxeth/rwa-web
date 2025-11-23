@@ -2,6 +2,7 @@ import { HomeButton } from "@/components/button/HomeButton";
 import { LazyImage } from "@/components/image/LazyImage";
 import { TitlePrimary } from "@/components/title-primary"
 import { useRouter } from "@/hooks/useRouter";
+import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/utils/tw";
 import { memo } from "react"
 
@@ -42,14 +43,15 @@ export const ItemImage = memo(
 
 const Section5 = memo(
   () => {
+    const { t } = useTranslation()
     const router = useRouter()
     const className1 = `text-[28px] font-medium leading-[36px] mt-6 mb-5`
     const className2 = `text-[16px] font-normal leading-[20px] text-[rgba(255,255,255,0.6)] `
     return (
-      <div className="min-h-[810px] px-[170px] text-white relative overflow-hidden">
+      <div className="min-h-[810px] px-[170px] text-white relative overflow-hidden pt-[68px]">
         <div className="flex justify-center flex-col items-center">
           <TitlePrimary className=" font-medium text-[36px] w-[628px] text-center leading-[100%]">
-            An Open Ecosystem for On-Chain Assets and Capital
+            {t('newHome.t19')}
           </TitlePrimary>
           
 
@@ -58,15 +60,15 @@ const Section5 = memo(
             <ItemBox>
               <ItemImage src="/images/home/new/sec5_1.png" />
               <div className="pl-4 pr-[44px]">
-                <div className={className1}>Trade Global Assets with Crypto</div>
-                <div className={className2}>Access U.S., Hong Kong, and other major markets using crypto — no fiat conversion, no banking friction.</div>
+                <div className={className1}>{t('newHome.t20')}</div>
+                <div className={className2}>{t('newHome.t21')}</div>
               </div>
             </ItemBox>
             <ItemBox className=" mt-[110px]">
               <ItemImage src="/images/home/new/sec5_2.png" />
               <div className="pl-4 pr-[44px]">
-                <div className={className1}>On-Chain Liquidity, Real-Market Depth</div>
-                <div className={className2}>Experience the same liquidity and execution quality as traditional brokers, with instant settlement and full transparency.</div>
+                <div className={className1}>{t('newHome.t22')}</div>
+                <div className={className2}>{t('newHome.t23')}</div>
               </div>
             </ItemBox>
           </div>
@@ -74,19 +76,19 @@ const Section5 = memo(
             <ItemBox>
               <ItemImage src="/images/home/new/sec5_3.png" />
               <div className="pl-4 pr-[44px]">
-                <div className={className1}>Trade Global Assets with Crypto</div>
-                <div className={className2}>Access U.S., Hong Kong, and other major markets using crypto — no fiat conversion, no banking friction.</div>
+                <div className={className1}>{t('newHome.t24')}</div>
+                <div className={className2}>{t('newHome.t25')}</div>
               </div>
             </ItemBox>
             <ItemBox className=" mt-[110px]">
               <ItemImage src="/images/home/new/sec5_4.png" />
               <div className="pl-4 pr-[44px] mt-6">
-                <div className={className2}>From global equities to emerging on-chain opportunities, we make every asset accessible — and every investor empowered.</div>
+                <div className={className2}>{t('newHome.t26')}</div>
                 <div className="flex">
                   <div>
                     <HomeButton onClick={() => router.push('/lite-trade')} type="start" className="mt-8 h-[51px] min-w-[236px]" >
                       <div className="flex items-center justify-between w-full text-[18px] font-semibold gap-x-1">
-                        Trade Now
+                        {t('newHome.btn3')}
                         <div className="w-[35px] h-[35px] flex items-center justify-center bg-white rounded-full">
                           <img src="/images/home/new/arrow-right.png" className="w-[12px] h-[12px]" alt="" />
                         </div>

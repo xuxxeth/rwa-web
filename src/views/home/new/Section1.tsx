@@ -1,12 +1,14 @@
 import { HomeButton } from "@/components/button/HomeButton";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { useRouter } from "@/hooks/useRouter";
+import { useTranslation } from "@/hooks/useTranslation";
 import { memo, use, useEffect, useState } from "react";
 
 const factor = 1456 / 816;
 
 const Section1 = memo(
   () => {
+    const { t } = useTranslation()
     const router = useRouter()
     const [height, setHeight] = useState(816);
 
@@ -39,8 +41,8 @@ const Section1 = memo(
           />
         </div>
         <div className=" relative z-10 flex flex-col items-center justify-center h-full">
-          <div className="text-[48px] font-semibold leading-[56px] md:w-[662px] text-center">Building a Tokenized Reality for Everyone</div>
-          <div className="text-[18px] font-normal mt-4 leading-[26px] text-[rgba(255,255,255,0.8)] w-[363px] text-center">A world where every real asset can move freely, securely, and compliantly.</div>
+          <div className="text-[48px] font-semibold leading-[56px] md:w-[662px] text-center">{t('newHome.t1')}</div>
+          <div className="text-[18px] font-normal mt-4 leading-[26px] text-[rgba(255,255,255,0.8)] w-[363px] text-center">{t('newHome.t2')}</div>
           <div className=" mt-8">
             <HomeButton type="start" 
               onClick={() => {
@@ -48,7 +50,7 @@ const Section1 = memo(
               }}
             >
               <div className="flex items-center justify-center text-[18px] font-semibold gap-x-1">
-                Start Trading
+                {t('newHome.btn2')}
                 <div className="w-[35px] h-[35px] flex items-center justify-center bg-white rounded-full">
                   <img src="/images/home/new/arrow-right.png" className="w-[12px] h-[12px]" alt="" />
                 </div>

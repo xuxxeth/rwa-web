@@ -4,6 +4,7 @@ import { TitlePrimary } from "@/components/title-primary";
 import { useMotionScroll } from "@/hooks/useMotionScroll";
 import { LazyImage } from "@/components/image/LazyImage";
 import { cn } from "@/utils/tw";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // const from = 0.4
 // const to = 0.6
@@ -41,6 +42,7 @@ export const ItemBox = memo(
 );
 
 const Section2 = memo(() => {
+  const { t } = useTranslation()
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
   const { scrollY, animated } = useMotionScroll(to, sectionRef);
@@ -69,14 +71,14 @@ const Section2 = memo(() => {
   
   useEffect(() => {
     if (animated) {
-      setDoneMap({
-        A: true,
-        B: true,
-        C: true,
-        D: true,
-        BG: true,
-        logo: true,
-      });
+      // setDoneMap({
+      //   A: true,
+      //   B: true,
+      //   C: true,
+      //   D: true,
+      //   BG: true,
+      //   logo: true,
+      // });
     }
   }, [animated])
   
@@ -105,12 +107,10 @@ const Section2 = memo(() => {
           {/* 标题区域 */}
           <div className="flex justify-center flex-col items-center">
             <TitlePrimary className="font-normal text-[28px] mb-5">
-              Built on Regulation. Driven by Transparency.
+              {t('newHome.t3')}
             </TitlePrimary>
             <div className="font-normal text-[20px] leading-[150%] mb-[68px] w-[763px] text-center">
-              Licensed under the Mauritius FSC Investment Dealer framework,
-              we operate with full AML/CFT, KYC, and KYT compliance — ensuring a
-              globally trusted, transparent, and fully compliant trading environment.
+              {t('newHome.t4')}
             </div>
           </div>
 
@@ -126,11 +126,10 @@ const Section2 = memo(() => {
                   >
                     <div className=" relative z-10">
                       <div className="w-[120px]">
-                        <TitlePrimary>Regulated by Mauritius FSC</TitlePrimary>
+                        <TitlePrimary>{t('newHome.t5')}</TitlePrimary>
                       </div>
                       <ItemContent>
-                        Licensed and supervised under the Mauritius Investment Dealer
-                        framework, ensuring full compliance, credibility, and investor protection.
+                        {t('newHome.t6')}
                       </ItemContent>
                     </div>
                   </motion.div>
@@ -168,10 +167,10 @@ const Section2 = memo(() => {
               <ItemBox
               >
                 <div className="w-[170px]">
-                  <TitlePrimary>Comprehensive AML/CFT Standards</TitlePrimary>
+                  <TitlePrimary>{t('newHome.t7')}</TitlePrimary>
                 </div>
                 <ItemContent>
-                  Operations follow strict anti–money laundering and counter–terrorism financing protocols aligned with global FSC requirements.
+                  {t('newHome.t8')}
                 </ItemContent>
               </ItemBox>
             </motion.div>
@@ -180,10 +179,10 @@ const Section2 = memo(() => {
               <ItemBox
               >
                 <div className="w-[120px]">
-                  <TitlePrimary>KYC & KYT Integration</TitlePrimary>
+                  <TitlePrimary>{t('newHome.t9')}</TitlePrimary>
                 </div>
                 <ItemContent>
-                  Partnering with trusted compliance providers to implement real-time KYT and robust identity verification — ensuring transparent and traceable transactions
+                  {t('newHome.t10')}
                 </ItemContent>
               </ItemBox>
             </motion.div>
@@ -193,17 +192,17 @@ const Section2 = memo(() => {
               >
                 <div>
                   <TitlePrimary>
-                    {'Audit & '} <br /> {'Transparency'}
+                    {t('newHome.t11')} <br /> {t('newHome.t12')}
                   </TitlePrimary>
                 </div>
                 <ItemContent>
                   <div className="">
-                    Regulated by Mauritius FSC with ongoing audits and compliance reviews. Audited by 
+                    {t('newHome.t13')}
                     <span className=" cursor-pointer text-[#6AFCDF]"> SlowMist 
                     <img src="/images/home/new/link.png" className="w-[12px] h-[12px] inline-block relative top-[-2px] mx-1" />
 
                     </span>
-                     for proven security.
+                    {t('newHome.t14')}
                   </div>
                   
                 </ItemContent>

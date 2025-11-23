@@ -155,8 +155,6 @@ body {
     backdrop-filter: blur(200px); 
   }
   .new-circle-bg4 {
-    width: 1107px;
-    height: 707px;
     border-radius: 50%;
     background: radial-gradient(
       50% 50% at 50% 50%, 
@@ -376,7 +374,7 @@ body {
   outline: none !important;
 }
 .title-primary {
-  background: linear-gradient(90deg, #BEFF6E 30.55%, #6AFCDF 50%);
+  background: linear-gradient(90deg, #BEFF6E 0.55%, #6AFCDF 50%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text; /* for some browsers */
@@ -389,6 +387,7 @@ body {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   mix-blend-mode: normal;
   border-radius: 6px;
   clip-path: polygon(

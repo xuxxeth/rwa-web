@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useMotionScroll } from "@/hooks/useMotionScroll";
 import { LazyImage } from "@/components/image/LazyImage";
 import { ItemBox, ItemContent } from "./Section2";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // const from = 0.4
 // const to = 0.6
@@ -10,8 +11,8 @@ import { ItemBox, ItemContent } from "./Section2";
 const from = 0
 const to = 10
 
-
 const Section2 = memo(() => {
+  const { t } = useTranslation()
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
   const { scrollY, animated } = useMotionScroll(to, sectionRef);
@@ -44,7 +45,6 @@ const Section2 = memo(() => {
       });
     }
   }, [animated])
-  
 
 
   return (
@@ -80,7 +80,7 @@ const Section2 = memo(() => {
                     <LazyImage src="/images/home/new/sec3_1.png" className="w-full h-full" />
                   </div>
                   <ItemContent>
-                    <div className="pl-[18px] pb-[18px]">Pay with Crypto</div>
+                    <div className="pl-[18px] pb-[18px]">{t('newHome.t15')}</div>
                   </ItemContent>
                 </div>
                 
@@ -95,7 +95,7 @@ const Section2 = memo(() => {
                     <LazyImage src="/images/home/new/sec3_2.png" className="w-full h-full" />
                   </div>
                   <ItemContent>
-                    <div className="pl-[18px] pb-[18px]">Mint 1:1 asset-backed RWA tokens</div>
+                    <div className="pl-[18px] pb-[18px]">{t('newHome.t16')}</div>
                   </ItemContent>
                 </div>
                 
@@ -111,7 +111,7 @@ const Section2 = memo(() => {
                     <LazyImage src="/images/home/new/sec3_3.png" className="w-full h-full" />
                   </div>
                   <ItemContent>
-                    <div className="pl-[18px] pb-[18px]">Handle U.S. stocks for you; custody by licensed broker</div>
+                    <div className="pl-[18px] pb-[18px]">{t('newHome.t17')}</div>
                   </ItemContent>
                 </div>
                 
@@ -127,7 +127,7 @@ const Section2 = memo(() => {
                     <LazyImage src="/images/home/new/sec3_4.png" className="w-full h-full" />
                   </div>
                   <ItemContent>
-                    <div className="pl-[18px] pb-[18px]">Transfer freely on-chain, unlimited DeFi potential</div>
+                    <div className="pl-[18px] pb-[18px]">{t('newHome.t18')}</div>
                   </ItemContent>
                 </div>
                 

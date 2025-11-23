@@ -114,6 +114,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       setIsWalletConnecting(false)
       // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
       if (!connectInit.current) {
+        connectInit.current = true
         toastSuccess({
           title: t('connectSuccess')
         })
@@ -142,7 +143,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
   }, [account, chainId, chains, handleDisConnect])
   useEffect(() => {
-    if (!account && !disconnectInit.current) {
+    if (!account && !disconnectInit.current && connectInit.current) {
       disconnectInit.current = true
       toastError({
         title: t('walletDisconnect'),

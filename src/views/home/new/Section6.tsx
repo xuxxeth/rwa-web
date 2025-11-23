@@ -1,41 +1,47 @@
 import { LazyImage } from "@/components/image/LazyImage";
 import { TitlePrimary } from "@/components/title-primary";
-import { memo, useId } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
+import { memo, useId, useMemo } from "react";
 
 const Section6 = memo(
   () => {
-    const partnerList = [
-      {
-        logo: '/images/home/new/usmart.svg',
-        title: 'Licensed Brokerage Partner',
-        desc: 'A regulated broker providing real-market liquidity and execution for tokenized equities traded on our platform.',
-        web: 'www.usmart.sg'
-      },
-      {
-        logo: '/images/home/new/slowmist.png',
-        title: 'Security Audit Partner',
-        desc: 'A leading blockchain security firm that audited and verified our smart contracts and platform infrastructure.',
-        web: 'slowmist.com'
-      },
-      {
-        logo: '/images/home/new/megvii.svg',
-        title: 'Licensed Brokerage Partner',
-        desc: 'A regulated broker providing real-market liquidity and execution for tokenized equities traded on our platform.',
-        web: 'www.usmart.sg'
-      },
-      {
-        logo: '/images/home/new/pyth.png',
-        title: 'Oracle Provider',
-        desc: 'Delivering accurate and verifiable market data to guarantee fair and transparent on-chain settlement prices.',
-        web: 'www.pyth.network'
-      },
-      {
-        logo: '/images/home/new/arisk.png',
-        title: 'On-Chain KYT & Compliance Partner',
-        desc: 'Powering real-time transaction monitoring and on-chain identity verification, ensuring full regulatory compliance.',
-        web: 'arisk.io'
-      },
-    ]
+    const { t } = useTranslation()
+    
+    const partnerList = useMemo(() => {
+      return [
+        {
+          logo: '/images/home/new/usmart.svg',
+          title: t('newHome.t28'),
+          desc: t('newHome.t29'),
+          web: 'www.usmart.sg'
+        },
+        {
+          logo: '/images/home/new/slowmist.png',
+          title: t('newHome.t30'),
+          desc: t('newHome.t31'),
+          web: 'slowmist.com'
+        },
+        {
+          logo: '/images/home/new/megvii.svg',
+          title: t('newHome.t32'),
+          desc: t('newHome.t33'),
+          web: 'faceplusplus.com.cn'
+        },
+        {
+          logo: '/images/home/new/pyth.png',
+          title: t('newHome.t34'),
+          desc: t('newHome.t35'),
+          web: 'www.pyth.network'
+        },
+        {
+          logo: '/images/home/new/arisk.png',
+          title: t('newHome.t36'),
+          desc: t('newHome.t37'),
+          web: 'arisk.io'
+        },
+      ]
+    }, [t])
+
     const _id = useId()
     return (
       <div className="p-[93px] flex justify-center text-white">
@@ -43,9 +49,12 @@ const Section6 = memo(
         >
           <LazyImage src="/images/home/new/sec6_bg.png" className="w-full absolute left-0 top-0" />
           <div className=" relative py-[28px] px-[60px]">
-            <TitlePrimary className=" font-medium text-[36px] w-full text-center leading-[100%]">
-              Ecosystem & Partnerships
-            </TitlePrimary>
+            <div className="w-full flex justify-center">
+              <TitlePrimary className=" font-medium text-[36px] text-center leading-[100%]">
+                {t('newHome.t27')}
+              </TitlePrimary>
+            </div>
+           
             <div className=" flex items-center justify-center mt-[40px] gap-x-[40px]">
               {
                 partnerList.slice(0, 3).map((item, index) => {
