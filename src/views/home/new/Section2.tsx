@@ -71,14 +71,14 @@ const Section2 = memo(() => {
   
   useEffect(() => {
     if (animated) {
-      // setDoneMap({
-      //   A: true,
-      //   B: true,
-      //   C: true,
-      //   D: true,
-      //   BG: true,
-      //   logo: true,
-      // });
+      setDoneMap({
+        A: true,
+        B: true,
+        C: true,
+        D: true,
+        BG: true,
+        logo: true,
+      });
     }
   }, [animated])
   

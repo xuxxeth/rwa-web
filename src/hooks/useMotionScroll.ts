@@ -1,5 +1,5 @@
 import { useMotionValue, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const throttleGap = 16; // 约等于 60FPS
 
@@ -7,14 +7,22 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
   const { scrollY: scrollYBody, scrollYProgress  } = useScroll({target: sectionRef});
   const bodyRef = useRef<HTMLElement | null>(null);
   const originalStyle = useRef<{ overflow: string; paddingRight: string, scrollBarWidth: number }>({ overflow: "", paddingRight: "", scrollBarWidth: 0 });
-  const rectY = useRef(0);
+  const rectY = useRef(0);  
 
   const scrollYLast = useRef(0);
   const scrollY = useMotionValue(0);
   const animateStart = useRef(false);
   const animated = useRef(false);
+  const lastScrollY = useRef(0);
+  const scrollThreshold = 50;
+
+  const isOutOfViewport = useRef(false)
+  const direction = useRef('')
 
   scrollYBody.on("change", (v) => {
+    const scrollDirection = v > lastScrollY.current ? 'down' : 'up';
+    const scrollDelta = Math.abs(v - lastScrollY.current);
+    lastScrollY.current = v;
     if (v > rectY.current) {
       if (!animated.current && bodyRef.current) {
         bodyRef.current.style.overflow = "hidden";
@@ -24,6 +32,25 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
         animateStart.current = true; // 标记动画开始
       }
     }
+    return
+    // if (scrollDelta < scrollThreshold) return;
+    // if (scrollDirection === 'down') {
+    //   if (v > rectY.current) {
+    //     if (!animated.current && bodyRef.current) {
+    //       bodyRef.current.style.overflow = "hidden";
+    //       if (originalStyle.current.scrollBarWidth > 0) {
+    //         bodyRef.current.style.paddingRight = `${originalStyle.current.scrollBarWidth}px`;
+    //       }
+    //       animateStart.current = true; // 标记动画开始
+    //     }
+    //   }
+    // }
+    // if (scrollDirection === 'up' && v > rectY.current) {
+    //   if (sectionRef.current) {
+    //     sectionRef.current.style.position = 'sticky';
+    //   }
+    // }
+    
   });
   scrollY.on("change", (v) => {
     const now = Date.now();
@@ -45,10 +72,42 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
       animated.current = true;
       if (sectionRef.current) {
         sectionRef.current.style.position = 'static';
+        
       }
-
     }
   });
+
+
+  useEffect(() => {
+    const checkElementPosition = () => {
+      if (!sectionRef.current) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      const isOutTop = rect.bottom < 0;
+      const isOutBottom = rect.top > windowHeight;
+      
+      const isOut = isOutTop || isOutBottom;
+      const newDirection = isOutTop ? 'top' : isOutBottom ? 'bottom' : '';
+      
+      isOutOfViewport.current = isOut
+      direction.current = newDirection
+      
+    };
+
+    // 初始检查
+    checkElementPosition();
+    
+    // 监听滚动事件
+    window.addEventListener('scroll', checkElementPosition);
+    window.addEventListener('resize', checkElementPosition);
+    
+    return () => {
+      window.removeEventListener('scroll', checkElementPosition);
+      window.removeEventListener('resize', checkElementPosition);
+    };
+  }, [sectionRef]);
 
   useEffect(() => {
     bodyRef.current = document.body
