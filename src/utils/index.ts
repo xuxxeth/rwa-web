@@ -14,7 +14,7 @@ export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
-export function noop() {}
+export function noop() { }
 
 export function parseAmount(value: string | number, decimals: number = 6): string {
   return new BigNumber(value)
@@ -150,3 +150,7 @@ export function formatToQuarterLabel(dateStr: string | number) {
 export const TEN_MINUTES = 10 * 60 * 1000
 export const ONE_MINUTE = 60 * 1000
 export const TEN_SECONDS = 10 * 1000
+
+export function genAuthReqId() {
+  return 'auth-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
+}

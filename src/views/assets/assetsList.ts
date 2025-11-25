@@ -36,7 +36,7 @@ export function useAssetsList(chainId: number, account: string) {
 
   useEffect(() => {
     const listener = (data: IAggregateData) => {
-      const items = data.Items
+      const items = data.items
 
       const priceMap = items.reduce((acc: Record<string, { price: number }>, cur) => {
         acc[symbolToLower(cur.S)] = { price: cur.p }

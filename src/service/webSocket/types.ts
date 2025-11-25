@@ -1,6 +1,6 @@
 export interface IAggregateData {
     timestamp: number
-    Items: {
+    items: {
       S: string
       p: number
       s: number
