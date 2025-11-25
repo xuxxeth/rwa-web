@@ -8,7 +8,7 @@ function replaceAfterSecondDot(str: string) {
 }
 function processType(type: string) {
   const parts = type.split('.');
-  
+
   if (parts.length < 3) {
     return {
       original: type,
@@ -16,10 +16,10 @@ function processType(type: string) {
       extracted: parts[parts.length - 1] || ''
     };
   }
-  
+
   const replaced = parts.slice(0, 2).join('.') + '.*';
   const extracted = parts.slice(2).join('.');
-  
+
   return {
     original: type,
     replaced: replaced,
@@ -104,7 +104,7 @@ class WebSocketService {
 
   private ensureInitialized() {
     if (!this.ws) {
-      throw new Error('WebSocket 未初始化，请先调用 init 方法')
+      this.init({})
     }
   }
 
@@ -177,20 +177,20 @@ class WebSocketService {
     if (data.type.indexOf('order.') === 0) {
       const typeInfo = processType(data.type)
       const listenersOrder = this.listeners.get(typeInfo.replaced)
-      
+
       if (listenersOrder) {
         data.data.sl = typeInfo.extracted
         listenersOrder.forEach(cb => cb(data.data))
       }
     }
-    
+
   }
 
   /** 发送数据 */
   private send(data: WSMessage) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
-      
+
     } else {
       this.pendingQueue.push(data)
     }
