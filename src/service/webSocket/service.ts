@@ -3,6 +3,30 @@ import type { IAggregateData, ISummaryData, IPingData } from './types'
 
 export const WSS_URL = import.meta.env.VITE_WSS_URL
 
+function replaceAfterSecondDot(str: string) {
+  return str.replace(/^([^.]*\.[^.]*)\.(.*)$/, '$1.*');
+}
+function processType(type: string) {
+  const parts = type.split('.');
+  
+  if (parts.length < 3) {
+    return {
+      original: type,
+      replaced: type,
+      extracted: parts[parts.length - 1] || ''
+    };
+  }
+  
+  const replaced = parts.slice(0, 2).join('.') + '.*';
+  const extracted = parts.slice(2).join('.');
+  
+  return {
+    original: type,
+    replaced: replaced,
+    extracted: extracted
+  };
+}
+
 export interface WSMessage {
   request: string
   args: any
@@ -13,12 +37,14 @@ export interface ResMessage<T extends EventType> {
   data: EventDataMap[T]
 }
 
-export type EventType = 'summary' | 'aggregate' | 'ping'
+export type EventType = 'summary' | 'aggregate' | 'ping' | 'auth' | string
 
 type EventDataMap = {
   summary: ISummaryData
   aggregate: IAggregateData
   ping: IPingData
+  auth: IPingData
+  [key: string]: any
 }
 
 type Listener<T extends EventType> = (data: ResMessage<T>['data']) => void
@@ -33,12 +59,13 @@ interface WSOptions {
 class WebSocketService {
   private static instance: WebSocketService
   private ws: ReconnectingWebSocket | null = null
-  private listeners: Map<EventType, Set<Listener<EventType>>> = new Map()
-  private subscriptions: Set<EventType> = new Set()
+  private listeners: Map<EventType | string, Set<Listener<EventType>>> = new Map()
+  private subscriptions: Set<EventType | string> = new Set()
   private url: string = ''
   private options?: WSOptions
   private pendingQueue: WSMessage[] = []
-
+  private authStatus: boolean = false
+  private authSignture: string = ''
   /** 单例获取 */
   public static getInstance(): WebSocketService {
     if (!WebSocketService.instance) {
@@ -50,7 +77,6 @@ class WebSocketService {
   /** 初始化, 只允许初始化一次*/
   public init(options: WSOptions) {
     if (this.ws) {
-      console.warn('WebSocket 已初始化')
       return
     }
 
@@ -65,6 +91,15 @@ class WebSocketService {
     })
 
     this.bindEvents()
+  }
+  /** 自动回复 pong */
+  public auth(signture: string) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      const auth = { request: 'auth', args: signture }
+      this.ws.send(JSON.stringify(auth))
+    } else {
+      this.authSignture = signture
+    }
   }
 
   private ensureInitialized() {
@@ -86,6 +121,10 @@ class WebSocketService {
       this.pendingQueue.forEach(msg => this.send(msg))
       this.pendingQueue = []
       this.resubscribeAll()
+      if (this.authSignture) {
+        this.auth(this.authSignture)
+        this.authSignture = ''
+      }
     })
 
     ws.addEventListener('message', this.handleMessageBound)
@@ -107,7 +146,12 @@ class WebSocketService {
         this.replyPong(data as ResMessage<'ping'>)
         return
       }
-
+      if (data.type === 'auth') {
+        this.authStatus = true
+        // 所有缓存的订单相关的订阅全部重新订阅
+        this.resubscribeAll()
+        return
+      }
       this.dispatch(data)
     } catch (err) {
       console.warn(' WS parse error:', err, raw)
@@ -129,14 +173,25 @@ class WebSocketService {
     if (listeners) {
       listeners.forEach(cb => cb(data.data))
     }
+    // order.97.*订阅，也会返回order.97.COINc数据，特殊处理
+    if (data.type.indexOf('order.') === 0) {
+      const typeInfo = processType(data.type)
+      const listenersOrder = this.listeners.get(typeInfo.replaced)
+      
+      if (listenersOrder) {
+        data.data.sl = typeInfo.extracted
+        listenersOrder.forEach(cb => cb(data.data))
+      }
+    }
+    
   }
 
   /** 发送数据 */
   private send(data: WSMessage) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
+      
     } else {
-      console.warn('WebSocket not open, message queued:', data)
       this.pendingQueue.push(data)
     }
   }
@@ -149,7 +204,7 @@ class WebSocketService {
     this.send({ request: 'sub', args: [...this.subscriptions] })
   }
 
-  public on<T extends EventType>(eventType: T, listener: Listener<T>) {
+  public on<T extends EventType>(eventType: T | string, listener: Listener<T>) {
     this.ensureInitialized()
 
     // 检查是否是第一个监听器
@@ -170,7 +225,7 @@ class WebSocketService {
     }
   }
 
-  private subscribe(topic: EventType | EventType[]) {
+  private subscribe(topic: EventType | EventType[] | string) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出不在 subscriptions 中的新 topic
     const newTopics = topicList.filter(t => !this.subscriptions.has(t))
@@ -188,7 +243,7 @@ class WebSocketService {
     this.send({ request: 'sub', args: newTopics })
   }
 
-  private unsubscribe(topic: EventType | EventType[]) {
+  private unsubscribe(topic: EventType | EventType[] | string | string[]) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出在 subscriptions 中的 topic
     const validTopics = topicList.filter(t => this.subscriptions.has(t))
@@ -216,7 +271,6 @@ class WebSocketService {
 
     // 检查是否还有监听器
     const hasListeners = listenerSet.size > 0
-
     // 如果没有监听器了，自动取消订阅
     if (!hasListeners) {
       this.unsubscribe(eventType)

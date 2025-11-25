@@ -7,6 +7,7 @@ import { checkSymbolEqual, symbolToLower, truncate } from '@/utils';
 import { useBaseStore } from './baseStore';
 import type { ICandlesParams } from '@/service/kline/types';
 import { klineApi } from '@/service/kline/api';
+import type { IOrderData } from '@/service/webSocket/types';
 
 export const useWssStore = create<WssStore>()(
   persist(
@@ -14,7 +15,7 @@ export const useWssStore = create<WssStore>()(
       priceInitialized: false,
       stableTokenWithPrice: {},
       tokenWithPrice: {},
-      
+      newOrder: null,
       setStableTokenWithPrice: (data: IRwaPrice[]) => {
         const { priceInitialized } = get();
         if (priceInitialized) return; // 
@@ -44,11 +45,11 @@ export const useWssStore = create<WssStore>()(
       },
       
       getCandles: async (params: ICandlesParams) => {
-        
         const res = klineApi.getCandles(params)
-        console.log(res, 11111)
-
         return res
+      },
+      updateNewOrder: (order: IOrderData) => {
+        set({ newOrder: { ...order } })
       }
       
     }),

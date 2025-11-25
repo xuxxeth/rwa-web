@@ -10,7 +10,7 @@ import { useBaseStore } from "./stores/baseStore";
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { useWssOn } from './hooks/useWssOn'
+import { useWssAuth, useWssOn } from './hooks/useWssOn'
 import { useMarketState } from './hooks/useMarketState'
 import { Menus } from './components/menu'
 import { useRiskUserConfig } from './hooks/useRiskStatus'
@@ -50,6 +50,8 @@ function App() {
   useMarketState()
   
   useRiskUserConfig()
+
+  useWssAuth()
 
   useEffect(() => {
     if (!chainId) return

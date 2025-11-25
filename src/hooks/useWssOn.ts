@@ -1,5 +1,12 @@
 import wsService, { type EventType } from "@/service/webSocket/service";
 import { useEffect, useRef } from "react";
+import { useSignatureValidStatus } from "./useSignature";
+import { useChainId } from "ca-common-web";
+import storage from "@/utils/storage";
+import { CONNECT_ACCOUNT } from "@/config/constants";
+import { useActiveWeb3 } from "./useActiveWe3";
+import type { IOrderData } from "@/service/webSocket/types";
+import { useWssStore } from "@/stores/wssStore";
 
 export function useWssOn(event?: EventType, callback?: (data: any) => void) {
   const framePending = useRef<Boolean>(false)
@@ -26,4 +33,36 @@ export function useWssOn(event?: EventType, callback?: (data: any) => void) {
     wsService
   }
   
+}
+
+export function useWssAuth() {
+  const { account, chainId } = useActiveWeb3()
+  const { wsService } = useWssOn()
+  const [ isSignatureValid ] = useSignatureValidStatus()
+  const updateNewOrder = useWssStore(state => state.updateNewOrder)
+
+  useEffect(() => {
+    wsService.init({})
+    const listener = (data: IOrderData) => {
+      console.log('wss order info: ', data)
+      updateNewOrder(data)
+    } 
+    const sub = `order.${chainId}.*`
+    
+    if (isSignatureValid && chainId && account) {
+      const account = storage.getItem(CONNECT_ACCOUNT)
+      const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
+      if (localSignature && localSignature.account && account.toLowerCase() === localSignature.account.toLowerCase()) {
+        const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
+        wsService.auth(auth);
+      }
+      wsService.off(sub, listener)
+      wsService.on(sub, listener)
+    } else {
+      wsService.off(sub, listener)
+    }
+    return () => {
+      wsService.off(sub, listener)
+    }
+  }, [isSignatureValid, chainId, account])
 }

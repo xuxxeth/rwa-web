@@ -20,3 +20,24 @@ export type ISummaryData = {
 }[]
 
 export type IPingData = number
+
+export type IOrderData = {
+    "hx": string   // tx_hash
+    "id": number,     // Order id
+    "si": number,            // Stock id
+    "p": number,      // Order price
+    "s": number,          // Order size
+    "S": string,         // Order side: BUY/SELL
+    "y": string,       // Trade type: MARKET/LIMIT
+    "x": string,         // Order status
+    "R": string,        // Risk type
+    "N": number,      // Network fee(Stable Token)
+    "V": number,          // Network fee(Native Token)
+    "f": string,         // Time in force
+    "d": 7,             // Valid date
+    "st": string,    // SessionType
+    "T": string,        // Token of payment
+    "m": number         // 委托金额
+    "t": number     // Update time(Unix timestamp: s)
+    "E": number  // Event time(Unix timestamp: ms)
+  }

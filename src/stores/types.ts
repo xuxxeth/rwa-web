@@ -13,6 +13,7 @@ import type {
 } from "@/service/base/types";
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 import type { IUserCofnig } from "@/service/risk/types";
+import type { IOrderData } from "@/service/webSocket/types";
 
 export interface BaseStore {
   connectInit: boolean,
@@ -80,8 +81,10 @@ export interface WssStore {
   priceInitialized: Boolean,
   stableTokenWithPrice: Record<string, ITokenWithPrice>;
   tokenWithPrice: Record<string, ITokenWithPrice>;
+  newOrder: IOrderData | null;
   setStableTokenWithPrice: (data: IRwaPrice[]) => void;
   getCandles: (params: ICandlesParams) => Promise<ApiResponse<ICandlesItem[]>>;
+  updateNewOrder: (order: IOrderData) => void;
 }
 
 export interface RiskSTore {
