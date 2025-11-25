@@ -28,11 +28,9 @@ export interface BaseStore {
   marketInfo: IMarket;
   marketState: IMarketState;
   marketTradeState: number;
-  autoRefreshTokenBalances: boolean;
   tokenWithBalance: Record<string, ITokenWithBalance>;
   freshTokenBalancesCount: number;
   stockWithPrice: Record<string, IStockWithPrice>;
-  setAutoRefreshTokenBalances: (autoRefresh: boolean) => void;
   setConnectInit: (init: boolean) => void;
   setShowConnect: (show: boolean) => void;
   setCurrentWallet: (wallet: any) => void;

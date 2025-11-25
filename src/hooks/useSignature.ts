@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { useTradeStore } from '@/stores/tradeStore'
 import { SIGNATURE_EXPIRES } from '@/config/constants'
+import { CONNECT_ACCOUNT } from '../config/constants'
 
 export function useRequestSignature() {
   const [signing, setSigning] = useState(false)
@@ -17,11 +18,11 @@ export function useRequestSignature() {
       storage.setItem(`signature_${res.account?.toLowerCase()}`, res)
       setSigning(false)
       return res
-    } catch(error) {
+    } catch (error) {
       setSigning(false)
       return null
     }
-    
+
   }, [signing, requestSignature])
 
   // 浏览器原生的 localStorage API 是同步的? 所以这里不需要 async await
