@@ -32,13 +32,13 @@ export function useWssOn(event?: EventType, callback?: (data: any) => void) {
   return {
     wsService
   }
-  
+
 }
 
 export function useWssAuth() {
   const { account, chainId } = useActiveWeb3()
   const { wsService } = useWssOn()
-  const [ isSignatureValid ] = useSignatureValidStatus()
+  const [isSignatureValid] = useSignatureValidStatus()
   const updateNewOrder = useWssStore(state => state.updateNewOrder)
 
   useEffect(() => {
@@ -46,9 +46,9 @@ export function useWssAuth() {
     const listener = (data: IOrderData) => {
       console.log('wss order info: ', data)
       updateNewOrder(data)
-    } 
+    }
     const sub = `order.${chainId}.*`
-    
+
     if (isSignatureValid && chainId && account) {
       const account = storage.getItem(CONNECT_ACCOUNT)
       const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null

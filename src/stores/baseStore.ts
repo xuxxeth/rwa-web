@@ -35,12 +35,7 @@ export const useBaseStore = create<BaseStore>()(
       marketTradeState: MARKET_STATUS.DEFAULT,
       freshTokenBalancesCount: 1,
       // TODO: 使用 Map 可能性能更好?
-      // token 余额
-      autoRefreshTokenBalances: false,
       tokenWithBalance: {},
-      setAutoRefreshTokenBalances: (autoRefresh: boolean) => {
-        set({ autoRefreshTokenBalances: autoRefresh })
-      },
       setConnectInit: (init: boolean) => {
         set({ connectInit: init })
       },

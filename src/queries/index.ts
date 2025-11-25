@@ -8,14 +8,6 @@ import {
   type ITradeHistoryFilter,
 } from '@/stores/orderFilterStore'
 import { type ErrorHandlers } from '@/config/constants'
-import { TEN_SECONDS } from '@/utils/index'
-
-const refreshConfig = {
-  // 每10秒刷新一次
-  refetchInterval: TEN_SECONDS,
-  // 页面不可见时暂停刷新
-  refetchIntervalInBackground: false,
-}
 
 // 获取市场行情的 queryOptions
 export function marketQuoteOptions(chainId: number) {
@@ -86,8 +78,7 @@ export function infiniteOpenOrderOptions(
     },
     initialPageParam: undefined,
     getNextPageParam: lastPage => lastPage?.nextPage,
-    enabled: chainId !== null && isSignatureValid,
-    ...refreshConfig,
+    enabled: chainId !== null && isSignatureValid
   })
 }
 
@@ -150,7 +141,6 @@ export function infiniteOrderHistoryOptions(
     initialPageParam: undefined,
     getNextPageParam: lastPage => lastPage?.nextPage,
     enabled: chainId !== null && isSignatureValid,
-    ...refreshConfig
   })
 }
 
@@ -206,7 +196,6 @@ export function infiniteTradeHistoryOptions(
     },
     initialPageParam: undefined,
     getNextPageParam: lastPage => lastPage?.nextPage,
-    enabled: chainId !== null && isSignatureValid,
-    ...refreshConfig
+    enabled: chainId !== null && isSignatureValid
   })
 }

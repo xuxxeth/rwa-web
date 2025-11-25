@@ -92,7 +92,7 @@ class WebSocketService {
 
     this.bindEvents()
   }
-  /** 自动回复 pong */
+
   public auth(signture: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const auth = { request: 'auth', args: signture }
@@ -183,7 +183,6 @@ class WebSocketService {
         listenersOrder.forEach(cb => cb(data.data))
       }
     }
-
   }
 
   /** 发送数据 */

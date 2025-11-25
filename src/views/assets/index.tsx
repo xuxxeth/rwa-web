@@ -12,8 +12,8 @@ import { useAssetsList } from './assetsList'
 import OrderHistory from './OrderHistory'
 import TradeHistory from './TradeHistory'
 import { useRwaTokens } from '@/hooks/useTokens'
-import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
+import wsService from '@/service/webSocket/service'
 
 function Assets() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)

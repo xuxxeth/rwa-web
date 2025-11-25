@@ -13,7 +13,7 @@ import type { ITableConfig } from '@/components/table-header'
 import { symbolToLower } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 
 type SortableField = 'value'
 
@@ -23,7 +23,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
   const updateInputToken = useTradeStore(state => state.updateInputToken)
-  const setAutoRefreshTokenBalances = useBaseStore(state => state.setAutoRefreshTokenBalances)
 
   const rwaList = useBaseStore(state => state.rwaList)
 
@@ -45,15 +44,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
 
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
     usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort, defaultSort)
-
-
-  useEffect(() => {
-    // 开启自动刷新 token balances
-    setAutoRefreshTokenBalances(true)
-    return () => {
-      setAutoRefreshTokenBalances(false)
-    }
-  }, [])
 
   return (
     <>
