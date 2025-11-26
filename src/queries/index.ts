@@ -22,12 +22,13 @@ export function marketQuoteOptions(chainId: number) {
 }
 
 export function openOrderOptions(
+  account: string,
   chainId: number,
   isSignatureValid: boolean,
   filters?: IOpenOrderFilter
 ) {
   return queryOptions({
-    queryKey: ['openOrder', chainId, filters],
+    queryKey: ['openOrder', account, chainId, filters],
     queryFn: async () => {
       const data = await scanApi.getOpenOrders(filters)
       return data?.data || []
@@ -37,6 +38,7 @@ export function openOrderOptions(
 }
 
 export function infiniteOpenOrderOptions(
+  account: string,
   chainId: number,
   isSignatureValid: boolean,
   filters?: IOpenOrderFilter,
@@ -55,10 +57,10 @@ export function infiniteOpenOrderOptions(
       },
       string | undefined
     >,
-    [string, number, IOpenOrderFilter | undefined],
+    [string, string, number, IOpenOrderFilter | undefined],
     string | undefined
   >({
-    queryKey: ['infiniteOpenOrder', chainId, filters],
+    queryKey: ['infiniteOpenOrder', account, chainId, filters],
     queryFn: async ({ pageParam }) => {
       // pageParam 是前一页的最后一个orderId，初始值为undefined
       const data = await scanApi.getOpenOrders(
@@ -83,12 +85,13 @@ export function infiniteOpenOrderOptions(
 }
 
 export function orderHistoryOptions(
+  account: string,
   chainId: number,
   isSignatureValid: boolean,
   filters?: IOpenOrderHistoryFilter
 ) {
   return queryOptions({
-    queryKey: ['orderHistory', chainId, filters],
+    queryKey: ['orderHistory', account, chainId, filters],
     queryFn: async () => {
       const data = await scanApi.getOrderHistory(filters)
       return data?.data || []
@@ -98,6 +101,7 @@ export function orderHistoryOptions(
 }
 
 export function infiniteOrderHistoryOptions(
+  account: string,
   chainId: number,
   isSignatureValid: boolean,
   filters?: IOpenOrderHistoryFilter,
@@ -116,10 +120,10 @@ export function infiniteOrderHistoryOptions(
       },
       string | undefined
     >,
-    [string, number, IOpenOrderHistoryFilter | undefined],
+    [string, string, number, IOpenOrderHistoryFilter | undefined],
     string | undefined
   >({
-    queryKey: ['infiniteOrderHistory', chainId, filters],
+    queryKey: ['infiniteOrderHistory', account, chainId, filters],
     queryFn: async ({ pageParam }) => {
       // pageParam 是前一页的最后一个orderId，初始值为undefined
       const data = await scanApi.getOrderHistory(
@@ -160,6 +164,7 @@ export function tradeHistoryOptions(
 }
 
 export function infiniteTradeHistoryOptions(
+  account: string,
   chainId: number,
   isSignatureValid: boolean,
   filters?: ITradeHistoryFilter,
@@ -178,10 +183,10 @@ export function infiniteTradeHistoryOptions(
       },
       number | undefined
     >,
-    [string, number, ITradeHistoryFilter | undefined],
+    [string, string, number, ITradeHistoryFilter | undefined],
     string | undefined
   >({
-    queryKey: ['infiniteTradeHistory', chainId, filters],
+    queryKey: ['infiniteTradeHistory', account, chainId, filters],
     queryFn: async ({ pageParam }) => {
       // pageParam 是前一页的最后一个orderId，初始值为undefined
       const data = await scanApi.getTrades({ ...filters, after: pageParam }, errorHandlers)

@@ -24,13 +24,14 @@ import { useOrderFilterStore, generateTradeHistoryFilterObj } from '@/stores/ord
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from './SignatureVerify'
 import { DatePickerWithRange } from '@/components/date-range-picker'
-import { LazyImage } from '@/components/image/LazyImage'
+import { type OrderChanged } from './Shared'
 
-function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa[] }) {
-  const { chainId, account, rwaTokens } = props
+function TradeHistory(props: {
+  chainId: number; account: string; rwaTokens: IRwa[], orderChanged: OrderChanged
+}) {
+  const { chainId, account, rwaTokens, orderChanged } = props
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
-  const { t } = useTranslation()
   const tradeHistoryFilters = useOrderFilterStore(state => state.tradeHistoryFilters)
   const updateTradeHistoryFilters = useOrderFilterStore(state => state.updateTradeHistoryFilters)
 
@@ -49,31 +50,32 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
     return { ...userSelectFilter, ...otherFilter }
   }, [tradeHistoryFilters])
 
-  // const {
-  //   data,
-  //   isPending,
-  //   status: queryStatus,
-  //   isError,
-  //   error,
-  // } = useQuery(tradeHistoryOptions(chainId, isSignatureValid, filters));
-
   const {
     data,
     isLoading,
     status: queryStatus,
     isError,
+    refetch,
     error,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
     fetchNextPage,
+    isFetchedAfterMount
   } = useInfiniteQuery(
-    infiniteTradeHistoryOptions(chainId, isSignatureValid, filters, {
+    infiniteTradeHistoryOptions(account, chainId, isSignatureValid, filters, {
       onUnAuthorized: () => {
         refreshIsSignatureValid(false)
       },
     })
   )
+
+  useEffect(() => {
+    if (!isFetchedAfterMount || isLoading || !orderChanged) return
+    if (['FILLED', 'CANCELLED', 'PARTIALLY_FILLED', 'FAILED'].includes(orderChanged.status)) {
+      refetch()
+    }
+  }, [orderChanged])
 
   // 用于检测滚动到底部的ref
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -169,14 +171,14 @@ function TradeHistory(props: { chainId: number; account: string; rwaTokens: IRwa
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
             className='border-none rounded-lg hover:bg-white/10'
-            // dynamicClassName={(item: ITrade) =>
-            //   isRiskLocked(item.riskType)
-            //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
-            //     : 'hover:bg-white/10'
-            // }
-            // ExtraComponent={({ item }: { item: ITrade }) =>
-            //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
-            // }
+          // dynamicClassName={(item: ITrade) =>
+          //   isRiskLocked(item.riskType)
+          //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+          //     : 'hover:bg-white/10'
+          // }
+          // ExtraComponent={({ item }: { item: ITrade }) =>
+          //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+          // }
           />
           <ScrollLoadMore<ITrade>
             isFetchingNextPage={isFetchingNextPage}

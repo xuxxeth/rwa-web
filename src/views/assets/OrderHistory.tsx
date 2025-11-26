@@ -4,11 +4,13 @@ import { cn } from "@/utils";
 import { type IRwa } from "@/service/base/types";
 import HistoryOrderTable from "./HistoryOrderTable";
 import OpenOrderTable from "./OpenOrderTable";
+import { type OrderChanged } from "./Shared";
 
 function OrderHistory(props: {
   chainId: number;
   account: string;
   rwaTokens: IRwa[];
+  orderChanged: OrderChanged
 }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"openOrders" | "orderHistory">(

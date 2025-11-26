@@ -1,5 +1,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import type { IAggregateData, ISummaryData, IPingData } from './types'
+import { genAuthReqId } from '@/utils';
 
 export const WSS_URL = import.meta.env.VITE_WSS_URL
 
@@ -30,6 +31,7 @@ function processType(type: string) {
 export interface WSMessage {
   request: string
   args: any
+  requestId?: string
 }
 
 export interface ResMessage<T extends EventType> {
@@ -60,6 +62,7 @@ class WebSocketService {
   private static instance: WebSocketService
   private ws: ReconnectingWebSocket | null = null
   private listeners: Map<EventType | string, Set<Listener<EventType>>> = new Map()
+  private authListeners: Map<string, Listener<string>> = new Map()
   private subscriptions: Set<EventType | string> = new Set()
   private url: string = ''
   private options?: WSOptions
@@ -150,6 +153,15 @@ class WebSocketService {
         this.authStatus = true
         // 所有缓存的订单相关的订阅全部重新订阅
         this.resubscribeAll()
+
+        // 调用认证监听器
+        const requestId = data.data.data
+        const authListener = this.authListeners.get(requestId)
+        if (authListener) {
+          authListener(data.data)
+          this.authListeners.delete(requestId)
+        }
+
         return
       }
       this.dispatch(data)
@@ -201,6 +213,15 @@ class WebSocketService {
     console.log('🔁 Resubscribing channels...')
     // 批量一次性订阅所有 topic
     this.send({ request: 'sub', args: [...this.subscriptions] })
+  }
+
+  public onAuth(signature: string, listener: Listener<string>) {
+    // 每次发送 auth 请求时，都生成一个新的 requestId
+    const requestId = genAuthReqId()
+    // 存储 auth 监听器
+    this.authListeners.set(requestId, listener)
+
+    this.send({ request: 'auth', args: signature, requestId })
   }
 
   public on<T extends EventType>(eventType: T | string, listener: Listener<T>) {

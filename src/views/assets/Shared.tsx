@@ -7,16 +7,25 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed } from '@/utils'
 import type { OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
-import { ScrollBox } from '@/components/scroll-box'
 import { NoData } from '@/components/markets/NoData'
+
+export type OrderChanged = {
+  orderId: string,
+  eventTime: number
+  status: OrderChangedStatus
+} | null
+export type OrderChangedStatus = 'NEW' | 'FILLED' | 'PENDING_CANCEL' | 'CANCELLED' | "PARTIALLY_FILLED" | "FAILED"
+
+export function checkOrderChangedEqual(a: OrderChanged | null, b: OrderChanged | null) {
+  if (a === null || b === null) return false
+  return a.orderId === b.orderId && a.eventTime === b.eventTime && a.status === b.status
+}
 
 export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-sm/5.5 font-normal', props.className)}>{props.text}</div>
