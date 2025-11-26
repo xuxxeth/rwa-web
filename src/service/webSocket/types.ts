@@ -21,6 +21,26 @@ export type ISummaryData = {
 
 export type IPingData = number
 
+export type Code = 9200 | 9901 | 9401 | 9403 | 9429 | 9500
+
+export type IAuthData = {
+  code: Code,
+  data?: string
+  message?: string
+}
+
+export type ISubData =  {
+  code: Code
+  data?: any
+  message?: string
+}
+
+export type IUnsubData = {
+  code: Code
+  data?: any
+  message?: string
+}
+
 export type IOrderData = {
     "hx": string   // tx_hash
     "id": number,     // Order id
@@ -40,4 +60,5 @@ export type IOrderData = {
     "m": number         // 委托金额
     "t": number     // Update time(Unix timestamp: s)
     "E": number  // Event time(Unix timestamp: ms)
+    "sl": string  // 提取的具体的 rwa symbol
   }

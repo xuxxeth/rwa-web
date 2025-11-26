@@ -1,12 +1,13 @@
 import ReconnectingWebSocket from 'reconnecting-websocket'
-import type { IAggregateData, ISummaryData, IPingData } from './types'
-import { genAuthReqId } from '@/utils';
+import type { IAggregateData, ISummaryData, IPingData, IAuthData, ISubData, IUnsubData, IOrderData } from './types'
+import { genWsRequestId } from '@/utils';
 
 export const WSS_URL = import.meta.env.VITE_WSS_URL
 
 function replaceAfterSecondDot(str: string) {
   return str.replace(/^([^.]*\.[^.]*)\.(.*)$/, '$1.*');
 }
+
 function processType(type: string) {
   const parts = type.split('.');
 
@@ -18,7 +19,9 @@ function processType(type: string) {
     };
   }
 
+  // 替换第三个点后的内容为通配符，例如将 order.123456.Applc 替换为 order.123456.*
   const replaced = parts.slice(0, 2).join('.') + '.*';
+  // 提取第三个点后的内容，例如将 order.123456.Applc 提取为 Applc
   const extracted = parts.slice(2).join('.');
 
   return {
@@ -28,28 +31,63 @@ function processType(type: string) {
   };
 }
 
-export interface WSMessage {
-  request: string
+// 客户端可以向 WebSocket 服务端请求的事件类型
+export type RequestEventType = 'sub' | 'unsub' | 'auth' | 'pong'
+
+// 客户端发送给 WebSocket 服务端的请求消息结构
+export interface WSRequestMessage<T extends RequestEventType> {
+  request: T
   args: any
   requestId?: string
 }
 
-export interface ResMessage<T extends EventType> {
+// 客户端从 WebSocket 服务端接收的响应消息结构
+export interface ResMessage<T extends ResEventType> {
   type: T
-  data: EventDataMap[T]
+  requestId?: string
+  data: ResEventDataMap[T]
 }
 
-export type EventType = 'summary' | 'aggregate' | 'ping' | 'auth' | string
+// 事件类型核心定义 (Source of Truth) 
 
-type EventDataMap = {
+// 订单相关事件的模板字面量类型
+export type OrderEventType = `order.${number}.${string}`
+
+/**
+ * 所有客户端可以**订阅**的事件及其 `data` 载荷的类型映射。
+ * 这是所有“可订阅事件”的“真实数据源”。
+ * `SubscribedEventType` 会从此类型自动派生。
+ */
+export type SubscribableEventDataMap = {
   summary: ISummaryData
   aggregate: IAggregateData
-  ping: IPingData
-  auth: IPingData
-  [key: string]: any
+  auth: IAuthData // auth 是一个特殊的可订阅事件，通常只触发一次
+} & {
+  [key: OrderEventType]: IOrderData
 }
 
-type Listener<T extends EventType> = (data: ResMessage<T>['data']) => void
+/**
+ * 所有 WebSocket 响应事件及其 `data` 的类型映射。
+ * 这是所有“响应事件”的“真实数据源”。
+ * `ResEventType` 会从此类型自动派生。
+ */
+type ResEventDataMap = {
+  // 对应客户端请求的响应
+  sub: ISubData
+  unsub: IUnsubData
+} & {
+  // 服务端主动推送的事件
+  ping: IPingData
+} & SubscribableEventDataMap // 包含所有可订阅的事件
+
+// --- 派生类型定义 ---
+// 所有 WebSocket 响应事件的名称集合，通过 `keyof` 从 `ResEventDataMap` 自动派生
+export type ResEventType = keyof ResEventDataMap
+// 所有客户端可以订阅的事件名称集合，通过 `keyof` 从 `SubscribableEventDataMap` 自动派生
+export type SubscribedEventType = keyof SubscribableEventDataMap
+
+// 事件监听器的函数类型
+type Listener<T extends SubscribedEventType> = (data: ResEventDataMap[T]) => void
 
 interface WSOptions {
   url?: string
@@ -61,12 +99,12 @@ interface WSOptions {
 class WebSocketService {
   private static instance: WebSocketService
   private ws: ReconnectingWebSocket | null = null
-  private listeners: Map<EventType | string, Set<Listener<EventType>>> = new Map()
-  private authListeners: Map<string, Listener<string>> = new Map()
-  private subscriptions: Set<EventType | string> = new Set()
+  private listeners: Map<SubscribedEventType, Set<Listener<SubscribedEventType>>> = new Map()
+  private authListeners: Map<string, Listener<'auth'>> = new Map()
+  private subscriptions: Set<SubscribedEventType> = new Set()
   private url: string = ''
   private options?: WSOptions
-  private pendingQueue: WSMessage[] = []
+  private pendingQueue: WSRequestMessage<RequestEventType>[] = []
   private authStatus: boolean = false
   private authSignture: string = ''
   /** 单例获取 */
@@ -144,27 +182,35 @@ class WebSocketService {
   /** 处理消息 */
   private handleMessage(raw: any) {
     try {
-      const data = JSON.parse(raw) as ResMessage<EventType>
+      const data = JSON.parse(raw) as ResMessage<ResEventType>
+      // 处理 ping 事件
       if (data.type === 'ping') {
         this.replyPong(data as ResMessage<'ping'>)
         return
       }
+      // 处理 auth 事件
       if (data.type === 'auth') {
         this.authStatus = true
         // 所有缓存的订单相关的订阅全部重新订阅
         this.resubscribeAll()
 
         // 调用认证监听器
-        const requestId = data.data.data
-        const authListener = this.authListeners.get(requestId)
-        if (authListener) {
-          authListener(data.data)
-          this.authListeners.delete(requestId)
+        const requestId = data.requestId
+        if (requestId) {
+          const authListener = this.authListeners.get(requestId)
+          if (authListener) {
+            authListener(data.data as IAuthData)
+            this.authListeners.delete(requestId)
+          }
         }
 
         return
       }
-      this.dispatch(data)
+
+      if (['sub', 'unsub'].includes(data.type)) {
+        return
+      }
+      this.dispatch(data as ResMessage<SubscribedEventType>)
     } catch (err) {
       console.warn(' WS parse error:', err, raw)
     }
@@ -173,32 +219,32 @@ class WebSocketService {
   /** 自动回复 pong */
   private replyPong(pingData: ResMessage<'ping'>) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      const pong = { request: 'pong', args: { ts: Date.now() } }
+      const pong: WSRequestMessage<'pong'> = { request: 'pong', args: { ts: Date.now() } }
       this.ws.send(JSON.stringify(pong))
     }
   }
 
   /** 分发事件 */
-  private dispatch(data: ResMessage<EventType>) {
+  private dispatch(data: ResMessage<SubscribedEventType>) {
     // 调用对应事件监听器
     const listeners = this.listeners.get(data.type)
     if (listeners) {
       listeners.forEach(cb => cb(data.data))
     }
-    // order.97.*订阅，也会返回order.97.COINc数据，特殊处理
+    // order.97.* 订阅， 返回的数据格式为 order.97.[具体的 rwa 的 symbol]，特殊处理
     if (data.type.indexOf('order.') === 0) {
       const typeInfo = processType(data.type)
-      const listenersOrder = this.listeners.get(typeInfo.replaced)
+      const listenersOrder = this.listeners.get(typeInfo.replaced as SubscribedEventType)
 
       if (listenersOrder) {
-        data.data.sl = typeInfo.extracted
+        (data.data as IOrderData).sl = typeInfo.extracted
         listenersOrder.forEach(cb => cb(data.data))
       }
     }
   }
 
   /** 发送数据 */
-  private send(data: WSMessage) {
+  private send<T extends RequestEventType>(data: WSRequestMessage<T>) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
 
@@ -215,16 +261,16 @@ class WebSocketService {
     this.send({ request: 'sub', args: [...this.subscriptions] })
   }
 
-  public onAuth(signature: string, listener: Listener<string>) {
+  public onAuth(signature: string, listener: Listener<'auth'>) {
     // 每次发送 auth 请求时，都生成一个新的 requestId
-    const requestId = genAuthReqId()
+    const requestId = genWsRequestId()
     // 存储 auth 监听器
     this.authListeners.set(requestId, listener)
 
     this.send({ request: 'auth', args: signature, requestId })
   }
 
-  public on<T extends EventType>(eventType: T | string, listener: Listener<T>) {
+  public on<T extends SubscribedEventType>(eventType: T, listener: Listener<T>) {
     this.ensureInitialized()
 
     // 检查是否是第一个监听器
@@ -245,7 +291,7 @@ class WebSocketService {
     }
   }
 
-  private subscribe(topic: EventType | EventType[] | string) {
+  private subscribe(topic: SubscribedEventType | SubscribedEventType[]) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出不在 subscriptions 中的新 topic
     const newTopics = topicList.filter(t => !this.subscriptions.has(t))
@@ -263,7 +309,7 @@ class WebSocketService {
     this.send({ request: 'sub', args: newTopics })
   }
 
-  private unsubscribe(topic: EventType | EventType[] | string | string[]) {
+  private unsubscribe(topic: SubscribedEventType | SubscribedEventType[]) {
     const topicList = Array.isArray(topic) ? topic : [topic]
     // 过滤出在 subscriptions 中的 topic
     const validTopics = topicList.filter(t => this.subscriptions.has(t))
@@ -283,7 +329,7 @@ class WebSocketService {
   }
 
   /** 移除事件监听 */
-  public off<T extends EventType>(eventType: T, listener: Listener<T>) {
+  public off<T extends SubscribedEventType>(eventType: T, listener: Listener<T>) {
     if (!this.listeners.has(eventType)) return
     // 移除监听器
     const listenerSet = this.listeners.get(eventType)! as Set<Listener<T>>
