@@ -35,9 +35,13 @@ import { DatePickerWithRange } from '@/components/date-range-picker'
 export default function HistoryOrderTable(props: {
   chainId: number
   account: string
-  rwaTokens: IRwa[]
+  rwaTokens: IRwa[],
+  orderChanged: {
+    orderId: string;
+    status: string;
+  } | null
 }) {
-  const { chainId, rwaTokens } = props
+  const { chainId, account, rwaTokens, orderChanged } = props
 
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
@@ -59,22 +63,21 @@ export default function HistoryOrderTable(props: {
     return { ...userSelectFilter, ...otherFilter }
   }, [orderHistoryFilters])
 
-  // const {
-  //   data,
-  //   isPending,
-  //   status: queryStatus,
-  //   isError,
-  //   error,
-  // } = useQuery(orderHistoryOptions(chainId, isSignatureValid, filters));
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
+  const { data, fetchNextPage, refetch, isFetchedAfterMount, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
     useInfiniteQuery(
-      infiniteOrderHistoryOptions(chainId, isSignatureValid, filters, {
+      infiniteOrderHistoryOptions(account, chainId, isSignatureValid, filters, {
         onUnAuthorized: () => {
           refreshIsSignatureValid(false)
         },
       })
     )
+
+  useEffect(() => {
+    if (!isFetchedAfterMount || isLoading || !orderChanged) return
+    if (['FILLED', 'CANCELLED', 'PARTIALLY_FILLED', 'FAILED'].includes(orderChanged.status)) {
+      refetch()
+    }
+  }, [orderChanged])
 
   const allOrders = data?.pages?.flatMap(page => page.data) || []
 

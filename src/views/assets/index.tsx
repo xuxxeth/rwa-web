@@ -14,6 +14,10 @@ import TradeHistory from './TradeHistory'
 import { useRwaTokens } from '@/hooks/useTokens'
 import { useAppStore } from '@/stores/appStore'
 import wsService from '@/service/webSocket/service'
+import storage from '@/utils/storage'
+import { type OrderChanged, checkOrderChangedEqual } from './Shared'
+
+import { useSignatureValidStatus } from '@/hooks/useSignature'
 
 function Assets() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -30,6 +34,50 @@ function Assets() {
   const { assetsList, estimatedBalance } = useAssetsList(chainId!, account)
 
   const rwaTokens = useRwaTokens()
+
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+
+  const [orderChanged, _setOrderChanged] = useState<OrderChanged | null>(null)
+
+
+  const setOrderChanged = (orderChanged: OrderChanged | null) => {
+    _setOrderChanged(prev => {
+      if (checkOrderChangedEqual(orderChanged, prev)) {
+        return prev
+      }
+      return orderChanged
+    })
+  }
+
+  useEffect(() => {
+    if (!account || !chainId || !isSignatureValid) return
+    const localSignature = storage.getItem(`signature_${account.toLowerCase()}`)
+    if (!localSignature) return
+    const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
+
+    const topic = `order.${chainId}.*`
+
+    const orderListener = (data: any) => {
+      const newOrderChanged = {
+        orderId: String(data.id),
+        status: data.x === 0 ? 'NEW' : data.x,
+        eventTime: data.E
+      }
+      setOrderChanged(newOrderChanged)
+    }
+
+    wsService.onAuth(auth, (data) => {
+      if (data.code === 9200) {
+        // auth 认证成功之后再订阅 order 事件
+        wsService.on(topic, orderListener)
+      }
+    })
+
+    return () => {
+      wsService.off(topic, orderListener)
+    }
+
+  }, [account, chainId, isSignatureValid])
 
   return (
     <>
@@ -58,10 +106,10 @@ function Assets() {
                     <AssetsTable assetsList={assetsList} chainId={chainId} account={account} />
                   )}
                   {activeTab === 'orderHistory' && (
-                    <OrderHistory chainId={chainId} account={account} rwaTokens={rwaTokens} />
+                    <OrderHistory chainId={chainId} account={account} rwaTokens={rwaTokens} orderChanged={orderChanged} />
                   )}
                   {activeTab === 'tradeHistory' && (
-                    <TradeHistory chainId={chainId} account={account} rwaTokens={rwaTokens} />
+                    <TradeHistory chainId={chainId} account={account} rwaTokens={rwaTokens} orderChanged={orderChanged} />
                   )}
                 </TabsContent>
               </Tabs>

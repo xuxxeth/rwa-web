@@ -24,14 +24,15 @@ import { useOrderFilterStore, generateOpenOrderFilterObj } from '@/stores/orderF
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from './SignatureVerify'
 import { useTradeUtils } from '@/hooks/useTrading'
+import { type OrderChanged } from './Shared'
 
 export default function OpenOrderTable(props: {
   chainId: number
   account: string
   rwaTokens: IRwa[]
+  orderChanged: OrderChanged
 }) {
-  const { t } = useTranslation()
-  const { chainId, account, rwaTokens } = props
+  const { chainId, account, rwaTokens, orderChanged } = props
 
   const openOrderFilters = useOrderFilterStore(state => state.openOrderFilters)
   const updateOpenOrderFilters = useOrderFilterStore(state => state.updateOpenOrderFilters)
@@ -46,15 +47,6 @@ export default function OpenOrderTable(props: {
     return { ...userSelectFilter, ...otherFilter }
   }, [openOrderFilters])
 
-  // const {
-  //   data,
-  //   isPending,
-  //   status: queryStatus,
-  //   isError,
-  //   error,
-  //   refetch,
-  // } = useQuery(openOrderOptions(chainId, isSignatureValid, filter));
-
   const {
     data,
     refetch,
@@ -64,8 +56,9 @@ export default function OpenOrderTable(props: {
     isFetching,
     isLoading,
     isError,
+    isFetchedAfterMount
   } = useInfiniteQuery(
-    infiniteOpenOrderOptions(chainId, isSignatureValid, filter, {
+    infiniteOpenOrderOptions(account, chainId, isSignatureValid, filter, {
       onUnAuthorized: () => {
         refreshIsSignatureValid(false)
       },
@@ -73,8 +66,12 @@ export default function OpenOrderTable(props: {
   )
 
   const allOpenOrders = data?.pages?.flatMap(page => page.data) || []
-
   const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isFetchedAfterMount || isLoading || !orderChanged) return
+    refetch()
+  }, [orderChanged])
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -254,13 +251,12 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
 ]
 
 function CancelOrderButton(props: { orderId: string; refetch: () => void; disabled: boolean }) {
-  const { refetch, disabled } = props
+  const { disabled } = props
   const { t } = useTranslation()
   const { orderId } = props
   const { cancelOrder } = useTradeUtils()
   const { toastSuccess, toastError } = useToast()
   const [isCanceling, setIsCanceling] = useState(false)
-  const maxRefetchCount = useRef(5)
 
   const handleCancelOrder = async () => {
     try {
@@ -270,11 +266,6 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
         toastSuccess({
           title: t('assets.order.cancelOrderSuccess'),
         })
-        while (maxRefetchCount.current > 0) {
-          maxRefetchCount.current--
-          refetch()
-          await sleep(1000)
-        }
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message
