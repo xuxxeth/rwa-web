@@ -195,7 +195,8 @@ class WebSocketService {
         this.resubscribeAll()
 
         // 调用认证监听器
-        const requestId = data.requestId
+        // (data.data as any).data 为了兼容历史的 requestId 格式
+        const requestId = data.requestId ?? (data.data as any).data
         if (requestId) {
           const authListener = this.authListeners.get(requestId)
           if (authListener) {
@@ -208,6 +209,7 @@ class WebSocketService {
       }
 
       if (['sub', 'unsub'].includes(data.type)) {
+        // 暂时没有处理 sub 和 unsub 事件
         return
       }
       this.dispatch(data as ResMessage<SubscribedEventType>)
