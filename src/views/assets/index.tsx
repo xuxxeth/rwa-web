@@ -13,7 +13,7 @@ import OrderHistory from './OrderHistory'
 import TradeHistory from './TradeHistory'
 import { useRwaTokens } from '@/hooks/useTokens'
 import { useAppStore } from '@/stores/appStore'
-import wsService from '@/service/webSocket/service'
+import wsService, { type OrderEventType } from '@/service/webSocket/service'
 import storage from '@/utils/storage'
 import { type OrderChanged, checkOrderChangedEqual } from './Shared'
 
@@ -55,7 +55,7 @@ function Assets() {
     if (!localSignature) return
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
 
-    const topic = `order.${chainId}.*`
+    const topic: OrderEventType = `order.${chainId}.*`
 
     const orderListener = (data: any) => {
       const newOrderChanged = {

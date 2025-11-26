@@ -1,4 +1,4 @@
-import wsService, { type EventType } from "@/service/webSocket/service";
+import wsService, { type OrderEventType, type SubscribedEventType } from "@/service/webSocket/service";
 import { useEffect, useRef } from "react";
 import { useSignatureValidStatus } from "./useSignature";
 import { useChainId } from "ca-common-web";
@@ -8,7 +8,7 @@ import { useActiveWeb3 } from "./useActiveWe3";
 import type { IOrderData } from "@/service/webSocket/types";
 import { useWssStore } from "@/stores/wssStore";
 
-export function useWssOn(event?: EventType, callback?: (data: any) => void) {
+export function useWssOn(event?: SubscribedEventType, callback?: (data: any) => void) {
   const framePending = useRef<Boolean>(false)
 
   useEffect(() => {
@@ -42,12 +42,14 @@ export function useWssAuth() {
   const updateNewOrder = useWssStore(state => state.updateNewOrder)
 
   useEffect(() => {
+    if(!chainId) return
+    
     wsService.init({})
     const listener = (data: IOrderData) => {
       console.log('wss order info: ', data)
       updateNewOrder(data)
     }
-    const sub = `order.${chainId}.*`
+    const sub: OrderEventType = `order.${chainId}.*`
 
     if (isSignatureValid && chainId && account) {
       const account = storage.getItem(CONNECT_ACCOUNT)
