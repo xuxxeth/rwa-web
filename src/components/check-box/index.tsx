@@ -15,6 +15,7 @@ const CheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
   }, [checked])
   return (
     <button
+      type="button"
       className=" cursor-pointer outline-none"
       onClick={() => {
         setCheck(!check);

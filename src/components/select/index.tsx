@@ -34,8 +34,12 @@ const Select = memo(
     useEffect(() => {
       if (defaultValue) {
         setCurrentValue(defaultValue)
+        const _current = data.find(item => item.value === defaultValue)
+        if (_current) {
+          setCurrentItem(_current)
+        }
       }
-    }, [defaultValue]) 
+    }, [defaultValue, data]) 
 
     return (
       <SelectCom 

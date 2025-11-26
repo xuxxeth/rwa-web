@@ -178,7 +178,7 @@ export function DatePicker({
             )}
           >
             <div className='text-[16px] font-normal'>
-              { selected ? format(selected?.getTime(), FormatStr) : <span className='text-[rgba(255,255,255,0.3)]'>{placeholder ?? ''}</span> }
+              { selected ? format(selected?.getTime(), FormatStr) : userSelectedDate ? format(userSelectedDate, FormatStr) : <span className='text-[rgba(255,255,255,0.3)]'>{placeholder ?? ''}</span> }
             </div>
             <CalendarIcon />
             {/* {date?.from ? (

@@ -1,4 +1,5 @@
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
 import { memo, useEffect } from "react";
 
@@ -13,12 +14,13 @@ const Updater = memo(
     });
 
     const newOrder = useWssStore(state => state.newOrder)
-
+    const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
     useEffect(() => {
       if (newOrder) {
         console.log('new order info: ', newOrder)
+        freshTokenBalances()
       }
-    }, [newOrder])
+    }, [newOrder, freshTokenBalances])
 
     return null
   }

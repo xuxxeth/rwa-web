@@ -34,6 +34,11 @@ const CountrySelect = memo(
     useEffect(() => {
       if (defaultValue) {
         setCurrentCode(defaultValue)
+        const _country = countryList.find(country => country.en === defaultValue)
+        if (_country) {
+          setCurrentCountry(_country)
+          onChange && onChange(_country)
+        }
       }
     }, [defaultValue]) 
 

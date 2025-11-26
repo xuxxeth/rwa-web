@@ -6,8 +6,9 @@ import { LazyImage } from "@/components/image/LazyImage"
 import { Select } from "@/components/select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { usePersistentForm } from "@/hooks/usePersistentForm"
 import { useTranslation } from "@/hooks/useTranslation"
-import { memo } from "react"
+import { memo, useMemo, useState } from "react"
 
 const genderList = [
   {value: '1', label: 'Male'},
@@ -22,36 +23,129 @@ export const InputBox = ({ children }: { children: React.ReactNode}) => {
     </div>
   )
 }
+export const ErrorBox = ({ children, error }: { children?: React.ReactNode, error?: string}) => {
+  if (!error) return null
+  return (
+    <div className="text-red-500 text-sm mt-2">
+      { children || error }
+    </div>
+  )
+}
+
+interface FormData {
+  // 基础信息
+  firstName: string;
+  lastName: string;
+  // fullName: string;
+  gendar: number; // 0女，1男
+  dob: string; // 出生日期
+  email: string;
+  // 证件信息
+  type: number; // 0身份证, 1护照 
+  issueCountry: string
+  no: string;
+  residentAddress: string;
+
+  // 工作信息
+  currentEmployment: string;
+  description: string;
+
+  // 补充信息
+
+}
 
 const BaseInfo = memo(
   () => {
     const { t } = useTranslation()
+    const { register, handleSubmit, watch, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+      gendar: 0
+    });
+
+    const [gendar, setGendar] = useState('0')
+    const [issueCountry, setIssueCountry] = useState('')
     
+    const firstName = watch('firstName' );
+    const lastName = watch('lastName');
+
+    const fullName = useMemo(() => {
+      const first = firstName || '';
+      const last = lastName || '';
+      return `${first} ${last}`.trim();
+    }, [firstName, lastName])
+
+    const onSubmit = (data: FormData) => {
+      console.log(data)
+    }
+
+    console.log(errors)
+
     return (
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className=" grid grid-cols-3 font-normal gap-x-6">
           <div>
             <div className="mb-2 text-[16px]">{t('identity.firstName')}</div>
             <InputBox >
               <Input className=""
                 placeholder={t('identity.firstName')}
+                {
+                  ...register("firstName", {
+                    required: '请输入内容',
+                    maxLength: {
+                      value: 30,
+                      message: "最大支持输入30位字符"
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                      message: "只支持中文和英文字母"
+                    },
+                    onChange: (e) => {
+                      // 实时限制输入长度
+                      if (e.target.value.length > 30) {
+                        e.target.value = e.target.value.slice(0, 30);
+                      }
+                    }
+                  })
+                  
+                }
+                
               />
             </InputBox>
-            
+            <ErrorBox error={errors.firstName?.message} />  
           </div>
           <div>
             <div className="mb-2 text-[16px]">{t('identity.lastName')}</div>
             <InputBox >
               <Input className=""
                 placeholder={t('identity.lastName')}
+                {
+                  ...register("lastName", {
+                    required: '请输入内容',
+                    maxLength: {
+                      value: 30,
+                      message: "最大支持输入30位字符"
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                      message: "只支持中文和英文字母"
+                    },
+                    onChange: (e) => {
+                      // 实时限制输入长度
+                      if (e.target.value.length > 30) {
+                        e.target.value = e.target.value.slice(0, 30);
+                      }
+                    }
+                  })
+                  
+                }
               />
             </InputBox>
+            <ErrorBox error={errors.lastName?.message} />  
             
           </div>
           <div>
             <div className="mb-2 text-[16px]">{t('identity.fullName')}</div>
             <InputBox >
-              <Input className=""
+              <Input disabled value={fullName} className=""
                 placeholder={t('identity.fullName')}
               />
             </InputBox>
@@ -65,8 +159,8 @@ const BaseInfo = memo(
               <DatePicker 
                 placeholder={t('identity.selectDate')}
                 userSelectedDate={new Date().getTime()} 
-                onUserSelectedDateChanged={() => {
-
+                onUserSelectedDateChanged={(value) => {
+                  console.log(value)
                 }} 
               />
             </div>
@@ -77,13 +171,22 @@ const BaseInfo = memo(
             <Select 
               placeholder={t('identity.select')}
               data={genderList}
+              defaultValue={'0'}
+              onChange={data => {
+                setGendar(data.value)
+              }}
             />
           </div>
         </div>
         <div className=" grid grid-cols-2 gap-x-6 mt-8">
           <div>
             <div className="mb-2 text-[16px]">{t('identity.issuingCountry')}</div>
-              <CountrySelect />
+              <CountrySelect 
+                onChange={data => {
+                  console.log(data)
+                  setIssueCountry(data.code)
+                }}
+              />
           </div>
           <div>
             <div className="mb-2 text-[16px]">{t('identity.documentType')}</div>
@@ -120,10 +223,8 @@ const BaseInfo = memo(
             {t('identity.aggree1')}<a href="" target="_blank" className="text-[rgba(26,133,255,1)]">{t('identity.aggree3')}</a>{t('identity.aggree2')}
           </div>
         </div>
-        <Button className="bg-white text-black w-full mt-8"
-          onClick={async () => {
-            
-          }}
+        <Button type="submit" className="bg-white text-black w-full mt-8"
+          
         >
           { t('identity.continue') }
           
