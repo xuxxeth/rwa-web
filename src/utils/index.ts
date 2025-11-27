@@ -189,12 +189,13 @@ export async function mergeImagesFromUrls(url1: string, url2: string): Promise<F
 
         canvas.toBlob((blob) => {
           if (blob) {
-            const mergedFile = new File([blob], 'merged-image.png', { type: 'image/png' })
+            // jpeg 能以更小的文件体积保留可接受的图像质量
+            const mergedFile = new File([blob], 'merged-image.jpg', { type: 'image/jpeg' })
             resolve(mergedFile)
           } else {
             reject(new Error('Failed to convert Canvas to Blob'))
           }
-        })
+        }, 'image/jpeg', 0.8) // 添加质量参数 0.8
       }
     }
 
