@@ -154,3 +154,54 @@ export const TEN_SECONDS = 10 * 1000
 export function genWsRequestId() {
   return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
 }
+
+export async function mergeImagesFromUrls(url1: string, url2: string): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const image1 = new Image()
+    const image2 = new Image()
+
+    image1.crossOrigin = "anonymous"
+    image2.crossOrigin = "anonymous"
+
+    image1.src = url1
+    image2.src = url2
+
+    let loadedCount = 0
+    const onImageLoad = () => {
+      loadedCount++
+      if (loadedCount === 2) {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) {
+          return reject(new Error('Failed to get canvas 2D context'));
+        }
+
+        // 以上下排列
+        const maxWidth = Math.max(image1.width, image2.width)
+        const totalHeight = image1.height + image2.height
+        canvas.width = maxWidth
+        canvas.height = totalHeight
+
+        // 绘制图片
+        ctx.drawImage(image1, 0, 0)
+        ctx.drawImage(image2, 0, image1.height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const mergedFile = new File([blob], 'merged-image.png', { type: 'image/png' })
+            resolve(mergedFile)
+          } else {
+            reject(new Error('Failed to convert Canvas to Blob'))
+          }
+        })
+      }
+    }
+
+    image1.onerror = () => reject(new Error(`Failed to load image 1: ${url1}`))
+    image2.onerror = () => reject(new Error(`Failed to load image 2: ${url2}`))
+
+    image1.onload = onImageLoad
+    image2.onload = onImageLoad
+  })
+}

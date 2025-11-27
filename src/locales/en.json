@@ -258,7 +258,7 @@
       "uploadAddressDesc5": "Utility bill, telecom bill, or other service bills.",
       "uploadAddressDesc6": "Any government-issued statement or letter containing your full name and address (e.g., Social Security letter, IRA notice, city council letter).",
       "uploadAddressDesc7": "All documents must clearly display your full name and complete address in English. Documents must be issued within the last three months.",
-      "addressProof": "Proof of Address"
+      "addrProof": "Proof of Address"
     },
     "firstName": "First Name",
     "lastName": "Last Name",
