@@ -116,7 +116,7 @@ class WebSocketService {
   private options?: WSOptions
   private pendingQueue: WSRequestMessage<RequestEventType>[] = []
   private authStatus: boolean = false
-  private authSignture: string = ''
+  private authSignature: string = ''
   /** 单例获取 */
   public static getInstance(): WebSocketService {
     if (!WebSocketService.instance) {
@@ -146,10 +146,9 @@ class WebSocketService {
 
   public auth(signture: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      const auth = { request: 'auth', requestId: genRequestId(), args: signture }
-      this.ws.send(JSON.stringify(auth))
+      this.send({ request: 'auth', args: signture })
     } else {
-      this.authSignture = signture
+      this.authSignature = signture
     }
   }
 
@@ -172,9 +171,9 @@ class WebSocketService {
       this.pendingQueue.forEach(msg => this.send(msg))
       this.pendingQueue = []
       this.resubscribeAll()
-      if (this.authSignture) {
-        this.auth(this.authSignture)
-        this.authSignture = ''
+      if (this.authSignature) {
+        this.auth(this.authSignature)
+        this.authSignature = ''
       }
     })
 
