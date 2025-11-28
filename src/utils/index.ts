@@ -151,10 +151,6 @@ export const TEN_MINUTES = 10 * 60 * 1000
 export const ONE_MINUTE = 60 * 1000
 export const TEN_SECONDS = 10 * 1000
 
-export function genWsRequestId() {
-  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
-}
-
 export async function mergeImagesFromUrls(url1: string, url2: string): Promise<File> {
   return new Promise((resolve, reject) => {
     const image1 = new Image()

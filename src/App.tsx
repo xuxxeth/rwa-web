@@ -48,7 +48,7 @@ function App() {
   // 获取Rwa余额
   // useRwaBalances()
   useMarketState()
-  
+
   useRiskUserConfig()
 
   useWssAuth()
@@ -63,10 +63,15 @@ function App() {
 
   useEffect(() => {
     wsService.init({})
+
     return () => {
       wsService.close()
     }
   }, [])
+
+  useEffect(() => {
+    wsService.closeAndReConnect()
+  }, [account])
 
   return (
     <>
@@ -74,7 +79,7 @@ function App() {
       {
         isHomeMenus ? <HomeMenus /> : <Menus />
       }
-      
+
       <Updater />
       <RoutesWrapper />
       <Toaster position='top-center' />

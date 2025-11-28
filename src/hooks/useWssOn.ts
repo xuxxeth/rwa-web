@@ -42,8 +42,8 @@ export function useWssAuth() {
   const updateNewOrder = useWssStore(state => state.updateNewOrder)
 
   useEffect(() => {
-    if(!chainId) return
-    
+    if (!chainId) return
+
     wsService.init({})
     const listener = (data: IOrderData) => {
       console.log('wss order info: ', data)
@@ -58,11 +58,9 @@ export function useWssAuth() {
         const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
         wsService.auth(auth);
       }
-      wsService.off(sub, listener)
-      wsService.on(sub, listener)
-    } else {
-      wsService.off(sub, listener)
+      wsService.on(sub, listener, true)
     }
+
     return () => {
       wsService.off(sub, listener)
     }
