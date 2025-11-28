@@ -1,6 +1,5 @@
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import type { IAggregateData, ISummaryData, IPingData, IAuthData, ISubData, IUnsubData, IOrderData } from './types'
-import { genWsRequestId } from '@/utils';
 
 export const WSS_URL = import.meta.env.VITE_WSS_URL
 
@@ -37,14 +36,14 @@ export type RequestEventType = 'sub' | 'unsub' | 'auth' | 'pong'
 // 客户端发送给 WebSocket 服务端的请求消息结构
 export interface WSRequestMessage<T extends RequestEventType> {
   request: T
-  args: any
-  requestId?: string
+  args?: any
+  requestId?: number
 }
 
 // 客户端从 WebSocket 服务端接收的响应消息结构
 export interface ResMessage<T extends ResEventType> {
   type: T
-  requestId?: string
+  requestId: number
   data: ResEventDataMap[T]
 }
 
@@ -96,12 +95,23 @@ interface WSOptions {
   maxReconnectionDelay?: number
 }
 
+// 从 1 开始记数，因为默认返回0
+let requestIdCount = 1
+function genRequestId() {
+  return requestIdCount++
+}
+
+function genAuthListenerkey(requestId: number) {
+  return 'auth-' + requestId
+}
+
 class WebSocketService {
   private static instance: WebSocketService
   private ws: ReconnectingWebSocket | null = null
   private listeners: Map<SubscribedEventType, Set<Listener<SubscribedEventType>>> = new Map()
   private authListeners: Map<string, Listener<'auth'>> = new Map()
   private subscriptions: Set<SubscribedEventType> = new Set()
+  private authPendingTopics: Set<SubscribedEventType> = new Set()
   private url: string = ''
   private options?: WSOptions
   private pendingQueue: WSRequestMessage<RequestEventType>[] = []
@@ -136,7 +146,7 @@ class WebSocketService {
 
   public auth(signture: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      const auth = { request: 'auth', args: signture }
+      const auth = { request: 'auth', requestId: genRequestId(), args: signture }
       this.ws.send(JSON.stringify(auth))
     } else {
       this.authSignture = signture
@@ -191,25 +201,29 @@ class WebSocketService {
       // 处理 auth 事件
       if (data.type === 'auth') {
         this.authStatus = true
-        // 所有缓存的订单相关的订阅全部重新订阅
-        this.resubscribeAll()
+
+        if (this.authPendingTopics.size > 0) {
+          this.subscribe(Array.from(this.authPendingTopics))
+          this.authPendingTopics.clear()
+        }
 
         // 调用认证监听器
         // (data.data as any).data 为了兼容历史的 requestId 格式
-        const requestId = data.requestId ?? (data.data as any).data
-        if (requestId) {
-          const authListener = this.authListeners.get(requestId)
+        const requestId = data.requestId
+        if (requestId && requestId !== 0) {
+          const listenerKey = genAuthListenerkey(requestId)
+          const authListener = this.authListeners.get(listenerKey)
           if (authListener) {
             authListener(data.data as IAuthData)
-            this.authListeners.delete(requestId)
+            this.authListeners.delete(listenerKey)
           }
         }
 
         return
       }
 
-      if (['sub', 'unsub'].includes(data.type)) {
-        // 暂时没有处理 sub 和 unsub 事件
+      if (['sub', 'unsub', 'exit'].includes(data.type)) {
+        // 暂时没有处理 sub 和 unsub 和 exit 事件
         return
       }
       this.dispatch(data as ResMessage<SubscribedEventType>)
@@ -247,9 +261,12 @@ class WebSocketService {
 
   /** 发送数据 */
   private send<T extends RequestEventType>(data: WSRequestMessage<T>) {
+    // 对非 pong 请求，如果 没有 requestId， 则自动添加 requestId
+    if (data.request !== 'pong' && data.requestId === undefined) {
+      data.requestId = genRequestId()
+    }
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
-
     } else {
       this.pendingQueue.push(data)
     }
@@ -264,15 +281,17 @@ class WebSocketService {
   }
 
   public onAuth(signature: string, listener: Listener<'auth'>) {
+    this.ensureInitialized()
     // 每次发送 auth 请求时，都生成一个新的 requestId
-    const requestId = genWsRequestId()
+    const requestId = genRequestId()
     // 存储 auth 监听器
-    this.authListeners.set(requestId, listener)
+    const listenerKey = genAuthListenerkey(requestId)
+    this.authListeners.set(listenerKey, listener)
 
-    this.send({ request: 'auth', args: signature, requestId })
+    this.send({ request: 'auth', args: signature, requestId: requestId })
   }
 
-  public on<T extends SubscribedEventType>(eventType: T, listener: Listener<T>) {
+  public on<T extends SubscribedEventType>(eventType: T, listener: Listener<T>, needAuth?: boolean) {
     this.ensureInitialized()
 
     // 检查是否是第一个监听器
@@ -289,7 +308,11 @@ class WebSocketService {
 
     // 如果是第一个监听器，自动订阅
     if (isFirstListener) {
-      this.subscribe(eventType)
+      if (needAuth) {
+        this.authPendingTopics.add(eventType)
+      } else {
+        this.subscribe(eventType)
+      }
     }
   }
 
@@ -341,6 +364,7 @@ class WebSocketService {
     const hasListeners = listenerSet.size > 0
     // 如果没有监听器了，自动取消订阅
     if (!hasListeners) {
+      this.listeners.delete(eventType)
       this.unsubscribe(eventType)
     }
   }
@@ -363,6 +387,15 @@ class WebSocketService {
     this.ws?.close()
     this.ws = null
     console.log('🧹 WebSocket closed manually')
+  }
+
+  // 主动关闭连接后，立刻重新连接
+  public closeAndReConnect() {
+    // clear auth signature
+    this.authSignture = ''
+
+    this.ws?.close()
+    this.ws?.reconnect()
   }
 }
 
