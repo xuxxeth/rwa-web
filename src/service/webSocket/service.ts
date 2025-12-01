@@ -389,7 +389,7 @@ class WebSocketService {
   // 主动关闭连接后，立刻重新连接
   public closeAndReConnect() {
     // clear auth signature
-    this.authSignture = ''
+    this.authSignature = ''
 
     this.ws?.close()
     this.ws?.reconnect()
