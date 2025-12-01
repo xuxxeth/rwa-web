@@ -69,10 +69,6 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
-    wsService.closeAndReConnect()
-  }, [account])
-
   return (
     <>
       <ScrollToTop />

@@ -115,8 +115,15 @@ class WebSocketService {
   private url: string = ''
   private options?: WSOptions
   private pendingQueue: WSRequestMessage<RequestEventType>[] = []
-  private authStatus: boolean = false
-  private authSignature: string = ''
+
+  private auth: {
+    map: Record<number, string>
+    signatureAuthed: string | undefined
+  } = {
+      map: {},
+      signatureAuthed: undefined
+    }
+
   /** 单例获取 */
   public static getInstance(): WebSocketService {
     if (!WebSocketService.instance) {
@@ -144,12 +151,12 @@ class WebSocketService {
     this.bindEvents()
   }
 
-  public auth(signture: string) {
-    this.authSignature = signture
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.send({ request: 'auth', args: signture })
-    }
-  }
+  // public auth(signture: string) {
+  //   this.authSignature = signture
+  //   if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+  //     this.send({ request: 'auth', args: signture })
+  //   }
+  // }
 
   private ensureInitialized() {
     if (!this.ws) {
@@ -170,9 +177,6 @@ class WebSocketService {
       this.pendingQueue.forEach(msg => this.send(msg))
       this.pendingQueue = []
       this.resubscribeAll()
-      if (this.authSignature) {
-        this.auth(this.authSignature)
-      }
     })
 
     ws.addEventListener('message', this.handleMessageBound)
@@ -197,24 +201,26 @@ class WebSocketService {
       }
       // 处理 auth 事件
       if (data.type === 'auth') {
-        this.authStatus = true
-
-        if (this.authPendingTopics.size > 0) {
-          this.subscribe(Array.from(this.authPendingTopics))
-          this.authPendingTopics.clear()
-        }
-
-        // 调用认证监听器
-        // (data.data as any).data 为了兼容历史的 requestId 格式
         const requestId = data.requestId
-        if (requestId && requestId !== 0) {
-          const listenerKey = genAuthListenerkey(requestId)
-          const authListener = this.authListeners.get(listenerKey)
-          if (authListener) {
-            authListener(data.data as IAuthData)
-            this.authListeners.delete(listenerKey)
+        // 认证成功之后，执行回调
+        if ((data.data as IAuthData).code === 9200) {
+          // 存储认证成功的 signature
+          this.auth.signatureAuthed = this.auth.map[requestId]
+
+          // 如果认证监听函数存在的话, 调用认证监听器
+          if (requestId && requestId !== 0) {
+            const listenerKey = genAuthListenerkey(requestId)
+            const authListener = this.authListeners.get(listenerKey)
+            if (authListener) {
+              authListener(data.data as IAuthData)
+              this.authListeners.delete(listenerKey)
+            }
           }
         }
+
+
+        // 执行完之后，清除 map 中的 requestId
+        delete this.auth.map[requestId]
 
         return
       }
@@ -277,10 +283,24 @@ class WebSocketService {
     this.send({ request: 'sub', args: [...this.subscriptions] })
   }
 
+  public exitAuth() {
+    // 如果没有认证成功的 signature， 则无需退出认证
+    if (this.auth.signatureAuthed === undefined) {
+      return
+    }
+    this.auth.signatureAuthed = undefined
+    // 没有退出认证的请求，只能关闭再重新连接请求
+    this.ws?.close()
+    this.ws?.reconnect()
+  }
+
   public onAuth(signature: string, listener: Listener<'auth'>) {
     this.ensureInitialized()
     // 每次发送 auth 请求时，都生成一个新的 requestId
     const requestId = genRequestId()
+
+    this.auth.map[requestId] = signature
+
     // 存储 auth 监听器
     const listenerKey = genAuthListenerkey(requestId)
     this.authListeners.set(listenerKey, listener)
@@ -288,7 +308,7 @@ class WebSocketService {
     this.send({ request: 'auth', args: signature, requestId: requestId })
   }
 
-  public on<T extends SubscribedEventType>(eventType: T, listener: Listener<T>, needAuth?: boolean) {
+  public on<T extends SubscribedEventType>(eventType: T, listener: Listener<T>) {
     this.ensureInitialized()
 
     // 检查是否是第一个监听器
@@ -305,11 +325,7 @@ class WebSocketService {
 
     // 如果是第一个监听器，自动订阅
     if (isFirstListener) {
-      if (needAuth) {
-        this.authPendingTopics.add(eventType)
-      } else {
-        this.subscribe(eventType)
-      }
+      this.subscribe(eventType)
     }
   }
 
@@ -386,14 +402,15 @@ class WebSocketService {
     console.log('🧹 WebSocket closed manually')
   }
 
-  // 主动关闭连接后，立刻重新连接
-  public closeAndReConnect() {
-    // clear auth signature
-    this.authSignature = ''
+  // // 主动关闭连接后，立刻重新连接
+  // public closeAndReConnect() {
+  //   // clear auth signature
+  //   this.authSignature = ''
+  //   // 把私有订阅的 listener 也移除
 
-    this.ws?.close()
-    this.ws?.reconnect()
-  }
+  //   this.ws?.close()
+  //   this.ws?.reconnect()
+  // }
 }
 
 // 导出单例

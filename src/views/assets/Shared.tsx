@@ -18,7 +18,7 @@ import { NoData } from '@/components/markets/NoData'
 export type OrderChanged = {
   orderId: string,
   eventTime: number
-  status: OrderChangedStatus
+  status: string
 } | null
 export type OrderChangedStatus = 'NEW' | 'FILLED' | 'PENDING_CANCEL' | 'CANCELLED' | "PARTIALLY_FILLED" | "FAILED"
 

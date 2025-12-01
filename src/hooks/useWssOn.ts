@@ -1,11 +1,10 @@
 import wsService, { type OrderEventType, type SubscribedEventType } from "@/service/webSocket/service";
 import { useEffect, useRef } from "react";
 import { useSignatureValidStatus } from "./useSignature";
-import { useChainId } from "ca-common-web";
 import storage from "@/utils/storage";
 import { CONNECT_ACCOUNT } from "@/config/constants";
 import { useActiveWeb3 } from "./useActiveWe3";
-import type { IOrderData } from "@/service/webSocket/types";
+import type { IAuthData, IOrderData } from "@/service/webSocket/types";
 import { useWssStore } from "@/stores/wssStore";
 
 export function useWssOn(event?: SubscribedEventType, callback?: (data: any) => void) {
@@ -56,13 +55,17 @@ export function useWssAuth() {
       const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
       if (localSignature && localSignature.account && account.toLowerCase() === localSignature.account.toLowerCase()) {
         const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
-        wsService.auth(auth);
+
+        // onAuth 第二个参数是成功之后的回调
+        wsService.onAuth(auth, (data: IAuthData) => {
+          wsService.on(sub, listener)
+        });
       }
-      wsService.on(sub, listener, true)
     }
 
     return () => {
       wsService.off(sub, listener)
+      wsService.exitAuth()
     }
   }, [isSignatureValid, chainId, account])
 }
