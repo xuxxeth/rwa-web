@@ -52,7 +52,7 @@ export function LngSubMenus({
         <div className=" flex items-center shrink-0">
           <button className="cursor-pointer">
             <img src="/images/icons/language.png" className={cn(
-              "w-10 h-10",
+              "w-[30px] h-[30px] lg:w-10 lg:h-10",
               from === 'home' ? ' rounded-full' : ''
             )} alt="" />
           </button>

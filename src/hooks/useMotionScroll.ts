@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 const throttleGap = 16; // 约等于 60FPS
 
-export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElement | null>) {
+export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElement | null>, isH5?: boolean) {
   const { scrollY: scrollYBody, scrollYProgress  } = useScroll({target: sectionRef});
   const bodyRef = useRef<HTMLElement | null>(null);
   const originalStyle = useRef<{ overflow: string; paddingRight: string, scrollBarWidth: number }>({ overflow: "", paddingRight: "", scrollBarWidth: 0 });
@@ -23,7 +23,7 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
     const scrollDirection = v > lastScrollY.current ? 'down' : 'up';
     const scrollDelta = Math.abs(v - lastScrollY.current);
     lastScrollY.current = v;
-    if (v > rectY.current) {
+    if (v > rectY.current && !isH5) {
       if (!animated.current && bodyRef.current) {
         bodyRef.current.style.overflow = "hidden";
         if (originalStyle.current.scrollBarWidth > 0) {

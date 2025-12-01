@@ -16,6 +16,7 @@ const box2: React.CSSProperties = {
 
 const Section4_2 = memo(
   ({
+    scale = 1,
     rwaList = [],
     onClick
   }: SectionProps) => {
@@ -90,7 +91,11 @@ const Section4_2 = memo(
     const rwa2 = useMemo(() => rwaList && rwaList[1], [rwaList])
 
     return (
-      <div className="w-[537px] h-[537px] absolute left-[calc(50%-268.5px)] top-[calc(50%-268.5px)]">
+      <div className="w-[537px] h-[537px] absolute left-[calc(50%-268.5px)] top-[calc(50%-268.5px)]"
+        style={{
+          scale: scale
+        }}
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="537" height="537" viewBox="0 0 537 537" fill="none">
           <path d="M317.065 0.979928C327.414 -0.647448 337.986 1.90301 346.455 8.07004L491.666 113.817C500.134 119.984 505.806 129.263 507.433 139.611L535.338 317.066C536.965 327.414 534.415 337.986 528.248 346.455L422.501 491.666C416.334 500.134 407.055 505.806 396.706 507.433L219.252 535.338C208.903 536.965 198.331 534.415 189.863 528.248L44.6521 422.501C36.1838 416.334 30.5121 407.055 28.8847 396.706L0.979898 219.252C-0.647478 208.903 1.90298 198.331 8.07001 189.863L113.817 44.6522C119.984 36.1838 129.263 30.5121 139.611 28.8847L317.065 0.979928Z" stroke="url(#paint0_linear_3090_8007)"/>
           <defs>

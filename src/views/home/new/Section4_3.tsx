@@ -40,6 +40,7 @@ export const TokenBox = memo(
 )
 
 export type SectionProps = {
+  scale?: number
   rwaList?: IRwa[],
   onClick?: (rwa: IRwa) => void
 }
@@ -59,6 +60,7 @@ const box3: React.CSSProperties = {
 
 const Section4_3 = memo(
   ({
+    scale = 1,
     rwaList = [],
     onClick
   }: SectionProps) => {
@@ -103,7 +105,11 @@ const Section4_3 = memo(
     }, [ controls3_1]);
 
     return (
-      <div className="w-[401px] h-[401px] relative left-[calc(50%-200.5px)] top-[calc(50%-200.5px)]">
+      <div className="w-[401px] h-[401px] relative left-[calc(50%-200.5px)] top-[calc(50%-200.5px)]"
+        style={{
+          scale: scale
+        }}
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="401" height="401" viewBox="0 0 401 401" fill="none">
           <path d="M133.125 8.66307C141.436 2.28566 151.94 -0.529056 162.327 0.838343L288.067 17.3918C298.453 18.7592 307.871 24.1966 314.248 32.5075L391.453 133.125C397.831 141.436 400.646 151.94 399.278 162.327L382.725 288.067C381.357 298.453 375.92 307.871 367.609 314.248L266.992 391.453C258.681 397.831 248.176 400.646 237.79 399.278L112.05 382.725C101.664 381.357 92.2459 375.92 85.8686 367.609L8.66306 266.992C2.28565 258.681 -0.529067 248.176 0.838332 237.79L17.3917 112.05C18.7592 101.664 24.1966 92.2459 32.5075 85.8686L133.125 8.66307Z" stroke="url(#paint0_linear_3090_8024)"/>
           <defs>

@@ -5,17 +5,26 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}", // 一定要包含源码路径
   ],
   theme: {
+    screens: {
+      'sm': '375px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1440px',
+      '2xl': '1920px',
+    },
     extend: {
       screens: {
-        sm: "375px", // 小屏
-        md: "768px", // 中屏
-        xl: "1440px", // 超大屏
+        'sm': '375px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1440px',
+        '2xl': '1920px',
       },
       dropShadow: {
         "glow-green": "0 0 35px rgba(157, 255, 58, 0.5)",
       },
       fontFamily: {
-        sans: ["Poppins", "sans-serif"], // 全局默认字体
+        sans: ["Inter", "sans-serif"], // 全局默认字体
       },
       colors: {
         stockrise: 'rgba(80,227,194,1)',

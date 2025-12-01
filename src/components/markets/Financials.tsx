@@ -116,6 +116,10 @@ const Financials = memo(
 
     }, [current, indicatorsData])
 
+    const roeName = useMemo(() => {
+      return annualList.find(item => item.value === current)?.label
+    }, [current, annualList])
+
     return (
       <div>
         <ProfileTitle title={t('financials.t1')} className=" mt-10 mb-6" />
@@ -206,7 +210,7 @@ const Financials = memo(
                 <Bar
                   yAxisId="left"
                   dataKey="bar1"
-                  name="ROE"
+                  name={roeName}
                   barSize={35}
                   radius={[2, 2, 0, 0]}
                   fill="#578CF9"
@@ -243,7 +247,7 @@ const Financials = memo(
           <div className="flex justify-center items-center gap-x-6">
             <div className="flex items-center gap-x-1">
               <div className="w-[11px] h-[11px] bg-[#578CF9] rounded-full"></div>
-              <div className="text-[12px] font-normal">ROE</div>
+              <div className="text-[12px] font-normal">{roeName}</div>
             </div>
             {/* <div className="flex items-center gap-x-1">
               <div className="w-[11px] h-[11px] bg-[#76CEDF] rounded-full"></div>

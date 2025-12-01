@@ -11,23 +11,25 @@ export function XFooter({
 }) {
   const { t } = useTranslation()
   return (
-    <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] mt-[130px]'>
+    <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] mt-[130px] font-normal'>
 
     <MainLayout>
-      <div className='flex justify-between px-5 font-normal'>
+      <div className='md:flex justify-between px-5 font-normal'>
         <div>
           <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' />
-          <a href='mailto:contact@cyberalpha.cc'>
-            <div className='flex items-center my-4'>
-              <img src='/images/icons/e_mail.png' className='w-6' alt='' />
-              <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
+          <div className=' hidden md:block'>
+            <a href='mailto:contact@cyberalpha.cc'>
+              <div className='flex items-center my-4'>
+                <img src='/images/icons/e_mail.png' className='w-6' alt='' />
+                <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
+              </div>
+            </a>
+            <div className=' text-base text-80'>
+              @ 2025 Cyber Alpha. {t('footer.text1')}
             </div>
-          </a>
-          <div className=' text-base text-80'>
-            @ 2025 Cyber Alpha. {t('footer.text1')}
           </div>
         </div>
-        <div className='flex text-base text-white gap-x-[100px]'>
+        <div className='flex flex-col md:flex-row text-base text-white gap-x-[100px] mt-5 md:mt-0'>
           <div>
             <div className=' font-semibold'>{t('footer.text5')}</div>
             <a href={X_URL} target='_blank'>
@@ -49,7 +51,7 @@ export function XFooter({
               </div>
             </a>
           </div>
-          <div>
+          <div className='mt-8 md:mt-0'>
             <div className=' font-semibold'>{t('About')}</div>
             
             <div className='flex items-center mt-4'>
@@ -74,15 +76,18 @@ export function XFooter({
               </div>
             </a>
           </div>
-          {/* <div>
-            <div className=' font-semibold'>{t('footer.text4')}</div>
-            <a href='mailto:contact@cyberalpha.cc'>
-              <div className='flex items-center mt-6'>
-                <img src='/images/icons/e_mail.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
-              </div>
-            </a>
-          </div> */}
+         
+        </div>
+        <div className='  md:hidden mt-8'>
+          <a href='mailto:contact@cyberalpha.cc'>
+            <div className='flex items-center my-4'>
+              <img src='/images/icons/e_mail.png' className='w-6' alt='' />
+              <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
+            </div>
+          </a>
+          <div className=' text-base text-80'>
+            @ 2025 Cyber Alpha. {t('footer.text1')}
+          </div>
         </div>
       </div>
     </MainLayout>

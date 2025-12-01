@@ -15,13 +15,13 @@ export function Menus() {
         {/* <img src="./images/logo_text.png" className="w-[206px]" alt="" /> */}
         <img onClick={() => router.push('/')} src="/images/logo_text.png" className="w-[206px] cursor-pointer" alt="" />
         <div className=" flex items-center gap-x-[80px] ml-20">
-          <MenusItem
+          {/* <MenusItem
             title={t("Homepage")}
             active={router.location.pathname === "/"}
             onClick={() => {
               router.push("/");
             }}
-          />
+          /> */}
           <MenusItem
             title={t("Markets")}
             active={router.location.pathname.startsWith("/markets/quotes")}
