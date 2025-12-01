@@ -126,14 +126,14 @@ const Section4_1 = memo(
             // @ts-ignore
             const rect = e.target.getBoundingClientRect()
             setRectPos(rect)
-            setShowTip(true)
+            setShowTip4(true)
             controls1_1.stop();
             controls1_2.stop();
             controls1_3.stop();
             controls1_4.stop();
           }}
           onHoverEnd={async () => {
-            setShowTip(false)
+            setShowTip4(false)
             runAnimation1_1();
             runAnimation1_2();
             runAnimation1_3();
@@ -163,14 +163,14 @@ const Section4_1 = memo(
             // @ts-ignore
             const rect = e.target.getBoundingClientRect()
             setRectPos(rect)
-            setShowTip(true)
+            setShowTip3(true)
             controls1_1.stop();
             controls1_2.stop();
             controls1_3.stop();
             controls1_4.stop();
           }}
           onHoverEnd={async () => {
-            setShowTip(false)
+            setShowTip3(false)
             runAnimation1_1();
             runAnimation1_2();
             runAnimation1_3();
@@ -200,14 +200,14 @@ const Section4_1 = memo(
             // @ts-ignore
             const rect = e.target.getBoundingClientRect()
             setRectPos(rect)
-            setShowTip(true)
+            setShowTip2(true)
             controls1_1.stop();
             controls1_2.stop();
             controls1_3.stop();
             controls1_4.stop();
           }}
           onHoverEnd={async () => {
-            setShowTip(false)
+            setShowTip2(false)
             runAnimation1_1();
             runAnimation1_2();
             runAnimation1_3();

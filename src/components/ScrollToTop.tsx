@@ -5,11 +5,15 @@ export function ScrollToTop() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    // 路由变化时滚动到顶部
-    window.scrollTo({
-      top: 0,
-      behavior: "instant" // 可改成 'smooth' 有平滑效果
-    })
+    console.log(pathname, 1111)
+    if (pathname !== '/') {
+       // 路由变化时滚动到顶部
+      window.scrollTo({
+        top: 0,
+        behavior: "instant" // 可改成 'smooth' 有平滑效果
+      })
+    }
+   
   }, [pathname])
 
   return null

@@ -23,7 +23,7 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
     const scrollDirection = v > lastScrollY.current ? 'down' : 'up';
     const scrollDelta = Math.abs(v - lastScrollY.current);
     lastScrollY.current = v;
-    if (v > rectY.current && !isH5) {
+    if (v > rectY.current && !isH5 && !animateStart.current) {
       if (!animated.current && bodyRef.current) {
         bodyRef.current.style.overflow = "hidden";
         if (originalStyle.current.scrollBarWidth > 0) {
@@ -31,6 +31,15 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
         }
         animateStart.current = true; // 标记动画开始
       }
+    }
+    if (animateStart.current && v < rectY.current) {
+      if ( bodyRef.current) {
+        bodyRef.current.style.overflow = "hidden";
+        if (originalStyle.current.scrollBarWidth > 0) {
+          bodyRef.current.style.paddingRight = `${originalStyle.current.scrollBarWidth}px`;
+        }
+      }
+
     }
     return
     // if (scrollDelta < scrollThreshold) return;
@@ -69,11 +78,8 @@ export function useMotionScroll(to: number, sectionRef: React.RefObject<HTMLElem
         bodyRef.current.style.overflow = originalStyle.current.overflow;
         bodyRef.current.style.paddingRight = originalStyle.current.paddingRight;
       }
-      animated.current = true;
-      if (sectionRef.current) {
-        sectionRef.current.style.position = 'static';
-        
-      }
+      // animated.current = true;
+      
     }
   });
 

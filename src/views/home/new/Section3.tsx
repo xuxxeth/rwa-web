@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useTailwindBreakpoints } from "@/hooks/useBreakpoints";
 
 const from = 0
-const to = 10
+const to = 5
 
 const Section3Lg = memo(() => {
   const { t } = useTranslation()
@@ -49,7 +49,7 @@ const Section3Lg = memo(() => {
   return (
     <div
       ref={sectionRef}
-      className=" hidden lg:block h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
+      className=" hidden lg:block h-[810px] lg:px-4 xl:px-[170px] text-white"
     >
       <div className=" relative w-full h-full flex items-center justify-center">
         <div className=" absolute w-full h-full left-0 top-0 flex items-center justify-center overflow-hidden">

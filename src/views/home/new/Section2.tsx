@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { TitlePrimary } from "@/components/title-primary";
 import { useMotionScroll } from "@/hooks/useMotionScroll";
@@ -41,7 +41,7 @@ export const ItemBox = memo(
 
 const Section2Lg = memo(() => {
   const { t } = useTranslation()
-  const { isLg, isXl, is2Xl } = useTailwindBreakpoints();
+  const { isLg, isXl, is2Xl, windowWidth } = useTailwindBreakpoints();
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
   const { scrollY, animated } = useMotionScroll(to, sectionRef, !(isLg || isXl || is2Xl));
@@ -54,12 +54,15 @@ const Section2Lg = memo(() => {
     BG: false,
     logo: false,
   });
-
+  const xATo = useMemo(() => windowWidth < 1440 ? 432 - 36 - 36 : 432, [windowWidth])
+  const xBTo = useMemo(() => windowWidth < 1440  ? 144 - 36 : 144, [windowWidth])
+  const xCTo = useMemo(() => windowWidth < 1440  ? -144 : -144, [windowWidth])
+  const xDTo = useMemo(() => windowWidth < 1440  ? -432 + 36 : -432, [windowWidth])
   // 计算动画值
-  const xA = useTransform(scrollY, [from, to], [0, isLg ? 432 - 36 - 36 : 432],);
-  const xB = useTransform(scrollY, [from, to], [0, isLg ? 144 - 36 : 144],);
-  const xC = useTransform(scrollY, [from, to], [0, isLg ? -144 : -144],);
-  const xD = useTransform(scrollY, [from, to], [0, isLg ? -432 + 36 : -432],);
+  const xA = useTransform(scrollY, [from, to], [0, xATo],);
+  const xB = useTransform(scrollY, [from, to], [0, xBTo],);
+  const xC = useTransform(scrollY, [from, to], [0, xCTo],);
+  const xD = useTransform(scrollY, [from, to], [0, xDTo],);
   const xBG = useTransform(scrollY, [from, to], [1261, 927]);
   const yBG = useTransform(scrollY, [from, to], [1101, 810]);
 
@@ -84,7 +87,7 @@ const Section2Lg = memo(() => {
   return (
     <div
       ref={sectionRef}
-      className=" hidden lg:block h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
+      className=" hidden lg:block h-[810px] lg:px-4 xl:px-[170px] text-white"
     >
       <div className=" relative w-full h-full flex items-center justify-center">
         <div className=" absolute w-full h-full left-0 top-0 flex items-center justify-center overflow-hidden">
@@ -113,7 +116,7 @@ const Section2Lg = memo(() => {
 
           {/* 动画卡片区域 */}
           <div className="flex items-center justify-center lg:gap-x-[18px] xl:gap-x-[54px] relative">
-            <motion.div style={{ x: doneMap.A ? 432 : xA, zIndex: 10, transition: 'all 0.1s linear' }}>
+            <motion.div style={{ x: doneMap.A ? xATo : xA, zIndex: 10, transition: 'all 0.1s linear' }}>
               <ItemBox>
                   <motion.div
                     style={{
@@ -160,7 +163,7 @@ const Section2Lg = memo(() => {
 
             </motion.div>
 
-            <motion.div style={{ x: doneMap.B ? 144 : xB, zIndex: 9, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div style={{ x: doneMap.B ? xBTo : xB, zIndex: 9, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
               <ItemBox
               >
                 <div className="w-[170px]">
@@ -172,7 +175,7 @@ const Section2Lg = memo(() => {
               </ItemBox>
             </motion.div>
 
-            <motion.div style={{ x: doneMap.C ? -144 : xC, zIndex: 8, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div style={{ x: doneMap.C ? xCTo : xC, zIndex: 8, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
               <ItemBox
               >
                 <div className="w-[120px]">
@@ -184,7 +187,7 @@ const Section2Lg = memo(() => {
               </ItemBox>
             </motion.div>
 
-            <motion.div style={{ x: doneMap.D ? -432 : xD, zIndex: 7, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div style={{ x: doneMap.D ? xDTo : xD, zIndex: 7, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
               <ItemBox
               >
                 <div>

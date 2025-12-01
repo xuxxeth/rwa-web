@@ -3,6 +3,7 @@ import type { IRwa } from "@/service/base/types"
 import { cn } from "@/utils/tw"
 import { motion, transform, useAnimation, useMotionValue, useTransform } from "framer-motion"
 import { memo, useEffect, useMemo, useRef, useState } from "react"
+import ReactDOM from "react-dom"
 
 export const TokenBox = memo(
   ({
@@ -11,9 +12,17 @@ export const TokenBox = memo(
   }: { style?: any, rwa?: IRwa}) => {
     const rwaPrice = useRwaPrice(rwa?.symbol || '')
     const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
-    return (
+    const [isMounted, setIsMounted] = useState(false);
+    
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+    
+    if (!isMounted) return null;
+
+    return ReactDOM.createPortal(
       <div className=" border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.08)] rounded-[8px] h-[58px] px-[8px] flex flex-col justify-center
-         fixed left-[68px] top-0 text-white w-[180px] translate-x-[-45px] backdrop-blur-[60px] z-[51px]"
+        fixed left-[68px] top-0 text-white w-[180px] translate-x-[-45px] backdrop-blur-[60px] z-[59]"
         style={{
           ...style,
         }}
@@ -34,7 +43,8 @@ export const TokenBox = memo(
             {Math.abs(Number(rwaPrice?.up || "0"))}%
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     )
   }
 )

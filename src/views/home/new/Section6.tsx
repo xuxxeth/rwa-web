@@ -56,11 +56,11 @@ const Section6 = memo(
               </TitlePrimary>
             </div>
            
-            <div className=" flex items-center md:items-stretch justify-center flex-col md:flex-row mt-[40px] gap-5 lg:gap-x-[40px]">
+            <div className=" flex items-center sm:items-stretch justify-center flex-col md:flex-row mt-[40px] gap-5 lg:gap-x-[40px]">
               {
                 partnerList.slice(0, 3).map((item, index) => {
                   return (
-                    <div key={`${_id}-${index}`} className="border-[rgba(255,255,255,0.1)] border rounded-[16px] w-[341px] sm:w-[230px] lg:w-[352px] min-h-[287px] p-8 lg:p-10">
+                    <div key={`${_id}-${index}`} className="border-[rgba(255,255,255,0.1)] border rounded-[16px] w-[341px] sm:w-[230px] lg:w-[352px] sm:min-h-[287px] p-8 lg:p-10">
                       <LazyImage src={item.logo} className="scale-75 lg:scale-100 origin-left" />
                       <div className="mt-5 text-[16px] font-semibold">{item.title}</div>
                       <div className="mt-5 text-[14px] lg:text-[16px] leading-[20px] font-normal text-[rgba(255,255,255,0.6)]">{item.desc}</div>
@@ -76,11 +76,11 @@ const Section6 = memo(
                 })
               }
             </div>
-            <div className=" flex items-center md:items-stretch flex-col md:flex-row justify-center mt-5 sm:mt-[40px] gap-5 lg:gap-x-[40px]">
+            <div className=" flex items-center sm:items-stretch flex-col md:flex-row justify-center mt-5 sm:mt-[40px] gap-5 lg:gap-x-[40px]">
               {
                 partnerList.slice(3, 5).map((item, index) => {
                   return (
-                    <div key={`${_id}-${index}`} className="border-[rgba(255,255,255,0.1)] border rounded-[16px] w-[341px] sm:w-[354px] lg:w-[548px] min-h-[287px] p-10">
+                    <div key={`${_id}-${index}`} className="border-[rgba(255,255,255,0.1)] border rounded-[16px] w-[341px] sm:w-[354px] lg:w-[548px] sm:min-h-[287px] p-8 sm:p-10">
                       <LazyImage src={item.logo} className="scale-75 lg:scale-100 origin-left" />
                       <div className="mt-5 text-[16px] font-semibold">{item.title}</div>
                       <div className="mt-5 text-[14px] lg:text-[16px] leading-[20px] font-normal text-[rgba(255,255,255,0.6)]">{item.desc}</div>

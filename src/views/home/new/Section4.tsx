@@ -40,7 +40,9 @@ const Section4 = memo(
           </div> */}
           <LazyImage src="/images/home/new/sec4_bg3.png" className="w-full" />
         </div>
-        <div className="w-[250px] h-[250px] absolute left-[calc(50%-125px)] top-[calc(50%-125px)] flex items-center justify-center">
+        <div className="w-[250px] h-[250px] absolute left-[calc(50%-125px)] top-[calc(50%-125px)] flex items-center justify-center"
+          style={{scale: scale}}
+        >
           <LazyImage src="/images/home/new/sec4_bg.png" className="w-full h-full absolute left-0 top-0" />
           <LazyImage src="/images/home/new/logo.png" className="w-[180px]" />
         </div>
