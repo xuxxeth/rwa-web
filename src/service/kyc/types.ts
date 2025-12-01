@@ -68,9 +68,8 @@ export interface IKycSubmitData {
         }>
     }
     employmentInfo: IEmploymentInfo
-    // 待补充其他字段
+    // TODO: 待补充其他字段
 }
-
 
 export interface IUploadResponse {
     name: string,
