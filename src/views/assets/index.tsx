@@ -13,11 +13,8 @@ import OrderHistory from './OrderHistory'
 import TradeHistory from './TradeHistory'
 import { useRwaTokens } from '@/hooks/useTokens'
 import { useAppStore } from '@/stores/appStore'
-import wsService, { type OrderEventType } from '@/service/webSocket/service'
-import storage from '@/utils/storage'
 import { type OrderChanged, checkOrderChangedEqual } from './Shared'
-
-import { useSignatureValidStatus } from '@/hooks/useSignature'
+import { useWssStore } from "@/stores/wssStore";
 
 function Assets() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -35,10 +32,9 @@ function Assets() {
 
   const rwaTokens = useRwaTokens()
 
-  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
-
   const [orderChanged, _setOrderChanged] = useState<OrderChanged | null>(null)
 
+  const newOrder = useWssStore(state => state.newOrder)
 
   const setOrderChanged = (orderChanged: OrderChanged | null) => {
     _setOrderChanged(prev => {
@@ -50,34 +46,14 @@ function Assets() {
   }
 
   useEffect(() => {
-    if (!account || !chainId || !isSignatureValid) return
-    const localSignature = storage.getItem(`signature_${account.toLowerCase()}`)
-    if (!localSignature) return
-    const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
-
-    const topic: OrderEventType = `order.${chainId}.*`
-
-    const orderListener = (data: any) => {
-      const newOrderChanged = {
-        orderId: String(data.id),
-        status: data.x === 0 ? 'NEW' : data.x,
-        eventTime: data.E
-      }
-      setOrderChanged(newOrderChanged)
+    if (newOrder === null) return
+    const newOrderChanged = {
+      orderId: String(newOrder.id),
+      status: newOrder.x,
+      eventTime: newOrder.E
     }
-
-    wsService.onAuth(auth, (data) => {
-      if (data.code === 9200) {
-        // auth 认证成功之后再订阅 order 事件
-        wsService.on(topic, orderListener)
-      }
-    })
-
-    return () => {
-      wsService.off(topic, orderListener)
-    }
-
-  }, [account, chainId, isSignatureValid])
+    setOrderChanged(newOrderChanged)
+  }, [newOrder])
 
   return (
     <>
