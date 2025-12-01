@@ -145,10 +145,9 @@ class WebSocketService {
   }
 
   public auth(signture: string) {
+    this.authSignature = signture
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.send({ request: 'auth', args: signture })
-    } else {
-      this.authSignature = signture
     }
   }
 
@@ -173,7 +172,6 @@ class WebSocketService {
       this.resubscribeAll()
       if (this.authSignature) {
         this.auth(this.authSignature)
-        this.authSignature = ''
       }
     })
 
