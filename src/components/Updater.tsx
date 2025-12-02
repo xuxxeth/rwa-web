@@ -1,4 +1,5 @@
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
+import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
 import { memo, useEffect } from "react";
@@ -21,6 +22,21 @@ const Updater = memo(
         freshTokenBalances()
       }
     }, [newOrder, freshTokenBalances])
+
+
+    const setTokenWithPriceByWebSocketData = useBaseStore(
+        state => state.setTokenWithPriceByWebSocketData
+      )
+    const setStockWithPriceByWebSocketData = useBaseStore(
+      (state) => state.setStockWithPriceByWebSocketData
+    );
+    const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+    
+    useWssOn('summary', (data: any) => {
+      setTokenWithPriceByWebSocketData(data || [])
+      setStockWithPriceByWebSocketData(data || [])
+      stableTokenWithPrice(data || [])
+    })
 
     return null
   }
