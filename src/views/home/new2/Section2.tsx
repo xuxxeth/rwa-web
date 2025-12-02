@@ -38,7 +38,7 @@ export const ItemBox = memo(
   }
 );
 
-const Section2Lg = memo(({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart: boolean}) => {
+const Section2Lg = memo(({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart?: boolean}) => {
   const { t } = useTranslation()
   const { isLg, isXl, is2Xl, windowWidth } = useTailwindBreakpoints();
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -408,7 +408,7 @@ const Section2H5 = memo(
   }
 )
 
-const Section2 = ({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart: boolean}) => {
+const Section2 = ({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart?: boolean}) => {
   return (
     <>
       <Section2Lg scrollY={scrollY} locked={locked} animateStart={animateStart} />

@@ -111,7 +111,7 @@ export default function Page() {
       <div
         ref={(el: any) => (el && (sectionsRef.current[1] = el))}
       >
-        <Section2 scrollY={scrollY2} locked={locked2} />
+        <Section2 scrollY={scrollY2} locked={locked2}/>
       </div>
       <div
         ref={(el: any) => (el && (sectionsRef.current[2] = el))}
