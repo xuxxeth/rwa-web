@@ -16,78 +16,69 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export default function Page() {
   const sectionsRef = useRef<any[]>([]);
-  const sectionsScrollY = useRef<number[]>([0, 200, 100, 0, 0, 0, 0])
+  const sectionsScrollY = useRef<number[]>([0, 200, 100, 0, 0, 0])
 
   const scrollY2 = useMotionValue(0);
   const scrollY3 = useMotionValue(0);
   const [locked2, setLocked2] = useState(false)
   const [locked3, setLocked3] = useState(false)
 
-  const stopWeel = useRef(false)
-
   useEffect(() => {
     const sections = sectionsRef.current;
-    const maxIndex = sections.length - 1; // <-- 自动计算最后一页 index
-
     let currentIndex = 0;
-
-    let locked = false;
-    let wheelDelta = 0;
-    const threshold = 120;
     
-    const bodyRef = document.body
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const originalStyle = {
-      overflow: bodyRef.style.overflow,
-      paddingRight: bodyRef.style.paddingRight,
-      scrollBarWidth
-    };
-    console.log(originalStyle, 4444)
-    bodyRef.style.paddingRight = `${originalStyle.scrollBarWidth}px`;
-    bodyRef.style.overflow = "hidden";
-    const preventScroll = (e: any) => {
-      if (!stopWeel.current) {
-        e.preventDefault()
-      }
-    };
+    let locked = false; // 是否锁住滚动
+    let wheelDelta = 0; // 滚动累计距离阈值
+    const threshold = 120; // 鼠标滚轮触发阈值（可调）
+
+    // 1. 禁用原生滚动
+    const preventScroll = (e: { preventDefault: () => any; }) => e.preventDefault();
+    document.body.style.overflow = "hidden"; // 彻底禁止浏览器滚动
     window.addEventListener("wheel", preventScroll, { passive: false });
 
-    const onWheel = (e: WheelEvent) => {
-      if (locked || stopWeel.current) return;
+    // 2. 监听 mousewheel 来判断手势方向
+    const onWheel = (e: { deltaY: number; }) => {
+      if (locked) return; // 动画期间禁止再次触发
 
       wheelDelta += e.deltaY;
-
-      // 将内部动画同步给 Section2/3
-      if (currentIndex === 1) scrollY2.set(wheelDelta);
-      if (currentIndex === 2) scrollY3.set(wheelDelta);
-
-      /** =============== 下一页 =============== **/
-      if (e.deltaY > 0 && wheelDelta > sectionsScrollY.current[currentIndex] + threshold) {
+      if (currentIndex === 1) {
+        scrollY2.set(wheelDelta)
+      }
+      if (currentIndex === 2) {
+        scrollY3.set(wheelDelta)
+      }
+      // console.log(sectionsScrollY.current[currentIndex])
+      // 👇 向下滚（下一屏）
+      if (wheelDelta > sectionsScrollY.current[currentIndex] + threshold) {
         goToSection(currentIndex + 1);
         wheelDelta = 0;
-        return;
+        if (currentIndex === 1) {
+          scrollY2.set(wheelDelta)
+        }
+        if (currentIndex === 2) {
+          scrollY3.set(wheelDelta)
+      }
       }
 
-      /** =============== 上一页（最后一页也能往上） =============== **/
-      if (e.deltaY < 0 && wheelDelta < -1 - sectionsScrollY.current[currentIndex]) {
+      // 👇 向上滚（上一屏）
+      if (wheelDelta < -1 - sectionsScrollY.current[currentIndex]) {
         goToSection(currentIndex - 1);
         wheelDelta = 0;
-        return;
       }
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
 
-    /** =============== 切屏函数 =============== **/
+    // 3. 切屏函数
     const goToSection = (index: number) => {
-      if (index < 0) return;             // 第一页不能往上
-      if (index > maxIndex) return;      // 最后一页不能往下
-
-      if (index === 2) setLocked2(true);
-      if (index === 3) setLocked3(true);
-
-      locked = true;
-
+      if (index < 0 || index >= sections.length) return;
+      if (index === 2) {
+        setLocked2(true)
+      }
+      if (index === 3) {
+        setLocked3(true)
+      }
+      locked = true; // 锁动画
       gsap.to(window, {
         duration: 1,
         scrollTo: {
@@ -97,12 +88,8 @@ export default function Page() {
         ease: "power3.out",
         onComplete: () => {
           currentIndex = index;
-          locked = false;
-          if (currentIndex === 3) {
-            stopWeel.current = true
-            bodyRef.style.overflow = originalStyle.overflow;
-            bodyRef.style.paddingRight = '0px';
-          }
+          locked = false; // 允许下一次滚动
+          // storage.setItem('HOME_INDEX', String(currentIndex))
         },
       });
     };
@@ -135,12 +122,18 @@ export default function Page() {
         ref={(el: any) => (el && (sectionsRef.current[3] = el))}
       >
         <Section4 />
-        <Section5 />
-        <Section6 />
-        <XFooter from="home" />
-        
       </div>
-      
+      <div
+        ref={(el: any) => (el && (sectionsRef.current[4] = el))}
+      >
+        <Section5 />
+      </div>
+      <div
+        ref={(el: any) => (el && (sectionsRef.current[5] = el))}
+      >
+        <Section6 />
+      </div>
+      <XFooter from="home" />
     </div>
     
   );

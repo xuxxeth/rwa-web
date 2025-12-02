@@ -5,10 +5,9 @@ export function ScrollToTop() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "instant" // 可改成 'smooth' 有平滑效果
-    })
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    });
    
   }, [pathname])
 
