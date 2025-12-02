@@ -1,7 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { motion, MotionValue, useMotionValue, useTransform } from "framer-motion";
 import { TitlePrimary } from "@/components/title-primary";
-import { useMotionScroll } from "@/hooks/useMotionScroll";
 import { LazyImage } from "@/components/image/LazyImage";
 import { cn } from "@/utils/tw";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -39,7 +38,7 @@ export const ItemBox = memo(
   }
 );
 
-const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boolean}) => {
+const Section2Lg = memo(({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart: boolean}) => {
   const { t } = useTranslation()
   const { isLg, isXl, is2Xl, windowWidth } = useTailwindBreakpoints();
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +94,6 @@ const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
   //     });
   //   }
   // })
-  
   return (
     <div
       ref={sectionRef}
@@ -117,18 +115,53 @@ const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
         </div>
         <div className=" relative z-30">
           {/* 标题区域 */}
-          <div className="flex justify-center flex-col items-center">
-            <TitlePrimary className="font-normal text-[28px] mb-5">
-              {t('newHome.t3')}
-            </TitlePrimary>
-            <div className="font-normal text-[20px] leading-[150%] mb-[68px] w-[763px] text-center">
-              {t('newHome.t4')}
+          <motion.div
+            animate={
+              animateStart ? 
+                {
+                  y: 0,
+                  opacity: 1
+                }: 
+                {
+                  y: 100,
+                  opacity: 0.6
+                }
+            }
+            transition={{
+              duration: 0.6,
+              ease: 'easeInOut'
+            }}
+          >
+            <div className="flex justify-center flex-col items-center">
+              <TitlePrimary className="font-normal text-[28px] mb-5">
+                {t('newHome.t3')}
+              </TitlePrimary>
+              <div className="font-normal text-[20px] leading-[150%] mb-[68px] w-[763px] text-center">
+                {t('newHome.t4')}
+              </div>
             </div>
-          </div>
+          </motion.div>
+          
 
           {/* 动画卡片区域 */}
           <div className="flex items-center justify-center lg:gap-x-[18px] xl:gap-x-[54px] relative">
-            <motion.div style={{ x: doneMap.A ? xATo : xA, zIndex: 10, transition: 'all 0.1s linear' }}>
+            <motion.div 
+              style={{ x: doneMap.A ? xATo : xA, zIndex: 10, transition: 'all 0.1s linear' }}
+              animate={
+                animateStart ? 
+                  {
+                    y: 0
+                  }: 
+                  {
+                    y: 150
+                  }
+              }
+              transition={{
+                duration: 0.6,
+                ease: 'easeInOut'
+              }}
+
+            >
               <ItemBox>
                   <motion.div
                     style={{
@@ -175,7 +208,22 @@ const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
 
             </motion.div>
 
-            <motion.div style={{ x: doneMap.B ? xBTo : xB, zIndex: 9, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div 
+              style={{ x: doneMap.B ? xBTo : xB, zIndex: 9, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}
+              animate={
+                animateStart ? 
+                  {
+                    y: 0
+                  }: 
+                  {
+                    y: 120
+                  }
+              }
+              transition={{
+                duration: 0.6,
+                ease: 'easeInOut'
+              }}
+            >
               <ItemBox
               >
                 <div className="w-[170px]">
@@ -187,7 +235,22 @@ const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
               </ItemBox>
             </motion.div>
 
-            <motion.div style={{ x: doneMap.C ? xCTo : xC, zIndex: 8, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div 
+              style={{ x: doneMap.C ? xCTo : xC, zIndex: 8, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}
+              animate={
+                animateStart ? 
+                  {
+                    y: 0
+                  }: 
+                  {
+                    y: 90
+                  }
+              }
+              transition={{
+                duration: 0.6,
+                ease: 'easeInOut'
+              }}
+            >
               <ItemBox
               >
                 <div className="w-[120px]">
@@ -199,7 +262,22 @@ const Section2Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
               </ItemBox>
             </motion.div>
 
-            <motion.div style={{ x: doneMap.D ? xDTo : xD, zIndex: 7, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}>
+            <motion.div 
+              style={{ x: doneMap.D ? xDTo : xD, zIndex: 7, opacity: doneMap.logo ? 0 : logoOpacity3, transition: 'all 0.1s linear' }}
+              animate={
+                animateStart ? 
+                  {
+                    y: 0
+                  }: 
+                  {
+                    y: 60
+                  }
+              }
+              transition={{
+                duration: 0.6,
+                ease: 'easeInOut'
+              }}
+            >
               <ItemBox
               >
                 <div>
@@ -330,10 +408,10 @@ const Section2H5 = memo(
   }
 )
 
-const Section2 = ({ scrollY, locked }: {scrollY: MotionValue, locked: boolean}) => {
+const Section2 = ({ scrollY, locked, animateStart }: {scrollY: MotionValue, locked: boolean, animateStart: boolean}) => {
   return (
     <>
-      <Section2Lg scrollY={scrollY} locked={locked} />
+      <Section2Lg scrollY={scrollY} locked={locked} animateStart={animateStart} />
       <Section2H5 />
     </>
   )

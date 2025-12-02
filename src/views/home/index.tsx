@@ -22,6 +22,7 @@ export default function Page() {
   const scrollY3 = useMotionValue(0);
   const [locked2, setLocked2] = useState(false)
   const [locked3, setLocked3] = useState(false)
+  const [animateStart2, setAnimateStart2] = useState(false)
 
   const stopWeel = useRef(false)
 
@@ -42,7 +43,7 @@ export default function Page() {
       paddingRight: bodyRef.style.paddingRight,
       scrollBarWidth
     };
-    console.log(originalStyle, 4444)
+
     bodyRef.style.paddingRight = `${originalStyle.scrollBarWidth}px`;
     bodyRef.style.overflow = "hidden";
     const preventScroll = (e: any) => {
@@ -86,6 +87,10 @@ export default function Page() {
       if (index === 2) setLocked2(true);
       if (index === 3) setLocked3(true);
 
+      if (index === 1) {
+        setAnimateStart2(true)
+      }
+
       locked = true;
 
       gsap.to(window, {
@@ -124,7 +129,7 @@ export default function Page() {
       <div
         ref={(el: any) => (el && (sectionsRef.current[1] = el))}
       >
-        <Section2 scrollY={scrollY2} locked={locked2} />
+        <Section2 scrollY={scrollY2} locked={locked2} animateStart={animateStart2} />
       </div>
       <div
         ref={(el: any) => (el && (sectionsRef.current[2] = el))}
