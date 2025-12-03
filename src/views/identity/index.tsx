@@ -2,26 +2,16 @@ import { MainLayout } from '@/layouts/main'
 import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
-import { useParams } from 'react-router-dom'
-import { Upload } from './components/Upload'
-import { FaceRecognition } from './components/FaceRecognition'
-import { VerifyStatus } from './components/VerifyStatus'
+import { WarningInfo } from './components/WarningInfo'
 
 function Identity() {
-  const { step } = useParams<{
-    step: 'info' | 'identityUpload' | 'addressUpload' | 'face' | 'state'
-  }>()
 
   return (
     <>
       <MainLayout>
         <IdentityLayout>
-          <div className='mt-8'>
-            {step === 'info' && <BaseInfo />}
-            {step === 'identityUpload' && <Upload type='identity' />}
-            {step === 'face' && <FaceRecognition />}
-            {step === 'state' && <VerifyStatus />}
-          </div>
+          <WarningInfo />
+          <BaseInfo />
         </IdentityLayout>
       </MainLayout>
       <XFooter />

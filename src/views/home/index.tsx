@@ -16,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export default function Page() {
   const sectionsRef = useRef<any[]>([]);
-  const sectionsScrollY = useRef<number[]>([0, 200, 100, 0, 0, 0, 0])
+  const sectionsScrollY = useRef<number[]>([0, 300, 100, 0, 0, 0, 0])
 
   const scrollY2 = useMotionValue(0);
   const scrollY3 = useMotionValue(0);
@@ -56,11 +56,24 @@ export default function Page() {
     const onWheel = (e: WheelEvent) => {
       if (locked || stopWeel.current) return;
 
-      wheelDelta += e.deltaY;
+
+      const delta = e.deltaY; // delta 可以为正负
+      // 调参项（可调）：
+      const scale = 60;      // delta / scale -> tanh 输入，scale 越小，响应越敏感（快速到达饱和）
+      const maxStep = 2;   // movement 的最大绝对值（避免瞬间跳太大）
+      const sensitivity = 2; // 全局灵敏度额外系数（0.5 ~ 2 可选）
+
+      // tanh 映射：随 delta 增大而平滑增长，最终饱和到 ±maxStep
+      let movement = Math.tanh(delta / scale) * maxStep * sensitivity;
+
+      // 保留三位小数
+      movement = Number(movement.toFixed(3));
+
+      wheelDelta += movement;
 
       // 将内部动画同步给 Section2/3
-      if (currentIndex === 1) scrollY2.set(wheelDelta);
-      if (currentIndex === 2) scrollY3.set(wheelDelta);
+      if (currentIndex === 1) scrollY2.set(scrollY2.get() + movement);
+      if (currentIndex === 2) scrollY3.set(scrollY3.get() + movement);
 
       /** =============== 下一页 =============== **/
       if (e.deltaY > 0 && wheelDelta > sectionsScrollY.current[currentIndex] + threshold) {

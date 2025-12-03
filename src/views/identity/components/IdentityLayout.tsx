@@ -30,17 +30,17 @@ const IdentityLayout = memo(
 
     return (
       <div className="flex justify-center">
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[600px] text-white  max-w-[928px]">
-          <div className=" text-[24px] font-medium mt-8">{t('identity.Identity_verification')}</div>
-          <div className="mt-5 flex items-center gap-x-[4px]">
+        <div className=" bg-[rgba(7,8,13,1)] min-h-[600px] text-white  w-[928px]">
+          {/* <div className=" text-[24px] font-medium mt-8">{t('identity.Identity_verification')}</div> */}
+          {/* <div className="mt-5 flex items-center gap-x-[4px]">
             <TipLine active />
             <TipLine />
             <TipLine />
             <TipLine />
             <TipLine />
-          </div>
-          <div className="px-[160px] relative">
-            <div className=" absolute left-0 top-0 flex items-center">
+          </div> */}
+          <div className="relative pt-8">
+            <div className=" absolute -left-[120px] top-0 flex items-center">
               <LazyImage src="/images/icons/identity/back.png" className="w-6 h-6 mr-1" />
               {t('Back')}
             </div>

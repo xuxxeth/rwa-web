@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useTailwindBreakpoints } from "@/hooks/useBreakpoints";
 
 const from = 0
-const to = 200
+const to = 300
 
 
 export const ItemContent = memo(

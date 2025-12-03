@@ -3,6 +3,7 @@ import { CountrySelect } from "@/components/country-select"
 import { DatePicker } from "@/components/date-range-picker"
 import { DoctypeSelect } from "@/components/doctype-select"
 import { LazyImage } from "@/components/image/LazyImage"
+import { KycInput } from "@/components/input/KycInput"
 import { Select } from "@/components/select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,18 +16,48 @@ const genderList = [
   {value: '0', label: 'Female'},
 
 ]
+export const SectionTitle = ({ children }: { children: React.ReactNode}) => {
+  return (
+    <div className="text-[18px] font-normal leading-[100%]">
+      { children }
+    </div>
+  )
+}
+
+export const SectionBox = ({ children }: { children: React.ReactNode}) => {
+  return (
+    <div className="p-5 bg-[#0E0E0E] rounded-[4px]">
+      { children }
+    </div>
+  )
+}
+export const FormItemBox = ({ children }: { children: React.ReactNode}) => {
+  return (
+    <div className="my-5">
+      { children }
+    </div>
+  )
+}
+export const FormItemLabel = ({ children, title }: { children?: React.ReactNode, title?: string}) => {
+  return (
+    <div className="flex items-center text-[#909090] text-[16px] font-normal">
+      { children || title } <span className="text-[#CA3F64] ml-1 flex items-center">*</span>
+    </div>
+  )
+}
 
 export const InputBox = ({ children }: { children: React.ReactNode}) => {
   return (
-    <div className="bg-[rgba(255,255,255,0.08)] px-4 rounded-[6px] text-[16px] h-[56px] flex items-center">
+    <div className=" mt-2">
       { children }
     </div>
   )
 }
 export const ErrorBox = ({ children, error }: { children?: React.ReactNode, error?: string}) => {
-  if (!error) return null
+  if (!error && !children) return null
   return (
-    <div className="text-red-500 text-sm mt-2">
+    <div className="text-[#CA3F64] text-[12px] font-normal mt-2 flex items-center">
+      <LazyImage src="/images/kyc/error.png" className="w-[14px] h-[14px] mr-1" />
       { children || error }
     </div>
   )
@@ -80,78 +111,106 @@ const BaseInfo = memo(
     console.log(errors)
 
     return (
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className=" grid grid-cols-3 font-normal gap-x-6">
-          <div>
-            <div className="mb-2 text-[16px]">{t('identity.firstName')}</div>
-            <InputBox >
-              <Input className=""
-                placeholder={t('identity.firstName')}
-                {
-                  ...register("firstName", {
-                    required: '请输入内容',
-                    maxLength: {
-                      value: 30,
-                      message: "最大支持输入30位字符"
-                    },
-                    pattern: {
-                      value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                      message: "只支持中文和英文字母"
-                    },
-                    onChange: (e) => {
-                      // 实时限制输入长度
-                      if (e.target.value.length > 30) {
-                        e.target.value = e.target.value.slice(0, 30);
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
+        <SectionBox>
+          <SectionTitle>{t('kyc.t2')}</SectionTitle>
+          <div className=" grid grid-cols-3 font-normal gap-x-6">
+            <FormItemBox>
+              <FormItemLabel title={t('kyc.t3')} />
+              <InputBox >
+                <KycInput 
+                  className=""
+                  placeholder={t('kyc.t4')}
+                  error={errors.firstName?.message}
+                  {
+                    ...register("firstName", {
+                      required: '请输入内容',
+                      maxLength: {
+                        value: 30,
+                        message: "最大支持输入30位字符"
+                      },
+                      pattern: {
+                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                        message: "只支持中文和英文字母"
+                      },
+                      onChange: (e) => {
+                        // 实时限制输入长度
+                        if (e.target.value.length > 30) {
+                          e.target.value = e.target.value.slice(0, 30);
+                        }
                       }
-                    }
-                  })
-                  
-                }
-                
-              />
-            </InputBox>
-            <ErrorBox error={errors.firstName?.message} />  
-          </div>
-          <div>
-            <div className="mb-2 text-[16px]">{t('identity.lastName')}</div>
-            <InputBox >
-              <Input className=""
-                placeholder={t('identity.lastName')}
-                {
-                  ...register("lastName", {
-                    required: '请输入内容',
-                    maxLength: {
-                      value: 30,
-                      message: "最大支持输入30位字符"
-                    },
-                    pattern: {
-                      value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                      message: "只支持中文和英文字母"
-                    },
-                    onChange: (e) => {
-                      // 实时限制输入长度
-                      if (e.target.value.length > 30) {
-                        e.target.value = e.target.value.slice(0, 30);
+                    })
+                    
+                  }
+                />
+                <ErrorBox error={errors.firstName?.message}/>
+              </InputBox>
+            </FormItemBox>
+            <FormItemBox>
+              <FormItemLabel title={t('kyc.t5')} />
+              <InputBox >
+                <KycInput 
+                  className=""
+                  placeholder={t('kyc.t4')}
+                  error={errors.firstName?.message}
+                  {
+                    ...register("firstName", {
+                      required: '请输入内容',
+                      maxLength: {
+                        value: 30,
+                        message: "最大支持输入30位字符"
+                      },
+                      pattern: {
+                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                        message: "只支持中文和英文字母"
+                      },
+                      onChange: (e) => {
+                        // 实时限制输入长度
+                        if (e.target.value.length > 30) {
+                          e.target.value = e.target.value.slice(0, 30);
+                        }
                       }
-                    }
-                  })
-                  
-                }
-              />
-            </InputBox>
-            <ErrorBox error={errors.lastName?.message} />  
-            
+                    })
+                    
+                  }
+                />
+                <ErrorBox error={errors.firstName?.message}/>
+              </InputBox>
+            </FormItemBox>
+            <FormItemBox>
+              <FormItemLabel title={t('kyc.t6')} />
+              <InputBox >
+                <KycInput 
+                  className=""
+                  placeholder={t('kyc.t4')}
+                  error={errors.firstName?.message}
+                  {
+                    ...register("firstName", {
+                      required: '请输入内容',
+                      maxLength: {
+                        value: 30,
+                        message: "最大支持输入30位字符"
+                      },
+                      pattern: {
+                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                        message: "只支持中文和英文字母"
+                      },
+                      onChange: (e) => {
+                        // 实时限制输入长度
+                        if (e.target.value.length > 30) {
+                          e.target.value = e.target.value.slice(0, 30);
+                        }
+                      }
+                    })
+                    
+                  }
+                />
+                <ErrorBox error={errors.firstName?.message}/>
+              </InputBox>
+            </FormItemBox>
           </div>
-          <div>
-            <div className="mb-2 text-[16px]">{t('identity.fullName')}</div>
-            <InputBox >
-              <Input disabled value={fullName} className=""
-                placeholder={t('identity.fullName')}
-              />
-            </InputBox>
-            
-          </div>
-        </div>
+        </SectionBox>
+
         <div className=" grid grid-cols-2 gap-x-6 mt-8">
           <div>
             <div className="mb-2 text-[16px]">{t('identity.DOB')}</div>
