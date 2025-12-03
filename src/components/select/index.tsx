@@ -16,6 +16,7 @@ export type CountrySelectProps = {
   placeholder?: string
   onChange?: (item: ItemProps) => void;
   className?: string;
+  activeColor?: string
 }
 
 const Select = memo(
@@ -25,7 +26,8 @@ const Select = memo(
     data = [],
     placeholder,
     onChange, 
-    className
+    className,
+    activeColor
   }: CountrySelectProps) => {
     const [curretnValue, setCurrentValue] = useState('')
     const [currentItem, setCurrentItem] = useState<ItemProps | null>(null)
@@ -63,6 +65,7 @@ const Select = memo(
             className,
             open ? 'border-[rgba(156,255,58,0.5)]' : ''
           )}
+          style={{borderColor: open ? activeColor ? activeColor : '' : ''}}
         >
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentItem ? (

@@ -60,9 +60,9 @@ const DoctypeSelect = memo(
         <SelectTrigger 
           open={open}
           className={cn(
-            "px-4 py-0 h-[56px] shadow-none flex items-center justify-between rounded-[8px] bg-[rgba(255,255,255,0.08)] border border-solid border-[rgba(255,255,255,0)]",
+            "px-4 py-0 h-[44px] shadow-none flex items-center justify-between rounded-[8px] bg-[rgba(255,255,255,0.08)] border border-solid border-[rgba(255,255,255,0)]",
             className,
-            open ? 'border-[rgba(156,255,58,0.5)]' : ''
+            open ? 'border-[#ffffff]' : ''
           )}
         >
           <div className="flex items-center gap-2 w-[70px] text-white">

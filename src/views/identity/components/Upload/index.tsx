@@ -56,7 +56,10 @@ function IdentityUpload() {
 
   return (
     <div>
-      <Text text='uploadId' className='text-lg my-5 text-white' />
+      <div className='flex items-center mb-5'>
+        <Text text='uploadId' className='text-[18px] font-normal text-white' /> 
+        <span className="text-[#CA3F64] ml-1 flex items-center">*</span>
+      </div>
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard fileType='idFront' onUploaded={onFrontUploaded} uploadedRes={frontRes} />
         <UploadCard fileType='idBack' onUploaded={onBackUploaded} uploadedRes={backRes} />
@@ -71,7 +74,10 @@ function AddressUpload() {
 
   return (
     <div>
-      <Text text='uploadAddr' className='text-lg my-5 text-white' />
+      <div className='flex items-center mb-5'>
+        <Text text='uploadAddr' className='text-[18px] font-normal text-white' /> 
+        <span className="text-[#CA3F64] ml-1 flex items-center">*</span>
+      </div>
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard
           fileType='addressCertificates'
@@ -140,7 +146,6 @@ function ExtraInfoUpload() {
 
   return (
     <div>
-      <Text text='extra' className='text-lg my-5 text-white' />
       <Text text='uploadIncome' />
       <Text text='extraTips' className='text-sm mt-2' />
       <div className='grid grid-cols-2 gap-x-6 gap-y-5 my-5'>

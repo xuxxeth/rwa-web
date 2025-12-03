@@ -26,7 +26,7 @@ function Identity() {
   // 这样简单的 Mock 一下
   const MockKycDetail: IKycDetail = {
     account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    overallStatus: 1,
+    overallStatus: 0,
     riskLevel: 3,
     verifyType: 'basic-info',
     pendingMaterials: 'income-certificate',

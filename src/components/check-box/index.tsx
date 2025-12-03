@@ -24,7 +24,7 @@ const CheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
     >
       <LazyImage
         src={check ? "/images/icons/checked.png" : "/images/icons/check.png"}
-        className="w-[24px] h-[24px]"
+        className="w-[18px] h-[18px]"
       />
     </button>
   );

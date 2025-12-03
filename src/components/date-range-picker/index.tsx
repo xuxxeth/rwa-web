@@ -146,11 +146,15 @@ export function DatePickerWithRange({
 export function DatePicker({
   userSelectedDate,
   onUserSelectedDateChanged,
-  placeholder
+  placeholder,
+  className,
+  activeColor
 }: {
   userSelectedDate: number
   onUserSelectedDateChanged: (date?: number) => void
   placeholder?: string
+  className?: string
+  activeColor?: string
 
 }) {
   const [selected, setSelected] = React.useState<Date>();
@@ -174,8 +178,10 @@ export function DatePicker({
             id='date'
             className={cn(
               'w-full h-[56px] rounded-sm border border-white/1 text-white bg-transparent justify-between text-left font-normal',
+              className,
               isOpen ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
+            style={{borderColor: isOpen ? activeColor ? activeColor : '' : ''}}
           >
             <div className='text-[16px] font-normal'>
               { selected ? format(selected?.getTime(), FormatStr) : userSelectedDate ? format(userSelectedDate, FormatStr) : <span className='text-[rgba(255,255,255,0.3)]'>{placeholder ?? ''}</span> }
