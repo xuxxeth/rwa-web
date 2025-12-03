@@ -22,6 +22,8 @@ export function checkImgUploaded(uploadedRes: IUploadedRes | null) {
 export const AcceptedFiles = {
   'image/jpeg': ['.jpg', '.jpeg'],
   'image/jpg': ['.jpg'],
+  'image/png': ['.png'],
+  'application/pdf': ['.pdf'],
 }
 
 const langPrefix = 'identity.upload'
