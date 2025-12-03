@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
 import {
-  type UploadFileType,
+  type IUploadedRes,
+  checkImgUploaded,
   useUploadedRes,
   uploadFile,
-  AcceptedFiles,
   Text,
   saveUploadKey,
   UploadCard,
@@ -31,10 +31,6 @@ export function Upload({ type }: { type: 'identity' | 'passport' | 'address' | '
     return <ExtraInfoUpload />
   }
   return null
-}
-
-function checkImgUploaded(uploadedRes: IUploadedRes | null) {
-  return uploadedRes?.key && uploadedRes?.url
 }
 
 function IdentityUpload() {
@@ -173,10 +169,4 @@ function ExtraInfoUpload() {
       </div>
     </div>
   )
-}
-
-interface IUploadedRes {
-  success: boolean
-  url?: string
-  key?: string
 }

@@ -62,11 +62,7 @@ const routes: RouteObject[] = [
   },
   {
     path: '/identity',
-    element: <Navigate to="/identity/info" replace />,
-  },
-  {
-    path: '/identity/:step',
-    element: <Identity />,
+   element: <Identity />,
   },
   {
     path: "/kline",

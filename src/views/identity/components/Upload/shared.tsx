@@ -9,15 +9,19 @@ import { useDropzone } from 'react-dropzone'
 import { LazyImage } from '@/components/image/LazyImage'
 import { SpinLoading, CircularProgress } from '@/components/loading'
 
-export const AcceptedFiles = {
-  'image/jpeg': ['.jpg', '.jpeg'],
-  'image/jpg': ['.jpg'],
-}
-
 export interface IUploadedRes {
   success: boolean
   url?: string
   key?: string
+}
+
+export function checkImgUploaded(uploadedRes: IUploadedRes | null) {
+  return uploadedRes?.key && uploadedRes?.url
+}
+
+export const AcceptedFiles = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/jpg': ['.jpg'],
 }
 
 const langPrefix = 'identity.upload'
