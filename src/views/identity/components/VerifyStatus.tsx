@@ -7,7 +7,7 @@ import { memo } from "react";
 const VerifyStatus = memo(
   () => {
     const { t } = useTranslation()
-    
+
     return (
       <div className=" text-white font-normal">
         <div className="flex flex-col items-center">
@@ -19,8 +19,8 @@ const VerifyStatus = memo(
               
             }}
           >
-            { t('identity.done') }
-            
+            {t('identity.done')}
+
           </Button>
         </div>
         <div className="flex flex-col items-center">
@@ -46,11 +46,11 @@ const VerifyStatus = memo(
           </div>
           <Button className="bg-white text-black w-full mt-10"
             onClick={async () => {
-              
+
             }}
           >
-            { t('identity.reVerify') }
-            
+            {t('identity.reVerify')}
+
           </Button>
         </div>
         <div className="flex flex-col items-center">
@@ -59,7 +59,7 @@ const VerifyStatus = memo(
           <div className="mt-2 text-[18px] text-[rgba(255,255,255,0.6)]">
             {t('identity.state8')}
           </div>
-          
+
         </div>
       </div>
     )

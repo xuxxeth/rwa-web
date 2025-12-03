@@ -8,7 +8,9 @@ import { FaceRecognition } from './components/FaceRecognition'
 import { VerifyStatus } from './components/VerifyStatus'
 
 function Identity() {
-  const { step } = useParams<{ step: 'info' | 'identityUpload' | 'addressUpload' | 'face' | 'state' }>()
+  const { step } = useParams<{
+    step: 'info' | 'identityUpload' | 'addressUpload' | 'face' | 'state'
+  }>()
 
   return (
     <>
@@ -17,7 +19,6 @@ function Identity() {
           <div className='mt-8'>
             {step === 'info' && <BaseInfo />}
             {step === 'identityUpload' && <Upload type='identity' />}
-            {step === 'addressUpload' && <Upload type='address' />}
             {step === 'face' && <FaceRecognition />}
             {step === 'state' && <VerifyStatus />}
           </div>
