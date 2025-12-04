@@ -1,39 +1,46 @@
 
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem,  } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { memo, useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { LazyImage } from "../image/LazyImage";
 
-export type IDoctypeCode = {
+export type IItemCode = {
   code: string,
-  icon: string,
   label: string,
 }
 
-export type DoctypeSelectProps = {
+export type IncomeSelectProps = {
   defaultValue?: string;
   value?: string;
-  onChange?: (code: IDoctypeCode) => void;
+  onChange?: (code: IItemCode) => void;
   className?: string
 }
 
-const DoctypeSelect = memo(
+const IncomeSelect = memo(
   ({
     defaultValue,
     value, 
     onChange, 
     className
-  }: DoctypeSelectProps) => {
+  }: IncomeSelectProps) => {
     const { t } = useTranslation()
-    const idList = [
-      { code: '1', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
-      { code: '2', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
+    const dataList = [
+      { code: '1', label: t('income.t1')},
+      { code: '2', label: t('income.t2')},
+      { code: '3', label: t('income.t3')},
+      { code: '4', label: t('income.t4')},
+      { code: '5', label: t('income.t5')},
+      { code: '6', label: t('income.t6')},
+      { code: '7', label: t('income.t7')},
+      { code: '8', label: t('income.t8')},
+      { code: '9', label: t('income.t9')},
+      { code: '10', label: t('income.t10')},
+      { code: '11', label: t('income.t11')},
     ]
-    const [currentCode, setCurrentCode] = useState(idList[0].code)
-    const [currentDoctype, setCurrentDoctype] = useState(idList[0])
+    const [currentCode, setCurrentCode] = useState(dataList[0].code)
+    const [currentItem, setCurrentItem] = useState(dataList[0])
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
@@ -51,9 +58,9 @@ const DoctypeSelect = memo(
         onValueChange={(code) => {
           if (code) {
             setCurrentCode(code)
-            const _id = idList.find(id => id.code === code)
+            const _id = dataList.find(id => id.code === code)
             if (_id) {
-              setCurrentDoctype(_id)
+              setCurrentItem(_id)
               onChange && onChange(_id)
             }
           }
@@ -70,21 +77,17 @@ const DoctypeSelect = memo(
         >
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentCode ? (
-              <>
-                <LazyImage className="w-6 h-6" src={currentDoctype.icon} />
-                <span className=" font-normal md:text-[16px]">{currentDoctype.label}</span>
-              </>
+              <span className=" font-normal md:text-[16px]">{currentItem.label}</span>
             ) : (
               <span className="md:text-[1.04vw] text-5">{''}</span>
             )}
           </div>
         </SelectTrigger>
         <SelectContent className=" ">
-          {idList.map(id => (
+          {dataList.map(id => (
             <SelectItem key={id.code} value={id.code}>
               <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
                 <div className=" flex items-center  gap-x-2">
-                  <LazyImage className="w-6 h-6" src={id.icon} />
                   <span>{id.label}</span>
                 </div>
                 <span
@@ -102,7 +105,7 @@ const DoctypeSelect = memo(
   }
 )
 
-export { DoctypeSelect }
+export { IncomeSelect }
 
 
 

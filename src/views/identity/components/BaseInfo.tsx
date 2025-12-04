@@ -12,6 +12,8 @@ import { useTranslation } from "@/hooks/useTranslation"
 import { memo, useMemo, useState } from "react"
 import { Upload } from "./Upload"
 import { cn } from "@/utils/tw"
+import { EmploymentSelect } from "@/components/employment-select"
+import { IncomeSelect } from "@/components/income-select"
 
 const genderList = [
   {value: '1', label: 'Male'},
@@ -119,7 +121,7 @@ const BaseInfo = memo(
       <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
         <SectionBox>
           <SectionTitle>{t('kyc.t2')}</SectionTitle>
-          <div className=" grid grid-cols-3 font-normal gap-x-6">
+          <div className=" grid grid-cols-4 font-normal gap-x-6">
             <FormItemBox>
               <FormItemLabel title={t('kyc.t3')} />
               <InputBox >
@@ -183,7 +185,8 @@ const BaseInfo = memo(
                 <ErrorBox error={errors.lastName?.message}/>
               </InputBox>
             </FormItemBox>
-            <FormItemBox>
+            <div className=" col-span-2">
+              <FormItemBox>
               <FormItemLabel title={t('kyc.t6')} />
               <InputBox >
                 <KycInput 
@@ -214,6 +217,12 @@ const BaseInfo = memo(
                 <ErrorBox error={errors.fullName?.message}/>
               </InputBox>
             </FormItemBox>
+            </div>
+            
+            
+          </div>
+          <div className=" grid grid-cols-3 font-normal gap-x-6">
+            {/* 性别 */}
             <FormItemBox>
               <FormItemLabel title={t('kyc.t7')} />
               <InputBox >
@@ -224,11 +233,13 @@ const BaseInfo = memo(
                   data={genderList}
                   defaultValue={'0'}
                   onChange={data => {
+                    console.log(data)
                     setGendar(data.value)
                   }}
                 />
               </InputBox>
             </FormItemBox>
+            {/* 出生日期 */}
             <FormItemBox>
               <FormItemLabel title={t('kyc.t8')} />
               <InputBox >
@@ -245,6 +256,7 @@ const BaseInfo = memo(
                 </div>
               </InputBox>
             </FormItemBox>
+            {/* 邮箱 */}
             <FormItemBox>
               <FormItemLabel title={t('kyc.t9')} />
               <InputBox >
@@ -280,7 +292,8 @@ const BaseInfo = memo(
         </SectionBox>
         <SectionBox>
           <SectionTitle>{t('kyc.t10')}</SectionTitle>
-          <div className=" grid grid-cols-2 font-normal gap-x-6">
+          <div className=" grid grid-cols-3 font-normal gap-x-6">
+            {/* 证件类型 */}
             <FormItemBox>
               <FormItemLabel title={t('kyc.t11')} />
               <InputBox >
@@ -298,8 +311,6 @@ const BaseInfo = memo(
                 />
               </InputBox>
             </FormItemBox>
-          </div>
-          <div className=" grid grid-cols-1 font-normal">
             <FormItemBox>
               <FormItemLabel title={t('kyc.t13')} />
               <InputBox >
@@ -330,8 +341,9 @@ const BaseInfo = memo(
                 />
                 <ErrorBox error={errors.no?.message}/>
               </InputBox>
-            </FormItemBox>      
+            </FormItemBox>  
           </div>
+          
           <div className=" grid grid-cols-1 font-normal">
             <FormItemBox>
               <FormItemLabel title={t('kyc.t14')} />
@@ -374,57 +386,40 @@ const BaseInfo = memo(
         </SectionBox>
         
         <SectionBox className="pb-5">
+          {/* 上传证件 */}
           <Upload type="identity" />
         </SectionBox>  
         <SectionBox className="pb-5">
+          {/* 上传地址证明 */}
           <Upload type="address" />
         </SectionBox> 
         <SectionBox>
           <SectionTitle>{t('kyc.t16')}</SectionTitle>
           <div className=" grid grid-cols-2 font-normal gap-x-6">
+            {/* 就业状况 */}
             <FormItemBox>
               <FormItemLabel title={t('kyc.t17')} />
               <InputBox >
-                <DoctypeSelect />
+                <EmploymentSelect />
+              </InputBox>
+            </FormItemBox>
+          </div>
+          
+        </SectionBox>
+        <SectionBox>
+          <SectionTitle>{t('kyc.t21')}</SectionTitle>
+          <div className=" grid grid-cols-2 font-normal gap-x-6">
+            {/* 收入类型 */}
+            <FormItemBox>
+              <FormItemLabel title={t('kyc.t22')} />
+              <InputBox >
+                <IncomeSelect />
               </InputBox>
             </FormItemBox>
             
           </div>
-          <div className=" grid grid-cols-1 font-normal">
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t18')} />
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.no?.message}
-                  {
-                    ...register("no", {
-                      required: '请输入内容',
-                      maxLength: {
-                        value: 30,
-                        message: "最大支持输入30位字符"
-                      },
-                      pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                        message: "只支持中文和英文字母"
-                      },
-                      onChange: (e) => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
-                        }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.no?.message}/>
-              </InputBox>
-            </FormItemBox>      
-          </div>
           
-        </SectionBox>  
+        </SectionBox>
         <SectionBox>
           <SectionTitle>{t('kyc.t19')}</SectionTitle>
           <div className="h-5"></div>

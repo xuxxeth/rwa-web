@@ -15,8 +15,12 @@ const Section1 = memo(
     useEffect(() => {
       const handleResize = () => {
         const newWidth = document.body.clientWidth;
-        const newHeight = newWidth / factor;
-        setHeight(newHeight);
+        let newHeight = newWidth / factor;
+        if (newWidth > 1456) {
+          newHeight = 816
+        }
+        
+        setHeight(newHeight > 816 ? 816 : newHeight);
       };
 
       window.addEventListener('resize', handleResize);
@@ -50,21 +54,23 @@ const Section1 = memo(
 
     return (
       <>
-        <div className=" hidden lg:block w-full relative text-white"
-          style={{
-            height: height + 'px'
-          }}
-        >
-          <div className=" absolute left-0 top-0 h-full w-full">
-            <VideoPlayer
-              src="/images/home/new/bg-video.mp4"
-              poster="/images/home/new/small.png"
-              muted
-              loop
-              className="w-full h-full"
-            />
+        <div className=" hidden lg:flex h-[calc(100vh-88px)] items-center justify-center text-white">
+          <div className=" w-full max-w-[1456px] relative text-white"
+            style={{
+              height: height + 'px'
+            }}
+          >
+            <div className=" absolute left-0 top-0 h-full w-full">
+              <VideoPlayer
+                src="/images/home/new/bg-video.mp4"
+                poster="/images/home/new/small.png"
+                muted
+                loop
+                className="w-full h-full"
+              />
+            </div>
+            <MainContent />
           </div>
-          <MainContent />
         </div>
         <div className=" block lg:hidden w-full relative text-white pt-[124px] sm:pt-[211px]"
         >

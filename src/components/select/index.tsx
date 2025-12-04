@@ -32,7 +32,7 @@ const Select = memo(
     const [curretnValue, setCurrentValue] = useState('')
     const [currentItem, setCurrentItem] = useState<ItemProps | null>(null)
     const [open, setOpen] = useState(false)
-
+    
     useEffect(() => {
       if (defaultValue) {
         setCurrentValue(defaultValue)
@@ -50,12 +50,15 @@ const Select = memo(
           setOpen(open)
         }}
         onValueChange={(value) => {
-          setCurrentValue(value)
-          const item = data.find(item => item.value === value)
-          if (item) {
-            setCurrentItem(item)
-            onChange && onChange(item)
+          if (value) {
+            setCurrentValue(value)
+            const item = data.find(item => item.value === value)
+            if (item) {
+              setCurrentItem(item)
+              onChange && onChange(item)
+            }
           }
+          
         }}
       >
         <SelectTrigger 
@@ -75,7 +78,7 @@ const Select = memo(
             )}
           </div>
         </SelectTrigger>
-        <SelectContent className=" border-none">
+        <SelectContent className="">
           {data.map(item => (
             <SelectItem key={item.value} value={item.value}>
               <div className="flex items-center justify-between gap-2 text-white text-[16px] w-full">

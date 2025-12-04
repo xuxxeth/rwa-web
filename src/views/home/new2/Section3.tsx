@@ -59,7 +59,7 @@ const Section3Lg = memo(({ scrollY, locked }: {scrollY: MotionValue, locked: boo
   return (
     <div
       ref={sectionRef}
-      className=" hidden lg:block h-[810px] lg:px-4 xl:px-[170px] text-white"
+      className=" hidden lg:block h-[calc(100vh-88px)] min-h-[810px] lg:px-4 xl:px-[170px] text-white"
     >
       <div className=" relative w-full h-full flex items-center justify-center">
         <div className=" absolute w-full h-full left-0 top-0 flex items-center justify-center overflow-hidden">

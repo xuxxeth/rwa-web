@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils"
 import { LazyImage } from "../image/LazyImage"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[16px] text-[16px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#324054] disabled:bg-[#324054] disabled:text-[#6C86AD] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[8px] text-[16px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#1D1D1D] disabled:bg-[#1D1D1D] disabled:text-[#5B5B5B] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default: "bg-[#FFFFFF] text-black",
         secondary: "bg-[#9CFF3A] text-black shadow-sm hover:bg-[#9CFF3A]/80",
-        primary: "bg-[#2EBD85] text-black shadow-sm hover:bg-[#2EBD85]/80",
-        warning: "bg-[#F6465D] text-black shadow-sm hover:bg-[#F6465D]/90",
+        primary: "bg-[#25A750] text-black shadow-sm hover:bg-[#25A750]/80",
+        warning: "bg-[#CA3F64] text-black shadow-sm hover:bg-[#CA3F64]/90",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
@@ -60,7 +60,7 @@ const buttonVariants = cva(
       },
       {
         outline: true,
-        className: "disabled:border-[#324054] disabled:text-[#6C86AD] disabled:bg-black",
+        className: "disabled:border-[#324054] disabled:text-[#6C86AD] disabled:bg-[#CA3F64]",
       },
     ],
     defaultVariants: {
