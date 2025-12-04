@@ -40,7 +40,6 @@ function IdentityUpload() {
   const handleMergedIamge = async (frontRes: IUploadedRes | null, backRes: IUploadedRes | null) => {
     try {
       if (checkImgUploaded(frontRes) && checkImgUploaded(backRes)) {
-        debugger
         const mergedFile = await mergeImagesFromUrls(frontRes?.url!, backRes?.url!)
         const mergedRes = await uploadFile(mergedFile, () => {})
         saveUploadKey('idMerged', mergedRes?.key)
@@ -57,8 +56,8 @@ function IdentityUpload() {
   return (
     <div>
       <div className='flex items-center mb-5'>
-        <Text text='uploadId' className='text-[18px] font-normal text-white' /> 
-        <span className="text-[#CA3F64] ml-1 flex items-center">*</span>
+        <Text text='uploadId' className='text-[18px] font-normal text-white' />
+        <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
       </div>
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard fileType='idFront' onUploaded={onFrontUploaded} uploadedRes={frontRes} />
@@ -75,8 +74,8 @@ function AddressUpload() {
   return (
     <div>
       <div className='flex items-center mb-5'>
-        <Text text='uploadAddr' className='text-[18px] font-normal text-white' /> 
-        <span className="text-[#CA3F64] ml-1 flex items-center">*</span>
+        <Text text='uploadAddr' className='text-[18px] font-normal text-white' />
+        <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
       </div>
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard

@@ -295,7 +295,7 @@ export function UploadCard(props: {
               <LazyImage
                 src={uploadedRes.url}
                 className='rounded-lg'
-                style={{ opacity: isHover ? 0.1 : 1 }}
+                style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />
               {isHover && (
                 <button className='absolute bg-[#0E0E0E] rounded-lg cursor-pointer left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-4'>
