@@ -29,8 +29,8 @@ const DoctypeSelect = memo(
   }: DoctypeSelectProps) => {
     const { t } = useTranslation()
     const idList = [
-      { code: '1', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
-      { code: '2', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
+      { code: '0', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
+      { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
     ]
     const [currentCode, setCurrentCode] = useState(idList[0].code)
     const [currentDoctype, setCurrentDoctype] = useState(idList[0])
@@ -39,6 +39,10 @@ const DoctypeSelect = memo(
     useEffect(() => {
       if (defaultValue) {
         setCurrentCode(defaultValue)
+        const _id = idList.find(id => id.code === defaultValue)
+        if (_id) {
+          setCurrentDoctype(_id)
+        }
       }
     }, [defaultValue]) 
 

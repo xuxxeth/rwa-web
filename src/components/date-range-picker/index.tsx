@@ -15,7 +15,7 @@ import { DayPicker, getDefaultClassNames } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 import './custom.css'
 
-const FormatStr = 'yyyy-MM-dd'
+export const FormatStr = 'yyyy-MM-dd'
 
 export function setStartOfDay(date: Date): Date {
   const newDate = new Date(date)

@@ -3,8 +3,10 @@
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { memo, useEffect, useState } from "react";
-import { countryList } from "./countryList";
 import { Check } from "lucide-react";
+import { kycApi } from "@/service/kyc/api";
+import { RESPONSE_CODE } from "@/config/constants";
+import type { ISupportedCountry } from "@/service/kyc/types";
 
 export type ICountryCode = {
   code: string,
@@ -16,7 +18,7 @@ export type ICountryCode = {
 export type CountrySelectProps = {
   defaultValue?: string;
   value?: string;
-  onChange?: (code: ICountryCode) => void;
+  onChange?: (code: ISupportedCountry) => void;
   className?: string
 }
 
@@ -27,20 +29,40 @@ const CountrySelect = memo(
     onChange, 
     className
   }: CountrySelectProps) => {
-    const [currentCode, setCurrentCode] = useState(countryList[0].en)
-    const [currentCountry, setCurrentCountry] = useState(countryList[0])
+    const [countryList, setCountryList] = useState<ISupportedCountry[]>([])
+    const [currentCode, setCurrentCode] = useState('')
+    const [currentCountry, setCurrentCountry] = useState<ISupportedCountry>({key: '', value: ''})
     const [open, setOpen] = useState(false)
 
+
     useEffect(() => {
-      if (defaultValue) {
+      if (defaultValue && countryList.length > 0) {
         setCurrentCode(defaultValue)
-        const _country = countryList.find(country => country.en === defaultValue)
+        const _country = countryList.find(country => country.key === defaultValue) || countryList[0]
         if (_country) {
           setCurrentCountry(_country)
           onChange && onChange(_country)
+          if (!defaultValue) {
+            setCurrentCode(_country.key)
+          }
         }
       }
-    }, [defaultValue]) 
+    }, [defaultValue, countryList.length]) 
+
+
+    useEffect(() => {
+      kycApi.getSupportedCountries()
+        .then(res => {
+          if (res.code === RESPONSE_CODE.SUCCESS) {
+            const _list = res.data || []
+            setCountryList(_list)
+            if (_list[0]) {
+              setCurrentCode(_list[0].key)
+              setCurrentCountry(_list[0])
+            }
+          }
+        })
+    }, [])
 
     return (
       <Select 
@@ -49,12 +71,15 @@ const CountrySelect = memo(
           setOpen(open)
         }}
         onValueChange={(en) => {
-          setCurrentCode(en)
-          const _country = countryList.find(country => country.en === en)
-          if (_country) {
-            setCurrentCountry(_country)
-            onChange && onChange(_country)
+          if (en) {
+            setCurrentCode(en)
+            const _country = countryList.find(country => country.key === en)
+            if (_country) {
+              setCurrentCountry(_country)
+              onChange && onChange(_country)
+            }
           }
+          
         }}
       >
         <SelectTrigger 
@@ -68,8 +93,8 @@ const CountrySelect = memo(
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentCode ? (
               <>
-                <span className=" text-[24px]">{currentCountry.icon}</span>
-                <span className=" font-normal md:text-[16px]">{currentCountry.en}</span>
+                {/* <span className=" text-[24px]">{currentCountry.icon}</span> */}
+                <span className=" font-normal md:text-[16px]">{currentCountry.value}</span>
               </>
             ) : (
               <span className="md:text-[1.04vw] text-5">Select Country</span>
@@ -78,15 +103,15 @@ const CountrySelect = memo(
         </SelectTrigger>
         <SelectContent className=" border-none">
           {countryList.map(code => (
-            <SelectItem key={code.en} value={code.en}>
+            <SelectItem key={code.key} value={code.key}>
               <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
                 <div>
-                  <span className=" text-[20px]">{code.icon}</span>
-                  <span>{code.en}</span>
+                  {/* <span className=" text-[20px]">{code.icon}</span> */}
+                  <span>{code.value}</span>
                 </div>
                 <span
                   className="ml-auto data-[state=checked]:block hidden text-[#9CFF3A]"
-                  data-state={code.en === currentCode ? 'checked' : ''}
+                  data-state={code.key === currentCode ? 'checked' : ''}
                 >
                   <Check className="h-4 w-4 text-white" />
                 </span>

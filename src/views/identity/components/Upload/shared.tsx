@@ -95,14 +95,14 @@ export function useUploadedArrRes(props: {
   useEffect(() => {
     if (!isFetched) return
     if (uploadedKeys.length > 0) {
-      saveUploadKey('addressCertificates', uploadedKeys)
+      saveUploadKey(props.fileType, uploadedKeys)
     } else {
-      saveUploadKey('addressCertificates', null)
+      saveUploadKey(props.fileType, null)
     }
   }, [uploadedKeys, isFetched])
 
   useEffect(() => {
-    getUploadedFileUrl('addressCertificates').then(res => {
+    getUploadedFileUrl(props.fileType).then(res => {
       if (res) {
         setUploadedRes(res.map(item => ({ success: true, ...item })))
       }
@@ -168,7 +168,7 @@ export const uploadFile = async (
   }
 }
 
-const KYC_UPLOAD_STORAGE_KEY = 'kyc_upload_key'
+export const KYC_UPLOAD_STORAGE_KEY = 'kyc_upload_key'
 
 export type UploadFileType =
   | 'idFront'

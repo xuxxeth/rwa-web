@@ -22,21 +22,30 @@ export interface IBasicInfo {
     firstName: string
     lastName: string
     fullName: string
-    gender: KYC_GENDER
+    gender: number
     dob: string
     email: string
 }
 
 export interface IIdInfo {
-    type: KYC_ID_TYPE
+    type: number
     issueCountry: string
     no: string
-    residentAddress: string
+    residentAddress?: string
+    useCertificateAddress?: boolean
 }
 
 export interface IEmploymentInfo {
-    currentEmployment: string
-    description: string
+    employment: number
+    description?: string
+}
+
+export interface IIncomeInfo {
+    source: number
+}
+
+export interface IExtraInfo {
+    incomeCertifications: string[]
 }
 
 export interface IKycDetail {
@@ -62,12 +71,14 @@ export interface IKycDetail {
 export interface IKycSubmitData {
     basicInfo: IBasicInfo
     idInfo: IIdInfo & {
-        files: Array<{
-            key: string,
-            value: string
-        }>
+        files: {
+            [key: string]: string,
+        }
     }
-    employmentInfo: IEmploymentInfo
+    workInfo: IEmploymentInfo
+    incomeInfo: IIncomeInfo
+    extraInfo: IExtraInfo
+    approvedProtocols: string[]
     // TODO: 待补充其他字段
 }
 
