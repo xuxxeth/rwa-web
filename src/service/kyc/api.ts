@@ -8,9 +8,11 @@ import type {
   FilePutMimeType,
   IFilePutUrlRes,
   IFillAccessUrlRes,
+  ILivenessUrlRes,
 } from './types'
 
 export const kycApi = {
+  getLivenessUrl: () => client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness-url'),
   getSupportedCountries: () =>
     client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/support-countries'),
   getKycStatus: () => client.get<ApiResponse<IKycStatus>>('/v1/kyc/status'),

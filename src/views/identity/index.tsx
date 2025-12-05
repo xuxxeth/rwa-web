@@ -6,6 +6,8 @@ import { IdentityLayout } from './components/IdentityLayout'
 import { WarningInfo } from './components/WarningInfo'
 import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
+import FaceRecognition from './components/FaceRecognition'
+import VerifyStatus from './components/VerifyStatus'
 
 function Identity() {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
@@ -26,14 +28,21 @@ function Identity() {
   // 这样简单的 Mock 一下
   const MockKycDetail: IKycDetail = {
     account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    overallStatus: 0,
+    overallStatus: 3,
     riskLevel: 3,
-    verifyType: 'basic-info',
+    verifyType: 'liveness',
     pendingMaterials: 'income-certificate',
   }
 
-  const { account, overallStatus, riskLevel, userInfo, pendingMaterials, verifyType } =
-    MockKycDetail
+  const {
+    account,
+    overallStatus,
+    riskLevel,
+    userInfo,
+    pendingMaterials,
+    verifyType,
+    rejectReason,
+  } = MockKycDetail
 
   //  0 未认证, 显示信息采集组件
   if (overallStatus === 0) {
@@ -47,7 +56,8 @@ function Identity() {
 
   // 1 认证中
   if (overallStatus === 1) {
-    // 接下来判断处于认证的哪个阶段, 1. basic-info 阶段
+    // 接下来判断处于认证的哪个阶段,
+    // 1. basic-info 阶段
     if (verifyType === 'basic-info') {
       // 高风险，并且用户没有上传收入证明
       if (riskLevel === 3 && pendingMaterials === 'income-certificate') {
@@ -73,6 +83,11 @@ function Identity() {
 
     // 3. 活体阶段
     if (verifyType === 'liveness') {
+      return (
+        <MainContentWrapper>
+          <FaceRecognition refresh={refresh} isFaceVerifyFailed={false} />
+        </MainContentWrapper>
+      )
     }
 
     // 4. aml 阶段
@@ -81,20 +96,33 @@ function Identity() {
 
     // 5. kyt 阶段
     if (verifyType === 'kyt') {
-      
     }
   }
 
   // 2. 已通过
   if (overallStatus === 2) {
+    return (
+      <MainContentWrapper>
+        <VerifyStatus overallStatus={overallStatus} />
+      </MainContentWrapper>
+    )
   }
 
   // 3. 已拒绝
   if (overallStatus === 3) {
-  }
+    if (verifyType === 'liveness') {
+      return (
+        <MainContentWrapper>
+          <FaceRecognition refresh={refresh} isFaceVerifyFailed={true} />
+        </MainContentWrapper>
+      )
+    }
 
-  // 4. 人工审核中
-  if (overallStatus === 4) {
+    return (
+      <MainContentWrapper>
+        <VerifyStatus overallStatus={overallStatus} />
+      </MainContentWrapper>
+    )
   }
 }
 

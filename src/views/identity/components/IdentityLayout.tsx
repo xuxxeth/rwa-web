@@ -39,7 +39,7 @@ const IdentityLayout = memo(
             <TipLine />
             <TipLine />
           </div> */}
-          <div className="relative pt-8">
+          <div className="relative pt-5">
             <div className=" absolute -left-[120px] top-0 flex items-center">
               <LazyImage src="/images/icons/identity/back.png" className="w-6 h-6 mr-1" />
               {t('Back')}

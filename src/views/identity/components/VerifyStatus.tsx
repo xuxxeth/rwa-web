@@ -1,69 +1,86 @@
-import { LazyImage } from "@/components/image/LazyImage";
-import { Button } from "@/components/ui/button";
-import { Trans, useTranslation } from "@/hooks/useTranslation";
-import { memo } from "react";
+import { LazyImage } from '@/components/image/LazyImage'
+import { useTranslation } from '@/hooks/useTranslation'
+import { useRouter } from '@/hooks/useRouter'
 
+export default function VerifyStatus({ overallStatus }: { overallStatus: number }) {
+  const { t } = useTranslation()
 
-const VerifyStatus = memo(
-  () => {
-    const { t } = useTranslation()
-
-    return (
-      <div className=" text-white font-normal">
-        <div className="flex flex-col items-center">
-          <LazyImage src="/images/icons/identity/done.png" className="w-[268px]" />
-          <div className="text-[24px] mt-10">{t('identity.state1')}</div>
-          <div className="mt-2 text-[18px] text-[rgba(255,255,255,0.6)]">{t('identity.state2')}</div>
-          <Button className="bg-white text-black w-full mt-10"
-            onClick={async () => {
-              
-            }}
-          >
-            {t('identity.done')}
-
-          </Button>
-        </div>
-        <div className="flex flex-col items-center">
-          <LazyImage src="/images/icons/identity/fail.png" className="w-[268px]" />
-          <div className="text-[24px] mt-10">{t('identity.state3')}</div>
-          <div className="mt-2 text-[18px] text-[rgba(255,255,255,0.6)]">
-            <Trans i18nKey={'identity.state4'}>
-              账户状态异常，请联系 <a href="mailto:contact@cyberalpha.cc" className=" text-white">contact@cyberalpha.cc</a> 获取帮助
-            </Trans>
-          </div>
-          <Button className="w-full mt-5" outline>
-            <div className="flex items-center">
-              <LazyImage src="/images/icons/identity/mail-02.png" className="w-6 h-6 mr-[10px]" />
-              {t('identity.copyEmail')}
-            </div>
-          </Button>
-        </div>
-        <div className="flex flex-col items-center">
-          <LazyImage src="/images/icons/identity/fail.png" className="w-[268px]" />
-          <div className="text-[24px] mt-10">{t('identity.state5')}</div>
-          <div className="mt-2 text-[18px] text-[rgba(255,255,255,0.6)]">
-            {t('identity.state6')}
-          </div>
-          <Button className="bg-white text-black w-full mt-10"
-            onClick={async () => {
-
-            }}
-          >
-            {t('identity.reVerify')}
-
-          </Button>
-        </div>
-        <div className="flex flex-col items-center">
-          <LazyImage src="/images/icons/identity/success.png" className="w-[268px]" />
-          <div className="text-[24px] mt-10">{t('identity.state7')}</div>
-          <div className="mt-2 text-[18px] text-[rgba(255,255,255,0.6)]">
-            {t('identity.state8')}
-          </div>
-
-        </div>
-      </div>
-    )
+  let content = null
+  if (overallStatus === 2) {
+    content = <VerifySuccessed />
   }
-)
 
-export { VerifyStatus }
+  if (overallStatus === 3) {
+    content = <VerifyFailed />
+  }
+
+  return (
+    <div className='bg-[#0E0E0E] p-8'>
+      <div className='text-lg font-medium pb-4 border-b border-white/10'>
+        {t(`${langPrefix}.res`)}
+      </div>
+      {content}
+    </div>
+  )
+}
+
+const langPrefix = 'identity.result'
+
+export function VerifySuccessed() {
+  const { t } = useTranslation()
+  const router = useRouter()
+
+  return (
+    <div className='flex flex-col gap-5 items-center'>
+      <LazyImage src='/images/icons/identity/success.png' className='w-[120px] h-[90px] pt-5' />
+      <div>
+        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.ok`)}</div>
+        <div className='text-base text-[#909090]'>{t(`${langPrefix}.okTip`)}</div>
+      </div>
+      <Button onClick={() => router.push('/markets/quotes')} text='m' />
+    </div>
+  )
+}
+
+export function VerifyFailed() {
+  const { t } = useTranslation()
+  const router = useRouter()
+  return (
+    <div className='flex flex-col gap-5 items-center'>
+      <LazyImage src='/images/icons/identity/fail.png' className='w-[120px] h-[90px] pt-5' />
+      <div>
+        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.f`)}</div>
+        <div className='text-base text-[#909090]'>{t(`${langPrefix}.r`)}</div>
+      </div>
+      <Button onClick={() => router.push('/')} text='h' />
+    </div>
+  )
+}
+
+export function Verifying() {
+  const { t } = useTranslation()
+  const router = useRouter()
+  return (
+    <div className='flex flex-col gap-5 items-center'>
+      <LazyImage src='/images/icons/identity/verifying.png' className='w-[120px] h-[90px] pt-5' />
+      <div>
+        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.verifying`)}</div>
+        <div className='text-base text-[#909090]'>{t(`${langPrefix}.verifyingTip`)}</div>
+      </div>
+      <Button onClick={() => router.push('/')} text='h' />
+    </div>
+  )
+}
+function Button({ onClick, text }: { onClick: () => void; text: string }) {
+  const { t } = useTranslation()
+  return (
+    <div>
+      <button
+        onClick={onClick}
+        className='w-[402px] h-[46px] border rounded-lg cursor-pointer border-white bg-transparent text-white tex-base font-bold'
+      >
+        {t(`${langPrefix}.${text}`)}
+      </button>
+    </div>
+  )
+}

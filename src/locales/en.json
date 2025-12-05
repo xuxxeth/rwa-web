@@ -263,6 +263,29 @@
       "passportTips": "请上传护照信息页，确保照片、姓名、证件号与有效期清晰可见，无遮挡无反光，证件有效，四角完整，JPG格式且小于2MB。",
       "reUpload": "重新上传"
     },
+    "face": {
+      "rg": "Facial Verification",
+      "title": "Scan the QR code with your phone to complete facial verification.",
+      "tip": "For a smooth process, ensure good lighting and keep your face clearly visible.",
+      "btn": "View Verification Result",
+      "fresh": "Refresh",
+      "invalid": "QR code expired",
+      "times": "You have reached today’s verification limit. Please try again tomorrow.",
+      "f": "Verification Failed",
+      "ft": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
+      "rv": "Retry Verification"
+    },
+    "result": {
+      "res": "Verification Result",
+      "ok": "Verification completed",
+      "okTip": "Your account has successfully passed identity verification, and you can now start using trading features.",
+      "m": "Explore Markets",
+      "f": "Your identity verification was not approved.",
+      "r": "The information you submitted did not pass our review, and you cannot access the platform services for now.",
+      "h": "Return to Home",
+      "verifying": "Your documents are under review.",
+      "verifyingTip": "Your submitted documents are undergoing compliance review, which typically takes 1–3 business days. Please check this page later for updates."
+    },
     "firstName": "First Name",
     "lastName": "Last Name",
     "fullName": "Full Name",
@@ -281,7 +304,6 @@
     "aggree1": "I have read and agree to ",
     "aggree2": ", and consent to the processing and sharing of necessary information for KYC/sanctions screening and compliance review purposes.",
     "aggree3": "Anti-Money Laundering and Counter-Terrorist Financing (AML/CFT) Policy",
-    "face": "Face Recognition",
     "scqr": "Scan the QR code with your mobile phone camera",
     "copyLinkTo": "Copy the link to open in your mobile browser",
     "copylink": "Copy Link",
