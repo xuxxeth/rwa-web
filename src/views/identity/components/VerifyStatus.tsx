@@ -1,13 +1,17 @@
 import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
+import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
+import { useTokenBalances, useAccount } from 'ca-common-web'
+import { useEffect, useState } from 'react'
+import { isLess, parseAmount } from '@/utils'
 
 export default function VerifyStatus({ overallStatus }: { overallStatus: number }) {
   const { t } = useTranslation()
 
   let content = null
   if (overallStatus === 2) {
-    content = <VerifySuccessed />
+    content = <VerifySucceeded />
   }
 
   if (overallStatus === 3) {
@@ -26,9 +30,11 @@ export default function VerifyStatus({ overallStatus }: { overallStatus: number 
 
 const langPrefix = 'identity.result'
 
-export function VerifySuccessed() {
+export function VerifySucceeded() {
   const { t } = useTranslation()
   const router = useRouter()
+
+  const isTokenQualified = useIsTokenQualified()
 
   return (
     <div className='flex flex-col gap-5 items-center'>
@@ -38,7 +44,89 @@ export function VerifySuccessed() {
         <div className='text-base text-[#909090]'>{t(`${langPrefix}.okTip`)}</div>
       </div>
       <Button onClick={() => router.push('/markets/quotes')} text='m' />
+      {isTokenQualified === undefined ? (
+        'checking is token qualified...'
+      ) : isTokenQualified ? (
+        <HotRwas />
+      ) : (
+        <TradePrepare />
+      )}
     </div>
+  )
+}
+
+const MIN_USDT_AMOUNT = '10'
+const MIN_NATIVE_TOKEN_AMOUNT = '0.05'
+
+function useIsTokenQualified() {
+  const account = useAccount()
+
+  const usdt = useUSDT()
+  const { getBalance, getTokenBalances } = useTokenBalances()
+
+  const [balances, setBalances] = useState<{ usdt: bigint; nativeToken: bigint } | undefined>(
+    undefined
+  )
+
+  useEffect(() => {
+    if (!usdt || !account) return
+    Promise.all([
+      getBalance(account),
+      getTokenBalances(account, [usdt.address as `0x${string}`]),
+    ]).then(res => {
+      setBalances({ usdt: res[1][0].balance as bigint, nativeToken: res[0] })
+    })
+  }, [usdt, account])
+
+  if (balances === undefined || !usdt) return undefined
+
+  if (isLess(balances.usdt, parseAmount(MIN_USDT_AMOUNT, usdt.decimals))) return false
+  if (isLess(balances.nativeToken, parseAmount(MIN_NATIVE_TOKEN_AMOUNT, 18))) return false
+
+  return true
+}
+
+function TradePrepare() {
+  const { t } = useTranslation()
+  return (
+    <div className='flex flex-col gap-4 text-base text-[#1A85FF]'>
+      <a href='#pre1' target='_blank' className='flex flex-row items-center gap-1.5'>
+        {t(`${langPrefix}.pre1`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
+      </a>
+      <a href='#pre2' target='_blank' className='flex flex-row items-center gap-1.5'>
+        {t(`${langPrefix}.pre2`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
+      </a>
+    </div>
+  )
+}
+
+function HotRwas() {
+  const { t } = useTranslation()
+  const rwaList = useRwaTokens()
+  const top6RwaList = rwaList.sort((a, b) => b.weight - a.weight).slice(0, 4)
+
+  return (
+    <>
+      <div className='text-2xl mt-5'>{t(`${langPrefix}.hot`)}</div>
+      <div className='grid grid-cols-3 gap-5'>
+        {top6RwaList.map(rwa => {
+          return (
+            <div className='flex flex-row items-center justify-center gap-4 p-4 bg-[#1C1C1C] rounded-lg'>
+              <LazyImage src={rwa.icon} className='w-[42px] h-[42px] rounded-lg' />
+              <div className='flex flex-col'>
+                <div className='text-base'>{rwa.symbol}</div>
+                <div className='text-sm text-60'>{rwa.name}</div>
+              </div>
+              <div className='flex flex-col'>
+                <div className='text-base'>$203.33</div>
+                <div className='text-sm text-60'>{rwa.name}</div>
+              </div>
+              <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
+            </div>
+          )
+        })}
+      </div>
+    </>
   )
 }
 

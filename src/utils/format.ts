@@ -239,7 +239,7 @@ export function compareBigNumber(a: string | number, b: string | number): -1 | 0
   return 0
 }
 
-function toBN(value: string | number | BigNumber): BigNumber {
+function toBN(value: string | number | BigNumber | bigint): BigNumber {
   return new BigNumber(value ?? 0)
 }
 
@@ -262,7 +262,7 @@ export function isGreaterOrEqual(
 }
 
 /** 是否小于 */
-export function isLess(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+export function isLess(a: string | number | BigNumber | bigint, b: string | number | BigNumber | bigint): boolean {
   return toBN(a).isLessThan(toBN(b))
 }
 
