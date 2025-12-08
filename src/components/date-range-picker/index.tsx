@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { subDays, format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
-import { type DateRange } from 'react-day-picker'
+import { type CaptionLabelProps, type DateRange } from 'react-day-picker'
 import VectorSVG from '../pagination/vector.svg?react'
 import ArrowSVG from './arrow.svg?react'
 
@@ -148,14 +148,19 @@ export function DatePicker({
   onUserSelectedDateChanged,
   placeholder,
   className,
-  activeColor
+  activeColor,
+  captionLayout,
+  minDate,
+  maxDate
 }: {
   userSelectedDate: number
   onUserSelectedDateChanged: (date?: number) => void
   placeholder?: string
   className?: string
   activeColor?: string
-
+  captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years"
+  minDate?: number
+  maxDate?: number
 }) {
   const [selected, setSelected] = React.useState<Date>();
   const [isOpen, setIsOpen] = React.useState(false)
@@ -207,11 +212,13 @@ export function DatePicker({
         <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='start'>
           <DayPicker
             numberOfMonths={1}
-            captionLayout={'label'}
+            captionLayout={captionLayout || 'label'}
             showOutsideDays={false}
             selected={selected}
             onSelect={setSelected}
             mode='single'
+            endMonth={maxDate ? new Date(maxDate) : undefined} 
+            startMonth={minDate ? new Date(minDate) : undefined}
             components={{
               Chevron: ({ className, orientation, ...props }) => {
                 if (orientation === 'left') {

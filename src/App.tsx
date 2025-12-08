@@ -75,10 +75,10 @@ function App() {
       {
         isHomeMenus ? <HomeMenus /> : <Menus />
       }
-
-      <Updater />
       <RoutesWrapper />
       <Toaster position='top-center' />
+      <Updater />
+
     </>
   )
 }

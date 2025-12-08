@@ -420,5 +420,72 @@
     "t35": "Delivering accurate and verifiable market data to guarantee fair and transparent on-chain settlement prices.",
     "t36": "On-Chain KYT & Compliance Partner",
     "t37": "Powering real-time transaction monitoring and on-chain identity verification, ensuring full regulatory compliance."
+  },
+  "kyc": {
+    "t1": "请使用您的常用钱包地址登录并完成 KYC。验证信息将绑定该地址且不可更改，仅用于身份核验。",
+    "t2": "Basic Information",
+    "t3": "First Name",
+    "t4": "Please enter",
+    "t5": "Last Name",
+    "t6": "Full Name",
+    "t7": "Gender",
+    "t8": "Date of Birth",
+    "t9": "Email",
+    "t10": "ID Information",
+    "t11": "Select ID Type",
+    "t12": "Select Issuing Country",
+    "t13": "Enter ID Number",
+    "t14": "Current Residential Address",
+    "t15": "Same as ID address",
+    "t16": "工作信息",
+    "t17": "Current Employment Status",
+    "t18": "Description",
+    "t19": "补充信息",
+    "t20": "为必填项",
+    "t21": "Income Information",
+    "t22": "Income Sources",
+    "t23": "Description"
+  },
+  "employment": {
+    "t1": "退休",
+    "t2": "学生",
+    "t3": "失业",
+    "t4": "就业"
+  },
+  "income": {
+    "t1": "Salary",
+    "t2": "Employment bonus",
+    "t3": "Related-party loan",
+    "t4": "Rental income",
+    "t5": "Insurance settlement",
+    "t6": "From regulated financial institutions (such as banks)",
+    "t7": "Retirement fund / tips",
+    "t8": "Dividends",
+    "t9": "Lottery winnings",
+    "t10": "Donation",
+    "t11": "Inheritance"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "compliance": {
+    "t1": "Compliance Notice",
+    "t2": "Welcome to Cyber Alpha.",
+    "t3": "To comply with international regulatory requirements and maintain lawful operations,Cyber Alpha’s products and services are not available to users from the following countries or regions: ",
+    "t4": "United States",
+    "t5": "Canada",
+    "t6": "Mainland China",
+    "t7": "Russia",
+    "t8": "and any other jurisdictions subject to international sanctions or regulatory restrictions.",
+    "t9": "By clicking “Agree,” you acknowledge and confirm that:",
+    "t10": "You are not a citizen, resident, or entity of the restricted regions listed above;",
+    "t11": "You confirm that you have read and agree to the Cyber Alpha Terms of Service, Privacy Policy, and the Restricted Countries List.",
+    "t12": "You understand and accept the risks and compliance obligations associated with using this platform.",
+    "t13": "If you do not meet the above conditions, please discontinue use of this website and its related services immediately.",
+    "t14": "Agree",
+    "t15": "Cyber Alpha Terms of Service",
+    "t16": "Privacy Policy",
+    "t17": "and"
   }
 }

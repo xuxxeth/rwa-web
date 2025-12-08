@@ -2,7 +2,9 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
 import { useWssStore } from "@/stores/wssStore";
-import { memo, useEffect } from "react";
+import { lazy, memo, useEffect } from "react";
+const KycState = lazy(() => import("@/components/kyc-state"));
+const Compliance = lazy(() => import("@/components/compliance"));
 
 const Updater = memo(
   () => {
@@ -38,7 +40,12 @@ const Updater = memo(
       stableTokenWithPrice(data || [])
     })
 
-    return null
+    return (
+      <>
+        {/* <KycState /> */}
+        {/* <Compliance /> */}
+      </>
+    )
   }
 )
 

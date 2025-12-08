@@ -72,6 +72,30 @@ export const ErrorBox = ({ children, error }: { children?: React.ReactNode, erro
   )
 }
 
+export const calcYearDate = function() {
+  const now = new Date();
+
+  // 计算最小日期（65岁 —— 最早生日）
+  const minDate = new Date(
+    now.getFullYear() - 65,
+    now.getMonth(),
+    now.getDate()
+  ).getTime();
+
+  // 计算最大日期（18岁 —— 最晚生日）
+  const maxDate = new Date(
+    now.getFullYear() - 18,
+    now.getMonth(),
+    now.getDate()
+  ).getTime();
+
+  return {
+    minDate,
+    maxDate,
+    defaultDate: maxDate
+  }
+}
+
 interface FormData {
   // 基础信息
   firstName: string;
@@ -99,6 +123,11 @@ const BaseInfo = memo(
   () => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
+    const [dateOptions, setDateOptions] = useState({
+      minDate: 0,
+      maxDate: 0,
+      defaultDate: 0
+    })
     const genderList = [
       {value: '1', label: t('gender.male')},
       {value: '0', label: t('gender.female')},
@@ -194,7 +223,11 @@ const BaseInfo = memo(
       
     }
 
-    console.log(errors)
+    useEffect(() => {
+      const dateOptions = calcYearDate()
+      setDateOptions(dateOptions)
+      setValue('dob', format(dateOptions.maxDate, FormatStr))
+    }, [])
 
 
     return (
@@ -325,14 +358,16 @@ const BaseInfo = memo(
               <InputBox >
                 <div className="bg-[rgba(255,255,255,0.08)] rounded-[6px]">
                   <DatePicker
+                    captionLayout="dropdown"
+                    minDate={dateOptions.minDate}
+                    maxDate={dateOptions.maxDate}
                     activeColor="#FFFFFF"
                     className="h-[44px]"
                     placeholder={t('identity.selectDate')}
-                    userSelectedDate={949334400000} 
+                    userSelectedDate={dateOptions.defaultDate} 
                     onUserSelectedDateChanged={(value) => {
-                      console.log(value)
                       if (value) {
-                        setValue('dob', format(949334400000, FormatStr)) 
+                        setValue('dob', format(value, FormatStr)) 
                       }
                       
                     }} 

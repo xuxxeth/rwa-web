@@ -1,32 +1,42 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
-/**
- * 禁用 body 滚动且避免滚动条消失导致的闪动
- */
 export function useBodyScrollLock(open: boolean) {
+  const originalStyle = useRef({
+    overflow: "",
+    paddingRight: ""
+  });
+
+  const unlock = useCallback(() => {
+    const body = document.body;
+    body.style.overflow = originalStyle.current.overflow;
+    body.style.paddingRight = originalStyle.current.paddingRight;
+  }, []);
+
   useEffect(() => {
     const body = document.body;
 
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-    const originalStyle = {
+    // 保存原样式（只保存一次）
+    originalStyle.current = {
       overflow: body.style.overflow,
       paddingRight: body.style.paddingRight,
     };
 
+    const scrollBarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
     if (open) {
-      body.style.overflow = "hidden";
+      body.style.overflow = "hidden"; // 禁止滚动
       if (scrollBarWidth > 0) {
-        body.style.paddingRight = `${scrollBarWidth}px`;
+        body.style.paddingRight = `${scrollBarWidth}px`; // 防止闪动
       }
     } else {
-      body.style.overflow = originalStyle.overflow;
-      body.style.paddingRight = originalStyle.paddingRight;
+      unlock(); // 关闭时恢复
     }
 
-    // 组件卸载时恢复
     return () => {
-      body.style.overflow = originalStyle.overflow;
-      body.style.paddingRight = originalStyle.paddingRight;
+      unlock(); // 卸载也恢复
     };
-  }, [open]);
+  }, [open, unlock]);
+
+  return { unlock };
 }

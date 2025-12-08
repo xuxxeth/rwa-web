@@ -24,7 +24,7 @@ const Assets = lazy(() => import("../views/assets"));
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <Home />,
+    element: <Home2 />,
   },
   {
     path: "/home2",
