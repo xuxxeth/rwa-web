@@ -7,10 +7,19 @@ import { WarningInfo } from './components/WarningInfo'
 import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
-import VerifyStatus from './components/VerifyStatus'
 import { Risk3Info } from './components/Risk3Info'
 import { IDExpired } from './components/IDExpired'
 import { ExtraInfo } from './components/ExtraInfo'
+import { OCRVerifyFailed, VerifySucceeded, VerifyFailed } from './components/VerifyStatus'
+
+function InfoCollection() {
+  return (
+    <>
+      <WarningInfo />
+      <BaseInfo />
+    </>
+  )
+}
 
 function Identity() {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
@@ -35,26 +44,27 @@ function Identity() {
     riskLevel: 3,
     verifyType: 'basic-info',
     pendingMaterials: 'income-certificate',
-    status: 5
+    status: 5,
   }
 
   const {
     account,
     overallStatus,
     riskLevel,
+    status,
     userInfo,
     pendingMaterials,
     verifyType,
     rejectReason,
-    status
   } = MockKycDetail
+
   if (status === 5) {
     return (
       <MainContentWrapper>
         {/* <IDExpired /> */}
         {/* <Risk3Info /> */}
 
-        <ExtraInfo /> 
+        <ExtraInfo />
       </MainContentWrapper>
     )
   }
@@ -62,8 +72,7 @@ function Identity() {
   if (overallStatus === 0) {
     return (
       <MainContentWrapper>
-        <WarningInfo />
-        <BaseInfo />
+        <InfoCollection />
       </MainContentWrapper>
     )
   }
@@ -82,17 +91,6 @@ function Identity() {
           </MainContentWrapper>
         )
       }
-    }
-
-    // 2. ocr 阶段
-    if (verifyType === 'ocr') {
-      // ocr 认证失败了，应该还是展示信息采集组件
-      return (
-        <MainContentWrapper>
-          <WarningInfo />
-          <BaseInfo />
-        </MainContentWrapper>
-      )
     }
 
     // 3. 活体阶段
@@ -117,24 +115,28 @@ function Identity() {
   if (overallStatus === 2) {
     return (
       <MainContentWrapper>
-        <VerifyStatus overallStatus={overallStatus} />
+        <VerifySucceeded />
       </MainContentWrapper>
     )
   }
 
   // 3. 已拒绝
   if (overallStatus === 3) {
-    if (verifyType === 'liveness') {
+    if (verifyType === 'ocr' && status === 3) {
       return (
         <MainContentWrapper>
-          <FaceRecognition refresh={refresh} isFaceVerifyFailed={true} />
+          <OCRVerifyFailed retryComponent={<InfoCollection />} />
         </MainContentWrapper>
       )
     }
 
+    if (verifyType === 'liveness') {
+      
+    }
+
     return (
       <MainContentWrapper>
-        <VerifyStatus overallStatus={overallStatus} />
+        <VerifyFailed />
       </MainContentWrapper>
     )
   }

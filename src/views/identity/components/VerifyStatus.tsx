@@ -3,57 +3,157 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { isLess, parseAmount } from '@/utils'
 
-export default function VerifyStatus({ overallStatus }: { overallStatus: number }) {
+export type VerifyType = 'succeeded' | 'failed' | 'verifying'
+
+export function VerifySucceeded() {
+  const router = useRouter()
+  const isTokenQualified = useIsTokenQualified()
+
+  const extra =
+    isTokenQualified === undefined ? null : isTokenQualified ? <HotRwas /> : <TradePrepare />
+
+  return (
+    <VerifyStatus
+      type='succeeded'
+      title='ok'
+      detail='okTip'
+      btnText='m'
+      btnOnClick={() => router.push('/markets/quotes')}
+      extra={extra}
+    />
+  )
+}
+
+export function OCRVerifyFailed(props: { retryComponent: ReactNode }) {
+  return (
+    <VerifyStatus
+      type='failed'
+      title='f'
+      detail='r'
+      btnText='rv'
+      retryComponent={props.retryComponent}
+    />
+  )
+}
+
+export function VerifyFailed() {
+  return <VerifyStatus type='failed' title='f' detail='r' btnText='h' />
+}
+
+function VerifyStatus(props: {
+  type: VerifyType
+  title: string
+  detail: string
+  btnText: string
+  btnOnClick?: () => void
+  extra?: ReactNode
+  retryComponent?: ReactNode
+}) {
   const { t } = useTranslation()
+  const [isRetry, setIsRetry] = useState(false)
 
-  let content = null
-  if (overallStatus === 2) {
-    content = <VerifySucceeded />
+  if (isRetry && props.retryComponent) {
+    return props.retryComponent
   }
 
-  if (overallStatus === 3) {
-    content = <VerifyFailed />
-  }
+  return (
+    <VerifyStatusWrapper>
+      <LazyImage src={getIconFromType(props.type)} className='w-[120px] h-[90px] pt-5' />
+      <div>
+        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.${props.title}`)}</div>
+        <div className='text-base text-[#909090]'>{t(`${langPrefix}.${props.detail}`)}</div>
+      </div>
+      <Button
+        onClick={() => {
+          if (props.btnOnClick) {
+            props.btnOnClick()
+          } else if (props.retryComponent) {
+            setIsRetry(true)
+          }
+        }}
+        text={props.btnText}
+      />
+      {props.extra}
+    </VerifyStatusWrapper>
+  )
+}
 
+function VerifyStatusWrapper(props: { children: ReactNode }) {
+  const { t } = useTranslation()
   return (
     <div className='bg-[#0E0E0E] p-8'>
       <div className='text-lg font-medium pb-4 border-b border-white/10'>
         {t(`${langPrefix}.res`)}
       </div>
-      {content}
+      <div className='flex flex-col gap-5 items-center'>{props.children}</div>
     </div>
   )
 }
+
+function getIconFromType(type: VerifyType) {
+  switch (type) {
+    case 'succeeded':
+      return '/images/icons/identity/success.png'
+    case 'failed':
+      return '/images/icons/identity/fail.png'
+    case 'verifying':
+      return '/images/icons/identity/verifying.png'
+    default:
+      throw new Error(`type ${type} is not supported`)
+  }
+}
+
+// export default function VerifyStatus({ overallStatus }: { overallStatus: number }) {
+//   const { t } = useTranslation()
+
+//   let content = null
+//   if (overallStatus === 2) {
+//     content = <VerifySucceeded />
+//   }
+
+//   if (overallStatus === 3) {
+//     content = <VerifyFailed />
+//   }
+
+//   return (
+//     <div className='bg-[#0E0E0E] p-8'>
+//       <div className='text-lg font-medium pb-4 border-b border-white/10'>
+//         {t(`${langPrefix}.res`)}
+//       </div>
+//       {content}
+//     </div>
+//   )
+// }
 
 const langPrefix = 'identity.result'
 
-export function VerifySucceeded() {
-  const { t } = useTranslation()
-  const router = useRouter()
+// export function VerifySucceeded() {
+//   const { t } = useTranslation()
+//   const router = useRouter()
 
-  const isTokenQualified = useIsTokenQualified()
+//   const isTokenQualified = useIsTokenQualified()
 
-  return (
-    <div className='flex flex-col gap-5 items-center'>
-      <LazyImage src='/images/icons/identity/success.png' className='w-[120px] h-[90px] pt-5' />
-      <div>
-        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.ok`)}</div>
-        <div className='text-base text-[#909090]'>{t(`${langPrefix}.okTip`)}</div>
-      </div>
-      <Button onClick={() => router.push('/markets/quotes')} text='m' />
-      {isTokenQualified === undefined ? (
-        'checking is token qualified...'
-      ) : isTokenQualified ? (
-        <HotRwas />
-      ) : (
-        <TradePrepare />
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div className='flex flex-col gap-5 items-center'>
+//       <LazyImage src='/images/icons/identity/success.png' className='w-[120px] h-[90px] pt-5' />
+//       <div>
+//         <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.ok`)}</div>
+//         <div className='text-base text-[#909090]'>{t(`${langPrefix}.okTip`)}</div>
+//       </div>
+//       <Button onClick={() => router.push('/markets/quotes')} text='m' />
+//       {isTokenQualified === undefined ? (
+//         'checking is token qualified...'
+//       ) : isTokenQualified ? (
+//         <HotRwas />
+//       ) : (
+//         <TradePrepare />
+//       )}
+//     </div>
+//   )
+// }
 
 const MIN_USDT_AMOUNT = '10'
 const MIN_NATIVE_TOKEN_AMOUNT = '0.05'
@@ -70,6 +170,7 @@ function useIsTokenQualified() {
 
   useEffect(() => {
     if (!usdt || !account) return
+    setBalances(undefined)
     Promise.all([
       getBalance(account),
       getTokenBalances(account, [usdt.address as `0x${string}`]),
@@ -130,21 +231,6 @@ function HotRwas() {
   )
 }
 
-export function VerifyFailed() {
-  const { t } = useTranslation()
-  const router = useRouter()
-  return (
-    <div className='flex flex-col gap-5 items-center'>
-      <LazyImage src='/images/icons/identity/fail.png' className='w-[120px] h-[90px] pt-5' />
-      <div>
-        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.f`)}</div>
-        <div className='text-base text-[#909090]'>{t(`${langPrefix}.r`)}</div>
-      </div>
-      <Button onClick={() => router.push('/')} text='h' />
-    </div>
-  )
-}
-
 export function Verifying() {
   const { t } = useTranslation()
   const router = useRouter()
@@ -159,6 +245,7 @@ export function Verifying() {
     </div>
   )
 }
+
 function Button({ onClick, text }: { onClick: () => void; text: string }) {
   const { t } = useTranslation()
   return (
