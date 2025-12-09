@@ -39,30 +39,39 @@ export function Text(props: { text: string; className?: string }) {
 }
 
 export function useUploadedRes(
-  fileType: UploadFileType
+  fileType: UploadFileType,
+  key?: string
 ): [IUploadedRes | null, (res: IUploadedRes | null) => void] {
-  const [uploadedRes, setUploadedRes] = useState<IUploadedRes | null>(null)
-  const [isFirstFetched, setIsFirstFetched] = useState(false)
+  const [uploadedRes, setUploadedRes] = useState<IUploadedRes | null>(() => {
+    if (!key) return null
+    return {
+      success: true,
+      key,
+    }
+  })
+  // const [isFirstFetched, setIsFirstFetched] = useState(false)
 
   const onUploaded = (res: IUploadedRes | null) => {
     setUploadedRes(res)
   }
 
-  const uploadedKeys = useMemo(() => {
-    return uploadedRes?.key
-  }, [uploadedRes])
+  // 存储到 localstorage
+  // const uploadedKeys = useMemo(() => {
+  //   return uploadedRes?.key
+  // }, [uploadedRes])
+
+  // useEffect(() => {
+  //   if (!isFirstFetched) return
+  //   saveUploadKey(fileType, uploadedKeys)
+  // }, [uploadedKeys, isFirstFetched])
 
   useEffect(() => {
-    if (!isFirstFetched) return
-    saveUploadKey(fileType, uploadedKeys)
-  }, [uploadedKeys, isFirstFetched])
-
-  useEffect(() => {
-    getUploadedFileUrl(fileType).then(res => {
+    if (!key) return
+    getUploadedFileUrl(key).then(res => {
       if (res) {
         setUploadedRes({ success: true, ...res[0] })
       }
-      setIsFirstFetched(true)
+      // setIsFirstFetched(true)
     })
   }, [])
 
@@ -71,14 +80,18 @@ export function useUploadedRes(
 
 export function useUploadedArrRes(props: {
   fileType: UploadFileType
+  keys?: string[]
 }): [
   Array<IUploadedRes | null>,
   (idx: number, res: IUploadedRes | null) => void,
   () => void,
   (idx: number) => void,
 ] {
-  const [uploadedRes, setUploadedRes] = useState<Array<IUploadedRes | null>>([null])
-  const [isFetched, setIsFetched] = useState(false)
+  const [uploadedRes, setUploadedRes] = useState<Array<IUploadedRes | null>>(() => {
+    if (!props.keys || props.keys.length === 0) return [null]
+    return props.keys.map(key => ({ success: true, key }))
+  })
+  // const [isFetched, setIsFetched] = useState(false)
 
   const onUploaded = (idx: number, res: IUploadedRes | null) => {
     setUploadedRes(prev => {
@@ -88,25 +101,27 @@ export function useUploadedArrRes(props: {
     })
   }
 
-  const uploadedKeys = useMemo(() => {
-    return uploadedRes.filter(item => item?.key).map(item => item?.key) as string[]
-  }, [uploadedRes])
+  // 存储到 localstorage
+  // const uploadedKeys = useMemo(() => {
+  //   return uploadedRes.filter(item => item?.key).map(item => item?.key) as string[]
+  // }, [uploadedRes])
+
+  // useEffect(() => {
+  //   if (!isFetched) return
+  //   if (uploadedKeys.length > 0) {
+  //     saveUploadKey(props.fileType, uploadedKeys)
+  //   } else {
+  //     saveUploadKey(props.fileType, null)
+  //   }
+  // }, [uploadedKeys, isFetched])
 
   useEffect(() => {
-    if (!isFetched) return
-    if (uploadedKeys.length > 0) {
-      saveUploadKey(props.fileType, uploadedKeys)
-    } else {
-      saveUploadKey(props.fileType, null)
-    }
-  }, [uploadedKeys, isFetched])
-
-  useEffect(() => {
-    getUploadedFileUrl(props.fileType).then(res => {
+    if (!props.keys || props.keys.length === 0) return
+    getUploadedFileUrl(props.keys).then(res => {
       if (res) {
         setUploadedRes(res.map(item => ({ success: true, ...item })))
       }
-      setIsFetched(true)
+      // setIsFetched(true)
     })
   }, [])
 
@@ -200,32 +215,51 @@ export const saveUploadKey = (
   }
 }
 
-export async function getUploadedFileUrl(storageKey: UploadFileType) {
+// export async function getUploadedFileUrl(storageKey: UploadFileType) {
+//   try {
+//     const item = (storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}) as StorageData
+//     let s3Key = item[storageKey]
+//     if (s3Key) {
+//       s3Key = Array.isArray(s3Key) ? s3Key.join(',') : s3Key
+//       const accessUrl = await getFileAccessUrl(s3Key)
+//       if (accessUrl) {
+//         return accessUrl
+//       }
+//     }
+//     return null
+//   } catch (error) {
+//     console.error('Failed to get key from local storage', error)
+//     return null
+//   }
+// }
+
+export async function getUploadedFileUrl(keys: string | string[]) {
   try {
-    const item = (storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}) as StorageData
-    let s3Key = item[storageKey]
-    if (s3Key) {
-      s3Key = Array.isArray(s3Key) ? s3Key.join(',') : s3Key
-      const accessUrl = await getFileAccessUrl(s3Key)
-      if (accessUrl) {
-        return accessUrl
-      }
-    }
-    return null
+    keys = Array.isArray(keys) ? keys.join(',') : keys
+    const accessUrl = await getFileAccessUrl(keys)
+    if (!accessUrl) return []
+    return accessUrl
   } catch (error) {
-    console.error('Failed to get key from local storage', error)
-    return null
+    console.error('Failed to get key from keys', keys)
+    return []
   }
 }
 
-export function UploadCardAdd(props: { onClick: () => void }) {
+export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'view' }) {
   return (
-    <div
+    <button
+      disabled={props.mode === 'view'}
       onClick={props.onClick}
-      className='w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#5B5B5B] border-dashed'
+      className={cn(
+        'w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#5B5B5B] border-dashed',
+        props.mode === 'view' ? 'cursor-not-allowed disabled' : 'cursor-pointer'
+      )}
     >
-      <LazyImage src='/images/icons/identity/add.png' className='w-6 h-6 cursor-pointer' />
-    </div>
+      <LazyImage
+        src='/images/icons/identity/add.png'
+        className={cn('w-6 h-6 cursor-pointer', { 'cursor-not-allowed': props.mode === 'view' })}
+      />
+    </button>
   )
 }
 
@@ -233,8 +267,9 @@ export function UploadCard(props: {
   fileType: UploadFileType
   uploadedRes: IUploadedRes | null
   onUploaded: (res: IUploadedRes | null) => void
+  mode?: 'edit' | 'view'
 }) {
-  const { fileType, onUploaded, uploadedRes } = props
+  const { fileType, onUploaded, uploadedRes, mode } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -266,7 +301,7 @@ export function UploadCard(props: {
     noKeyboard: true,
     accept: AcceptedFiles,
     onDrop,
-    disabled: isUploading,
+    disabled: isUploading || mode === 'view',
   })
 
   return (
@@ -274,7 +309,8 @@ export function UploadCard(props: {
       <div
         {...getRootProps({
           className: cn(
-            'dropzone flex-1 border border-[#5B5B5B] border-dashed h-[262px] rounded-lg cursor-pointer bg-[#1A1A1A] hover:border-[rgba(26,133,255,1)] relative'
+            'dropzone flex-1 border border-[#5B5B5B] border-dashed h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] hover:border-[rgba(26,133,255,1)] relative',
+            mode === 'view' ? 'disabled cursor-not-allowed' : 'cursor-pointer'
           ),
         })}
         onMouseEnter={() => setIsHover(true)}
@@ -297,7 +333,7 @@ export function UploadCard(props: {
                 className='rounded-lg'
                 style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />
-              {isHover && (
+              {isHover && mode === 'edit' && (
                 <button className='absolute bg-[#0E0E0E] rounded-lg cursor-pointer left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-4'>
                   <Text text='reUpload' className='text-sm text-white' />
                 </button>
