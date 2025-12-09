@@ -8,6 +8,9 @@ import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
 import VerifyStatus from './components/VerifyStatus'
+import { Risk3Info } from './components/Risk3Info'
+import { IDExpired } from './components/IDExpired'
+import { ExtraInfo } from './components/ExtraInfo'
 
 function Identity() {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
@@ -28,10 +31,11 @@ function Identity() {
   // 这样简单的 Mock 一下
   const MockKycDetail: IKycDetail = {
     account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    overallStatus: 0,
+    overallStatus: 1,
     riskLevel: 3,
-    verifyType: 'liveness',
+    verifyType: 'basic-info',
     pendingMaterials: 'income-certificate',
+    status: 5
   }
 
   const {
@@ -42,8 +46,18 @@ function Identity() {
     pendingMaterials,
     verifyType,
     rejectReason,
+    status
   } = MockKycDetail
+  if (status === 5) {
+    return (
+      <MainContentWrapper>
+        {/* <IDExpired /> */}
+        {/* <Risk3Info /> */}
 
+        <ExtraInfo /> 
+      </MainContentWrapper>
+    )
+  }
   //  0 未认证, 显示信息采集组件
   if (overallStatus === 0) {
     return (
@@ -64,7 +78,7 @@ function Identity() {
         // 用户补充收入证明
         return (
           <MainContentWrapper>
-            <div>高风险用户，补充收入证明</div>
+            <Risk3Info />
           </MainContentWrapper>
         )
       }

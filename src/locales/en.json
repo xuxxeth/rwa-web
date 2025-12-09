@@ -447,7 +447,10 @@
     "t20": "为必填项",
     "t21": "Income Information",
     "t22": "Income Sources",
-    "t23": "Description"
+    "t23": "Description",
+    "t24": "Your passport/ID has expired. Please re-upload and complete verification.",
+    "t25": "Upload Additional Documents",
+    "t26": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted."
   },
   "employment": {
     "t1": "退休",

@@ -521,6 +521,11 @@ const BaseInfo = memo(
         </SectionBox>
         
         <SectionBox className="pb-5">
+          <div className=" flex items-center">
+            <SectionTitle>{t('identity.upload.uploadId')}</SectionTitle>
+            <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+          </div>
+          
           {/* 上传证件 */}
           <Upload type={type === 1 ? 'passport' : 'identity'} />
         </SectionBox>  

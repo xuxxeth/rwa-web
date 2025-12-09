@@ -55,10 +55,10 @@ function IdentityUpload() {
 
   return (
     <div>
-      <div className='flex items-center mb-5'>
+      {/* <div className='flex items-center mb-5'>
         <Text text='uploadId' className='text-[18px] font-normal text-white' />
         <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
-      </div>
+      </div> */}
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard fileType='idFront' onUploaded={onFrontUploaded} uploadedRes={frontRes} />
         <UploadCard fileType='idBack' onUploaded={onBackUploaded} uploadedRes={backRes} />
@@ -145,9 +145,8 @@ function ExtraInfoUpload() {
 
   return (
     <div>
-      <Text text='uploadIncome' />
-      <Text text='extraTips' className='text-sm mt-2' />
-      <div className='grid grid-cols-2 gap-x-6 gap-y-5 my-5'>
+      
+      <div className='grid grid-cols-2 gap-x-6 gap-y-5'>
         {uploadedRes.map((item, index) => {
           return (
             <div className='relative' key={uploadedRes.length + '' + index}>
