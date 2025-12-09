@@ -115,7 +115,12 @@ interface FormData {
   description: string; // 就业 时 必填
   // 收信息
   source: number;
-  approvedProtocols: string[]
+  approvedProtocols: string[],
+  idCardFront?: string,
+  idCardBack?: string,
+  idCard?: string,
+  passport?: string,
+  addressCertification?: string
 
 }
 
@@ -143,6 +148,13 @@ const BaseInfo = memo(
     const type = watch('type')
     const useCertificateAddress = watch('useCertificateAddress')
     const employment = watch('employment')
+    const idCardFront = watch('idCardFront')
+    const idCardBack = watch('idCardBack')
+    const idCard = watch('idCard')
+    const passport = watch('passport')
+    const addressCertification = watch('addressCertification')
+
+    console.log(passport)
 
     const [submiting, setSubmiting] = useState(false)
     
@@ -529,7 +541,20 @@ const BaseInfo = memo(
           </div>
           
           {/* 上传证件 */}
-          <Upload type={type === 1 ? 'passport' : 'identity'} onChanged={() => {}} />
+          <Upload 
+            type={type === 1 ? 'passport' : 'identity'} 
+            keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
+            onChanged={(keys) => {
+              if (type === 1) {
+                keys[0] && setValue('passport', keys[0])
+              } else {
+                keys[0] && setValue('idCardFront', keys[0])
+                keys[1] && setValue('idCardBack', keys[1])
+                keys[2] && setValue('idCard', keys[2])
+              }
+              
+            }} 
+          />
         </SectionBox>  
         <SectionBox className="pb-5">
           {/* 上传地址证明 */}

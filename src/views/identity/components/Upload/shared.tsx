@@ -73,7 +73,7 @@ export function useUploadedRes(
       }
       // setIsFirstFetched(true)
     })
-  }, [])
+  }, [key])
 
   return [uploadedRes, onUploaded]
 }

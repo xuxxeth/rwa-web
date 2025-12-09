@@ -88,6 +88,7 @@ function IdentityUpload({
   mode?: 'edit' | 'view'
   onChanged: (keys: string[]) => void
 }) {
+  console.log(keys)
   const [frontRes, onFrontUploaded] = useUploadedRes('idFront', keys?.[0])
   const [backRes, onBackUploaded] = useUploadedRes('idBack', keys?.[1])
 
@@ -107,7 +108,7 @@ function IdentityUpload({
 
   useUpdateEffect(() => {
     handleMergedIamge(frontRes, backRes).then(mergedKey => {
-      onChanged([frontRes?.key ?? '', backRes?.key ?? '', mergedKey ?? ''])
+      mergedKey && onChanged([frontRes?.key ?? '', backRes?.key ?? '', mergedKey ?? ''])
     })
   }, [frontRes?.key, backRes?.key])
 
@@ -213,9 +214,9 @@ function PassportUpload({
   onChanged: (keys: string) => void
 }) {
   const [passportRes, onPassportUploaded] = useUploadedRes('passport', keys)
-
+  
   useUpdateEffect(() => {
-    onChanged(passportRes?.key ?? '')
+    onChanged(passportRes?.url ?? '')
   }, [passportRes])
 
   return (
