@@ -2,52 +2,41 @@ import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
 import { QRCodeSVG } from 'qrcode.react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { type ILivenessUrlRes } from '@/service/kyc/types'
 import { kycApi } from '@/service/kyc/api'
 
 const faceLangPrefix = 'identity.face'
 
 export default function FaceRecognition({
-  refresh,
-  isFaceVerifyFailed,
+  refresh: refreshKycDetail,
 }: {
   refresh: () => Promise<void>
-  isFaceVerifyFailed: boolean
 }) {
-  const [isRetry, setIsRetry] = useState(false)
-
-  if (isFaceVerifyFailed && !isRetry) {
-    return <FaceRecognitionFailed onRetry={() => setIsRetry(true)} />
-  }
-
-  return <FaceRecognitionOperation refresh={refresh} />
-}
-
-function FaceRecognitionOperation({ refresh: refreshKycDetail }: { refresh: () => Promise<void> }) {
   const { t } = useTranslation()
-  const [urlInfo, setUrlInfo] = useState<ILivenessUrlRes | undefined>(undefined)
+  const [urlInfo, setUrlInfo] = useState<{ url: string; expireTime: number } | undefined>(undefined)
   const [isExpired, setIsExpired] = useState(false)
+  const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
 
   const refreshQrCode = async () => {
     const { data } = await kycApi.getLivenessUrl()
-    setUrlInfo(data)
-    setIsExpired(false)
+    setIsExpired(data.expireTime ? data.expireTime < Date.now() : false)
+
+    if (data.url && data.expireTime) {
+      setIsMaxTimesReached(false)
+      setUrlInfo({ url: data.url, expireTime: data.expireTime })
+    } else {
+      setIsMaxTimesReached(true)
+    }
   }
 
   useEffect(() => {
     refreshQrCode()
   }, [])
 
-  const MockUrlAndExpired = {
-    url: 'https://api.yljz.com/finauth/lite/do?token=795abfdc68778ca00493d36d49c1a14f',
-    expireTime: Date.now() + 6 * 1000,
-  }
-
   useEffect(() => {
-    if (isExpired || !urlInfo) return
+    if (isExpired || !urlInfo || !urlInfo.url || !urlInfo.expireTime) return
 
     const checkExpiration = () => {
-      if (urlInfo.expireTime < Date.now()) {
+      if (urlInfo.expireTime! < Date.now()) {
         setIsExpired(true)
       } else {
         setIsExpired(false)
@@ -55,6 +44,7 @@ function FaceRecognitionOperation({ refresh: refreshKycDetail }: { refresh: () =
     }
 
     checkExpiration()
+
     const interval = setInterval(() => {
       checkExpiration()
     }, 1000 * 2)
@@ -81,8 +71,12 @@ function FaceRecognitionOperation({ refresh: refreshKycDetail }: { refresh: () =
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
       <div className='m-4 self-center relative box-content w-[224px] h-[224px]'>
-        <QRCodeSVG value={MockUrlAndExpired.url} size={224} />
-        {isExpired ? (
+        {!isMaxTimesReached && urlInfo && urlInfo.url && (
+          <QRCodeSVG value={urlInfo.url} size={224} />
+        )}
+        {isMaxTimesReached ? (
+          <MaxTimesReached />
+        ) : isExpired ? (
           <QrCodeMask>
             <QrCodeExpirted refresh={refreshQrCode} />
           </QrCodeMask>
@@ -91,7 +85,7 @@ function FaceRecognitionOperation({ refresh: refreshKycDetail }: { refresh: () =
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
         <LazyImage src='/images/kyc/warning.png' className='w-5 h-5 mr-1' />
-        {t(`${faceLangPrefix}.tip`)}
+        {t(`${faceLangPrefix}.${isMaxTimesReached ? 'times' : 'tip'}`)}
       </div>
     </div>
   )
@@ -101,12 +95,12 @@ function FaceRecognitionOperation({ refresh: refreshKycDetail }: { refresh: () =
 function QrCodeExpirted({ refresh }: { refresh: () => Promise<void> }) {
   const { t } = useTranslation()
   return (
-    <button className='relative w-[62px] h-[62px] cursor-pointer bg-[#1D1D1D] rounded-lg flex flex-row items-center justify-center'>
+    <button
+      onClick={refresh}
+      className='relative w-[62px] h-[62px] cursor-pointer bg-[#1D1D1D] rounded-lg flex flex-row items-center justify-center'
+    >
       <LazyImage src='/images/icons/identity/refresh.png' className='w-[23px] h-7' />
-      <div
-        className='absolute left-0 w-full bottom-[-30px] text-[10px] text-white'
-        onClick={refresh}
-      >
+      <div className='absolute left-0 w-full bottom-[-30px] text-[10px] text-white'>
         <span className='text-base'>{t(`${faceLangPrefix}.fresh`)}</span>
       </div>
     </button>
@@ -143,6 +137,20 @@ function FaceRecognitionFailed({ onRetry }: { onRetry: () => void }) {
 function QrCodeInvalid() {
   const { t } = useTranslation()
   return <span className='text-white text-base'>{t(`${faceLangPrefix}.invalid`)} </span>
+}
+
+function MaxTimesReached() {
+  return (
+    <>
+      <QRCodeSVG
+        value={'You have reached today’s verification limit. Please try again tomorrow.'}
+        size={224}
+      />
+      <QrCodeMask>
+        <QrCodeInvalid />
+      </QrCodeMask>
+    </>
+  )
 }
 
 function QrCodeMask(props: { children: ReactNode }) {

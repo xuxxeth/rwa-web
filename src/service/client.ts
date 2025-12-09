@@ -1,4 +1,9 @@
-import { CODE_TO_HANDLER, CONNECT_ACCOUNT, REQUEST_TIMEOUT, type ErrorHandlers } from '@/config/constants'
+import {
+  CODE_TO_HANDLER,
+  CONNECT_ACCOUNT,
+  REQUEST_TIMEOUT,
+  type ErrorHandlers,
+} from '@/config/constants'
 import axios from 'axios'
 import { bscTestnet } from '@/hooks/useCaCommon'
 
@@ -8,7 +13,7 @@ import type {
   AxiosRequestConfig,
   AxiosInstance,
   AxiosRequestHeaders,
-  AxiosError
+  AxiosError,
 } from 'axios'
 import storage from '@/utils/storage'
 
@@ -38,17 +43,14 @@ const abortControllerMap: Map<string, AbortController> = new Map()
 
 const axiosInstance: AxiosInstance = axios.create({
   timeout: REQUEST_TIMEOUT,
-  baseURL: PATH_URL
+  baseURL: PATH_URL,
 })
 
 axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   const url = req.url || ''
   req.signal = controller.signal
-  abortControllerMap.set(
-    url,
-    controller
-  )
+  abortControllerMap.set(url, controller)
   const needAuth = url.includes('/scan/') || url.includes('/kyc/') // ✅ 判断 URL 是否需要授权
   const account = storage.getItem(CONNECT_ACCOUNT)
   const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
@@ -59,17 +61,21 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))
   }
 
-  if (localSignature && localSignature.account && account.toLowerCase() === localSignature.account.toLowerCase()) {
+  if (
+    localSignature &&
+    localSignature.account &&
+    account.toLowerCase() === localSignature.account.toLowerCase()
+  ) {
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
     req.headers.set('Authorization', auth)
   }
   const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
   const lng = storage.getItem('CA_LANGUAGE') || 'en'
-  
+
   req.headers.set('D11-Chain-Id', chainId)
   req.headers.set('CA-Chain-Id', chainId)
   req.headers.set('Accept-Language', lng)
-  
+
   return req
 })
 
@@ -90,7 +96,7 @@ axiosInstance.interceptors.response.use(
       const apiResponse = error.response.data as ApiResponse<any>
       const apiResponseCode = apiResponse.code
       const handler = config.errorHandlers?.[CODE_TO_HANDLER[apiResponseCode]]
-      if( handler) {
+      if (handler) {
         handler()
       }
       return Promise.resolve(error.response)
@@ -108,7 +114,7 @@ const client = {
       }
       axiosInstance
         .request(config)
-        .then((res) => resolve(res.data))
+        .then(res => resolve(res.data))
         .catch((err: any) => reject(err))
     })
   },
@@ -125,14 +131,14 @@ const client = {
     }
     abortControllerMap.clear()
   },
-   // ✅ 单独方法封装
+  // ✅ 单独方法封装
   get: async <T = any>(url: string, params?: any, config?: RequestConfig) => {
     try {
       return await client.request<T>({
         url,
         method: 'GET',
         params,
-        ...config
+        ...config,
       })
     } catch (error) {
       // if (params.noError) {
@@ -148,7 +154,7 @@ const client = {
         url,
         method: 'POST',
         data,
-        ...config
+        ...config,
       })
     } catch (error) {
       console.log(error)
@@ -162,13 +168,13 @@ const client = {
         url,
         method: 'PUT',
         data,
-        ...config
+        ...config,
       })
     } catch (error) {
       console.log(error)
       return null
     }
-  }
+  },
 }
 
 export default client

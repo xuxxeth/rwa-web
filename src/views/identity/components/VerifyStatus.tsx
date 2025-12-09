@@ -31,8 +31,20 @@ export function OCRVerifyFailed(props: { retryComponent: ReactNode }) {
   return (
     <VerifyStatus
       type='failed'
-      title='f'
+      title='vf'
       detail='r'
+      btnText='rv'
+      retryComponent={props.retryComponent}
+    />
+  )
+}
+
+export function FaceRecognitionFailed(props: { retryComponent: ReactNode }) {
+  return (
+    <VerifyStatus
+      type='failed'
+      title='vf'
+      detail='fTip'
       btnText='rv'
       retryComponent={props.retryComponent}
     />
@@ -232,17 +244,16 @@ function HotRwas() {
 }
 
 export function Verifying() {
-  const { t } = useTranslation()
   const router = useRouter()
+
   return (
-    <div className='flex flex-col gap-5 items-center'>
-      <LazyImage src='/images/icons/identity/verifying.png' className='w-[120px] h-[90px] pt-5' />
-      <div>
-        <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.verifying`)}</div>
-        <div className='text-base text-[#909090]'>{t(`${langPrefix}.verifyingTip`)}</div>
-      </div>
-      <Button onClick={() => router.push('/')} text='h' />
-    </div>
+    <VerifyStatus
+      type='verifying'
+      title='verifying'
+      detail='verifyingTip'
+      btnText='m'
+      btnOnClick={() => router.push('/markets/quotes')}
+    />
   )
 }
 

@@ -10,7 +10,13 @@ import FaceRecognition from './components/FaceRecognition'
 import { Risk3Info } from './components/Risk3Info'
 import { IDExpired } from './components/IDExpired'
 import { ExtraInfo } from './components/ExtraInfo'
-import { OCRVerifyFailed, VerifySucceeded, VerifyFailed } from './components/VerifyStatus'
+import {
+  OCRVerifyFailed,
+  FaceRecognitionFailed,
+  VerifySucceeded,
+  VerifyFailed,
+  Verifying,
+} from './components/VerifyStatus'
 
 function InfoCollection() {
   return (
@@ -38,14 +44,14 @@ function Identity() {
   }
 
   // 这样简单的 Mock 一下
-  const MockKycDetail: IKycDetail = {
-    account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    overallStatus: 0,
-    riskLevel: 3,
-    verifyType: 'basic-info',
-    pendingMaterials: 'income-certificate',
-    status: 5,
-  }
+  // const MockKycDetail: IKycDetail = {
+  //   account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+  //   overallStatus: 1,
+  //   riskLevel: 3,
+  //   verifyType: 'aml',
+  //   pendingMaterials: 'income-certificate',
+  //   status: 4,
+  // }
 
   const {
     account,
@@ -56,7 +62,7 @@ function Identity() {
     pendingMaterials,
     verifyType,
     rejectReason,
-  } = MockKycDetail
+  } = kycDetail
 
   // if (status === 5) {
   //   return (
@@ -94,20 +100,70 @@ function Identity() {
       }
     }
 
+    // 2. OCR 阶段
+    if (verifyType === 'OCR') {
+      // 1 认证中
+      if (status === 1) {
+        return (
+          <MainContentWrapper>
+            <Verifying />
+          </MainContentWrapper>
+        )
+      }
+
+      // ocr 认证失败, 6 已拒绝, 3 已失败
+      if (status === 6 || status === 3) {
+        return (
+          <MainContentWrapper>
+            <OCRVerifyFailed retryComponent={<InfoCollection />} />
+          </MainContentWrapper>
+        )
+      }
+    }
+
     // 3. 活体阶段
     if (verifyType === 'liveness') {
-      return (
-        <MainContentWrapper>
-          <FaceRecognition refresh={refresh} isFaceVerifyFailed={false} />
-        </MainContentWrapper>
-      )
+      // 活体认证 1. 认证中
+      if (status === 1) {
+        return (
+          <MainContentWrapper>
+            <FaceRecognition refresh={refresh} />
+          </MainContentWrapper>
+        )
+      }
+      // 活体认证  6 已拒绝, 3 已失败
+      if (status === 6 || status === 3) {
+        return (
+          <MainContentWrapper>
+            <FaceRecognitionFailed retryComponent={<FaceRecognition refresh={refresh} />} />
+          </MainContentWrapper>
+        )
+      }
     }
 
     // 4. aml 阶段
     if (verifyType === 'aml') {
+      // 4. 人工审核中，即使待审核的意思，等待审核员审核
+      if (status === 4) {
+        return (
+          <MainContentWrapper>
+            <Verifying />
+          </MainContentWrapper>
+        )
+      }
+
+      // 7. 已经驳回
+      if (status === 7) {
+        // 显示 AML 人审补充信息
+        return (
+          <MainContentWrapper>
+            <div>aml 人审核补充信息</div>
+          </MainContentWrapper>
+        )
+      }
     }
 
-    // 5. kyt 阶段
+    // 5. kyt 阶段，在电脑
     if (verifyType === 'kyt') {
     }
   }
@@ -123,17 +179,6 @@ function Identity() {
 
   // 3. 已拒绝
   if (overallStatus === 3) {
-    if (verifyType === 'ocr' && status === 3) {
-      return (
-        <MainContentWrapper>
-          <OCRVerifyFailed retryComponent={<InfoCollection />} />
-        </MainContentWrapper>
-      )
-    }
-
-    if (verifyType === 'liveness') {
-    }
-
     return (
       <MainContentWrapper>
         <VerifyFailed />

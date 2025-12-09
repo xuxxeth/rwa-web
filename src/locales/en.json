@@ -269,7 +269,7 @@
       "tip": "For a smooth process, ensure good lighting and keep your face clearly visible.",
       "btn": "View Verification Result",
       "fresh": "Refresh",
-      "invalid": "QR code expired",
+      "invalid": "QR code Invalid",
       "times": "You have reached today’s verification limit. Please try again tomorrow.",
       "f": "Verification Failed",
       "ft": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
@@ -281,6 +281,8 @@
       "okTip": "Your account has successfully passed identity verification, and you can now start using trading features.",
       "m": "Explore Markets",
       "f": "Your identity verification was not approved.",
+      "vf": "Verification Failed",
+      "fTip": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
       "r": "The information you submitted did not pass our review, and you cannot access the platform services for now.",
       "h": "Return to Home",
       "verifying": "Your documents are under review.",
@@ -288,7 +290,8 @@
       "pre1": "How to prepare before trading",
       "pre2": "How to make your first trade",
       "hot": "Popular Assets",
-      "rv": "Retry Verification"
+      "rs": "Retry Submit",
+      "rv": "Retry Verify"
     },
     "firstName": "First Name",
     "lastName": "Last Name",

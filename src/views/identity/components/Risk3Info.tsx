@@ -132,7 +132,7 @@ const Risk3Info = memo(
             <Text text='uploadIncome' className=' text-white' />
             <Text text='extraTips' className='text-sm mt-2' />
           </div>
-          <Upload type="extra" />
+          <Upload type="extra" onChanged={() => {}} />
           
         </SectionBox>
         <div className="flex justify-center mt-8">

@@ -527,11 +527,11 @@ const BaseInfo = memo(
           </div>
           
           {/* 上传证件 */}
-          <Upload type={type === 1 ? 'passport' : 'identity'} />
+          <Upload type={type === 1 ? 'passport' : 'identity'} onChanged={() => {}} />
         </SectionBox>  
         <SectionBox className="pb-5">
           {/* 上传地址证明 */}
-          <Upload type="address" />
+          <Upload type="address" onChanged={() => {}} />
         </SectionBox> 
         <SectionBox>
           <SectionTitle>{t('kyc.t16')}</SectionTitle>
@@ -607,7 +607,7 @@ const BaseInfo = memo(
         <SectionBox>
           <SectionTitle>{t('kyc.t19')}</SectionTitle>
           <div className="h-5"></div>
-          <Upload type="extra" />
+          <Upload type="extra" onChanged={() => {}} />
           <div className="flex items-center text-base text-[#909090]">
             <span className="text-[#CA3F64] mr-1 flex items-center">*</span>
             {t('kyc.t20')}
