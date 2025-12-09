@@ -32,12 +32,12 @@ export function Upload({
   type,
   keys,
   mode = 'edit',
-  onChanged,
+  onChanged = (keys: string | string[]) => ({}),
 }: {
   type: 'identity' | 'passport' | 'address' | 'extra'
   keys?: string[] | string
   mode?: 'edit' | 'view'
-  onChanged: (keys: string | string[]) => void
+  onChanged?: (keys: string | string[]) => void
 }) {
   // identity keys 是数组，0 是正面，1 是反面
   if (type === 'identity') {

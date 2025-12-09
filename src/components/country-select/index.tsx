@@ -20,6 +20,7 @@ export type CountrySelectProps = {
   value?: string;
   onChange?: (code: ISupportedCountry) => void;
   className?: string
+  placeHolder?: string
 }
 
 const CountrySelect = memo(
@@ -27,7 +28,8 @@ const CountrySelect = memo(
     defaultValue,
     value, 
     onChange, 
-    className
+    className,
+    placeHolder
   }: CountrySelectProps) => {
     const [countryList, setCountryList] = useState<ISupportedCountry[]>([])
     const [currentCode, setCurrentCode] = useState('')
@@ -97,7 +99,7 @@ const CountrySelect = memo(
                 <span className=" font-normal md:text-[16px]">{currentCountry.value}</span>
               </>
             ) : (
-              <span className="md:text-[1.04vw] text-5">Select Country</span>
+              <span className="md:text-[1.04vw] text-5">{placeHolder || 'Please select'} </span>
             )}
           </div>
         </SelectTrigger>

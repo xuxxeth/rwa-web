@@ -62,7 +62,7 @@ export function useRiskStatus() {
     if (!riskUserConfig) return RISK_STATUS.DEFAULT
     if (riskUserConfig.actions === -1) return RISK_STATUS.NOTSIGN
     if (riskUserConfig.actions === 1 || riskUserConfig.actions === 2 || riskUserConfig.actions === 3) return RISK_STATUS.VERIFIED
-    if (riskUserConfig.blacklist) return RISK_STATUS.ISSUE
+    if (riskUserConfig.blacklist) return RISK_STATUS.VERIFYING
     return RISK_STATUS.NOTVERIFIED
   }, [riskUserConfig])
   

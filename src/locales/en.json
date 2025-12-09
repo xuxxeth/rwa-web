@@ -228,6 +228,7 @@
   "Unauthorized": "Unauthorized Access",
   "No records found": "No Records Found",
   "identity": {
+    "verifyTip": "Please complete identity verification to start trading.",
     "verifyID": "Verify Identity",
     "verify": "Verifying",
     "Identity_verification": "Identity verification",
@@ -454,7 +455,9 @@
     "t23": "Description",
     "t24": "Your passport/ID has expired. Please re-upload and complete verification.",
     "t25": "Upload Additional Documents",
-    "t26": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted."
+    "t26": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted.",
+    "t27": "认证失败",
+    "t28": "Please select"
   },
   "employment": {
     "t1": "退休",

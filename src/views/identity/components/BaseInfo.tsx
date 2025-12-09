@@ -431,6 +431,7 @@ const BaseInfo = memo(
               {/* 证件签发国 */}
               <InputBox >
                 <CountrySelect 
+                  placeHolder={t('kyc.t28')}
                   onChange={data => {
                     setValue('issueCountry', data.key)
                   }}
@@ -475,7 +476,8 @@ const BaseInfo = memo(
             <FormItemBox>
               <FormItemLabel title={t('kyc.t14')} />
               <div className="mt-3 flex gap-x-2 items-center mb-3">
-                <CheckBox 
+                <CheckBox
+                  checked={useCertificateAddress}
                   onChange={v => {
                     setValue('useCertificateAddress', v)
                   }}
@@ -607,8 +609,8 @@ const BaseInfo = memo(
         <SectionBox>
           <SectionTitle>{t('kyc.t19')}</SectionTitle>
           <div className="h-5"></div>
-          <Upload type="extra" onChanged={() => {}} />
-          <div className="flex items-center text-base text-[#909090]">
+          <Upload type="extra" />
+          <div className="flex items-center text-base text-[#909090] py-3">
             <span className="text-[#CA3F64] mr-1 flex items-center">*</span>
             {t('kyc.t20')}
           </div>

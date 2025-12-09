@@ -21,7 +21,7 @@ function AccountDetail(props: { estimatedBalance: string; chainId: number }) {
         <div className='flex-1'>
           <div className='text-base/6 text-60 font-normal mb-2'>{t('assets.walletAddress')}</div>
           <div className='flex flex-row gap-2'>
-            <span className='text-xl/7.5 font-medium font-bold text-white'>
+            <span className='text-xl/7.5 font-bold text-white'>
               {shortenAddress(account)}
             </span>
             <CopyButton copyText={account} />

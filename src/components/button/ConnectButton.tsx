@@ -188,6 +188,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (action === 'assets') {
       router.push('/assets')
     }
+    if (action === 'identity') {
+      router.push('/identity')
+    }
   }
 
   return (
@@ -252,7 +255,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
                 </div>
                 <div className='flex items-center py-3 cursor-pointer'
-                  onClick={() => goTo('assets')}
+                  onClick={() => goTo('identity')}
                 >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('ID Verification')}</span>

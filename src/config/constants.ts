@@ -34,9 +34,11 @@ export const MARKET_STATUS = {
 export const RISK_STATUS = {
   DEFAULT: -1,
   NOTVERIFIED: 0,
-  ISSUE: 1,
+  VERIFYING: 1,
   VERIFIED: 2,
-  NOTSIGN: 3
+  REJECTED: 3,
+  REVIEW: 4,
+  NOTSIGN: 5
 }
 
 export type Address = `0x${string}`

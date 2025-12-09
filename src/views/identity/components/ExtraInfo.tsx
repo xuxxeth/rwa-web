@@ -12,7 +12,7 @@ import { RESPONSE_CODE } from "@/config/constants"
 import { ErrorBox, InputBox, SectionBox, SectionTitle } from "./BaseInfo"
 import { LazyImage } from "@/components/image/LazyImage"
 import { KycInput } from "@/components/input/KycInput"
-import { KycTextarea } from "@/components/input/KycTextArea"
+import { KycTextarea } from "@/components/input/KycTextarea"
 import { useFieldArray } from "react-hook-form"
 
 export type IExtraInfoItem = {
@@ -49,7 +49,7 @@ const ExtraInfo = memo(
   () => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
-    const { register, handleSubmit, watch, control, setValue, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+    const { register, handleSubmit, watch, control, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       extraList: [
         { name: "", description: "", files: [] }
       ]
@@ -59,30 +59,11 @@ const ExtraInfo = memo(
       control,
       name: "extraList"
     });
-    const type = watch('type')
-    const [extraList, setExtraList] = useState<IExtraInfoItem[]>([{name: '', files: [], description: ''}])
-
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
       // 1. 判断有没有上传证件照
       const kycFiles = storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}   
-      if (type === 0) { // 身份证，正反面都要传
-        if (!kycFiles.idFront) {
-          toastError({title: '请上傳人像頁'})
-          return
-        }
-        if (!kycFiles.idBack) {
-          toastError({title: '请上傳國徽面'})
-          return
-        }
-      }
-      if (type === 1) { // 只判断护照
-        if (!kycFiles.passport) {
-          toastError({title: '请上傳护照'})
-          return
-        }
-      }
 
       const params: IKycSubmitData = {
         basicInfo: {

@@ -12,9 +12,13 @@ export function useRouter() {
   const replace = (path: string) => {
     navigate(path, { replace: true })
   }
+  const back = () => {
+    navigate(-1)
+  }
   return {
     push,
     replace,
+    back,
     location
   }
 }

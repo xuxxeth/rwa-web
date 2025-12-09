@@ -10,6 +10,7 @@ import FaceRecognition from './components/FaceRecognition'
 import { Risk3Info } from './components/Risk3Info'
 import { IDExpired } from './components/IDExpired'
 import { ExtraInfo } from './components/ExtraInfo'
+import { ReviewInfo } from './components/ReviewInfo'
 import {
   OCRVerifyFailed,
   FaceRecognitionFailed,
@@ -28,11 +29,12 @@ function InfoCollection() {
 }
 
 function Identity() {
+
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
 
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
-    setKycDetail(res.data)
+    setKycDetail(res.data || { overallStatus: 0, verifyType: 'basic-info', status: 0 })
   }
 
   useEffect(() => {
@@ -64,16 +66,17 @@ function Identity() {
     rejectReason,
   } = kycDetail
 
-  // if (status === 5) {
-  //   return (
-  //     <MainContentWrapper>
-  //       {/* <IDExpired /> */}
-  //       {/* <Risk3Info /> */}
+  if (status === 5) {
+    return (
+      <MainContentWrapper>
+        {/* <IDExpired /> */}
+        {/* <Risk3Info /> */}
 
-  //       <ExtraInfo />
-  //     </MainContentWrapper>
-  //   )
-  // }
+        <ExtraInfo />
+      </MainContentWrapper>
+    )
+  }
+
 
   //  0 未认证, 显示信息采集组件
   if (overallStatus === 0) {

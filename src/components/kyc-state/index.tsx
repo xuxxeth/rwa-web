@@ -5,21 +5,26 @@ import { X } from "lucide-react"; // 关闭按钮图标（可换）
 import { Button } from "../ui/button";
 import { kycApi } from "@/service/kyc/api";
 import { LazyImage } from "../image/LazyImage";
+import type { IKycStatus } from "@/service/kyc/types";
+import { useFetchKycStatus } from "@/hooks/useKycStatus";
 
 const KycState = () => {
   const [show, setShow] = useState(false);
 
+  useFetchKycStatus()
+  
+  const [statusDetail, setStatusDetail] = useState<IKycStatus | null>()
   // 3 秒后显示
   useEffect(() => {
-    kycApi.getKycDetail()
+    kycApi.getKycStatus()
       .then(res => {
-        console.log(res)
+        setStatusDetail(res.data)
       })
-    const showTimer = setTimeout(() => {
-      setShow(true);
-    }, 3000);
+    // const showTimer = setTimeout(() => {
+    //   setShow(true);
+    // }, 3000);
 
-    return () => clearTimeout(showTimer);
+    // return () => clearTimeout(showTimer);
   }, []);
 
   // 显示后 10 秒自动隐藏

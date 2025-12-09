@@ -3,13 +3,15 @@ import { BoxCard } from "../BoxCard";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/hooks/useRouter";
+import { RISK_STATUS } from "@/config/constants";
 
 type MarketTradingProps = {
   align?: string
+  riskStatus?: number
 }
 
 const VerifyIdentity = memo(
-  ({  align = 'center' }: MarketTradingProps) => {
+  ({  align = 'center', riskStatus }: MarketTradingProps) => {
     const { t } = useTranslation()
     const router = useRouter()
     return (
@@ -18,14 +20,14 @@ const VerifyIdentity = memo(
         align === 'left' ? 'justify-start' : 'justify-center'
       )}>
         <div className="flex items-center gap-x-2">
-          <div className=" font-medium text-[14px]">{'Please complete identity verification to start trading.'}</div>
+          <div className=" font-medium text-[14px]">{t('identity.verifyTip')}</div>
         </div>
         <button className="cursor-pointer px-4 py-2 text-sm/4 font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)] ml-4"
           onClick={() => {
-            router.push('/assets')
+            router.push('/identity')
           }}
           >
-            {t("identity.verifyID")}
+            { riskStatus === RISK_STATUS.NOTVERIFIED ? t("identity.verifyID") : t("kyc.t27")}
         </button>
       </BoxCard>
     )

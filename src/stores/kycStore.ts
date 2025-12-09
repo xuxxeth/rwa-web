@@ -12,15 +12,15 @@ interface KycActions {
     fetchKycStatus: () => Promise<void>
 }
 
-export const kycStore = create<KycActions & KycState>(set => ({
-    kycStatus: null,
+export const useKycStore = create<KycActions & KycState>(set => ({
+    kycStatus: {status: -1, expiresTime: 0},
     isLoading: false,
     error: null,
     fetchKycStatus: async () => {
         set({ isLoading: true, error: null })
         try {
             const { data } = await kycApi.getKycStatus()
-            set({ kycStatus: data, isLoading: false })
+            set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
         } catch (error: any) {
             set({ error: error.message, isLoading: false })
         }

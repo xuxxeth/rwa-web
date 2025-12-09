@@ -1,4 +1,5 @@
 import { LazyImage } from "@/components/image/LazyImage"
+import { useRouter } from "@/hooks/useRouter"
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
 import { divide } from "@/utils"
@@ -27,7 +28,7 @@ const TipLine = memo(
 const IdentityLayout = memo(
   ({ children }: IdentityLayoutProps) => {
     const { t } = useTranslation()
-
+    const router = useRouter()
     return (
       <div className="flex justify-center">
         <div className=" bg-[rgba(7,8,13,1)] min-h-[600px] text-white  w-[928px]">
@@ -40,7 +41,11 @@ const IdentityLayout = memo(
             <TipLine />
           </div> */}
           <div className="relative pt-5">
-            <div className=" absolute -left-[120px] top-0 flex items-center">
+            <div className=" absolute -left-[120px] top-0 flex items-center cursor-pointer"
+              onClick={() => {
+                router.back()
+              }}
+            >
               <LazyImage src="/images/icons/identity/back.png" className="w-6 h-6 mr-1" />
               {t('Back')}
             </div>

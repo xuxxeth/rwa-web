@@ -5,8 +5,8 @@ export interface ISupportedCountry {
 
 // 0 未认证, 1 认证中, 2 已通过, 3 已拒绝, 4 人工审核中
 export type KYC_OVERALL_STATUS = 0 | 1 | 2 | 3 | 4
-// 0 未认证, 1 认证中, 2 已通过, 3 已失败, 4 人工审核中, 5 已过期, 6-已拒绝, 7 - 已驳回
-export type KYC_STATUS = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+// -1 未签名 0 未认证, 1 认证中, 2 已通过, 3 已失败, 4 人工审核中, 5 已过期, 6-已拒绝, 7 - 已驳回
+export type KYC_STATUS = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 export type KYC_GENDER = 0 | 1 // 0 女, 1 男
 export type KYC_ID_TYPE = 0 | 1 // 0 身份证 1 护照
 export type KYC_RISK_LEVEL = 1 | 2 | 3 // 1 低风险 2 中风险 3 高风险
