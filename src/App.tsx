@@ -31,6 +31,7 @@ export function RoutesWrapper() {
 }
 
 const HOME_MENUS_PATH = ['/']
+const NO_MENUS_PATH = ['/liveness-complete']
 
 function App() {
   const { t, i18n } = useTranslation()
@@ -38,6 +39,7 @@ function App() {
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
+  const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -74,7 +76,7 @@ function App() {
     <>
       <ScrollToTop />
       {
-        isHomeMenus ? <HomeMenus /> : <Menus />
+        !isNoMenus && (isHomeMenus ? <HomeMenus /> : <Menus />)
       }
       <RoutesWrapper />
       <Toaster position='top-center' />

@@ -20,7 +20,6 @@ import {
 } from './components/VerifyStatus'
 
 function Identity() {
-
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
 
   const refresh = async () => {
@@ -69,7 +68,6 @@ function Identity() {
     )
   }
 
-
   //  0 未认证, 显示信息采集组件
   if (overallStatus === 0) {
     return (
@@ -83,7 +81,7 @@ function Identity() {
   if (overallStatus === 1) {
     // 接下来判断处于认证的哪个阶段,
     // 1. basic-info 阶段
-    if (verifyType === 'basic-info') {
+    if (verifyType === 'BASIC-INFO') {
       // 高风险，并且用户没有上传收入证明
       if (riskLevel === 3 && pendingMaterials === 'income-certificate') {
         // 用户补充收入证明
@@ -110,14 +108,16 @@ function Identity() {
       if (status === 6 || status === 3) {
         return (
           <MainContentWrapper>
-            <OCRVerifyFailed retryComponent={<BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />} />
+            <OCRVerifyFailed
+              retryComponent={<BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />}
+            />
           </MainContentWrapper>
         )
       }
     }
 
     // 3. 活体阶段
-    if (verifyType === 'liveness') {
+    if (verifyType === 'LIVENESS') {
       // 活体认证 1. 认证中
       if (status === 1) {
         return (
@@ -137,7 +137,7 @@ function Identity() {
     }
 
     // 4. aml 阶段
-    if (verifyType === 'aml') {
+    if (verifyType === 'AML') {
       // 4. 人工审核中，即使待审核的意思，等待审核员审核
       if (status === 4) {
         return (
@@ -158,8 +158,8 @@ function Identity() {
       }
     }
 
-    // 5. kyt 阶段，在电脑
-    if (verifyType === 'kyt') {
+    // 5. kyt 阶段，在电脑端
+    if (verifyType === 'KYT') {
     }
   }
 

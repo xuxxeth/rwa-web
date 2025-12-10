@@ -11,7 +11,7 @@ export type KYC_GENDER = 0 | 1 // 0 女, 1 男
 export type KYC_ID_TYPE = 0 | 1 // 0 身份证 1 护照
 export type KYC_RISK_LEVEL = 1 | 2 | 3 // 1 低风险 2 中风险 3 高风险
 
-export type KYC_VERIFY_TYPE = 'basic-info' | 'OCR' | 'liveness' | 'aml' | 'kyt'
+export type KYC_VERIFY_TYPE = 'BASIC-INFO' | 'OCR' | 'LIVENESS' | 'AML' | 'KYT'
 
 export type KYC_PENDING_MATERIALS = 'income-certificate' | 'address-certificate' | 'extra-documents'
 

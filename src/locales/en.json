@@ -275,7 +275,9 @@
       "times": "You have reached today’s verification limit. Please try again tomorrow.",
       "f": "Verification Failed",
       "ft": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
-      "rv": "Retry Verification"
+      "rv": "Retry Verification",
+      "complete": "Facial Verification Completed",
+      "toWeb": "Please view the authentication results on the web browser."
     },
     "result": {
       "res": "Verification Result",
