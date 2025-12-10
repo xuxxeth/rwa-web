@@ -19,7 +19,6 @@ createRoot(document.getElementById('root')!).render(
     }}
   >
     <QueryClientProvider client={queryClient}>
-      
       <StrictMode>
         <ErrorBoundary fallback={<ErrorChildren />}>
           <Suspense fallback={<SuspenseLoading />}>

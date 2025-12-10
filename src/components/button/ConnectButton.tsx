@@ -11,11 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
 import { cn } from '@/lib/utils'
-import {
-  ConnectorType,
-  useQrCodeData,
-  type WalletConfig,
-} from '@/hooks/useCaCommon'
+import { ConnectorType, useQrCodeData, type WalletConfig } from '@/hooks/useCaCommon'
 import { useToast } from '@/hooks/useToast'
 import { DialogController } from '@/components/dialog/DialogController'
 import { LazyImage } from '../image/LazyImage'
@@ -116,7 +112,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       if (!connectInit.current) {
         connectInit.current = true
         toastSuccess({
-          title: t('connectSuccess')
+          title: t('connectSuccess'),
         })
         setTimeout(() => {
           connectInit.current = true
@@ -124,7 +120,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         }, 1000)
       }
       storage.setItem(CONNECT_ACCOUNT, account)
-
     }
   }, [wallets, chainId, account, handleConnect])
 
@@ -212,7 +207,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           <HoverCardTrigger asChild>
             <div
               className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'
-              onClick={() => { }}
+              onClick={() => {}}
             >
               {currentWallet?.info?.icon && (
                 <img src={currentWallet?.info?.icon} className='w-6 mr-2' alt='' />
@@ -254,7 +249,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
                 </div>
-                <div className='flex items-center py-3 cursor-pointer'
+                <div
+                  className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('identity')}
                 >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
@@ -266,7 +262,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
                   await handleDisConnect()
-
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />

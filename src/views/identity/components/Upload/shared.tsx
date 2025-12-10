@@ -5,13 +5,18 @@ import type { FilePutMimeType } from '@/service/kyc/types'
 import storage from '@/utils/storage'
 import { useTranslation } from '@/hooks/useTranslation'
 import { cn } from '@/utils'
-import { useDropzone } from 'react-dropzone'
+import { useDropzone, type FileRejection } from 'react-dropzone'
 import { LazyImage } from '@/components/image/LazyImage'
 import { SpinLoading, CircularProgress } from '@/components/loading'
 
 export interface IUploadedRes {
   success: boolean
   url?: string
+  key?: string
+}
+
+export interface IUploadedResV2 {
+  success: boolean
   key?: string
 }
 
@@ -36,6 +41,12 @@ export function Text(props: { text: string; className?: string }) {
       {t(`${langPrefix}.${text}`)}
     </div>
   )
+}
+
+export function IsKeyEqual(key1: string | undefined | null, key2: string | undefined | null) {
+  key1 = key1 ?? ''
+  key2 = key2 ?? ''
+  return key1 === key2
 }
 
 export function useUploadedRes(
@@ -67,6 +78,7 @@ export function useUploadedRes(
 
   useEffect(() => {
     if (!key) return
+    if (uploadedRes?.key === key) return
     getUploadedFileUrl(key).then(res => {
       if (res) {
         setUploadedRes({ success: true, ...res[0] })
@@ -77,6 +89,9 @@ export function useUploadedRes(
 
   return [uploadedRes, onUploaded]
 }
+
+// 2M
+const MAX_FILE_SIZE = 1024 * 1024 * 2
 
 export function useUploadedArrRes(props: {
   fileType: UploadFileType
@@ -137,6 +152,51 @@ export const getFileAccessUrl = async (key: string) => {
     return accessUrls
   } catch (error) {
     return undefined
+  }
+}
+
+export const uploadFileV2 = async (
+  file: File,
+  onProgress: (progress: number) => void
+): Promise<{ success: boolean; key: string } | null> => {
+  try {
+    const fileType = file.type as FilePutMimeType
+    const fileName = file.name
+    const { data } = await kycApi.getFilePutUrl(fileType, fileName)
+
+    if (!data || !data.url) {
+      throw new Error('Failed to get pre-signed URL.')
+    }
+    // 使用预签名 URL 上传文件到 S3
+    // 这里直接使用原始的 `axios` 实例，而不是封装的 `client`，
+    // 是因为上传到 S3 预签名 URL 是一个特殊请求。
+    // 封装的 `client` 包含全局拦截器（如添加认证头或 baseURL），
+    // 这些拦截器会干扰 S3 的上传过程，导致请求失败。
+    await axios.put(data.url, file, {
+      headers: {
+        // Content-Type 必须与生成预签名 URL 时指定的完全一致
+        'Content-Type': fileType,
+      },
+      onUploadProgress: processEvent => {
+        const { loaded, total } = processEvent
+        if (total) {
+          const percentCompleted = Math.round((loaded * 100) / total)
+          onProgress(percentCompleted)
+        }
+      },
+    })
+
+    return { success: true, key: data.key }
+
+    // const accessUrl = await getFileAccessUrl(data.key)
+
+    // if (accessUrl) {
+    //   return { success: true, key: data.key }
+    // }
+
+    throw new Error('Failed to get access URL.')
+  } catch (error) {
+    throw error
   }
 }
 
@@ -248,6 +308,7 @@ export async function getUploadedFileUrl(keys: string | string[]) {
 export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'view' }) {
   return (
     <button
+      type='button'
       disabled={props.mode === 'view'}
       onClick={props.onClick}
       className={cn(
@@ -263,54 +324,102 @@ export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'vie
   )
 }
 
-export function UploadCard(props: {
+export function UploadCardV2(props: {
   fileType: UploadFileType
-  uploadedRes: IUploadedRes | null
-  onUploaded: (res: IUploadedRes | null) => void
+  s3Key?: string
+  onUploaded: (res: IUploadedResV2 | null) => void
+  onS3KeyLoaded?: (key: string, url: string) => void
   mode?: 'edit' | 'view'
 }) {
-  const { fileType, onUploaded, uploadedRes, mode } = props
+  const { fileType, onUploaded, onS3KeyLoaded, s3Key, mode } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
 
   const [isHover, setIsHover] = useState(false)
 
+  const [previewUrl, setPreviewUrl] = useState<string>('')
+
+  const [isFileTooLarge, setIsFileTooLarge] = useState(false)
+
+  const [isPdf, setIsPdf] = useState(false)
+
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return
     const file = acceptedFiles[0]
-    onUploaded(null)
+
+    const isFilePdf = file.type === 'application/pdf'
+    setIsPdf(isFilePdf)
+
+    // onUploaded(null)
     setIsUploading(true)
     setUploadProgress(0)
+    setIsFileTooLarge(false)
 
     try {
-      const result = await uploadFile(file, progress => {
+      const result = await uploadFileV2(file, progress => {
         setUploadProgress(progress)
       })
       onUploaded(result)
+      // 上传成功后，生成预览 URL, 优先使用本地的 url
+      if (!isFilePdf) {
+        setPreviewUrl(URL.createObjectURL(file))
+      }
     } catch (error) {
       console.error('上传失败:', error)
-      onUploaded({ success: false })
+      // 上传失败时，不调用 onUploaded 函数，保持当前状态
+      // onUploaded({ success: false })
     } finally {
       setIsUploading(false)
     }
   }, [])
+
+  const onDropRejected = (fileRejections: FileRejection[]) => {
+    if (fileRejections.length > 0) {
+      const { errors } = fileRejections[0]
+      if (errors.length > 0) {
+        const { code } = errors[0]
+        if (code === 'file-too-large') {
+          setIsFileTooLarge(true)
+        }
+      }
+    }
+  }
 
   const { getRootProps, getInputProps } = useDropzone({
     // disables SPACE/ENTER to open the native file selection dialog
     noKeyboard: true,
     accept: AcceptedFiles,
     onDrop,
+    onDropRejected,
     disabled: isUploading || mode === 'view',
+    maxSize: MAX_FILE_SIZE,
   })
+
+  useEffect(() => {
+    if (!s3Key) return
+    getUploadedFileUrl(s3Key).then(urls => {
+      if (urls.length > 0) {
+        const url = urls[0].url
+        setPreviewUrl(url)
+        if (s3Key.includes('.pdf')) {
+          setIsPdf(true)
+        }
+        if (onS3KeyLoaded) {
+          onS3KeyLoaded(s3Key, url)
+        }
+      }
+    })
+  }, [s3Key])
 
   return (
     <>
       <div
         {...getRootProps({
           className: cn(
-            'dropzone flex-1 border border-[#5B5B5B] border-dashed h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] hover:border-[rgba(26,133,255,1)] relative',
-            mode === 'view' ? 'disabled cursor-not-allowed' : 'cursor-pointer'
+            'dropzone flex-1 border border-[#5B5B5B] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] hover:border-[rgba(26,133,255,1)] relative',
+            // mode === 'view' ? 'disabled cursor-not-allowed' : '',
+            isFileTooLarge ? 'border-[#CA3F64]' : ''
           ),
         })}
         onMouseEnter={() => setIsHover(true)}
@@ -326,15 +435,18 @@ export function UploadCard(props: {
                 <Text text='uploading' className='text-sm text-60' />
               </div>
             </>
-          ) : uploadedRes?.url ? (
+          ) : previewUrl ? (
             <>
               <LazyImage
-                src={uploadedRes.url}
+                src={isPdf ? '/images/icons/identity/pdf.png' : previewUrl}
                 className='rounded-lg'
                 style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />
               {isHover && mode === 'edit' && (
-                <button className='absolute bg-[#0E0E0E] rounded-lg cursor-pointer left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-4'>
+                <button
+                  type='button'
+                  className='absolute bg-[#0E0E0E] rounded-lg cursor-pointer left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-4'
+                >
                   <Text text='reUpload' className='text-sm text-white' />
                 </button>
               )}
@@ -352,6 +464,12 @@ export function UploadCard(props: {
             </>
           )}
         </div>
+        {isFileTooLarge && (
+          <div className='mt-2 flex flex-row items-center gap-1'>
+            <LazyImage className='w-3.5 h-3.5' src='/images/icons/identity/error2.png' />
+            <Text text='large' className='text-xs text-[#CA3F64]' />
+          </div>
+        )}
       </div>
     </>
   )

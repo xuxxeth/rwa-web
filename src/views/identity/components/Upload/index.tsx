@@ -1,13 +1,16 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
 import {
   type IUploadedRes,
   checkImgUploaded,
   useUploadedRes,
   uploadFile,
+  uploadFileV2,
   Text,
-  UploadCard,
   UploadCardAdd,
   useUploadedArrRes,
+  IsKeyEqual,
+  UploadCardV2,
+  type IUploadedResV2,
 } from './shared'
 import { mergeImagesFromUrls, cn } from '@/utils'
 import { LazyImage } from '@/components/image/LazyImage'
@@ -42,7 +45,7 @@ export function Upload({
   // identity keys 是数组，0 是正面，1 是反面
   if (type === 'identity') {
     return (
-      <IdentityUpload
+      <IdentityUploadV2
         keys={keys as string[]}
         mode={mode}
         onChanged={onChanged as (keys: string[]) => void}
@@ -79,7 +82,7 @@ export function Upload({
   return null
 }
 
-function IdentityUpload({
+function IdentityUploadV2({
   keys,
   mode,
   onChanged,
@@ -88,54 +91,129 @@ function IdentityUpload({
   mode?: 'edit' | 'view'
   onChanged: (keys: string[]) => void
 }) {
-  console.log(keys)
-  const [frontRes, onFrontUploaded] = useUploadedRes('idFront', keys?.[0])
-  const [backRes, onBackUploaded] = useUploadedRes('idBack', keys?.[1])
+  console.log('===>props.keys', keys, mode)
+  const [frontRes, saveFrontRes] = useState<{ key: string; url: string } | null>(null)
+  const [backRes, saveBackRes] = useState<{ key: string; url: string } | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
 
-  const handleMergedIamge = async (frontRes: IUploadedRes | null, backRes: IUploadedRes | null) => {
+  const handleMergedImage = async (frontUrl: string | undefined, backUrl: string | undefined) => {
     try {
-      if (checkImgUploaded(frontRes) && checkImgUploaded(backRes)) {
-        const mergedFile = await mergeImagesFromUrls(frontRes?.url!, backRes?.url!)
-        const mergedRes = await uploadFile(mergedFile, () => {})
-        // saveUploadKey('idMerged', mergedRes?.key)
-        return mergedRes?.key
-      } else {
-        // saveUploadKey('idMerged', undefined)
-        return undefined
+      if (frontUrl && backUrl) {
+        const mergedFile = await mergeImagesFromUrls(frontUrl, backUrl)
+        const mergedRes = await uploadFileV2(mergedFile, () => {})
+        return mergedRes?.key ?? ''
       }
-    } catch (error) {}
+      return ''
+    } catch (error) {
+      return ''
+    }
   }
 
-  useUpdateEffect(() => {
-    handleMergedIamge(frontRes, backRes).then(mergedKey => {
-      mergedKey && onChanged([frontRes?.key ?? '', backRes?.key ?? '', mergedKey ?? ''])
+  const curKeys = useRef<string[] | undefined>(undefined)
+
+  useLayoutEffect(() => {
+    curKeys.current = keys
+  }, [keys])
+
+  const onChangedInternal = (idx: number, value: string) => {
+    const newKeys = curKeys.current ? [...curKeys.current] : Array.from({ length: 3 }, () => '')
+    newKeys[idx] = value
+    onChanged(newKeys)
+  }
+
+  const onFrontUploaded = (res: IUploadedResV2 | null) => {
+    onChangedInternal(0, res?.key ?? '')
+    setIsDirty(true)
+  }
+
+  const onBackUploaded = (res: IUploadedResV2 | null) => {
+    onChangedInternal(1, res?.key ?? '')
+    setIsDirty(true)
+  }
+
+  useEffect(() => {
+    if (!isDirty) return
+    handleMergedImage(frontRes?.url, backRes?.url).then(mergedKey => {
+      onChangedInternal(2, mergedKey)
     })
-  }, [frontRes?.key, backRes?.key])
+  }, [isDirty, frontRes, backRes])
 
   return (
     <div>
-      {/* <div className='flex items-center mb-5'>
-        <Text text='uploadId' className='text-[18px] font-normal text-white' />
-        <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
-      </div> */}
       <div className='flex flex-row gap-5 my-5'>
-        <UploadCard
+        <UploadCardV2
           fileType='idFront'
           onUploaded={onFrontUploaded}
-          uploadedRes={frontRes}
+          onS3KeyLoaded={(key: string, url: string) => saveFrontRes({ key, url })}
+          s3Key={keys?.[0]}
           mode={mode}
         />
-        <UploadCard
+        <UploadCardV2
           fileType='idBack'
+          onS3KeyLoaded={(key: string, url: string) => saveBackRes({ key, url })}
           onUploaded={onBackUploaded}
-          uploadedRes={backRes}
+          s3Key={keys?.[1]}
           mode={mode}
         />
       </div>
-      <Text text='tips' className='text-sm' />
+      <Text text='tips' className='text-sm mt-2' />
     </div>
   )
 }
+
+// function IdentityUpload({
+//   keys,
+//   mode,
+//   onChanged,
+// }: {
+//   keys?: string[]
+//   mode?: 'edit' | 'view'
+//   onChanged: (keys: string[]) => void
+// }) {
+//   const [frontRes, onFrontUploaded] = useUploadedRes('idFront', keys?.[0])
+//   const [backRes, onBackUploaded] = useUploadedRes('idBack', keys?.[1])
+
+//   const handleMergedImage = async (frontRes: IUploadedRes | null, backRes: IUploadedRes | null) => {
+//     try {
+//       if (checkImgUploaded(frontRes) && checkImgUploaded(backRes)) {
+//         const mergedFile = await mergeImagesFromUrls(frontRes?.url!, backRes?.url!)
+//         const mergedRes = await uploadFile(mergedFile, () => {})
+//         // saveUploadKey('idMerged', mergedRes?.key)
+//         return mergedRes?.key
+//       } else {
+//         // saveUploadKey('idMerged', undefined)
+//         return undefined
+//       }
+//     } catch (error) {}
+//   }
+
+//   // 挂载那次不执行，之后变化了执行
+//   useUpdateEffect(() => {
+//     handleMergedImage(frontRes, backRes).then(mergedKey => {
+//       onChanged([frontRes?.key ?? '', backRes?.key ?? '', mergedKey ?? ''])
+//     })
+//   }, [frontRes?.key, backRes?.key])
+
+//   return (
+//     <div>
+//       <div className='flex flex-row gap-5 my-5'>
+//         <UploadCard
+//           fileType='idFront'
+//           onUploaded={onFrontUploaded}
+//           uploadedRes={frontRes}
+//           mode={mode}
+//         />
+//         <UploadCard
+//           fileType='idBack'
+//           onUploaded={onBackUploaded}
+//           uploadedRes={backRes}
+//           mode={mode}
+//         />
+//       </div>
+//       <Text text='tips' className='text-sm' />
+//     </div>
+//   )
+// }
 
 function AddressUpload({
   keys,
@@ -146,11 +224,16 @@ function AddressUpload({
   mode?: 'edit' | 'view'
   onChanged: (key: string) => void
 }) {
-  const [addrRes, onAddrUploaded] = useUploadedRes('addressCertificates', keys)
+  console.log('===>AddressUpload', keys)
+  // const [addrRes, onAddrUploaded] = useUploadedRes('addressCertificates', keys)
 
-  useUpdateEffect(() => {
-    onChanged(addrRes?.key ?? '')
-  }, [addrRes?.key])
+  // useUpdateEffect(() => {
+  //   onChanged(addrRes?.key ?? '')
+  // }, [addrRes?.key])
+
+  const onAddrUploaded = (res: IUploadedResV2 | null) => {
+    onChanged(res?.key ?? '')
+  }
 
   return (
     <div>
@@ -159,10 +242,10 @@ function AddressUpload({
         <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
       </div>
       <div className='flex flex-row gap-5 my-5'>
-        <UploadCard
+        <UploadCardV2
           fileType='addressCertificates'
           onUploaded={onAddrUploaded}
-          uploadedRes={addrRes}
+          s3Key={keys}
           mode={mode}
         />
         <div className='flex flex-col flex-1 justify-center'>
@@ -213,20 +296,24 @@ function PassportUpload({
   mode?: 'edit' | 'view'
   onChanged: (keys: string) => void
 }) {
-  const [passportRes, onPassportUploaded] = useUploadedRes('passport', keys)
-  
-  useUpdateEffect(() => {
-    onChanged(passportRes?.url ?? '')
-  }, [passportRes])
+  // const [passportRes, onPassportUploaded] = useUploadedRes('passport', keys)
+
+  // useUpdateEffect(() => {
+  //   onChanged(passportRes?.url ?? '')
+  // }, [passportRes])
+
+  const onPassportUploaded = (uploadedRes: IUploadedResV2 | null) => {
+    onChanged(uploadedRes?.key ?? '')
+  }
 
   return (
     <div>
       <Text text='uploadId' className='text-lg my-5 text-white' />
       <div className='flex flex-row gap-5'>
-        <UploadCard
+        <UploadCardV2
           fileType='passport'
           onUploaded={onPassportUploaded}
-          uploadedRes={passportRes}
+          s3Key={keys}
           mode={mode}
         />
         <div className='flex-1 flex flex-row items-center justify-center'>
@@ -246,31 +333,69 @@ function ExtraInfoUpload({
   mode?: 'edit' | 'view'
   onChanged: (keys: string[]) => void
 }) {
-  const [uploadedRes, onUploaded, onAdd, onDelete] = useUploadedArrRes({
-    fileType: 'incomeCertificates',
-    keys,
-  })
+  console.log('===>extra keys', keys)
+  // const [uploadedRes, onUploaded, onAdd, onDelete] = useUploadedArrRes({
+  //   fileType: 'incomeCertificates',
+  //   keys,
+  // })
 
-  const uploadedKeys = useMemo(() => uploadedRes.map(item => item?.key ?? ''), [uploadedRes])
+  // const uploadedKeys = useMemo(() => uploadedRes.map(item => item?.key ?? ''), [uploadedRes])
 
-  useUpdateEffect(() => {
-    onChanged(uploadedKeys)
-  }, [uploadedKeys])
+  // useUpdateEffect(() => {
+  //   onChanged(uploadedKeys)
+  // }, [uploadedKeys])
+
+  const curkeys = useRef(keys)
+
+  useLayoutEffect(() => {
+    curkeys.current = keys
+  }, [keys])
+
+  const atLeastOneKey = keys ?? ['']
+
+  // const onChangedInternal = (idx: number, value: string) => {
+  //   const newKeys = curkeys.current ? [...curkeys.current] : ['']
+  //   newKeys[idx] = value
+  //   onChanged(newKeys)
+  // }
+  const getNewKeys = () => {
+    const newKeys = curkeys.current ? [...curkeys.current] : ['']
+    return newKeys
+  }
+
+  const onUploaded = (uploadedRes: IUploadedResV2 | null, idx: number) => {
+    const newKeys = getNewKeys()
+    newKeys[idx] = uploadedRes?.key ?? ''
+    onChanged(newKeys)
+  }
+
+  const onAdd = () => {
+    const newKeys = getNewKeys()
+    newKeys.push('')
+    onChanged(newKeys)
+  }
+
+  const onDelete = (idx: number) => {
+    const newKeys = getNewKeys()
+    newKeys.splice(idx, 1)
+    onChanged(newKeys)
+  }
 
   return (
     <div>
       <div className='grid grid-cols-2 gap-x-6 gap-y-5'>
-        {uploadedRes.map((item, index) => {
+        {atLeastOneKey.map((s3Key, index) => {
           return (
-            <div className='relative' key={uploadedRes.length + '' + index}>
-              <UploadCard
+            <div className='relative' key={atLeastOneKey.length + '' + index}>
+              <UploadCardV2
                 fileType='incomeCertificates'
-                onUploaded={res => onUploaded(index, res)}
-                uploadedRes={item}
+                onUploaded={uploadedRes => onUploaded(uploadedRes, index)}
+                s3Key={s3Key}
                 mode={mode}
               />
               {index > 0 && (
                 <button
+                  type='button'
                   disabled={mode === 'view'}
                   onClick={event => {
                     if (mode === 'view') return
@@ -287,7 +412,7 @@ function ExtraInfoUpload({
             </div>
           )
         })}
-        {uploadedRes.length < 4 && <UploadCardAdd onClick={onAdd} mode={mode} />}
+        {atLeastOneKey.length < 4 && <UploadCardAdd onClick={onAdd} mode={mode} />}
       </div>
     </div>
   )
