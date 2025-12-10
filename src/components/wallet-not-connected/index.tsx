@@ -11,7 +11,7 @@ function WalletNotConnected() {
           className="w-22 h-22 m-auto"
           src="/images/icons/assets/wallet_empty.png"
         />
-        <div className="my-4 text-2xl/9 font-semibold">
+        <div className="my-4 text-2xl/9 font-semibold text-white">
           {t("assets.walletNotConnected")}
         </div>
         <div className="text-60 text-base/6 font-normal mb-8">

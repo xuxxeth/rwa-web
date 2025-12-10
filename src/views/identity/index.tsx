@@ -18,6 +18,36 @@ import {
   VerifyFailed,
   Verifying,
 } from './components/VerifyStatus'
+import { useAccount, useChainId } from 'ca-common-web'
+import { useTranslation } from '@/hooks/useTranslation'
+import { useAppStore } from '@/stores/appStore'
+import WalletNotConnected from '@/components/wallet-not-connected'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
+import SignatureVerify from '../assets/SignatureVerify'
+
+function IdentityEntry() {
+  const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+
+  const account = useAccount()
+  const chainId = useChainId()
+
+  const walltedConnected = account && chainId
+
+  if (!walltedConnected && isWalletConnecting) return null
+
+  if (!walltedConnected) {
+    // TODO: 修改一些文案
+    return <WalletNotConnected />
+  }
+
+  if (!isSignatureValid) {
+    // TODO: 修改一些文案
+    return <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
+  }
+
+  return <Identity />
+}
 
 function Identity() {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
@@ -35,16 +65,6 @@ function Identity() {
   if (kycDetail === undefined) {
     return 'loading...'
   }
-
-  // 这样简单的 Mock 一下
-  // const MockKycDetail: IKycDetail = {
-  //   account: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-  //   overallStatus: 1,
-  //   riskLevel: 3,
-  //   verifyType: 'aml',
-  //   pendingMaterials: 'income-certificate',
-  //   status: 4,
-  // }
 
   const {
     account,
@@ -193,4 +213,4 @@ function MainContentWrapper(props: { children: ReactNode }) {
   )
 }
 
-export default Identity
+export default IdentityEntry
