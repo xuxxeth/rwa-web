@@ -13,20 +13,6 @@ const KycState = () => {
 
   useFetchKycStatus()
   
-  const [statusDetail, setStatusDetail] = useState<IKycStatus | null>()
-  // 3 秒后显示
-  useEffect(() => {
-    kycApi.getKycStatus()
-      .then(res => {
-        setStatusDetail(res.data)
-      })
-    // const showTimer = setTimeout(() => {
-    //   setShow(true);
-    // }, 3000);
-
-    // return () => clearTimeout(showTimer);
-  }, []);
-
   // 显示后 10 秒自动隐藏
   useEffect(() => {
     // if (!show) return;

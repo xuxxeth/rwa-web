@@ -58,13 +58,7 @@ export interface IExtraInfo {
 
 export interface IKycDetail {
   account: string
-  userInfo?: {
-    basicInfo: IBasicInfo
-    idInfo: IIdInfo
-    employmentInfo: IEmploymentInfo
-    // 等后端确定，暂时还不太确定
-    approvedProtocols: string[]
-  }
+  userInfo?: IKycSubmitData
   overallStatus: KYC_OVERALL_STATUS
   riskLevel?: KYC_RISK_LEVEL
   verifyType?: KYC_VERIFY_TYPE
@@ -84,7 +78,7 @@ export interface IKycSubmitData {
   workInfo: IEmploymentInfo
   incomeInfo: IIncomeInfo
   extraInfo: IExtraInfo
-  approvedProtocols: string[]
+  approvedProtocols?: string[]
   // TODO: 待补充其他字段
 }
 
@@ -106,4 +100,8 @@ export interface IFillAccessUrlRes {
   key: string
   url: string
   expiration: number
+}
+
+export interface IPrivacyRes {
+  privacy: string
 }

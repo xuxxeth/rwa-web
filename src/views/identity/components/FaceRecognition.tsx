@@ -3,13 +3,15 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { QRCodeSVG } from 'qrcode.react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { kycApi } from '@/service/kyc/api'
+import type { IKycDetail } from '@/service/kyc/types'
+import type { ApiResponse } from '@/service/client'
 
 const faceLangPrefix = 'identity.face'
 
 export default function FaceRecognition({
   refresh: refreshKycDetail,
 }: {
-  refresh: () => Promise<void>
+  refresh: () => Promise<ApiResponse<IKycDetail>>
 }) {
   const { t } = useTranslation()
   const [urlInfo, setUrlInfo] = useState<{ url: string; expireTime: number } | undefined>(undefined)

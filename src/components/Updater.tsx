@@ -43,7 +43,7 @@ const Updater = memo(
     return (
       <>
         <KycState />
-        {/* <Compliance /> */}
+        <Compliance />
       </>
     )
   }

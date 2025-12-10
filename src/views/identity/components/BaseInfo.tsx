@@ -18,8 +18,39 @@ import storage from "@/utils/storage"
 import { KYC_UPLOAD_STORAGE_KEY } from "./Upload/shared"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
-import type { IKycSubmitData } from "@/service/kyc/types"
+import type { IKycDetail, IKycSubmitData } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
+import type { ApiResponse } from "@/service/client"
+import { WarningInfo } from "./WarningInfo"
+
+async function retryRefresh(
+  refresh: () => Promise<ApiResponse<IKycDetail>>,
+  maxRetries = 5,
+  interval = 3000,
+  attempt = 1
+): Promise<any> {
+  try {
+    const result = await refresh();
+    // 成功直接返回
+    if (result.code === RESPONSE_CODE.SUCCESS) {
+      return result;
+    }
+    if (attempt < maxRetries) {
+      await new Promise(res => setTimeout(res, interval));
+      return retryRefresh(refresh, maxRetries, interval, attempt + 1);
+    }
+    return result;
+
+  } catch (err) {
+    // refresh 报错也算失败
+    if (attempt < maxRetries) {
+      await new Promise(res => setTimeout(res, interval));
+      return retryRefresh(refresh, maxRetries, interval, attempt + 1);
+    }
+    // 最后一次也报错 → 返回错误对象（不抛错）
+    return { code: -1, message: err };
+  }
+}
 
 
 export const SectionTitle = ({ children }: { children: React.ReactNode}) => {
@@ -121,11 +152,19 @@ interface FormData {
   idCard?: string,
   passport?: string,
   addressCertification?: string
+  incomeCertifications?: string []
 
 }
 
 const BaseInfo = memo(
-  () => {
+  ({
+    userInfo,
+    refresh
+  }: {
+    userInfo?: IKycSubmitData
+    refresh?: () => Promise<ApiResponse<IKycDetail>>
+  }) => {
+
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
     const [dateOptions, setDateOptions] = useState({
@@ -138,12 +177,27 @@ const BaseInfo = memo(
       {value: '0', label: t('gender.female')},
 
     ]
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+    const { register, handleSubmit, watch, setValue, reset, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+      firstName: '',
+      lastName: '',
+      fullName: '',
       gendar: 0,
+      email: '',
       type: 0,
       employment: 1,
       source: 1,
-      issueCountry: 'CHN'
+      issueCountry: 'CHN',
+      residentAddress: '',
+      useCertificateAddress: false,
+      description: '',
+      approvedProtocols: [],
+      idCardFront: '',
+      idCardBack: '',
+      idCard: '',
+      passport: '',
+      addressCertification: '',
+      incomeCertifications: []
+
     });
     const type = watch('type')
     const useCertificateAddress = watch('useCertificateAddress')
@@ -153,32 +207,33 @@ const BaseInfo = memo(
     const idCard = watch('idCard')
     const passport = watch('passport')
     const addressCertification = watch('addressCertification')
-
-    console.log(passport)
+    const incomeCertifications = watch('incomeCertifications')
+    const source = watch('source')
 
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
+      
       // 1. 判断有没有上传证件照
       const kycFiles = storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}   
       if (type === 0) { // 身份证，正反面都要传
-        if (!kycFiles.idFront) {
+        if (!data.idCardFront) {
           toastError({title: '请上傳人像頁'})
           return
         }
-        if (!kycFiles.idBack) {
+        if (!data.idCardBack) {
           toastError({title: '请上傳國徽面'})
           return
         }
       }
       if (type === 1) { // 只判断护照
-        if (!kycFiles.passport) {
+        if (!data.passport) {
           toastError({title: '请上傳护照'})
           return
         }
       }
       // 无地址证明
-      if (!kycFiles.addressCertificates) {
+      if (!data.addressCertification) {
         toastError({title: '上傳地址證明'})
         return
       }
@@ -198,11 +253,11 @@ const BaseInfo = memo(
           residentAddress: data.useCertificateAddress ? '' : data.residentAddress,
           useCertificateAddress: data.useCertificateAddress,
           files: {
-            idCardFront: data.type === 0 ? kycFiles.idFront : '',
-            idCardBack: data.type === 0 ? kycFiles.idBack : '',
-            idCard: data.type === 0 ? kycFiles.idMerged : '',
-            passport: data.type === 0 ? '' : kycFiles.passport,
-            addressCertification: kycFiles.addressCertificates
+            idCardFront: data.type === 0 ? data.idCardFront || '' : '',
+            idCardBack: data.type === 0 ? data.idCardBack || '' : '',
+            idCard: data.type === 0 ? data.idCard || '' : '',
+            passport: data.type === 0 ? '' : data.passport || '',
+            addressCertification: data.addressCertification || ''
           }
         },
         workInfo: {
@@ -213,22 +268,36 @@ const BaseInfo = memo(
           source: data.source || 1
         },
         extraInfo: {
-          incomeCertifications: kycFiles.incomeCertificates || []
+          incomeCertifications: (data.incomeCertifications || []).filter(key => key)
         },
-        approvedProtocols: [
-          "AML-Policy-v3.0",
-          "Privacy-Agreement-v2.1"
-        ]
+        // approvedProtocols: [
+        //   "AML-Policy-v3.0",
+        //   "Privacy-Agreement-v2.1"
+        // ]
       }
       console.log(data)
       console.log(params)
-      console.log(submiting)
+
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)
       setSubmiting(false)
       if (res?.code === RESPONSE_CODE.SUCCESS) {
-        toastSuccess({title: '提交成功'})
+        if (refresh) {
+          const detailRes = await retryRefresh(refresh)
+          if (detailRes.code === RESPONSE_CODE) {
+            toastSuccess({title: '提交成功'})
+            clear()
+          } else {
+            toastError({title: res?.message || '提交失败'})
+          }
+
+        } else {
+          toastSuccess({title: '提交成功'})
+          clear()
+        }
+        
+        
       } else {
         toastError({title: res?.message || '提交失败'})
       }
@@ -241,423 +310,480 @@ const BaseInfo = memo(
       setValue('dob', format(dateOptions.maxDate, FormatStr))
     }, [])
 
+    useEffect(() => {
+      if (userInfo && userInfo.basicInfo.firstName) {
+        reset({
+          ...userInfo.basicInfo,
+          ...userInfo.idInfo,
+          ...userInfo.workInfo,
+          ...userInfo.incomeInfo,
+          ...userInfo.extraInfo,
+          ...userInfo.idInfo.files,
+          
+
+        })
+      }
+    }, [userInfo])
+
+  // firstName: string;
+  // lastName: string;
+  // fullName: string;
+  // gendar: number; // 0女，1男
+  // dob: string; // 出生日期
+  // email: string;
+  // // 证件信息
+  // type: number; // 0身份证, 1护照 
+  // issueCountry: string
+  // no: string;
+  // residentAddress: string;
+  // useCertificateAddress?: boolean; // 是否使用证件地址
+  // // 工作信息
+  // employment: number; // 就业情况
+  // description: string; // 就业 时 必填
+  // // 收信息
+  // source: number;
+  // approvedProtocols: string[],
+  // idCardFront?: string,
+  // idCardBack?: string,
+  // idCard?: string,
+  // passport?: string,
+  // addressCertification?: string
+  // incomeCertifications?: string []
 
     return (
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
-        <SectionBox>
-          <SectionTitle>{t('kyc.t2')}</SectionTitle>
-          <div className=" grid grid-cols-4 font-normal gap-x-6">
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t3')} />
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.firstName?.message}
-                  {
-                    ...register("firstName", {
-                      required: '最大支持输入30位字符',
-                      maxLength: {
-                        value: 30,
-                        message: "最大支持输入30位字符"
-                      },
-                      pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                        message: "只支持中文和英文字母"
-                      },
-                      onChange: (e) => {
-                        console.log(e.target.value)
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
-                        }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.firstName?.message}/>
-              </InputBox>
-            </FormItemBox>
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t5')} />
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.lastName?.message}
-                  {
-                    ...register("lastName", {
-                      required: '最大支持输入30位字符',
-                      maxLength: {
-                        value: 30,
-                        message: "最大支持输入30位字符"
-                      },
-                      pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                        message: "只支持中文和英文字母"
-                      },
-                      onChange: (e) => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
-                        }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.lastName?.message}/>
-              </InputBox>
-            </FormItemBox>
-            <div className=" col-span-2">
+      <>
+        <WarningInfo />
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
+          <SectionBox>
+            <SectionTitle>{t('kyc.t2')}</SectionTitle>
+            <div className=" grid grid-cols-4 font-normal gap-x-6">
               <FormItemBox>
-              <FormItemLabel title={t('kyc.t6')} />
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.fullName?.message}
-                  {
-                    ...register("fullName", {
-                      required: '最大支持输入30位字符',
-                      maxLength: {
-                        value: 30,
-                        message: "最大支持输入30位字符"
-                      },
-                      pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
-                        message: "只支持中文和英文字母"
-                      },
-                      onChange: (e) => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
+                <FormItemLabel title={t('kyc.t3')} />
+                <InputBox >
+                  <KycInput 
+                    className=""
+                    placeholder={t('kyc.t4')}
+                    error={errors.firstName?.message}
+                    {
+                      ...register("firstName", {
+                        required: '最大支持输入30位字符',
+                        maxLength: {
+                          value: 30,
+                          message: "最大支持输入30位字符"
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                          message: "只支持中文和英文字母"
+                        },
+                        onChange: (e) => {
+                          console.log(e.target.value)
+                          // 实时限制输入长度
+                          if (e.target.value.length > 30) {
+                            e.target.value = e.target.value.slice(0, 30);
+                          }
                         }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.fullName?.message}/>
-              </InputBox>
-            </FormItemBox>
-            </div>
-            
-            
-          </div>
-          <div className=" grid grid-cols-3 font-normal gap-x-6">
-            {/* 性别 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t7')} />
-              <InputBox >
-                <Select 
-                  activeColor="#FFFFFF"
-                  className="h-[44px] rounded-[6px]"
-                  placeholder={t('identity.select')}
-                  data={genderList}
-                  defaultValue={'0'}
-                  onChange={data => {
-                    console.log(data)
-                    setValue('gendar', Number(data.value))
-                  }}
-                />
-              </InputBox>
-            </FormItemBox>
-            {/* 出生日期 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t8')} />
-              <InputBox >
-                <div className="bg-[rgba(255,255,255,0.08)] rounded-[6px]">
-                  <DatePicker
-                    captionLayout="dropdown"
-                    minDate={dateOptions.minDate}
-                    maxDate={dateOptions.maxDate}
-                    activeColor="#FFFFFF"
-                    className="h-[44px]"
-                    placeholder={t('identity.selectDate')}
-                    userSelectedDate={dateOptions.defaultDate} 
-                    onUserSelectedDateChanged={(value) => {
-                      if (value) {
-                        setValue('dob', format(value, FormatStr)) 
-                      }
+                      })
                       
-                    }} 
+                    }
                   />
-                </div>
-              </InputBox>
-            </FormItemBox>
-            {/* 邮箱 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t9')} />
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.email?.message}
-                  {
-                    ...register("email", {
-                      required: '邮箱格式不正确，请重新输入',
-                      maxLength: {
-                        value: 50,
-                        message: "最大支持输入50位字符"
-                      },
-                      pattern: {
-                        value: /^(?=[^@]{1,64}@[^@]{1,255}$)(?=.{1,50}$)[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*(?:\.[a-zA-Z]{2,})+$/,
-                        message: "邮箱格式不正确，请重新输入"
-                      },
-                      onChange: (e) => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
-                        }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.email?.message}/>
-              </InputBox>
-            </FormItemBox>
-          </div>
-        </SectionBox>
-        <SectionBox>
-          <SectionTitle>{t('kyc.t10')}</SectionTitle>
-          <div className=" grid grid-cols-3 font-normal gap-x-6">
-            {/* 证件类型 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t11')} />
-
-              <InputBox >
-                <DoctypeSelect
-                  defaultValue={String(type)} 
-                  onChange={data => {
-                    console.log(data)
-                    setValue('type', Number(data.code))
-                  }}
-                />
-              </InputBox>
-            </FormItemBox>
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t12')} />
-              {/* 证件签发国 */}
-              <InputBox >
-                <CountrySelect 
-                  placeHolder={t('kyc.t28')}
-                  onChange={data => {
-                    setValue('issueCountry', data.key)
-                  }}
-                />
-              </InputBox>
-            </FormItemBox>
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t13')} />
-              {/* 证件号码 */}
-              <InputBox >
-                <KycInput 
-                  className=""
-                  placeholder={t('kyc.t4')}
-                  error={errors.no?.message}
-                  {
-                    ...register("no", {
-                      required: '请输入内容',
-                      maxLength: {
-                        value: 30,
-                        message: "最大支持输入30位字符"
-                      },
-                      pattern: {
-                        value: /^[A-Za-z0-9]+$/,
-                        message: "仅支持数字字母输入"
-                      },
-                      onChange: (e) => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30);
-                        }
-                      }
-                    })
-                    
-                  }
-                />
-                <ErrorBox error={errors.no?.message}/>
-              </InputBox>
-            </FormItemBox>  
-          </div>
-          
-          <div className=" grid grid-cols-1 font-normal">
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t14')} />
-              <div className="mt-3 flex gap-x-2 items-center mb-3">
-                <CheckBox
-                  checked={useCertificateAddress}
-                  onChange={v => {
-                    setValue('useCertificateAddress', v)
-                  }}
-                />
-                <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
-                  {t('kyc.t15')}
-                </div>
-              </div>
-              {
-                !useCertificateAddress && 
-                  <InputBox >
-                    <KycInput 
-                      className=""
-                      placeholder={t('kyc.t4')}
-                      error={errors.residentAddress?.message}
-                      {
-                        ...register("residentAddress", {
-                          required: '请输入内容',
-                          maxLength: {
-                            value: 30,
-                            message: "最大支持输入40位字符"
-                          },
-                          pattern: {
-                            value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
-                            message: "只支持中文和英文字母"
-                          },
-                          onChange: (e) => {
-                            // 实时限制输入长度
-                            if (e.target.value.length > 40) {
-                              e.target.value = e.target.value.slice(0, 40);
-                            }
+                  <ErrorBox error={errors.firstName?.message}/>
+                </InputBox>
+              </FormItemBox>
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t5')} />
+                <InputBox >
+                  <KycInput 
+                    className=""
+                    placeholder={t('kyc.t4')}
+                    error={errors.lastName?.message}
+                    {
+                      ...register("lastName", {
+                        required: '最大支持输入30位字符',
+                        maxLength: {
+                          value: 30,
+                          message: "最大支持输入30位字符"
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                          message: "只支持中文和英文字母"
+                        },
+                        onChange: (e) => {
+                          // 实时限制输入长度
+                          if (e.target.value.length > 30) {
+                            e.target.value = e.target.value.slice(0, 30);
                           }
-                        })
-                        
-                      }
-                    />
-                    <ErrorBox error={errors.residentAddress?.message}/>
-                  </InputBox>
-              }
-              
-            </FormItemBox>      
-          </div>
-        </SectionBox>
-        
-        <SectionBox className="pb-5">
-          <div className=" flex items-center">
-            <SectionTitle>{t('identity.upload.uploadId')}</SectionTitle>
-            <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
-          </div>
-          
-          {/* 上传证件 */}
-          <Upload 
-            type={type === 1 ? 'passport' : 'identity'} 
-            keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
-            onChanged={(keys) => {
-              if (type === 1) {
-                keys[0] && setValue('passport', keys[0])
-              } else {
-                keys[0] && setValue('idCardFront', keys[0])
-                keys[1] && setValue('idCardBack', keys[1])
-                keys[2] && setValue('idCard', keys[2])
-              }
-              
-            }} 
-          />
-        </SectionBox>  
-        <SectionBox className="pb-5">
-          {/* 上传地址证明 */}
-          <Upload type="address" onChanged={() => {}} />
-        </SectionBox> 
-        <SectionBox>
-          <SectionTitle>{t('kyc.t16')}</SectionTitle>
-          <div className=" grid grid-cols-3 font-normal gap-x-6">
-            {/* 就业状况 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t17')} />
-              <InputBox >
-                <EmploymentSelect 
-                  onChange={data => {
-                    setValue('employment', Number(data.code))
-                  }}
-                />
-              </InputBox>
-            </FormItemBox>
-            <div className=" col-span-2">
-              {
-                employment === 4 && 
+                        }
+                      })
+                      
+                    }
+                  />
+                  <ErrorBox error={errors.lastName?.message}/>
+                </InputBox>
+              </FormItemBox>
+              <div className=" col-span-2">
                 <FormItemBox>
-                  <FormItemLabel title={t('kyc.t23')} />
-                  <InputBox >
-                    <KycInput 
-                      className=""
-                      placeholder={t('kyc.t4')}
-                      error={errors.description?.message}
-                      {
-                        ...register("description", {
-                          required: '请输入内容',
-                          maxLength: {
-                            value: 30,
-                            message: "最大支持输入40位字符"
-                          },
-                          pattern: {
-                            value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
-                            message: "只支持中文和英文字母"
-                          },
-                          onChange: (e) => {
-                            // 实时限制输入长度
-                            if (e.target.value.length > 40) {
-                              e.target.value = e.target.value.slice(0, 40);
-                            }
+                <FormItemLabel title={t('kyc.t6')} />
+                <InputBox >
+                  <KycInput 
+                    className=""
+                    placeholder={t('kyc.t4')}
+                    error={errors.fullName?.message}
+                    {
+                      ...register("fullName", {
+                        required: '最大支持输入30位字符',
+                        maxLength: {
+                          value: 30,
+                          message: "最大支持输入30位字符"
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
+                          message: "只支持中文和英文字母"
+                        },
+                        onChange: (e) => {
+                          // 实时限制输入长度
+                          if (e.target.value.length > 30) {
+                            e.target.value = e.target.value.slice(0, 30);
                           }
-                        })
+                        }
+                      })
+                      
+                    }
+                  />
+                  <ErrorBox error={errors.fullName?.message}/>
+                </InputBox>
+              </FormItemBox>
+              </div>
+              
+              
+            </div>
+            <div className=" grid grid-cols-3 font-normal gap-x-6">
+              {/* 性别 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t7')} />
+                <InputBox >
+                  <Select 
+                    activeColor="#FFFFFF"
+                    className="h-[44px] rounded-[6px]"
+                    placeholder={t('identity.select')}
+                    data={genderList}
+                    defaultValue={'0'}
+                    onChange={data => {
+                      console.log(data)
+                      setValue('gendar', Number(data.value))
+                    }}
+                  />
+                </InputBox>
+              </FormItemBox>
+              {/* 出生日期 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t8')} />
+                <InputBox >
+                  <div className="bg-[rgba(255,255,255,0.08)] rounded-[6px]">
+                    <DatePicker
+                      captionLayout="dropdown"
+                      minDate={dateOptions.minDate}
+                      maxDate={dateOptions.maxDate}
+                      activeColor="#FFFFFF"
+                      className="h-[44px]"
+                      placeholder={t('identity.selectDate')}
+                      userSelectedDate={dateOptions.defaultDate} 
+                      onUserSelectedDateChanged={(value) => {
+                        if (value) {
+                          setValue('dob', format(value, FormatStr)) 
+                        }
                         
-                      }
+                      }} 
                     />
-                    <ErrorBox error={errors.description?.message}/>
-                  </InputBox>
-                </FormItemBox>
-              }
+                  </div>
+                </InputBox>
+              </FormItemBox>
+              {/* 邮箱 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t9')} />
+                <InputBox >
+                  <KycInput 
+                    className=""
+                    placeholder={t('kyc.t4')}
+                    error={errors.email?.message}
+                    {
+                      ...register("email", {
+                        required: '邮箱格式不正确，请重新输入',
+                        maxLength: {
+                          value: 50,
+                          message: "最大支持输入50位字符"
+                        },
+                        pattern: {
+                          value: /^(?=[^@]{1,64}@[^@]{1,255}$)(?=.{1,50}$)[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*(?:\.[a-zA-Z]{2,})+$/,
+                          message: "邮箱格式不正确，请重新输入"
+                        },
+                        onChange: (e) => {
+                          // 实时限制输入长度
+                          if (e.target.value.length > 30) {
+                            e.target.value = e.target.value.slice(0, 30);
+                          }
+                        }
+                      })
+                      
+                    }
+                  />
+                  <ErrorBox error={errors.email?.message}/>
+                </InputBox>
+              </FormItemBox>
+            </div>
+          </SectionBox>
+          <SectionBox>
+            <SectionTitle>{t('kyc.t10')}</SectionTitle>
+            <div className=" grid grid-cols-3 font-normal gap-x-6">
+              {/* 证件类型 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t11')} />
+
+                <InputBox >
+                  <DoctypeSelect
+                    defaultValue={String(type)} 
+                    onChange={data => {
+                      console.log(data)
+                      setValue('type', Number(data.code))
+                    }}
+                  />
+                </InputBox>
+              </FormItemBox>
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t12')} />
+                {/* 证件签发国 */}
+                <InputBox >
+                  <CountrySelect 
+                    placeHolder={t('kyc.t28')}
+                    onChange={data => {
+                      setValue('issueCountry', data.key)
+                    }}
+                  />
+                </InputBox>
+              </FormItemBox>
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t13')} />
+                {/* 证件号码 */}
+                <InputBox >
+                  <KycInput 
+                    className=""
+                    placeholder={t('kyc.t4')}
+                    error={errors.no?.message}
+                    {
+                      ...register("no", {
+                        required: '请输入内容',
+                        maxLength: {
+                          value: 30,
+                          message: "最大支持输入30位字符"
+                        },
+                        pattern: {
+                          value: /^[A-Za-z0-9]+$/,
+                          message: "仅支持数字字母输入"
+                        },
+                        onChange: (e) => {
+                          // 实时限制输入长度
+                          if (e.target.value.length > 30) {
+                            e.target.value = e.target.value.slice(0, 30);
+                          }
+                        }
+                      })
+                      
+                    }
+                  />
+                  <ErrorBox error={errors.no?.message}/>
+                </InputBox>
+              </FormItemBox>  
             </div>
             
-          </div>
-        </SectionBox>
-        <SectionBox>
-          <SectionTitle>{t('kyc.t21')}</SectionTitle>
-          <div className=" grid grid-cols-2 font-normal gap-x-6">
-            {/* 收入类型 */}
-            <FormItemBox>
-              <FormItemLabel title={t('kyc.t22')} />
-              <InputBox >
-                <IncomeSelect 
-                  onChange={data => {
-                    setValue('source', Number(data.code))
-                  }}
-                />
-              </InputBox>
-            </FormItemBox>
-            
-          </div>
+            <div className=" grid grid-cols-1 font-normal">
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t14')} />
+                <div className="mt-3 flex gap-x-2 items-center mb-3">
+                  <CheckBox
+                    checked={useCertificateAddress}
+                    onChange={v => {
+                      setValue('useCertificateAddress', v)
+                    }}
+                  />
+                  <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
+                    {t('kyc.t15')}
+                  </div>
+                </div>
+                {
+                  !useCertificateAddress && 
+                    <InputBox >
+                      <KycInput 
+                        className=""
+                        placeholder={t('kyc.t4')}
+                        error={errors.residentAddress?.message}
+                        {
+                          ...register("residentAddress", {
+                            required: '请输入内容',
+                            maxLength: {
+                              value: 30,
+                              message: "最大支持输入40位字符"
+                            },
+                            pattern: {
+                              value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
+                              message: "只支持中文和英文字母"
+                            },
+                            onChange: (e) => {
+                              // 实时限制输入长度
+                              if (e.target.value.length > 40) {
+                                e.target.value = e.target.value.slice(0, 40);
+                              }
+                            }
+                          })
+                          
+                        }
+                      />
+                      <ErrorBox error={errors.residentAddress?.message}/>
+                    </InputBox>
+                }
+                
+              </FormItemBox>      
+            </div>
+          </SectionBox>
           
-        </SectionBox>
-        <SectionBox>
-          <SectionTitle>{t('kyc.t19')}</SectionTitle>
-          <div className="h-5"></div>
-          <Upload type="extra" />
-          <div className="flex items-center text-base text-[#909090] py-3">
-            <span className="text-[#CA3F64] mr-1 flex items-center">*</span>
-            {t('kyc.t20')}
-          </div>
-        </SectionBox>
-
-        <div className="mt-8 flex gap-x-2 items-start">
-          <div className=" shrink-0 relative top-[2px]">
-            <CheckBox />
-          </div>
-          <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
-            {t('identity.aggree1')}<a href="" target="_blank" className="text-[rgba(26,133,255,1)]">{t('identity.aggree3')}</a>{t('identity.aggree2')}
-          </div>
-        </div>
-        <div className="flex justify-center mt-8">
-          <Button disabled={submiting} loading={submiting} type="submit" className="bg-white text-black w-full lg:w-[400px] rounded-[8px]"
-          >
-            { t('identity.continue') }
+          <SectionBox className="pb-5">
+            <div className=" flex items-center">
+              <SectionTitle>{t('identity.upload.uploadId')}</SectionTitle>
+              <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+            </div>
             
-          </Button>
-        </div>
+            {/* 上传证件 */}
+            <Upload 
+              type={type === 1 ? 'passport' : 'identity'} 
+              keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
+              onChanged={(keys) => {
 
-      </form>
+                if (type === 1) {
+                  keys[0] && setValue('passport', keys as string)
+                } else {
+                  keys[0] && setValue('idCardFront', keys[0])
+                  keys[1] && setValue('idCardBack', keys[1])
+                  keys[2] && setValue('idCard', keys[2])
+                }
+                
+              }} 
+            />
+          </SectionBox>  
+          <SectionBox className="pb-5">
+            {/* 上传地址证明 */}
+            <Upload 
+              type="address" 
+              keys={addressCertification}
+              onChanged={(keys) => {
+                setValue('addressCertification', keys as string)
+              }} 
+            />
+          </SectionBox> 
+          <SectionBox>
+            <SectionTitle>{t('kyc.t16')}</SectionTitle>
+            <div className=" grid grid-cols-3 font-normal gap-x-6">
+              {/* 就业状况 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t17')} />
+                <InputBox >
+                  <EmploymentSelect 
+                    onChange={data => {
+                      setValue('employment', Number(data.code))
+                    }}
+                  />
+                </InputBox>
+              </FormItemBox>
+              <div className=" col-span-2">
+                {
+                  employment === 4 && 
+                  <FormItemBox>
+                    <FormItemLabel title={t('kyc.t23')} />
+                    <InputBox >
+                      <KycInput 
+                        className=""
+                        placeholder={t('kyc.t4')}
+                        error={errors.description?.message}
+                        {
+                          ...register("description", {
+                            required: '请输入内容',
+                            maxLength: {
+                              value: 30,
+                              message: "最大支持输入40位字符"
+                            },
+                            pattern: {
+                              value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
+                              message: "只支持中文和英文字母"
+                            },
+                            onChange: (e) => {
+                              // 实时限制输入长度
+                              if (e.target.value.length > 40) {
+                                e.target.value = e.target.value.slice(0, 40);
+                              }
+                            }
+                          })
+                          
+                        }
+                      />
+                      <ErrorBox error={errors.description?.message}/>
+                    </InputBox>
+                  </FormItemBox>
+                }
+              </div>
+              
+            </div>
+          </SectionBox>
+          <SectionBox>
+            <SectionTitle>{t('kyc.t21')}</SectionTitle>
+            <div className=" grid grid-cols-2 font-normal gap-x-6">
+              {/* 收入类型 */}
+              <FormItemBox>
+                <FormItemLabel title={t('kyc.t22')} />
+                <InputBox >
+                  <IncomeSelect 
+                    defaultValue={String(source)}
+                    onChange={data => {
+                      setValue('source', Number(data.code))
+                    }}
+                  />
+                </InputBox>
+              </FormItemBox>
+              
+            </div>
+            
+          </SectionBox>
+          <SectionBox>
+            <SectionTitle>{t('kyc.t19')}</SectionTitle>
+            <div className="h-5"></div>
+            <Upload type="extra" 
+              keys={incomeCertifications}
+              onChanged={keys => {
+                const _keys = (keys as string[]).filter(key => key)
+                _keys.length > 0 && setValue('incomeCertifications', _keys)
+              }}
+            />
+            <div className="flex items-center text-base text-[#909090] py-3">
+              <span className="text-[#CA3F64] mr-1 flex items-center">*</span>
+              {t('kyc.t20')}
+            </div>
+          </SectionBox>
+
+          <div className="mt-8 flex gap-x-2 items-start">
+            <div className=" shrink-0 relative top-[2px]">
+              <CheckBox />
+            </div>
+            <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
+              {t('identity.aggree1')}<a href="" target="_blank" className="text-[rgba(26,133,255,1)]">{t('identity.aggree3')}</a>{t('identity.aggree2')}
+            </div>
+          </div>
+          <div className="flex justify-center mt-8">
+            <Button disabled={submiting} loading={submiting} type="submit" className="bg-white text-black w-full lg:w-[400px] rounded-[8px]"
+            >
+              { t('identity.continue') }
+              
+            </Button>
+          </div>
+
+        </form>
+      </>
+      
     )
   }
 )

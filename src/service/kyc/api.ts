@@ -9,6 +9,7 @@ import type {
   IFilePutUrlRes,
   IFillAccessUrlRes,
   ILivenessUrlRes,
+  IPrivacyRes,
 } from './types'
 
 export const kycApi = {
@@ -26,4 +27,11 @@ export const kycApi = {
     }),
   getFileAccessUrl: (keys: string) =>
     client.get<ApiResponse<IFillAccessUrlRes[]>>('/v1/kyc/file-access-url', { keys: keys }),
+  
+  getAgreementsAccepted: () =>
+    client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
+  
+  postAgreementsAccept: (privacy: string) =>
+    client.post<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accept?privacy=' + privacy),
+  
 }

@@ -7,6 +7,7 @@ import svgr from "vite-plugin-svgr";
 import { viteMockServe } from "vite-plugin-mock";
 
 // https://vite.dev/config/
+// @ts-ignore
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   return {

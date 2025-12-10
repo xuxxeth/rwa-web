@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-export function useBodyScrollLock(open: boolean) {
+export function useBodyScrollLock(open?: boolean) {
   const originalStyle = useRef({
     overflow: "",
     paddingRight: ""
@@ -12,23 +12,26 @@ export function useBodyScrollLock(open: boolean) {
     body.style.paddingRight = originalStyle.current.paddingRight;
   }, []);
 
+  const lock = useCallback(() => {
+    const body = document.body;
+    const scrollBarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden"; // 禁止滚动
+    if (scrollBarWidth > 0) {
+      body.style.paddingRight = `${scrollBarWidth}px`; // 防止闪动
+    }
+  }, [])
+
   useEffect(() => {
     const body = document.body;
-
     // 保存原样式（只保存一次）
     originalStyle.current = {
       overflow: body.style.overflow,
       paddingRight: body.style.paddingRight,
     };
 
-    const scrollBarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
-
     if (open) {
-      body.style.overflow = "hidden"; // 禁止滚动
-      if (scrollBarWidth > 0) {
-        body.style.paddingRight = `${scrollBarWidth}px`; // 防止闪动
-      }
+      lock();
     } else {
       unlock(); // 关闭时恢复
     }
@@ -36,7 +39,7 @@ export function useBodyScrollLock(open: boolean) {
     return () => {
       unlock(); // 卸载也恢复
     };
-  }, [open, unlock]);
+  }, [open, lock, unlock]);
 
-  return { unlock };
+  return { lock, unlock };
 }

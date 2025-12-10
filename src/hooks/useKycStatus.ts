@@ -16,20 +16,19 @@ export function useFetchKycStatus() {
 }
 
 export function useKycStatus() {
-  const kycStatus = useKycStore(state => state.kycStatus?.status)
-
-  const riskStatus = useMemo(() => {
-    if (kycStatus === undefined) return RISK_STATUS.DEFAULT
-    if (kycStatus === -1) return RISK_STATUS.NOTSIGN
-    if (kycStatus === 1) return RISK_STATUS.VERIFYING
-    if (kycStatus === 2) return RISK_STATUS.VERIFIED
-    if (kycStatus === 3) return RISK_STATUS.REJECTED
-    if (kycStatus === 4) return RISK_STATUS.REVIEW
+  const status = useKycStore(state => state.kycStatus?.status)
+  const kycStatus = useMemo(() => {
+    if (status === undefined) return RISK_STATUS.DEFAULT
+    if (status === -1) return RISK_STATUS.NOTSIGN
+    if (status === 1) return RISK_STATUS.VERIFYING
+    if (status === 2) return RISK_STATUS.VERIFIED
+    if (status === 3) return RISK_STATUS.REJECTED
+    if (status === 4) return RISK_STATUS.REVIEW
     // 0 未认证
     return RISK_STATUS.NOTVERIFIED
-  }, [kycStatus])
+  }, [status])
   
   return {
-    riskStatus,
+    kycStatus,
   }
 }

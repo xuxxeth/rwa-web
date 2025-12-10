@@ -34,10 +34,6 @@ const Section3Lg = memo(() => {
   const xD = useTransform(scrollYProgress, [from, to], [26, -52],);
   const xBG = useTransform(scrollYProgress, [from, to], [1380, 878]);
 
-  scrollYProgress.on('change', v=> {
-    console.log(v)
-  })
-
   return (
     <div ref={sectionRef} className="h-[2400px]">
       <div

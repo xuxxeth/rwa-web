@@ -19,15 +19,6 @@ import {
   Verifying,
 } from './components/VerifyStatus'
 
-function InfoCollection() {
-  return (
-    <>
-      <WarningInfo />
-      <BaseInfo />
-    </>
-  )
-}
-
 function Identity() {
 
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
@@ -35,6 +26,7 @@ function Identity() {
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
     setKycDetail(res.data || { overallStatus: 0, verifyType: 'basic-info', status: 0 })
+    return res
   }
 
   useEffect(() => {
@@ -82,7 +74,7 @@ function Identity() {
   if (overallStatus === 0) {
     return (
       <MainContentWrapper>
-        <InfoCollection />
+        <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />
       </MainContentWrapper>
     )
   }
@@ -118,7 +110,7 @@ function Identity() {
       if (status === 6 || status === 3) {
         return (
           <MainContentWrapper>
-            <OCRVerifyFailed retryComponent={<InfoCollection />} />
+            <OCRVerifyFailed retryComponent={<BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />} />
           </MainContentWrapper>
         )
       }

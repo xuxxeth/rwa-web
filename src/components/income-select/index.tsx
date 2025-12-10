@@ -46,6 +46,10 @@ const IncomeSelect = memo(
     useEffect(() => {
       if (defaultValue) {
         setCurrentCode(defaultValue)
+        const _id = dataList.find(id => id.code === defaultValue)
+        if (_id) {
+          setCurrentItem(_id)
+        }
       }
     }, [defaultValue]) 
 

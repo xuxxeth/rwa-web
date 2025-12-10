@@ -25,4 +25,13 @@ export const useKycStore = create<KycActions & KycState>(set => ({
             set({ error: error.message, isLoading: false })
         }
     },
+    // getKycDetail: async () => {
+    //     set({ isLoading: true, error: null })
+    //     try {
+    //         const { data } = await kycApi.getKycStatus()
+    //         set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
+    //     } catch (error: any) {
+    //         set({ error: error.message, isLoading: false })
+    //     }
+    // },
 }))

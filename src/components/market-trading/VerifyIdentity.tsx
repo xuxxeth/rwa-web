@@ -14,6 +14,7 @@ const VerifyIdentity = memo(
   ({  align = 'center', riskStatus }: MarketTradingProps) => {
     const { t } = useTranslation()
     const router = useRouter()
+    
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center pl-4 bg-[rgba(255,106,0,0.1)]",
@@ -27,7 +28,7 @@ const VerifyIdentity = memo(
             router.push('/identity')
           }}
           >
-            { riskStatus === RISK_STATUS.NOTVERIFIED ? t("identity.verifyID") : t("kyc.t27")}
+            { riskStatus !== RISK_STATUS.VERIFIED ? t("identity.verifyID") : t("kyc.t27")}
         </button>
       </BoxCard>
     )

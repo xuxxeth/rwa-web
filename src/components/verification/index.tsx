@@ -5,8 +5,8 @@ import SignButton from "../button/SignButton";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
-import { useKycStatus } from "@/hooks/useKycStatus";
 import { useRouter } from "@/hooks/useRouter";
+import { useKycStatus } from "@/hooks/useKycStatus";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
   if (!verified) {
@@ -63,7 +63,8 @@ export function VerificationStatus(props: {
 export function Verification(props: { verified: boolean; issued: boolean }) {
   const router = useRouter()
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
-  const { riskStatus } = useKycStatus()
+  const { riskStatus } = useRiskStatus()
+  const { kycStatus } = useKycStatus()
   const startVerification = () => {
     router.push('/identity')
   }
@@ -73,8 +74,8 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
       riskStatus === RISK_STATUS.DEFAULT ? null :
       isSignatureValid && riskStatus !== RISK_STATUS.NOTSIGN ? 
         <div className="flex flex-row gap-4">
-          <VerificationStatus verified={riskStatus === RISK_STATUS.VERIFIED} issued={riskStatus === RISK_STATUS.REJECTED} />
-          {riskStatus === RISK_STATUS.NOTVERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
+          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED} issued={riskStatus === RISK_STATUS.REJECTED} />
+          {kycStatus !== RISK_STATUS.VERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
         </div> :
         <SignButton refreshIsSignatureValid={() => {
           refreshIsSignatureValid()
