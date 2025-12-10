@@ -460,7 +460,10 @@
     "t25": "Upload Additional Documents",
     "t26": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted.",
     "t27": "认证失败",
-    "t28": "Please select"
+    "t28": "Please select",
+    "t29": "Verification Incomplete",
+    "t30": "Your information does not match your documents. Please resubmit your details.",
+    "t31": "Edit"
   },
   "employment": {
     "t1": "退休",

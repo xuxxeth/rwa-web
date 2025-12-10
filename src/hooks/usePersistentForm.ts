@@ -9,7 +9,6 @@ export function usePersistentForm<T extends Record<string, any>>(
   const methods = useForm<T>({
     defaultValues: defaultValues
   });
-
   const { watch, reset } = methods;
   const clearRef = useRef(false)
   // 加载本地
@@ -23,6 +22,7 @@ export function usePersistentForm<T extends Record<string, any>>(
   // 加载保存的数据
   useEffect(() => {
     try {
+      if (defaultValues?.firstName) return
       const savedData = localStorage.getItem(storageKey);
       if (savedData) {
         const parsedData = JSON.parse(savedData);
@@ -38,6 +38,7 @@ export function usePersistentForm<T extends Record<string, any>>(
     const subscription = watch((data) => {
       if (clearRef.current) return
       try {
+        if (defaultValues?.firstName) return
         localStorage.setItem(storageKey, JSON.stringify(data));
       } catch (error) {
         console.error('保存表单数据失败:', error);

@@ -5,7 +5,7 @@ import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
 import { WarningInfo } from './components/WarningInfo'
 import { kycApi } from '@/service/kyc/api'
-import type { IKycDetail } from '@/service/kyc/types'
+import { KYC_RISK_LEVEL, type IKycDetail } from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
 import { Risk3Info } from './components/Risk3Info'
 import { IDExpired } from './components/IDExpired'
@@ -83,7 +83,7 @@ function Identity() {
     // 1. basic-info 阶段
     if (verifyType === 'BASIC-INFO') {
       // 高风险，并且用户没有上传收入证明
-      if (riskLevel === 3 && pendingMaterials === 'income-certificate') {
+      if (riskLevel === KYC_RISK_LEVEL.HIGH && pendingMaterials === 'income-certificate') {
         // 用户补充收入证明
         return (
           <MainContentWrapper>

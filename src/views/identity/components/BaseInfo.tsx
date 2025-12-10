@@ -27,28 +27,27 @@ async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
   maxRetries = 5,
   interval = 3000,
-  attempt = 1
+  
 ): Promise<any> {
-  try {
-    const result = await refresh()
-    // 成功直接返回
-    if (result.code === RESPONSE_CODE.SUCCESS) {
-      return result
+  let attempt = 1
+  return new Promise((resolve) => {
+    const query = async () => {
+      const result = await refresh()
+      if (result.code === RESPONSE_CODE.SUCCESS && result.data?.account) {
+        return resolve(result)
+      }
+      if (attempt < maxRetries) {
+        setTimeout(() => {
+          attempt += 1
+          query()
+        }, interval)
+      } else {
+        resolve(result)
+      }
     }
-    if (attempt < maxRetries) {
-      await new Promise(res => setTimeout(res, interval))
-      return retryRefresh(refresh, maxRetries, interval, attempt + 1)
-    }
-    return result
-  } catch (err) {
-    // refresh 报错也算失败
-    if (attempt < maxRetries) {
-      await new Promise(res => setTimeout(res, interval))
-      return retryRefresh(refresh, maxRetries, interval, attempt + 1)
-    }
-    // 最后一次也报错 → 返回错误对象（不抛错）
-    return { code: -1, message: err }
-  }
+    query()
+  })
+  
 }
 
 export const SectionTitle = ({ children }: { children: React.ReactNode }) => {
@@ -166,7 +165,7 @@ const BaseInfo = memo(
       clear,
       formState: { errors },
     } = usePersistentForm<FormData>('kycBaseInfo', {
-      firstName: '',
+      firstName: userInfo?.basicInfo.firstName,
       lastName: '',
       fullName: '',
       gendar: 0,
@@ -187,6 +186,7 @@ const BaseInfo = memo(
       incomeCertifications: [],
     })
     const type = watch('type')
+    const gendar = watch('gendar')
     const useCertificateAddress = watch('useCertificateAddress')
     const employment = watch('employment')
     const idCardFront = watch('idCardFront')
@@ -269,22 +269,23 @@ const BaseInfo = memo(
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)
-      setSubmiting(false)
+      
       if (res?.code === RESPONSE_CODE.SUCCESS) {
         if (refresh) {
           const detailRes = await retryRefresh(refresh)
-          if (detailRes.code === RESPONSE_CODE) {
+          setSubmiting(false)
+          if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
             toastSuccess({ title: '提交成功' })
             clear()
-          } else {
-            toastError({ title: res?.message || '提交失败' })
           }
         } else {
           toastSuccess({ title: '提交成功' })
           clear()
+          setSubmiting(false)
         }
       } else {
         toastError({ title: res?.message || '提交失败' })
+        setSubmiting(false)
       }
     }
 
@@ -303,34 +304,13 @@ const BaseInfo = memo(
           ...userInfo.incomeInfo,
           ...userInfo.extraInfo,
           ...userInfo.idInfo.files,
+          gendar: userInfo.basicInfo.gender
+
         })
       }
     }, [userInfo])
 
-    // firstName: string;
-    // lastName: string;
-    // fullName: string;
-    // gendar: number; // 0女，1男
-    // dob: string; // 出生日期
-    // email: string;
-    // // 证件信息
-    // type: number; // 0身份证, 1护照
-    // issueCountry: string
-    // no: string;
-    // residentAddress: string;
-    // useCertificateAddress?: boolean; // 是否使用证件地址
-    // // 工作信息
-    // employment: number; // 就业情况
-    // description: string; // 就业 时 必填
-    // // 收信息
-    // source: number;
-    // approvedProtocols: string[],
-    // idCardFront?: string,
-    // idCardBack?: string,
-    // idCard?: string,
-    // passport?: string,
-    // addressCertification?: string
-    // incomeCertifications?: string []
+    
 
     return (
       <>
@@ -437,10 +417,9 @@ const BaseInfo = memo(
                     className='h-[44px] rounded-[6px]'
                     placeholder={t('identity.select')}
                     data={genderList}
-                    defaultValue={'0'}
+                    defaultValue={String(gendar)}
                     onChange={data => {
-                      console.log(data)
-                      setValue('gendar', Number(data.value))
+                      data && data.value && setValue('gendar', Number(data.value))
                     }}
                   />
                 </InputBox>
