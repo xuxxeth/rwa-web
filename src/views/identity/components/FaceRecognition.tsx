@@ -14,8 +14,10 @@ export default function FaceRecognition({
   refresh: () => Promise<ApiResponse<IKycDetail>>
 }) {
   const { t } = useTranslation()
+  // undefined 表示还没有请求
+  // null 表示请求回来，为 null
   const [urlInfo, setUrlInfo] = useState<
-    { url: string; expireTime: number; bizNo: string } | undefined
+    { url: string; expireTime: number; bizNo: string } | undefined | null
   >(undefined)
   const [isExpired, setIsExpired] = useState(false)
   const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
@@ -28,6 +30,7 @@ export default function FaceRecognition({
       setIsMaxTimesReached(false)
       setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
     } else {
+      setUrlInfo(null)
       setIsMaxTimesReached(true)
     }
   }
@@ -70,6 +73,8 @@ export default function FaceRecognition({
       clearInterval(interval)
     }
   }, [])
+
+  if (urlInfo === undefined) return null
 
   return (
     <div className='p-8 bg-[#0E0E0E] rounded-lg flex flex-col gap-5'>
