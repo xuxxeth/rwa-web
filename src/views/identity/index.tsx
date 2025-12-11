@@ -5,7 +5,12 @@ import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
 import { WarningInfo } from './components/WarningInfo'
 import { kycApi } from '@/service/kyc/api'
-import { KYC_RISK_LEVEL, KYC_VERIFY_TYPE, type IKycDetail } from '@/service/kyc/types'
+import {
+  KYC_RISK_LEVEL,
+  KYC_VERIFY_TYPE,
+  KYC_OVERALL_STATUS,
+  type IKycDetail,
+} from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
 import { Risk3Info } from './components/Risk3Info'
 import { IDExpired } from './components/IDExpired'
@@ -98,12 +103,12 @@ function Identity() {
   }
 
   // 1 认证中
-  if (overallStatus === 1) {
+  if (overallStatus === KYC_OVERALL_STATUS.VERIFYING) {
     // 接下来判断处于认证的哪个阶段,
     // 1. basic-info 阶段
-    if (verifyType === KYC_VERIFY_TYPE.BASIC) {
+    if (verifyType === KYC_VERIFY_TYPE.INCOME) {
       // 高风险，并且用户没有上传收入证明
-      if (riskLevel === KYC_RISK_LEVEL.HIGH && pendingMaterials === 'income-certificate') {
+      if (riskLevel === KYC_RISK_LEVEL.HIGH) {
         // 用户补充收入证明
         return (
           <MainContentWrapper>
