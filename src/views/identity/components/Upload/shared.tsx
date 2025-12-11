@@ -18,6 +18,7 @@ export interface IUploadedRes {
 export interface IUploadedResV2 {
   success: boolean
   key?: string
+  blobUrl?: string
 }
 
 export function checkImgUploaded(uploadedRes: IUploadedRes | null) {
@@ -43,12 +44,6 @@ export function Text(props: { text: string; className?: string }) {
   )
 }
 
-export function IsKeyEqual(key1: string | undefined | null, key2: string | undefined | null) {
-  key1 = key1 ?? ''
-  key2 = key2 ?? ''
-  return key1 === key2
-}
-
 export function useUploadedRes(
   fileType: UploadFileType,
   key?: string
@@ -60,21 +55,10 @@ export function useUploadedRes(
       key,
     }
   })
-  // const [isFirstFetched, setIsFirstFetched] = useState(false)
 
   const onUploaded = (res: IUploadedRes | null) => {
     setUploadedRes(res)
   }
-
-  // 存储到 localstorage
-  // const uploadedKeys = useMemo(() => {
-  //   return uploadedRes?.key
-  // }, [uploadedRes])
-
-  // useEffect(() => {
-  //   if (!isFirstFetched) return
-  //   saveUploadKey(fileType, uploadedKeys)
-  // }, [uploadedKeys, isFirstFetched])
 
   useEffect(() => {
     if (!key) return
@@ -83,7 +67,6 @@ export function useUploadedRes(
       if (res) {
         setUploadedRes({ success: true, ...res[0] })
       }
-      // setIsFirstFetched(true)
     })
   }, [key])
 
@@ -116,20 +99,6 @@ export function useUploadedArrRes(props: {
     })
   }
 
-  // 存储到 localstorage
-  // const uploadedKeys = useMemo(() => {
-  //   return uploadedRes.filter(item => item?.key).map(item => item?.key) as string[]
-  // }, [uploadedRes])
-
-  // useEffect(() => {
-  //   if (!isFetched) return
-  //   if (uploadedKeys.length > 0) {
-  //     saveUploadKey(props.fileType, uploadedKeys)
-  //   } else {
-  //     saveUploadKey(props.fileType, null)
-  //   }
-  // }, [uploadedKeys, isFetched])
-
   useEffect(() => {
     if (!props.keys || props.keys.length === 0) return
     getUploadedFileUrl(props.keys).then(res => {
@@ -155,7 +124,7 @@ export const getFileAccessUrl = async (key: string) => {
   }
 }
 
-export const uploadFileV2 = async (
+export const uploadFile = async (
   file: File,
   onProgress: (progress: number) => void
 ): Promise<{ success: boolean; key: string } | null> => {
@@ -187,57 +156,6 @@ export const uploadFileV2 = async (
     })
 
     return { success: true, key: data.key }
-
-    // const accessUrl = await getFileAccessUrl(data.key)
-
-    // if (accessUrl) {
-    //   return { success: true, key: data.key }
-    // }
-
-    throw new Error('Failed to get access URL.')
-  } catch (error) {
-    throw error
-  }
-}
-
-export const uploadFile = async (
-  file: File,
-  onProgress: (progress: number) => void
-): Promise<{ success: boolean; url: string; key: string } | null> => {
-  try {
-    const fileType = file.type as FilePutMimeType
-    const fileName = file.name
-    const { data } = await kycApi.getFilePutUrl(fileType, fileName)
-
-    if (!data || !data.url) {
-      throw new Error('Failed to get pre-signed URL.')
-    }
-    // 使用预签名 URL 上传文件到 S3
-    // 这里直接使用原始的 `axios` 实例，而不是封装的 `client`，
-    // 是因为上传到 S3 预签名 URL 是一个特殊请求。
-    // 封装的 `client` 包含全局拦截器（如添加认证头或 baseURL），
-    // 这些拦截器会干扰 S3 的上传过程，导致请求失败。
-    await axios.put(data.url, file, {
-      headers: {
-        // Content-Type 必须与生成预签名 URL 时指定的完全一致
-        'Content-Type': fileType,
-      },
-      onUploadProgress: processEvent => {
-        const { loaded, total } = processEvent
-        if (total) {
-          const percentCompleted = Math.round((loaded * 100) / total)
-          onProgress(percentCompleted)
-        }
-      },
-    })
-
-    const accessUrl = await getFileAccessUrl(data.key)
-
-    if (accessUrl) {
-      return { success: true, url: accessUrl[0].url, key: data.key }
-    }
-
-    throw new Error('Failed to get access URL.')
   } catch (error) {
     throw error
   }
@@ -275,24 +193,6 @@ export const saveUploadKey = (
   }
 }
 
-// export async function getUploadedFileUrl(storageKey: UploadFileType) {
-//   try {
-//     const item = (storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}) as StorageData
-//     let s3Key = item[storageKey]
-//     if (s3Key) {
-//       s3Key = Array.isArray(s3Key) ? s3Key.join(',') : s3Key
-//       const accessUrl = await getFileAccessUrl(s3Key)
-//       if (accessUrl) {
-//         return accessUrl
-//       }
-//     }
-//     return null
-//   } catch (error) {
-//     console.error('Failed to get key from local storage', error)
-//     return null
-//   }
-// }
-
 export async function getUploadedFileUrl(keys: string | string[]) {
   try {
     keys = Array.isArray(keys) ? keys.join(',') : keys
@@ -324,21 +224,20 @@ export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'vie
   )
 }
 
-export function UploadCardV2(props: {
+export function UploadCard(props: {
   fileType: UploadFileType
   s3Key?: string
-  onUploaded: (res: IUploadedResV2 | null) => void
-  onS3KeyLoaded?: (key: string, url: string) => void
+  onUploaded: (res: IUploadedResV2) => void
   mode?: 'edit' | 'view'
 }) {
-  const { fileType, onUploaded, onS3KeyLoaded, s3Key, mode } = props
+  const { fileType, onUploaded, s3Key, mode } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
 
   const [isHover, setIsHover] = useState(false)
 
-  const [previewUrl, setPreviewUrl] = useState<string>('')
+  const [previewUrl, setPreviewUrl] = useState<{ key: string; url: string } | null>(null)
 
   const [isFileTooLarge, setIsFileTooLarge] = useState(false)
 
@@ -351,19 +250,26 @@ export function UploadCardV2(props: {
     const isFilePdf = file.type === 'application/pdf'
     setIsPdf(isFilePdf)
 
-    // onUploaded(null)
     setIsUploading(true)
     setUploadProgress(0)
     setIsFileTooLarge(false)
 
     try {
-      const result = await uploadFileV2(file, progress => {
+      const result = await uploadFile(file, progress => {
         setUploadProgress(progress)
       })
-      onUploaded(result)
-      // 上传成功后，生成预览 URL, 优先使用本地的 url
-      if (!isFilePdf) {
-        setPreviewUrl(URL.createObjectURL(file))
+
+      if (result) {
+        const blobUrl = isFilePdf ? '' : URL.createObjectURL(file)
+        onUploaded({ ...result, blobUrl })
+
+        // 上传成功后，生成预览 URL, 优先使用本地的 url
+        if (result && !isFilePdf) {
+          setPreviewUrl({
+            key: result.key,
+            url: blobUrl,
+          })
+        }
       }
     } catch (error) {
       console.error('上传失败:', error)
@@ -398,16 +304,16 @@ export function UploadCardV2(props: {
 
   useEffect(() => {
     if (!s3Key) return
+    //  如果本地已经有了 previewUrl 且 key 相同，直接返回
+    if (previewUrl && s3Key === previewUrl.key) return
+
     getUploadedFileUrl(s3Key).then(urls => {
       if (urls.length > 0) {
         const url = urls[0].url
-        setPreviewUrl(url)
-        if (s3Key.includes('.pdf')) {
-          setIsPdf(true)
-        }
-        if (onS3KeyLoaded) {
-          onS3KeyLoaded(s3Key, url)
-        }
+
+        const isFilePdf = s3Key.includes('.pdf')
+        setIsPdf(isFilePdf)
+        setPreviewUrl({ key: s3Key, url: url })
       }
     })
   }, [s3Key])
@@ -438,7 +344,7 @@ export function UploadCardV2(props: {
           ) : previewUrl ? (
             <>
               <LazyImage
-                src={isPdf ? '/images/icons/identity/pdf.png' : previewUrl}
+                src={isPdf ? '/images/icons/identity/pdf.png' : previewUrl.url}
                 className='rounded-lg'
                 style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />

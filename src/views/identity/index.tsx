@@ -3,7 +3,6 @@ import { MainLayout } from '@/layouts/main'
 import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
-import { WarningInfo } from './components/WarningInfo'
 import { kycApi } from '@/service/kyc/api'
 import {
   KYC_RISK_LEVEL,
@@ -14,9 +13,7 @@ import {
 } from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
 import { Risk3Info } from './components/Risk3Info'
-import { IDExpired } from './components/IDExpired'
 import { ExtraInfo } from './components/ExtraInfo'
-import { ReviewInfo } from './components/ReviewInfo'
 import {
   OCRVerifyFailed,
   FaceRecognitionFailed,
@@ -25,7 +22,6 @@ import {
   Verifying,
 } from './components/VerifyStatus'
 import { useAccount, useChainId } from 'ca-common-web'
-import { useTranslation } from '@/hooks/useTranslation'
 import { useAppStore } from '@/stores/appStore'
 import WalletNotConnected from '@/components/wallet-not-connected'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
@@ -60,7 +56,7 @@ function Identity() {
 
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
-    setKycDetail(res.data || { overallStatus: 0, verifyType: 'basic-info', status: 0 })
+    setKycDetail(res.data)
     return res
   }
 

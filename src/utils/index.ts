@@ -14,7 +14,7 @@ export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
-export function noop() { }
+export function noop() {}
 
 export function parseAmount(value: string | number, decimals: number = 6): string {
   return new BigNumber(value)
@@ -151,16 +151,10 @@ export const TEN_MINUTES = 10 * 60 * 1000
 export const ONE_MINUTE = 60 * 1000
 export const TEN_SECONDS = 10 * 1000
 
-export async function mergeImagesFromUrls(url1: string, url2: string): Promise<File> {
+export async function mergeTwoImageFromUrls(url1: string, url2: string): Promise<File> {
   return new Promise((resolve, reject) => {
     const image1 = new Image()
     const image2 = new Image()
-
-    image1.crossOrigin = "anonymous"
-    image2.crossOrigin = "anonymous"
-
-    image1.src = url1
-    image2.src = url2
 
     let loadedCount = 0
     const onImageLoad = () => {
@@ -170,7 +164,7 @@ export async function mergeImagesFromUrls(url1: string, url2: string): Promise<F
         const ctx = canvas.getContext('2d')
 
         if (!ctx) {
-          return reject(new Error('Failed to get canvas 2D context'));
+          return reject(new Error('Failed to get canvas 2D context'))
         }
 
         // 以上下排列
@@ -181,17 +175,21 @@ export async function mergeImagesFromUrls(url1: string, url2: string): Promise<F
 
         // 绘制图片
         ctx.drawImage(image1, 0, 0)
-        ctx.drawImage(image2, 0, image1.height);
+        ctx.drawImage(image2, 0, image1.height)
 
-        canvas.toBlob((blob) => {
-          if (blob) {
-            // jpeg 能以更小的文件体积保留可接受的图像质量
-            const mergedFile = new File([blob], 'merged-image.jpg', { type: 'image/jpeg' })
-            resolve(mergedFile)
-          } else {
-            reject(new Error('Failed to convert Canvas to Blob'))
-          }
-        }, 'image/jpeg', 0.8) // 添加质量参数 0.8
+        canvas.toBlob(
+          blob => {
+            if (blob) {
+              // jpeg 能以更小的文件体积保留可接受的图像质量
+              const mergedFile = new File([blob], 'merged-image.jpg', { type: 'image/jpeg' })
+              resolve(mergedFile)
+            } else {
+              reject(new Error('Failed to convert Canvas to Blob'))
+            }
+          },
+          'image/jpeg',
+          0.8
+        ) // 添加质量参数 0.8
       }
     }
 
@@ -200,5 +198,31 @@ export async function mergeImagesFromUrls(url1: string, url2: string): Promise<F
 
     image1.onload = onImageLoad
     image2.onload = onImageLoad
+
+    // 使用 fetch 加载图片，并设置为 no-cache，强制浏览器重新发起带 Origin 的请求
+    // 从而避免使用之前缓存的"无 CORS 头"响应
+    const loadBlobImage = async (url: string, img: HTMLImageElement) => {
+      // 1. 如果是 Blob URL (本地预览图)，直接加载，无需 fetch
+      if (url.startsWith('blob:')) {
+        img.src = url
+        return
+      }
+
+      // 2. 如果是s3 url, 使用 fetch + no-cache 绕过 CORS 缓存
+      try {
+        const response = await fetch(url, { mode: 'cors', cache: 'no-cache' })
+        const blob = await response.blob()
+        const objectUrl = URL.createObjectURL(blob)
+        img.src = objectUrl
+      } catch (err) {
+        // 如果 fetch 失败，尝试回退到普通加载（可能仍然会失败，但值得一试）
+        console.warn('Fetch image failed, fallback to direct src', err)
+        img.crossOrigin = 'anonymous'
+        img.src = url
+      }
+    }
+
+    loadBlobImage(url1, image1)
+    loadBlobImage(url2, image2)
   })
 }
