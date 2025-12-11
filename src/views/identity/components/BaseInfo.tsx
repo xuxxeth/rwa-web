@@ -250,7 +250,7 @@ const BaseInfo = memo(
         },
         workInfo: {
           employment: data.employment,
-          description: data.description,
+          description: data.employment === 4 ? data.description : '',
         },
         incomeInfo: {
           source: data.source || 1,

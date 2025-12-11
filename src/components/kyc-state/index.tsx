@@ -27,10 +27,10 @@ const KycState = () => {
     return fail && kycDetail?.riskLevel !== KYC_RISK_LEVEL.HIGH
 
   }, [kycDetail])
-  const ocrExtra = useMemo(() => {
+  const ocrIncome = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-      (kycDetail.status === KYC_STATUS.FAIL || kycDetail.status === KYC_STATUS.REJECTED) &&
-      kycDetail.verifyType === KYC_VERIFY_TYPE.OCR
+      (kycDetail.status !== KYC_STATUS.VERIFIED) &&
+      kycDetail.verifyType === KYC_VERIFY_TYPE.INCOME
     return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
 
   }, [kycDetail])
@@ -38,6 +38,17 @@ const KycState = () => {
   // 显示后 10 秒自动隐藏
   useEffect(() => {
     if (!kycDetail) return
+    if (ocrIncome) {
+      setContent({
+        title: t('kyc.t29'),
+        content: t('kyc.t32'),
+        btnText: t('kyc.t33'),
+        btn: 'upload'
+      })
+      setShow(true)
+      return
+    }
+
     if (ocrFail) {
       setContent({
         title: t('kyc.t29'),
@@ -47,15 +58,17 @@ const KycState = () => {
       })
       setShow(true)
     }
-  }, [t, ocrFail]);
+    
+  }, [t, ocrFail, ocrIncome]);
 
   const close = () => setShow(false);
 
   const handleGo = useCallback(async () => {
     setShow(false)
     if (content.btn === 'edit') {
-      router.push('/identity')
+      
     }
+    router.push('/identity')
   }, [content])
 
   return ReactDOM.createPortal(
@@ -69,7 +82,7 @@ const KycState = () => {
             duration: 0.5,
             ease: "easeOut",
           }}
-          className="fixed bottom-4 right-4 z-[99] w-[450px] min-h-[200px] border border-[#333333] bg-[#0E0E0E] rounded-[16px] p-4"
+          className="fixed bottom-4 right-4 z-[99] w-[450px] min-h-[200px] border border-[#333333] bg-[#0E0E0E] rounded-[16px] p-4 flex flex-col justify-between"
         >
           <div className="flex justify-between">
             <div className="flex items-center gap-x-2">

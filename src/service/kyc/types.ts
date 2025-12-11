@@ -37,11 +37,12 @@ export const KYC_RISK_LEVEL = {
 export type KYC_RISK_LEVEL = typeof KYC_RISK_LEVEL[keyof typeof KYC_RISK_LEVEL] 
 
 export const KYC_VERIFY_TYPE = {
-  BASIC: 'basic-info',
+  BASIC: 'BASIC_INFO',
+  INCOME: 'INCOME',
   OCR: 'OCR',
-  LIVENESS: 'liveness',
-  AML: 'aml',
-  KYT: 'kyt'
+  LIVENESS: 'LIVENESS',
+  AML: 'AML',
+  KYT: 'KYT'
 }
 export type KYC_VERIFY_TYPE = typeof KYC_VERIFY_TYPE[keyof typeof KYC_VERIFY_TYPE]
 
