@@ -5,6 +5,7 @@ import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
 import { useEffect, useState, type ReactNode } from 'react'
 import { isLess, parseAmount } from '@/utils'
+import { useSearchParams } from 'react-router-dom'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
 
@@ -65,7 +66,10 @@ function VerifyStatus(props: {
   retryComponent?: ReactNode
 }) {
   const { t } = useTranslation()
-  const [isRetry, setIsRetry] = useState(false)
+  const [searchParams] = useSearchParams()
+  const isRetryFromUrl = searchParams.get('retry') === 'true'
+
+  const [isRetry, setIsRetry] = useState(isRetryFromUrl)
 
   if (isRetry && props.retryComponent) {
     return props.retryComponent

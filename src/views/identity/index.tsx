@@ -9,6 +9,7 @@ import {
   KYC_RISK_LEVEL,
   KYC_VERIFY_TYPE,
   KYC_OVERALL_STATUS,
+  KYC_STATUS,
   type IKycDetail,
 } from '@/service/kyc/types'
 import FaceRecognition from './components/FaceRecognition'
@@ -94,7 +95,7 @@ function Identity() {
   }
 
   //  0 未认证, 显示信息采集组件
-  if (overallStatus === 0) {
+  if (overallStatus === KYC_OVERALL_STATUS.NOTVERIFIED) {
     return (
       <MainContentWrapper>
         <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />
@@ -119,9 +120,9 @@ function Identity() {
     }
 
     // 2. OCR 阶段
-    if (verifyType === 'OCR') {
+    if (verifyType === KYC_VERIFY_TYPE.OCR) {
       // 1 认证中
-      if (status === 1) {
+      if (status === KYC_STATUS.VERIFYING) {
         return (
           <MainContentWrapper>
             <Verifying />
@@ -130,7 +131,7 @@ function Identity() {
       }
 
       // ocr 认证失败, 6 已拒绝, 3 已失败
-      if (status === 6 || status === 3) {
+      if (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) {
         return (
           <MainContentWrapper>
             <OCRVerifyFailed
@@ -142,9 +143,9 @@ function Identity() {
     }
 
     // 3. 活体阶段
-    if (verifyType === 'LIVENESS') {
+    if (verifyType === KYC_VERIFY_TYPE.LIVENESS) {
       // 活体认证 1. 认证中
-      if (status === 1) {
+      if (status === KYC_STATUS.VERIFYING) {
         return (
           <MainContentWrapper>
             <FaceRecognition refresh={refresh} />
@@ -152,7 +153,7 @@ function Identity() {
         )
       }
       // 活体认证  6 已拒绝, 3 已失败
-      if (status === 6 || status === 3) {
+      if (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) {
         return (
           <MainContentWrapper>
             <FaceRecognitionFailed retryComponent={<FaceRecognition refresh={refresh} />} />
@@ -162,9 +163,9 @@ function Identity() {
     }
 
     // 4. aml 阶段
-    if (verifyType === 'AML') {
+    if (verifyType === KYC_VERIFY_TYPE.AML) {
       // 4. 人工审核中，即使待审核的意思，等待审核员审核
-      if (status === 4) {
+      if (status === KYC_STATUS.VERIFYING) {
         return (
           <MainContentWrapper>
             <Verifying />
@@ -173,7 +174,7 @@ function Identity() {
       }
 
       // 7. 已经驳回
-      if (status === 7) {
+      if (status === KYC_STATUS.DECLINED) {
         // 显示 AML 人审补充信息
         return (
           <MainContentWrapper>
@@ -184,12 +185,12 @@ function Identity() {
     }
 
     // 5. kyt 阶段，在电脑端
-    if (verifyType === 'KYT') {
+    if (verifyType === KYC_VERIFY_TYPE.KYT) {
     }
   }
 
   // 2. 已通过
-  if (overallStatus === 2) {
+  if (overallStatus === KYC_OVERALL_STATUS.VERIFIED) {
     return (
       <MainContentWrapper>
         <VerifySucceeded />
@@ -198,7 +199,7 @@ function Identity() {
   }
 
   // 3. 已拒绝
-  if (overallStatus === 3) {
+  if (overallStatus === KYC_OVERALL_STATUS.FAIL) {
     return (
       <MainContentWrapper>
         <VerifyFailed />

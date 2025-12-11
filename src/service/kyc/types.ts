@@ -3,16 +3,16 @@ export interface ISupportedCountry {
   value: string
 }
 
-// 0 未认证, 1 认证中, 2 已通过, 3 已拒绝, 4 人工审核中
+// 0 未认证, 1 认证中, 2 已通过, 3 已拒绝
 export const KYC_OVERALL_STATUS = {
   DEFAULT: -1,
   NOTVERIFIED: 0,
   VERIFYING: 1,
   VERIFIED: 2,
   FAIL: 3,
-  REVIEW: 4,
 }
-export type KYC_OVERALL_STATUS = typeof KYC_OVERALL_STATUS[keyof typeof KYC_OVERALL_STATUS] 
+
+export type KYC_OVERALL_STATUS = (typeof KYC_OVERALL_STATUS)[keyof typeof KYC_OVERALL_STATUS]
 // -1 未签名 0 未认证, 1 认证中, 2 已通过, 3 已失败, 4 人工审核中, 5 已过期, 6-已拒绝, 7 - 已驳回
 export const KYC_STATUS = {
   DEFAULT: -1,
@@ -23,18 +23,18 @@ export const KYC_STATUS = {
   REVIEW: 4,
   EXPIRED: 5,
   REJECTED: 6,
-  DECLINED: 7
+  DECLINED: 7,
 }
-export type KYC_STATUS = typeof KYC_STATUS[keyof typeof KYC_STATUS] 
+export type KYC_STATUS = (typeof KYC_STATUS)[keyof typeof KYC_STATUS]
 export type KYC_GENDER = 0 | 1 // 0 女, 1 男
 export type KYC_ID_TYPE = 0 | 1 // 0 身份证 1 护照
 
 export const KYC_RISK_LEVEL = {
   LOW: 1,
   MIDDLE: 2,
-  HIGH: 3
+  HIGH: 3,
 } // 1 低风险 2 中风险 3 高风险
-export type KYC_RISK_LEVEL = typeof KYC_RISK_LEVEL[keyof typeof KYC_RISK_LEVEL] 
+export type KYC_RISK_LEVEL = (typeof KYC_RISK_LEVEL)[keyof typeof KYC_RISK_LEVEL]
 
 export const KYC_VERIFY_TYPE = {
   BASIC: 'BASIC_INFO',
@@ -42,16 +42,17 @@ export const KYC_VERIFY_TYPE = {
   OCR: 'OCR',
   LIVENESS: 'LIVENESS',
   AML: 'AML',
-  KYT: 'KYT'
+  KYT: 'KYT',
 }
-export type KYC_VERIFY_TYPE = typeof KYC_VERIFY_TYPE[keyof typeof KYC_VERIFY_TYPE]
+export type KYC_VERIFY_TYPE = (typeof KYC_VERIFY_TYPE)[keyof typeof KYC_VERIFY_TYPE]
 
 export const KYC_PENDING_MATERIALS = {
   INCOME: 'income-certificate',
   ADDRESS: 'address-certificate',
-  EXTRA: 'extra-documents'
+  EXTRA: 'extra-documents',
 }
-export type KYC_PENDING_MATERIALS = typeof KYC_PENDING_MATERIALS[keyof typeof KYC_PENDING_MATERIALS]
+export type KYC_PENDING_MATERIALS =
+  (typeof KYC_PENDING_MATERIALS)[keyof typeof KYC_PENDING_MATERIALS]
 
 export interface IKycStatus {
   status: KYC_STATUS
