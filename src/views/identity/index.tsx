@@ -174,7 +174,7 @@ function Identity() {
         // 显示 AML 人审补充信息
         return (
           <MainContentWrapper>
-            <div>aml 人审核补充信息</div>
+            <ExtraInfo />
           </MainContentWrapper>
         )
       }
@@ -182,6 +182,13 @@ function Identity() {
 
     // 5. kyt 阶段，在电脑端
     if (verifyType === KYC_VERIFY_TYPE.KYT) {
+      if (status === KYC_STATUS.VERIFYING) {
+        return (
+          <MainContentWrapper>
+            <Verifying />
+          </MainContentWrapper>
+        )
+      }
     }
   }
 

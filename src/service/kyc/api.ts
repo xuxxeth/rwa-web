@@ -4,7 +4,6 @@ import type {
   IKycStatus,
   IKycDetail,
   IKycSubmitData,
-  IUploadResponse,
   FilePutMimeType,
   IFilePutUrlRes,
   IFillAccessUrlRes,
@@ -15,6 +14,8 @@ import type {
 export const kycApi = {
   getLivenessUrl: () =>
     client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url'),
+  isLivenessUrlExpired: (bizNo: string) =>
+    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/is-expired', { bizNo: bizNo }),
   getSupportedCountries: () =>
     client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/support-countries'),
   getKycStatus: () => client.get<ApiResponse<IKycStatus>>('/v1/kyc/status'),
@@ -27,11 +28,9 @@ export const kycApi = {
     }),
   getFileAccessUrl: (keys: string) =>
     client.get<ApiResponse<IFillAccessUrlRes[]>>('/v1/kyc/file-access-url', { keys: keys }),
-  
-  getAgreementsAccepted: () =>
-    client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
-  
+
+  getAgreementsAccepted: () => client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
+
   postAgreementsAccept: (privacy: string) =>
     client.post<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accept?privacy=' + privacy),
-  
 }

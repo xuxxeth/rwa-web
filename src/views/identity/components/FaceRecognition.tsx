@@ -14,7 +14,9 @@ export default function FaceRecognition({
   refresh: () => Promise<ApiResponse<IKycDetail>>
 }) {
   const { t } = useTranslation()
-  const [urlInfo, setUrlInfo] = useState<{ url: string; expireTime: number } | undefined>(undefined)
+  const [urlInfo, setUrlInfo] = useState<
+    { url: string; expireTime: number; bizNo: string } | undefined
+  >(undefined)
   const [isExpired, setIsExpired] = useState(false)
   const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
 
@@ -24,7 +26,7 @@ export default function FaceRecognition({
 
     if (data.url && data.expireTime) {
       setIsMaxTimesReached(false)
-      setUrlInfo({ url: data.url, expireTime: data.expireTime })
+      setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
     } else {
       setIsMaxTimesReached(true)
     }
@@ -35,21 +37,22 @@ export default function FaceRecognition({
   }, [])
 
   useEffect(() => {
-    if (isExpired || !urlInfo || !urlInfo.url || !urlInfo.expireTime) return
+    if (isExpired || !urlInfo || !urlInfo.url || !urlInfo.expireTime || !urlInfo.bizNo) return
 
-    const checkExpiration = () => {
+    const checkExpiration = async () => {
       if (urlInfo.expireTime! < Date.now()) {
         setIsExpired(true)
-      } else {
-        setIsExpired(false)
+      }
+      const { data: isUsed } = await kycApi.isLivenessUrlExpired(urlInfo.bizNo)
+      if (isUsed) {
+        setIsExpired(true)
       }
     }
 
     checkExpiration()
-
     const interval = setInterval(() => {
       checkExpiration()
-    }, 1000 * 2)
+    }, 1000 * 3)
 
     return () => {
       clearInterval(interval)
@@ -110,30 +113,6 @@ function QrCodeExpirted({ refresh }: { refresh: () => Promise<void> }) {
 }
 
 const resultLangPrefix = 'identity.result'
-
-function FaceRecognitionFailed({ onRetry }: { onRetry: () => void }) {
-  const { t } = useTranslation()
-  return (
-    <div className='bg-[#0E0E0E] p-8'>
-      <div className='text-lg font-medium pb-4 border-b border-white/10'>
-        {t(`${resultLangPrefix}.res`)}
-      </div>
-      <div className='flex flex-col gap-5 items-center'>
-        <LazyImage src='/images/icons/identity/fail.png' className='w-[120px] h-[90px] pt-5' />
-        <div>
-          <div className='text-2xl mb-2 text-center'>{t(`${faceLangPrefix}.f`)}</div>
-          <div className='text-base text-[#909090]'>{t(`${faceLangPrefix}.ft`)}</div>
-        </div>
-        <button
-          onClick={onRetry}
-          className='w-[402px] h-[46px] border rounded-lg cursor-pointer border-white bg-transparent text-white tex-base font-bold'
-        >
-          {t(`${faceLangPrefix}.rv`)}
-        </button>
-      </div>
-    </div>
-  )
-}
 
 // 二维码失效
 function QrCodeInvalid() {
