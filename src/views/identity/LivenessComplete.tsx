@@ -1,8 +1,14 @@
 import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useSearchParams } from 'react-router-dom'
+
+const langPrefix = 'identity.face'
 
 export default function LivenessComplete() {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
+  const success = searchParams.get('success') === 'true'
+  const failReason = parseInt(searchParams.get('failReason') || '0')
 
   return (
     <div>
@@ -16,8 +22,10 @@ export default function LivenessComplete() {
           className='w-[195px] h-[192px] m-auto'
         />
       </div>
-      <div className='text-xl text-center text-white'>{t('identity.face.complete')}</div>
-      <div className='mt-4 text-base text-center text-white'>{t('identity.face.toWeb')}</div>
+      <div className='text-xl text-center text-white'>
+        {success ? t(`${langPrefix}.complete`) : t(`${langPrefix}.r${failReason}`)}
+      </div>
+      <div className='mt-4 text-base text-center text-white'>{t(`${langPrefix}.toWeb`)}</div>
     </div>
   )
 }

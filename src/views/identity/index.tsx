@@ -48,10 +48,10 @@ function IdentityEntry() {
     return <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
   }
 
-  return <Identity />
+  return <Identity account={account} />
 }
 
-function Identity() {
+function Identity({ account }: { account: string }) {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
 
   const refresh = async () => {
@@ -62,22 +62,14 @@ function Identity() {
 
   useEffect(() => {
     refresh()
-  }, [])
+  }, [account])
 
   if (kycDetail === undefined) {
     return 'loading...'
   }
 
-  const {
-    account,
-    overallStatus,
-    riskLevel,
-    status,
-    userInfo,
-    pendingMaterials,
-    verifyType,
-    rejectReason,
-  } = kycDetail
+  const { overallStatus, riskLevel, status, userInfo, pendingMaterials, verifyType, rejectReason } =
+    kycDetail
 
   if (status === 5) {
     return (

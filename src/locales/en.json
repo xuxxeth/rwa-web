@@ -277,7 +277,11 @@
       "ft": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
       "rv": "Retry Verification",
       "complete": "Facial Verification Completed",
-      "toWeb": "Please view the authentication results on the web browser."
+      "toWeb": "Please view the authentication results on the web browser.",
+      "r0": "Unknown status",
+      "r1": "Verification process not completed",
+      "r2": "Verification result not passed",
+      "r3": "Verification confidence not passed"
     },
     "result": {
       "res": "Verification Result",
