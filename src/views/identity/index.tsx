@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, useMemo, type ReactNode } from 'react'
 import { MainLayout } from '@/layouts/main'
 import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
@@ -28,6 +28,7 @@ import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from '@/components/signature-verify'
 import { useKycExpired } from '@/hooks/useKycStatus'
 import { IDExpired } from './components/IDExpired'
+import { useSearchParams } from 'react-router-dom'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -61,6 +62,14 @@ function Identity({ account }: { account: string }) {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
   const expireStatus = useKycExpired()
 
+  const [searchParams] = useSearchParams()
+  const isRetryFromUrl = searchParams.get('retry') === 'true'
+  const [isRetry, setIsRetry] = useState(isRetryFromUrl)
+
+  const resetRetry = () => {
+    setIsRetry(prev => (prev === true ? false : prev))
+  }
+
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
     setKycDetail(res.data)
@@ -71,159 +80,133 @@ function Identity({ account }: { account: string }) {
     refresh()
   }, [account])
 
-  if (kycDetail === undefined) {
-    return 'loading...'
+  const rules = useMemo(() => {
+    if (kycDetail === undefined) return []
+
+    const { overallStatus, riskLevel, status, verifyType } = kycDetail
+
+    return [
+      // 已过期/即将过期
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.EXPIRED ||
+          (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring),
+        render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />,
+      },
+      // 未认证
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.NOTVERIFIED,
+        render: () => <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />,
+      },
+      // 认证成功
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.VERIFIED,
+        render: () => <VerifySucceeded />,
+      },
+      // 认证失败
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.FAIL,
+        render: () => <VerifyFailed />,
+      },
+      // 认证中 - Income High Risk
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.INCOME &&
+          riskLevel === KYC_RISK_LEVEL.HIGH,
+        render: () => <Risk3Info />,
+      },
+      // 认证中 - OCR Verifying
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.OCR &&
+          status === KYC_STATUS.VERIFYING,
+        render: () => <Verifying />,
+      },
+      // 认证中 - OCR Failed/Rejected Retry
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.OCR &&
+          (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) &&
+          isRetry,
+        // 因为 isRetry 为 true 进入的 BaseInfo 组件，需要 BaseInfo 组件卸载的时候，执行 resetRetry, 把 isRetry 设置为 false
+        render: () => (
+          <BaseInfo onResetRetry={resetRetry} refresh={refresh} userInfo={kycDetail.userInfo} />
+        ),
+      },
+      // 认证中 - OCR Failed/Rejected
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.OCR &&
+          (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL),
+        render: () => (
+          <OCRVerifyFailed
+            retry={() => {
+              setIsRetry(true)
+            }}
+          />
+        ),
+      },
+      // 认证中 - Liveness Verifying or Retry
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.LIVENESS &&
+          (status === KYC_STATUS.VERIFYING ||
+            ((status === KYC_STATUS.FAIL || status === KYC_STATUS.REJECTED) && isRetry)),
+        render: () => (
+          <FaceRecognition status={status} refresh={refresh} onResetRetry={resetRetry} />
+        ),
+      },
+      // 认证中 - Liveness Verify Failed/Rejected
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          (status === KYC_STATUS.FAIL || status === KYC_STATUS.REJECTED) &&
+          verifyType === KYC_VERIFY_TYPE.LIVENESS,
+        render: () => (
+          <FaceRecognitionFailed
+            retry={() => {
+              setIsRetry(true)
+            }}
+          />
+        ),
+      },
+      // 认证中 - AML verifying
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.AML &&
+          (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW),
+        render: () => <Verifying />,
+      },
+      // 认证中 - AML Declined
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.AML &&
+          status === KYC_STATUS.REJECTED,
+        render: () => <ExtraInfo />,
+      },
+      // 认证中 - KYT Verifying
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.KYT &&
+          status === KYC_STATUS.VERIFYING,
+        render: () => <Verifying />,
+      },
+    ]
+  }, [kycDetail, expireStatus, isRetry])
+
+  const matchedRule = rules.find(r => r.match())
+  if (matchedRule) {
+    return <MainContentWrapper>{matchedRule.render()}</MainContentWrapper>
   }
-
-  const { overallStatus, riskLevel, status, userInfo, pendingMaterials, verifyType, rejectReason } =
-    kycDetail
-
-  if (status === 5) {
-    return (
-      <MainContentWrapper>
-        {/* <IDExpired /> */}
-        {/* <Risk3Info /> */}
-
-        <ExtraInfo />
-      </MainContentWrapper>
-    )
-  }
-
-  //  0 未认证, 显示信息采集组件
-  if (overallStatus === KYC_OVERALL_STATUS.NOTVERIFIED) {
-    return (
-      <MainContentWrapper>
-        <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />
-      </MainContentWrapper>
-    )
-  }
-
-  // 1 认证中
-  if (overallStatus === KYC_OVERALL_STATUS.VERIFYING) {
-    // 接下来判断处于认证的哪个阶段,
-    // 1. basic-info 阶段
-    if (verifyType === KYC_VERIFY_TYPE.INCOME) {
-      // 高风险，并且用户没有上传收入证明
-      if (riskLevel === KYC_RISK_LEVEL.HIGH) {
-        // 用户补充收入证明
-        return (
-          <MainContentWrapper>
-            <Risk3Info />
-          </MainContentWrapper>
-        )
-      }
-    }
-
-    // 2. OCR 阶段
-    if (verifyType === KYC_VERIFY_TYPE.OCR) {
-      // 1 认证中
-      if (status === KYC_STATUS.VERIFYING) {
-        return (
-          <MainContentWrapper>
-            <Verifying />
-          </MainContentWrapper>
-        )
-      }
-
-      // ocr 认证失败, 6 已拒绝, 3 已失败
-      if (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) {
-        return (
-          <MainContentWrapper>
-            <OCRVerifyFailed
-              retryComponent={<BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />}
-            />
-          </MainContentWrapper>
-        )
-      }
-    }
-
-    // 3. 活体阶段
-    if (verifyType === KYC_VERIFY_TYPE.LIVENESS) {
-      // 活体认证 1. 认证中
-      if (status === KYC_STATUS.VERIFYING) {
-        return (
-          <MainContentWrapper>
-            <FaceRecognition refresh={refresh} />
-          </MainContentWrapper>
-        )
-      }
-      // 活体认证  6 已拒绝, 3 已失败
-      if (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) {
-        return (
-          <MainContentWrapper>
-            <FaceRecognitionFailed retryComponent={<FaceRecognition refresh={refresh} />} />
-          </MainContentWrapper>
-        )
-      }
-    }
-
-    // 4. aml 阶段
-    if (verifyType === KYC_VERIFY_TYPE.AML) {
-      // 4. 人工审核中，即使待审核的意思，等待审核员审核
-      if (status === KYC_STATUS.VERIFYING) {
-        return (
-          <MainContentWrapper>
-            <Verifying />
-          </MainContentWrapper>
-        )
-      }
-
-      // 7. 已经驳回
-      if (status === KYC_STATUS.DECLINED) {
-        // 显示 AML 人审补充信息
-        return (
-          <MainContentWrapper>
-            <ExtraInfo />
-          </MainContentWrapper>
-        )
-      }
-    }
-
-    // 5. kyt 阶段，在电脑端
-    if (verifyType === KYC_VERIFY_TYPE.KYT) {
-      if (status === KYC_STATUS.VERIFYING) {
-        return (
-          <MainContentWrapper>
-            <Verifying />
-          </MainContentWrapper>
-        )
-      }
-    }
-  }
-
-  // 2. 已通过
-  if (overallStatus === KYC_OVERALL_STATUS.VERIFIED) {
-    // 即将过期
-    if (expireStatus.expiring) {
-      return (
-        <MainContentWrapper>
-          <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />
-        </MainContentWrapper>
-      )
-    }
-    return (
-      <MainContentWrapper>
-        <VerifySucceeded />
-      </MainContentWrapper>
-    )
-  }
-
-  // 3. 已拒绝
-  if (overallStatus === KYC_OVERALL_STATUS.FAIL) {
-    return (
-      <MainContentWrapper>
-        <VerifyFailed />
-      </MainContentWrapper>
-    )
-  }
-  // 已过期
-  if (overallStatus === KYC_OVERALL_STATUS.EXPIRED) {
-    return (
-      <MainContentWrapper>
-        <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />
-      </MainContentWrapper>
-    )
-  }
+  return null
 }
 
 function MainContentWrapper(props: { children: ReactNode }) {

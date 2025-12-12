@@ -28,27 +28,13 @@ export function VerifySucceeded() {
   )
 }
 
-export function OCRVerifyFailed(props: { retryComponent: ReactNode }) {
-  return (
-    <VerifyStatus
-      type='failed'
-      title='vf'
-      detail='r'
-      btnText='rv'
-      retryComponent={props.retryComponent}
-    />
-  )
+export function OCRVerifyFailed(props: { retry: () => void }) {
+  return <VerifyStatus type='failed' title='vf' detail='r' btnText='rv' btnOnClick={props.retry} />
 }
 
-export function FaceRecognitionFailed(props: { retryComponent: ReactNode }) {
+export function FaceRecognitionFailed(props: { retry: () => void }) {
   return (
-    <VerifyStatus
-      type='failed'
-      title='vf'
-      detail='fTip'
-      btnText='rv'
-      retryComponent={props.retryComponent}
-    />
+    <VerifyStatus type='failed' title='vf' detail='fTip' btnText='rv' btnOnClick={props.retry} />
   )
 }
 
@@ -66,14 +52,6 @@ function VerifyStatus(props: {
   retryComponent?: ReactNode
 }) {
   const { t } = useTranslation()
-  const [searchParams] = useSearchParams()
-  const isRetryFromUrl = searchParams.get('retry') === 'true'
-
-  const [isRetry, setIsRetry] = useState(isRetryFromUrl)
-
-  if (isRetry && props.retryComponent) {
-    return props.retryComponent
-  }
 
   return (
     <VerifyStatusWrapper>
@@ -86,8 +64,6 @@ function VerifyStatus(props: {
         onClick={() => {
           if (props.btnOnClick) {
             props.btnOnClick()
-          } else if (props.retryComponent) {
-            setIsRetry(true)
           }
         }}
         text={props.btnText}
@@ -228,7 +204,10 @@ function HotRwas() {
       <div className='grid grid-cols-3 gap-5'>
         {top6RwaList.map(rwa => {
           return (
-            <div className='flex flex-row items-center justify-center gap-4 p-4 bg-[#1C1C1C] rounded-lg'>
+            <div
+              key={rwa.symbol}
+              className='flex flex-row items-center justify-center gap-4 p-4 bg-[#1C1C1C] rounded-lg'
+            >
               <LazyImage src={rwa.icon} className='w-[42px] h-[42px] rounded-lg' />
               <div className='flex flex-col'>
                 <div className='text-base'>{rwa.symbol}</div>

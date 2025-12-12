@@ -26,11 +26,10 @@ import { WarningInfo } from './WarningInfo'
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
   maxRetries = 5,
-  interval = 3000,
-  
+  interval = 3000
 ): Promise<any> {
   let attempt = 1
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const query = async () => {
       const result = await refresh()
       if (result.code === RESPONSE_CODE.SUCCESS && result.data?.account) {
@@ -47,7 +46,6 @@ export async function retryRefresh(
     }
     query()
   })
-  
 }
 
 export const SectionTitle = ({ children }: { children: React.ReactNode }) => {
@@ -141,9 +139,11 @@ const BaseInfo = memo(
   ({
     userInfo,
     refresh,
+    onResetRetry,
   }: {
     userInfo?: IKycSubmitData
     refresh?: () => Promise<ApiResponse<IKycDetail>>
+    onResetRetry?: () => void
   }) => {
     const { t } = useTranslation()
     const { toastSuccess, toastError } = useToast()
@@ -269,7 +269,7 @@ const BaseInfo = memo(
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)
-      
+
       if (res?.code === RESPONSE_CODE.SUCCESS) {
         if (refresh) {
           const detailRes = await retryRefresh(refresh)
@@ -304,18 +304,25 @@ const BaseInfo = memo(
           ...userInfo.incomeInfo,
           ...userInfo.extraInfo,
           ...userInfo.idInfo.files,
-          gendar: userInfo.basicInfo.gender
-
+          gendar: userInfo.basicInfo.gender,
         })
       }
     }, [userInfo])
 
-    
+
+    useEffect(() => {
+      return () => {
+        if (onResetRetry) onResetRetry()
+      }
+    }, [])
 
     return (
       <>
         <WarningInfo />
-        <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className='w-full mt-2'
+        >
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
             <div className=' grid grid-cols-4 font-normal gap-x-6'>

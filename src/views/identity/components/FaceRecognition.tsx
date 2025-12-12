@@ -4,14 +4,19 @@ import { QRCodeSVG } from 'qrcode.react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
+import { KYC_STATUS } from '@/service/kyc/types'
 import type { ApiResponse } from '@/service/client'
 
 const faceLangPrefix = 'identity.face'
 
 export default function FaceRecognition({
   refresh: refreshKycDetail,
+  onResetRetry,
+  status,
 }: {
   refresh: () => Promise<ApiResponse<IKycDetail>>
+  onResetRetry: () => void
+  status?: number
 }) {
   const { t } = useTranslation()
   // undefined 表示还没有请求
@@ -38,6 +43,12 @@ export default function FaceRecognition({
   useEffect(() => {
     refreshQrCode()
   }, [])
+
+  useEffect(() => {
+    if (status && status === KYC_STATUS.VERIFYING) {
+      onResetRetry()
+    }
+  }, [status])
 
   useEffect(() => {
     if (isExpired || !urlInfo || !urlInfo.url || !urlInfo.expireTime || !urlInfo.bizNo) return
@@ -73,6 +84,8 @@ export default function FaceRecognition({
       clearInterval(interval)
     }
   }, [])
+
+  useEffect(() => {}, [])
 
   if (urlInfo === undefined) return null
 
