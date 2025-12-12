@@ -55,3 +55,9 @@ export function useKycExpired() {
     desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
   }
 }
+
+export function useKycRiskLevel() {
+  const kycDetail = useKycStore(state => state.kycDetail)
+
+  return useMemo(() => kycDetail?.riskLevel ?? 0, [kycDetail])
+}

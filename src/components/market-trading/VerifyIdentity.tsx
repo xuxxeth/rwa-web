@@ -4,6 +4,36 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/hooks/useRouter";
 import { RISK_STATUS } from "@/config/constants";
+import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
+import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
+
+export const useVerifyTip = function() {
+  const { t } = useTranslation()
+  const { expired, expiring } = useKycExpired()
+  const { kycStatus } = useKycStatus()
+  
+  const verifyTip = useMemo(() => {
+    let text = ''
+    // 认证被拒绝
+    if (kycStatus === KYC_OVERALL_STATUS.REJECTED) {
+      text = t('kyc.t27')
+    }
+    // 非认证成功的其他状态
+    if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED || kycStatus === KYC_OVERALL_STATUS.VERIFYING) {
+      text = t("identity.verifyID")
+    }
+    // 认证已过期
+    if (kycStatus === KYC_OVERALL_STATUS.EXPIRED) {
+      text = t('kyc.t51')
+    }
+
+    return text
+  }, [t, kycStatus, expired, expiring])
+
+  return {
+    verifyTip
+  }
+}
 
 type MarketTradingProps = {
   align?: string
@@ -14,6 +44,8 @@ const VerifyIdentity = memo(
   ({  align = 'center', riskStatus }: MarketTradingProps) => {
     const { t } = useTranslation()
     const router = useRouter()
+    
+    const { verifyTip } = useVerifyTip()
     
     return (
       <BoxCard className={cn(
@@ -28,7 +60,7 @@ const VerifyIdentity = memo(
             router.push('/identity')
           }}
           >
-            { riskStatus !== RISK_STATUS.VERIFIED ? t("identity.verifyID") : t("kyc.t27")}
+            { verifyTip }
         </button>
       </BoxCard>
     )

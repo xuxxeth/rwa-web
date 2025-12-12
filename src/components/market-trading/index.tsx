@@ -7,7 +7,6 @@ import { useBaseStore } from "@/stores/baseStore";
 import { MARKET_STATUS, RISK_STATUS } from "@/config/constants";
 import { VerifyIdentity } from "./VerifyIdentity";
 import { useKycStatus } from "@/hooks/useKycStatus";
-import { useRiskStatus } from "@/hooks/useRiskStatus";
 
 type MarketTradingProps = {
   align?: string

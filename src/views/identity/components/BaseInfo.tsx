@@ -8,7 +8,7 @@ import { Select } from '@/components/select'
 import { Button } from '@/components/ui/button'
 import { usePersistentForm } from '@/hooks/usePersistentForm'
 import { useTranslation } from '@/hooks/useTranslation'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Upload } from './Upload'
 import { cn } from '@/utils/tw'
 import { EmploymentSelect } from '@/components/employment-select'
@@ -22,6 +22,7 @@ import type { IKycDetail, IKycSubmitData } from '@/service/kyc/types'
 import { RESPONSE_CODE } from '@/config/constants'
 import type { ApiResponse } from '@/service/client'
 import { WarningInfo } from './WarningInfo'
+import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
@@ -146,6 +147,7 @@ const BaseInfo = memo(
     onResetRetry?: () => void
   }) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3()
     const { toastSuccess, toastError } = useToast()
     const [dateOptions, setDateOptions] = useState({
       minDate: 0,
@@ -196,6 +198,8 @@ const BaseInfo = memo(
     const addressCertification = watch('addressCertification')
     const incomeCertifications = watch('incomeCertifications')
     const source = watch('source')
+
+    const preAccount = useRef<string | undefined>(undefined)
 
     const [submiting, setSubmiting] = useState(false)
 
@@ -309,6 +313,16 @@ const BaseInfo = memo(
       }
     }, [userInfo])
 
+    useEffect(() => {
+      if (account && preAccount.current && account !== preAccount.current) {
+        clear()
+        storage.removeItem(KYC_UPLOAD_STORAGE_KEY)
+        storage.removeItem('kycBaseInfo')
+      }
+      preAccount.current = account
+    }, [account])
+
+    
 
     useEffect(() => {
       return () => {
@@ -548,15 +562,19 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-1 font-normal'>
               <FormItemBox>
                 <FormItemLabel title={t('kyc.t14')} />
-                <div className='mt-3 flex gap-x-2 items-center mb-3'>
-                  <CheckBox
-                    checked={useCertificateAddress}
-                    onChange={v => {
-                      setValue('useCertificateAddress', v)
-                    }}
-                  />
-                  <div className='text-[rgba(255,255,255,0.6)] text-[16px]'>{t('kyc.t15')}</div>
-                </div>
+                {
+                  type === 0 &&
+                  <div className='mt-3 flex gap-x-2 items-center mb-3'>
+                    <CheckBox
+                      checked={useCertificateAddress}
+                      onChange={v => {
+                        setValue('useCertificateAddress', v)
+                      }}
+                    />
+                    <div className='text-[rgba(255,255,255,0.6)] text-[16px]'>{t('kyc.t15')}</div>
+                  </div>
+                }
+                
                 {(!useCertificateAddress || type === 1) && (
                   <InputBox>
                     <KycInput
@@ -701,7 +719,7 @@ const BaseInfo = memo(
             </div>
           </SectionBox>
 
-          <div className='mt-8 flex gap-x-2 items-start'>
+          {/* <div className='mt-8 flex gap-x-2 items-start'>
             <div className=' shrink-0 relative top-[2px]'>
               <CheckBox />
             </div>
@@ -712,7 +730,7 @@ const BaseInfo = memo(
               </a>
               {t('identity.aggree2')}
             </div>
-          </div>
+          </div> */}
           <div className='flex justify-center mt-8'>
             <Button
               disabled={submiting}

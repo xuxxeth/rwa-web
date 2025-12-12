@@ -6,7 +6,9 @@ import { useSignatureValidStatus } from "@/hooks/useSignature";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
 import { useRouter } from "@/hooks/useRouter";
-import { useKycStatus } from "@/hooks/useKycStatus";
+import { useKycRiskLevel, useKycStatus } from "@/hooks/useKycStatus";
+import { useVerifyTip } from "../market-trading/VerifyIdentity";
+import { KYC_RISK_LEVEL } from "@/service/kyc/types";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
   if (!verified) {
@@ -65,6 +67,8 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
   const { kycStatus } = useKycStatus()
+  const kycRiskLevel = useKycRiskLevel()
+
   const startVerification = () => {
     router.push('/identity')
   }
@@ -74,7 +78,7 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
       riskStatus === RISK_STATUS.DEFAULT ? null :
       isSignatureValid && riskStatus !== RISK_STATUS.NOTSIGN ? 
         <div className="flex flex-row gap-4">
-          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED} issued={riskStatus === RISK_STATUS.REJECTED} />
+          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} />
           {kycStatus !== RISK_STATUS.VERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
         </div> :
         <SignButton refreshIsSignatureValid={() => {
@@ -94,6 +98,7 @@ export function StartVerificationButton({
   onClick?: () => void
 }) {
   const { t } = useTranslation();
+  const { verifyTip } = useVerifyTip()
   return (
     <button disabled={verifying} className={cn(
       "cursor-pointer px-4 py-2 text-sm/4 font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)]",
@@ -103,7 +108,7 @@ export function StartVerificationButton({
       onClick && onClick()
     }}
     >
-      {verifying ? t('identity.verify') + '...' : t("startVerification")}
+      {verifying ? t('identity.verify') + '...' : verifyTip}
     </button>
   );
 }

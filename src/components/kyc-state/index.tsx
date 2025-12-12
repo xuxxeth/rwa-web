@@ -10,7 +10,6 @@ import { useFetchKycStatus, useKycExpired, useKycStatus } from "@/hooks/useKycSt
 import { useKycStore } from "@/stores/kycStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
-import { useParams } from "react-router-dom";
 
 const NO_SHOW_PATH = ['/identity']
 
@@ -21,8 +20,7 @@ const KycState = () => {
   const [content, setContent] = useState({title: '', content: '', btnText: '', btn: ''})
   const kycDetail = useKycStore(state => state.kycDetail)
   const isNotShow = useMemo(() => NO_SHOW_PATH.includes(router.location.pathname), [router.location.pathname])
-  const expireStatus = useKycExpired()
-  console.log(expireStatus)
+  const { expired, expiring, desc } = useKycExpired()
 
   useFetchKycStatus()
 
@@ -62,20 +60,20 @@ const KycState = () => {
   
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if (expireStatus.expired && !show) {
+    if (expired && !show) {
       setContent({
         title: t('kyc.t48'),
-        content: t('kyc.t49', { expire: expireStatus.desc }),
+        content: t('kyc.t49', { expire: desc }),
         btnText: t('kyc.t50'),
         btn: 'edit'
       })
       setShow(true)
     }
 
-    if (expireStatus.expiring && !show) {
+    if (expiring && !show) {
       setContent({
         title: t('kyc.t45'),
-        content: t('kyc.t46', { expire: expireStatus.desc }),
+        content: t('kyc.t46', { expire: desc }),
         btnText: t('kyc.t47'),
         btn: 'edit'
       })
@@ -124,7 +122,7 @@ const KycState = () => {
     }
     
     
-  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expireStatus]);
+  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc]);
 
   const close = () => setShow(false);
 
