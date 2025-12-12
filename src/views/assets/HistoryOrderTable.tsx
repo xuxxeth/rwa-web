@@ -27,7 +27,7 @@ import {
 } from './Shared'
 import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
-import SignatureVerify from './SignatureVerify'
+import SignatureVerify from '@/components/signature-verify'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { generateOrderHistoryFilterObj } from '@/stores/orderFilterStore'
 import { DatePickerWithRange } from '@/components/date-range-picker'
@@ -35,10 +35,10 @@ import { DatePickerWithRange } from '@/components/date-range-picker'
 export default function HistoryOrderTable(props: {
   chainId: number
   account: string
-  rwaTokens: IRwa[],
+  rwaTokens: IRwa[]
   orderChanged: {
-    orderId: string;
-    status: string;
+    orderId: string
+    status: string
   } | null
 }) {
   const { chainId, account, rwaTokens, orderChanged } = props
@@ -63,14 +63,23 @@ export default function HistoryOrderTable(props: {
     return { ...userSelectFilter, ...otherFilter }
   }, [orderHistoryFilters])
 
-  const { data, fetchNextPage, refetch, isFetchedAfterMount, hasNextPage, isFetchingNextPage, isFetching, isLoading, isError } =
-    useInfiniteQuery(
-      infiniteOrderHistoryOptions(account, chainId, isSignatureValid, filters, {
-        onUnAuthorized: () => {
-          refreshIsSignatureValid(false)
-        },
-      })
-    )
+  const {
+    data,
+    fetchNextPage,
+    refetch,
+    isFetchedAfterMount,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isLoading,
+    isError,
+  } = useInfiniteQuery(
+    infiniteOrderHistoryOptions(account, chainId, isSignatureValid, filters, {
+      onUnAuthorized: () => {
+        refreshIsSignatureValid(false)
+      },
+    })
+  )
 
   useEffect(() => {
     if (!isFetchedAfterMount || isLoading || !orderChanged) return
@@ -195,14 +204,14 @@ export default function HistoryOrderTable(props: {
             extra={{ rwaTokens }}
             getKey={(item: IOrder) => item.orderId}
             className='border-none rounded-lg hover:bg-white/10'
-          // dynamicClassName={(item: IOrder) =>
-          //   isRiskLocked(item.riskType)
-          //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
-          //     : 'hover:bg-white/10'
-          // }
-          // ExtraComponent={({ item }: { item: IOrder }) =>
-          //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
-          // }
+            // dynamicClassName={(item: IOrder) =>
+            //   isRiskLocked(item.riskType)
+            //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+            //     : 'hover:bg-white/10'
+            // }
+            // ExtraComponent={({ item }: { item: IOrder }) =>
+            //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+            // }
           />
           <ScrollLoadMore<IOrder>
             isFetchingNextPage={isFetchingNextPage}
@@ -213,7 +222,12 @@ export default function HistoryOrderTable(props: {
           />
         </>
       ) : (
-        <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
+        <SignatureVerify
+          desc='signatureVerifyDescTop'
+          subDesc='signatureVerifyDescBottom'
+          className='mt-9'
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
       )}
     </>
   )
@@ -269,7 +283,9 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     sortable: false,
     breakOnSpace: false,
     width: 103,
-    render: (item: IOrder) => <TextCell className='w-[100px]' text={formatTimestamp(item.tradeTime)} />,
+    render: (item: IOrder) => (
+      <TextCell className='w-[100px]' text={formatTimestamp(item.tradeTime)} />
+    ),
   },
   {
     key: 'status',

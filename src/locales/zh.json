@@ -226,6 +226,8 @@
   "Unauthorized": "未授權",
   "No records found": "未找到記錄",
   "identity": {
+    "cwdesc": "連接錢包後才能完成 KYC",
+    "sd": "為保護您的個人資訊安全",
     "verifyTip": "請完成身份驗證以開始交易。",
     "verifyID": "驗證身分",
     "verify": "驗證中",     

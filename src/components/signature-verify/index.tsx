@@ -1,10 +1,15 @@
-import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
-import { cn } from '@/utils'
 import { useRequestSignature } from '@/hooks/useSignature'
+import { cn } from '@/utils'
+import { LazyImage } from '@/components/image/LazyImage'
 
-function SignatureVerify(props: { className?: string; refreshIsSignatureValid: () => void }) {
-  const { className, refreshIsSignatureValid } = props
+export default function SignatureVerify(props: {
+  className?: string
+  refreshIsSignatureValid: () => void
+  desc: string
+  subDesc?: string
+}) {
+  const { className, refreshIsSignatureValid, desc, subDesc } = props
   const { t } = useTranslation()
   const { signing, signature } = useRequestSignature()
 
@@ -18,10 +23,12 @@ function SignatureVerify(props: { className?: string; refreshIsSignatureValid: (
       <div>
         <LazyImage className='w-[50px] h-[60px]' src='/images/icons/assets/security.png' alt='' />
       </div>
-      <div className='text-sm mt-4 text-[24px] font-semibold'>{t('signatureVerify')}</div>
+      <div className='text-sm mt-4 text-[24px] font-semibold text-white'>
+        {t('signatureVerify')}
+      </div>
       <div className=' mt-4 text-60 text-base font-normal text-center'>
-        <div className='w-[450px] m-auto'>{t('signatureVerifyDescTop')}</div>
-        <div className='w-[350px] m-auto'>{t('signatureVerifyDescBottom')}</div>
+        <div className='w-[450px] m-auto'>{t(desc)}</div>
+        {subDesc && <div className='w-[350px] m-auto'>{t(subDesc)}</div>}
       </div>
       <button
         disabled={signing}
@@ -33,5 +40,3 @@ function SignatureVerify(props: { className?: string; refreshIsSignatureValid: (
     </div>
   )
 }
-
-export default SignatureVerify

@@ -16,13 +16,13 @@ import {
   DropDownFilter,
   ScrollLoadMore,
   TokenFilterItem,
-  TextCellWithTranslation
+  TextCellWithTranslation,
 } from './Shared'
 import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, sleep } from '@/utils'
 import { useToast } from '@/hooks/useToast'
 import { useOrderFilterStore, generateOpenOrderFilterObj } from '@/stores/orderFilterStore'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
-import SignatureVerify from './SignatureVerify'
+import SignatureVerify from '@/components/signature-verify'
 import { useTradeUtils } from '@/hooks/useTrading'
 import { type OrderChanged } from './Shared'
 
@@ -56,7 +56,7 @@ export default function OpenOrderTable(props: {
     isFetching,
     isLoading,
     isError,
-    isFetchedAfterMount
+    isFetchedAfterMount,
   } = useInfiniteQuery(
     infiniteOpenOrderOptions(account, chainId, isSignatureValid, filter, {
       onUnAuthorized: () => {
@@ -166,7 +166,12 @@ export default function OpenOrderTable(props: {
           />
         </>
       ) : (
-        <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
+        <SignatureVerify
+          desc='signatureVerifyDescTop'
+          subDesc='signatureVerifyDescBottom'
+          className='mt-9'
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
       )}
     </>
   )
@@ -222,14 +227,16 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'orderTime',
     sortable: false,
-    render: (item: IOpenOrder) => <TextCell className='w-[80px] text-sm/[17px]' text={formatTimestamp(item.txTime)} />,
+    render: (item: IOpenOrder) => (
+      <TextCell className='w-[80px] text-sm/[17px]' text={formatTimestamp(item.txTime)} />
+    ),
   },
   {
     key: 'expiration',
     sortable: false,
     render: (item: IOpenOrder) => {
       if (item.tif === 0) {
-        return <TextCellWithTranslation text="assets.order.intraday" />
+        return <TextCellWithTranslation text='assets.order.intraday' />
       }
 
       return <TextCell text={readableDuration(item.validDate * Day)} />

@@ -270,7 +270,7 @@ function ExtraInfoUpload({
     curkeys.current = keys
   }, [keys])
 
-  const atLeastOneKey = keys ?? ['']
+  const atLeastOneKey = !keys || keys.length === 0 ? [''] : keys
 
   const getNewKeys = () => {
     const newKeys = curkeys.current ? [...curkeys.current] : ['']

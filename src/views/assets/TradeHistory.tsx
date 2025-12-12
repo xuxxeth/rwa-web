@@ -22,12 +22,15 @@ import { type IRwa } from '@/service/base/types'
 import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
 import { useOrderFilterStore, generateTradeHistoryFilterObj } from '@/stores/orderFilterStore'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
-import SignatureVerify from './SignatureVerify'
+import SignatureVerify from '@/components/signature-verify'
 import { DatePickerWithRange } from '@/components/date-range-picker'
 import { type OrderChanged } from './Shared'
 
 function TradeHistory(props: {
-  chainId: number; account: string; rwaTokens: IRwa[], orderChanged: OrderChanged
+  chainId: number
+  account: string
+  rwaTokens: IRwa[]
+  orderChanged: OrderChanged
 }) {
   const { chainId, account, rwaTokens, orderChanged } = props
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
@@ -61,7 +64,7 @@ function TradeHistory(props: {
     isFetching,
     isFetchingNextPage,
     fetchNextPage,
-    isFetchedAfterMount
+    isFetchedAfterMount,
   } = useInfiniteQuery(
     infiniteTradeHistoryOptions(account, chainId, isSignatureValid, filters, {
       onUnAuthorized: () => {
@@ -171,14 +174,14 @@ function TradeHistory(props: {
             extra={{ rwaTokens }}
             getKey={(item: ITrade) => item.id}
             className='border-none rounded-lg hover:bg-white/10'
-          // dynamicClassName={(item: ITrade) =>
-          //   isRiskLocked(item.riskType)
-          //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
-          //     : 'hover:bg-white/10'
-          // }
-          // ExtraComponent={({ item }: { item: ITrade }) =>
-          //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
-          // }
+            // dynamicClassName={(item: ITrade) =>
+            //   isRiskLocked(item.riskType)
+            //     ? 'bg-[rgba(246,70,93,0.1)] hover:bg-[rgba(246,70,93,0.2)] relative'
+            //     : 'hover:bg-white/10'
+            // }
+            // ExtraComponent={({ item }: { item: ITrade }) =>
+            //   isRiskLocked(item.riskType) ? <RiskLockFlag riskType={item.riskType} /> : null
+            // }
           />
           <ScrollLoadMore<ITrade>
             isFetchingNextPage={isFetchingNextPage}
@@ -189,7 +192,12 @@ function TradeHistory(props: {
           />
         </>
       ) : (
-        <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
+        <SignatureVerify
+          desc='signatureVerifyDescTop'
+          subDesc='signatureVerifyDescBottom'
+          className='mt-9'
+          refreshIsSignatureValid={refreshIsSignatureValid}
+        />
       )}
     </>
   )

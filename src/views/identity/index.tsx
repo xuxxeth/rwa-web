@@ -25,7 +25,7 @@ import { useAccount, useChainId } from 'ca-common-web'
 import { useAppStore } from '@/stores/appStore'
 import WalletNotConnected from '@/components/wallet-not-connected'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
-import SignatureVerify from '../assets/SignatureVerify'
+import SignatureVerify from '@/components/signature-verify'
 import { useKycExpired } from '@/hooks/useKycStatus'
 import { IDExpired } from './components/IDExpired'
 
@@ -40,13 +40,18 @@ function IdentityEntry() {
   if (!walltedConnected && isWalletConnecting) return null
 
   if (!walltedConnected) {
-    // TODO: 修改一些文案
-    return <WalletNotConnected />
+    return <WalletNotConnected desc='identity.cwdesc' />
   }
 
   if (!isSignatureValid) {
-    // TODO: 修改一些文案
-    return <SignatureVerify className='mt-9' refreshIsSignatureValid={refreshIsSignatureValid} />
+    return (
+      <SignatureVerify
+        desc='identity.signd'
+        subDesc='identity.signSubd'
+        className='mt-9'
+        refreshIsSignatureValid={refreshIsSignatureValid}
+      />
+    )
   }
 
   return <Identity account={account} />

@@ -228,6 +228,9 @@
   "Unauthorized": "Unauthorized Access",
   "No records found": "No Records Found",
   "identity": {
+    "cwdesc": "Complete KYC after connecting your wallet.",
+    "signd": "To protect your personal information",
+    "signSubd": "please sign with your wallet to complete KYC",
     "verifyTip": "Please complete identity verification to start trading.",
     "verifyID": "Verify Identity",
     "verify": "Verifying",

@@ -91,7 +91,7 @@ function Assets() {
               </Tabs>
             </div>
           ) : isWalletConnecting ? null : (
-            <WalletNotConnected />
+            <WalletNotConnected desc='assets.walletNotConnected' />
           )}
         </ContentLayout>
       </MainLayout>
