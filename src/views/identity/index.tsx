@@ -105,7 +105,7 @@ function Identity({ account }: { account: string }) {
       },
       // 认证失败
       {
-        match: () => overallStatus === KYC_OVERALL_STATUS.FAIL,
+        match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
         render: () => <VerifyFailed />,
       },
       // 认证中 - Income High Risk
@@ -175,7 +175,7 @@ function Identity({ account }: { account: string }) {
           />
         ),
       },
-      // 认证中 - AML verifying
+      // 认证中 - AML verifying 和 review (人工审核中)
       {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
@@ -183,12 +183,12 @@ function Identity({ account }: { account: string }) {
           (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW),
         render: () => <Verifying />,
       },
-      // 认证中 - AML Declined
+      // 认证中 - AML Declined (AML 驳回)
       {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.AML &&
-          status === KYC_STATUS.REJECTED,
+          status === KYC_STATUS.DECLINED,
         render: () => <ExtraInfo />,
       },
       // 认证中 - KYT Verifying

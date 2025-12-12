@@ -39,7 +39,16 @@ export function FaceRecognitionFailed(props: { retry: () => void }) {
 }
 
 export function VerifyFailed() {
-  return <VerifyStatus type='failed' title='f' detail='r' btnText='h' />
+  const router = useRouter()
+  return (
+    <VerifyStatus
+      type='failed'
+      title='f'
+      detail='r'
+      btnText='h'
+      btnOnClick={() => router.push('/')}
+    />
+  )
 }
 
 function VerifyStatus(props: {
