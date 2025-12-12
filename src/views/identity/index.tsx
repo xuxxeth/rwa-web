@@ -26,11 +26,12 @@ import { useAppStore } from '@/stores/appStore'
 import WalletNotConnected from '@/components/wallet-not-connected'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from '../assets/SignatureVerify'
+import { useKycExpired } from '@/hooks/useKycStatus'
+import { IDExpired } from './components/IDExpired'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
-
   const account = useAccount()
   const chainId = useChainId()
 
@@ -53,6 +54,7 @@ function IdentityEntry() {
 
 function Identity({ account }: { account: string }) {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
+  const expireStatus = useKycExpired()
 
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
@@ -186,6 +188,14 @@ function Identity({ account }: { account: string }) {
 
   // 2. 已通过
   if (overallStatus === KYC_OVERALL_STATUS.VERIFIED) {
+    // 即将过期
+    if (expireStatus.expiring) {
+      return (
+        <MainContentWrapper>
+          <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />
+        </MainContentWrapper>
+      )
+    }
     return (
       <MainContentWrapper>
         <VerifySucceeded />
@@ -198,6 +208,14 @@ function Identity({ account }: { account: string }) {
     return (
       <MainContentWrapper>
         <VerifyFailed />
+      </MainContentWrapper>
+    )
+  }
+  // 已过期
+  if (overallStatus === KYC_OVERALL_STATUS.EXPIRED) {
+    return (
+      <MainContentWrapper>
+        <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />
       </MainContentWrapper>
     )
   }

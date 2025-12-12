@@ -1,111 +1,50 @@
-import { LazyImage } from "@/components/image/LazyImage"
 import { Button } from "@/components/ui/button"
 import { usePersistentForm } from "@/hooks/usePersistentForm"
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo, useState } from "react"
 import { Upload } from "./Upload"
-import { cn } from "@/utils/tw"
-import storage from "@/utils/storage"
-import { KYC_UPLOAD_STORAGE_KEY } from "./Upload/shared"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
-import type { IKycSubmitData } from "@/service/kyc/types"
+import type { IKycDetail } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
-import { SectionBox, SectionTitle } from "./BaseInfo"
+import { retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
 import {
   Text,
 } from './Upload/shared'
+import type { ApiResponse } from "@/service/client"
 
 interface FormData {
-  // 基础信息
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  gendar: number; // 0女，1男
-  dob: string; // 出生日期
-  email: string;
-  // 证件信息
-  type: number; // 0身份证, 1护照 
-  issueCountry: string
-  no: string;
-  residentAddress: string;
-  useCertificateAddress?: boolean; // 是否使用证件地址
-  // 工作信息
-  employment: number; // 就业情况
-  description: string; // 就业 时 必填
-  // 收信息
-  source: number;
-  approvedProtocols: string[]
+  incomeCertifications?: string[]
 
 }
 
 const Risk3Info = memo(
-  () => {
+  ({
+    refresh
+  }: {
+    refresh?: () => Promise<ApiResponse<IKycDetail>>
+  }) => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
-    const [dateOptions, setDateOptions] = useState({
-      minDate: 0,
-      maxDate: 0,
-      defaultDate: 0
-    })
-    const genderList = [
-      {value: '1', label: t('gender.male')},
-      {value: '0', label: t('gender.female')},
-
-    ]
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
-
+    const { handleSubmit, watch, setValue, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+      incomeCertifications: []
     });
-    const type = watch('type')
+    const incomeCertifications = watch('incomeCertifications')
 
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
       // 1. 判断有没有上传证件照
-      const kycFiles = storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}   
-      
+      const files = (data.incomeCertifications || []).filter(key => key)
       // 无地址证明
-      if (!kycFiles.incomeCertificates || kycFiles.incomeCertificates.length < 0) {
+      if (files.length < 0) {
         toastError({title: '上傳收入證明'})
         return
       }
-      const params: IKycSubmitData = {
-        basicInfo: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          fullName: data.fullName,
-          gender: data.gendar,
-          dob: data.dob,
-          email: data.email
-        },
-        idInfo: {
-          type: data.type,
-          issueCountry: data.issueCountry,
-          no: data.no,
-          residentAddress: data.useCertificateAddress ? '' : data.residentAddress,
-          useCertificateAddress: data.useCertificateAddress,
-          files: {
-            idCardFront: data.type === 0 ? kycFiles.idFront : '',
-            idCardBack: data.type === 0 ? kycFiles.idBack : '',
-            idCard: data.type === 0 ? kycFiles.idMerged : '',
-            passport: data.type === 0 ? '' : kycFiles.passport,
-            addressCertification: kycFiles.addressCertificates
-          }
-        },
-        workInfo: {
-          employment: data.employment,
-          description: data.description
-        },
-        incomeInfo: {
-          source: data.source || 1
-        },
+      const params: any = {
         extraInfo: {
-          incomeCertifications: kycFiles.incomeCertificates || []
+          incomeCertifications: files
         },
-        approvedProtocols: [
-          "AML-Policy-v3.0",
-          "Privacy-Agreement-v2.1"
-        ]
       }
       console.log(data)
       console.log(params)
@@ -113,15 +52,25 @@ const Risk3Info = memo(
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)
-      setSubmiting(false)
       if (res?.code === RESPONSE_CODE.SUCCESS) {
-        toastSuccess({title: '提交成功'})
+        if (refresh) {
+          const detailRes = await retryRefresh(refresh)
+          setSubmiting(false)
+          if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
+            toastSuccess({ title: '提交成功' })
+            clear()
+          }
+        } else {
+          toastSuccess({ title: '提交成功' })
+          clear()
+          setSubmiting(false)
+        }
       } else {
-        toastError({title: res?.message || '提交失败'})
-      }
+        toastError({ title: res?.message || '提交失败' })
+        setSubmiting(false)
+     }
       
     }
-
 
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
@@ -132,7 +81,13 @@ const Risk3Info = memo(
             <Text text='uploadIncome' className=' text-white' />
             <Text text='extraTips' className='text-sm mt-2' />
           </div>
-          <Upload type="extra" onChanged={() => {}} />
+          <Upload
+            type='extra'
+            keys={incomeCertifications}
+            onChanged={keys => {
+              keys.length > 0 && setValue('incomeCertifications', keys as string[])
+            }}
+          />
           
         </SectionBox>
         <div className="flex justify-center mt-8">

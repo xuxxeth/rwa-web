@@ -38,13 +38,15 @@ export const RISK_STATUS = {
   VERIFIED: 2,
   REJECTED: 3,
   REVIEW: 4,
-  NOTSIGN: 5
+  EXPIRED: 5,
+  NOTSIGN: 6
 }
 
 export type Address = `0x${string}`
 
 // 签名过期时间15天
 export const SIGNATURE_EXPIRES = 15 * 24 * 60 * 60;
+export const ID_EXPIRES = 375 * 24 * 60 * 60;
 
 const RED = '#FF6767'
 const GREEN = '#47D0A5'

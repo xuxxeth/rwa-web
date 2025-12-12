@@ -6,10 +6,13 @@ import { Button } from "../ui/button";
 import { kycApi } from "@/service/kyc/api";
 import { LazyImage } from "../image/LazyImage";
 import { KYC_OVERALL_STATUS, KYC_RISK_LEVEL, KYC_STATUS, KYC_VERIFY_TYPE, type IKycStatus } from "@/service/kyc/types";
-import { useFetchKycStatus } from "@/hooks/useKycStatus";
+import { useFetchKycStatus, useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
 import { useKycStore } from "@/stores/kycStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
+import { useParams } from "react-router-dom";
+
+const NO_SHOW_PATH = ['/identity']
 
 const KycState = () => {
   const { t } = useTranslation()
@@ -17,16 +20,22 @@ const KycState = () => {
   const [show, setShow] = useState(false);
   const [content, setContent] = useState({title: '', content: '', btnText: '', btn: ''})
   const kycDetail = useKycStore(state => state.kycDetail)
+  const isNotShow = useMemo(() => NO_SHOW_PATH.includes(router.location.pathname), [router.location.pathname])
+  const expireStatus = useKycExpired()
+  console.log(expireStatus)
 
   useFetchKycStatus()
 
+  // 1. ocr失败，填写信息与证件信息不一致
   const ocrFail = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
       (kycDetail.status === KYC_STATUS.FAIL || kycDetail.status === KYC_STATUS.REJECTED) &&
       kycDetail.verifyType === KYC_VERIFY_TYPE.OCR 
-    return fail && kycDetail?.riskLevel !== KYC_RISK_LEVEL.HIGH
+    return fail
 
   }, [kycDetail])
+
+  // 2. // 高风险用户，需要上传收证明
   const ocrIncome = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
       (kycDetail.status !== KYC_STATUS.VERIFIED) &&
@@ -34,10 +43,47 @@ const KycState = () => {
     return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
 
   }, [kycDetail])
+  // 3. 
+  const amlDeclined = useMemo(() => {
+    const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+      (kycDetail.status === KYC_STATUS.DECLINED) &&
+      kycDetail.verifyType === KYC_VERIFY_TYPE.AML
+    return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
+
+  }, [kycDetail])
+
+  const liveNessReject = useMemo(() => {
+    const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+      (kycDetail.status === KYC_STATUS.REJECTED) &&
+      kycDetail.verifyType === KYC_VERIFY_TYPE.LIVENESS
+    return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
+
+  }, [kycDetail])
   
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if (!kycDetail) return
+    if (expireStatus.expired && !show) {
+      setContent({
+        title: t('kyc.t48'),
+        content: t('kyc.t49', { expire: expireStatus.desc }),
+        btnText: t('kyc.t50'),
+        btn: 'edit'
+      })
+      setShow(true)
+    }
+
+    if (expireStatus.expiring && !show) {
+      setContent({
+        title: t('kyc.t45'),
+        content: t('kyc.t46', { expire: expireStatus.desc }),
+        btnText: t('kyc.t47'),
+        btn: 'edit'
+      })
+      setShow(true)
+    }
+
+    if (!kycDetail || isNotShow || show) return
+
     if (ocrIncome) {
       setContent({
         title: t('kyc.t29'),
@@ -58,8 +104,27 @@ const KycState = () => {
       })
       setShow(true)
     }
+    if (amlDeclined) {
+      setContent({
+        title: t('kyc.t29'),
+        content: t('kyc.t34'),
+        btnText: t('kyc.t35'),
+        btn: 'edit'
+      })
+      setShow(true)
+    }
+    if (liveNessReject) {
+      setContent({
+        title: t('kyc.t29'),
+        content: t('kyc.t36'),
+        btnText: t('kyc.t37'),
+        btn: 'edit'
+      })
+      setShow(true)
+    }
     
-  }, [t, ocrFail, ocrIncome]);
+    
+  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expireStatus]);
 
   const close = () => setShow(false);
 
@@ -68,12 +133,12 @@ const KycState = () => {
     if (content.btn === 'edit') {
       
     }
-    router.push('/identity')
+    router.push('/identity?retry=true')
   }, [content])
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      {show && (
+      {show && !isNotShow && (
         <motion.div
           initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}

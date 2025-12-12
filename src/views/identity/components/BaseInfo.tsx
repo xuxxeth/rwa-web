@@ -23,7 +23,7 @@ import { RESPONSE_CODE } from '@/config/constants'
 import type { ApiResponse } from '@/service/client'
 import { WarningInfo } from './WarningInfo'
 
-async function retryRefresh(
+export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
   maxRetries = 5,
   interval = 3000,
@@ -550,7 +550,7 @@ const BaseInfo = memo(
                   />
                   <div className='text-[rgba(255,255,255,0.6)] text-[16px]'>{t('kyc.t15')}</div>
                 </div>
-                {!useCertificateAddress && (
+                {(!useCertificateAddress || type === 1) && (
                   <InputBox>
                     <KycInput
                       className=''
@@ -582,7 +582,7 @@ const BaseInfo = memo(
           </SectionBox>
 
           <SectionBox className='pb-5'>
-            <div className=' flex items-center'>
+            <div className=' flex items-center mb-5'>
               <SectionTitle>{t('identity.upload.uploadId')}</SectionTitle>
               <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
             </div>
@@ -633,7 +633,7 @@ const BaseInfo = memo(
                     <InputBox>
                       <KycInput
                         className=''
-                        placeholder={t('kyc.t4')}
+                        placeholder={t('kyc.t38')}
                         error={errors.description?.message}
                         {...register('description', {
                           required: '请输入内容',
@@ -643,7 +643,7 @@ const BaseInfo = memo(
                           },
                           pattern: {
                             value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
-                            message: '只支持中文和英文字母',
+                            message: '只支持中文、英文字母和数字',
                           },
                           onChange: e => {
                             // 实时限制输入长度

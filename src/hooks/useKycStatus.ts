@@ -1,8 +1,9 @@
-import { RISK_STATUS } from "@/config/constants";
+import { ID_EXPIRES, RISK_STATUS } from "@/config/constants";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useKycStore } from "@/stores/kycStore";
+import { formatSecondsToDateTime } from "@/utils/format";
 
 export function useFetchKycStatus() {
   const { chainId, account } = useActiveWeb3()  
@@ -24,11 +25,33 @@ export function useKycStatus() {
     if (status === 2) return RISK_STATUS.VERIFIED
     if (status === 3) return RISK_STATUS.REJECTED
     if (status === 4) return RISK_STATUS.REVIEW
+    if (status === 5) return RISK_STATUS.EXPIRED
     // 0 未认证
     return RISK_STATUS.NOTVERIFIED
   }, [status])
   
   return {
     kycStatus,
+  }
+}
+export function useKycExpired() {
+  const kycStatus = useKycStore(state => state.kycStatus)
+
+  const expires = Number(kycStatus?.expiresTime)
+  if (expires <= 0) {
+    return {
+      expiring: false,
+      expired: false,
+      expiresTime: 0,
+      desc: ''
+    }
+  }
+  const now = Date.now() / 1000
+  
+  return {
+    expiring: expires - ID_EXPIRES < now && expires > now,
+    expired: kycStatus?.status === RISK_STATUS.EXPIRED,
+    expiresTime: kycStatus?.expiresTime,
+    desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
   }
 }

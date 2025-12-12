@@ -1,19 +1,29 @@
 import { Button } from "@/components/ui/button"
 import { usePersistentForm } from "@/hooks/usePersistentForm"
 import { useTranslation } from "@/hooks/useTranslation"
-import { memo, useId, useState } from "react"
+import { memo, useId, useMemo, useState } from "react"
 import { Upload } from "./Upload"
-import storage from "@/utils/storage"
-import { KYC_UPLOAD_STORAGE_KEY } from "./Upload/shared"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
-import type { IKycSubmitData } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
-import { ErrorBox, InputBox, SectionBox, SectionTitle } from "./BaseInfo"
+import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
 import { LazyImage } from "@/components/image/LazyImage"
 import { KycInput } from "@/components/input/KycInput"
 import { KycTextarea } from "@/components/input/KycTextarea"
 import { useFieldArray } from "react-hook-form"
+import type { ApiResponse } from "@/service/client"
+import type { IKycDetail } from "@/service/kyc/types"
+
+function findEmptyItemIndices(list: IExtraInfoItem[]) {
+  return list
+    .map((item, index) => {
+      const isDescriptionEmpty = !item.description || item.description.trim() === '';
+      const isFilesEmpty = !item.files || item.files.length === 0 || !item.files[0];
+      return { isEmpty: isDescriptionEmpty && isFilesEmpty, index };
+    })
+    .filter(item => item.isEmpty)
+    .map(item => item.index);
+}
 
 export type IExtraInfoItem = {
   name: string,
@@ -22,36 +32,20 @@ export type IExtraInfoItem = {
 }
 
 interface FormData {
-  // 基础信息
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  gendar: number; // 0女，1男
-  dob: string; // 出生日期
-  email: string;
-  // 证件信息
-  type: number; // 0身份证, 1护照 
-  issueCountry: string
-  no: string;
-  residentAddress: string;
-  useCertificateAddress?: boolean; // 是否使用证件地址
-  // 工作信息
-  employment: number; // 就业情况
-  description: string; // 就业 时 必填
-  // 收信息
-  source: number;
-  approvedProtocols: string[]
   extraList: IExtraInfoItem[]
-
 }
 
 const ExtraInfo = memo(
-  () => {
+  ({
+    refresh
+  }: {
+    refresh?: () => Promise<ApiResponse<IKycDetail>>
+  }) => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
-    const { register, handleSubmit, watch, control, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
+    const { register, handleSubmit, watch, setValue, clear, control, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       extraList: [
-        { name: "", description: "", files: [] }
+        { name: "", description: "", files: [] },
       ]
     });
     const _id = useId()
@@ -59,49 +53,35 @@ const ExtraInfo = memo(
       control,
       name: "extraList"
     });
+
+    const extraList = watch('extraList')
+
+    const errorList = findEmptyItemIndices(extraList) || []
+
+    console.log(extraList, errorList)
+
+    const [errorIndexs, setErrorIndexs] = useState<number[]>([])
+
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
-      // 1. 判断有没有上传证件照
-      const kycFiles = storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}   
+      console.log(errorList)
+      if (errorList.length > 0) {
+        toastError({title: '请补充资料图片或说明'})
+        return
+      }
 
-      const params: IKycSubmitData = {
-        basicInfo: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          fullName: data.fullName,
-          gender: data.gendar,
-          dob: data.dob,
-          email: data.email
-        },
-        idInfo: {
-          type: data.type,
-          issueCountry: data.issueCountry,
-          no: data.no,
-          residentAddress: data.useCertificateAddress ? '' : data.residentAddress,
-          useCertificateAddress: data.useCertificateAddress,
-          files: {
-            idCardFront: data.type === 0 ? kycFiles.idFront : '',
-            idCardBack: data.type === 0 ? kycFiles.idBack : '',
-            idCard: data.type === 0 ? kycFiles.idMerged : '',
-            passport: data.type === 0 ? '' : kycFiles.passport,
-            addressCertification: kycFiles.addressCertificates
-          }
-        },
-        workInfo: {
-          employment: data.employment,
-          description: data.description
-        },
-        incomeInfo: {
-          source: data.source || 1
-        },
+      const extras = data.extraList.map(extra => {
+        return {
+          ...extra,
+          files: extra.files?.map(file => file)
+        }
+      })
+      const params: any = {
         extraInfo: {
-          incomeCertifications: kycFiles.incomeCertificates || []
-        },
-        approvedProtocols: [
-          "AML-Policy-v3.0",
-          "Privacy-Agreement-v2.1"
-        ]
+          extras: extras
+        }
+        
       }
       console.log(data)
       console.log(params)
@@ -111,9 +91,21 @@ const ExtraInfo = memo(
       const res = await kycApi.submitKyc(params)
       setSubmiting(false)
       if (res?.code === RESPONSE_CODE.SUCCESS) {
-        toastSuccess({title: '提交成功'})
+        if (refresh) {
+          const detailRes = await retryRefresh(refresh)
+          setSubmiting(false)
+          if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
+            toastSuccess({ title: '提交成功' })
+            clear()
+          }
+        } else {
+          toastSuccess({ title: '提交成功' })
+          clear()
+          setSubmiting(false)
+        }
       } else {
-        toastError({title: res?.message || '提交失败'})
+        toastError({ title: res?.message || '提交失败' })
+        setSubmiting(false)
       }
       
     }
@@ -138,7 +130,7 @@ const ExtraInfo = memo(
                     <div className=" grid grid-cols-2 mb-5">
                       <div>
                         <div className="flex items-end justify-between font-normal mb-2">
-                          <div className="text-[16px]">資料名稱 </div>
+                          <div className="text-[16px]">{t('kyc.t40')} </div>
                           <div className="text-[12px] text-[#909090]">0/30</div>
                         </div>
                         <InputBox >
@@ -173,22 +165,37 @@ const ExtraInfo = memo(
                       </div>
                     </div>
                     <div className="font-normal mb-2">
-                      <div className="text-[16px]">資料图片 </div>
+                      <div className="text-[16px]">{t('kyc.t41')} </div>
                       <div className="text-[16px] text-[rgba(255,255,255,0.6)] mt-2">
-                        上傳圖片說明：支援 JPG/PNG/PDF，單張不超過 2MB；多頁請分次上傳並確保清晰可讀。
+                        {t('kyc.t44')}：{t('kyc.t43')}
                       </div>
                     </div>
-                    <Upload type="extra" />
+                    <Upload type="extra" 
+                      mode="edit"
+                      keys={extraList[index].files}  
+                      onChanged={keys => {
+                        setValue(`extraList.${index}.files`, keys as string[])
+                      }}   
+                    />
                     <div className="font-normal my-5">
-                      <div className="text-[16px]">資料说明 </div>
+                      <div className="text-[16px]">{t('kyc.t42')}</div>
                     </div>
                     <InputBox>
                       <KycTextarea placeholder="请输入" 
                         {
-                          ...register(`extraList.${index}.description`)
+                          ...register(`extraList.${index}.description`, {
+                            pattern: {
+                              value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,200}$/,
+                              message: '支持中文英文数字输入，最大支持输入200字符',
+                            },
+                          })
+                          
                         }
                       />
                     </InputBox>
+                    {
+                      errorList.includes(index) && <ErrorBox error={'资料图片和说明至少提交一个'}/>
+                    }
                     
                   </SectionBox>
                   <div className="w-[24px] ml-5 shrink-0">
@@ -217,7 +224,7 @@ const ExtraInfo = memo(
         <div className="flex justify-center mt-8">
           <Button disabled={submiting} loading={submiting} type="submit" className="bg-white text-black w-full lg:w-[400px] rounded-[8px]"
           >
-            { '提交資料' }
+            { t('kyc.t39') }
             
           </Button>
         </div>

@@ -245,7 +245,6 @@ function PassportUpload({
 
   return (
     <div>
-      <Text text='uploadId' className='text-lg my-5 text-white' />
       <div className='flex flex-row gap-5'>
         <UploadCard fileType='passport' onUploaded={onPassportUploaded} s3Key={keys} mode={mode} />
         <div className='flex-1 flex flex-row items-center justify-center'>

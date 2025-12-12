@@ -10,6 +10,8 @@ export const KYC_OVERALL_STATUS = {
   VERIFYING: 1,
   VERIFIED: 2,
   FAIL: 3,
+  EXPIRED: 5,
+  REJECTED: 6,
 }
 
 export type KYC_OVERALL_STATUS = (typeof KYC_OVERALL_STATUS)[keyof typeof KYC_OVERALL_STATUS]

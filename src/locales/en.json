@@ -471,7 +471,23 @@
     "t32": "Please upload your income proof to continue.",
     "t33": "Upload",
     "t34": "Additional information is required. Please check the details page and update your info.",
-    "t35": "View"
+    "t35": "View",
+    "t36": "Facial verification failed. Please redo the facial verification.",
+    "t37": "Verify",
+    "t38": "XX Company, Finance",
+    "t39": "Submit",
+    "t40": "Document Name",
+    "t41": "Document Image",
+    "t42": "Description",
+    "t43": "Supports JPG/PNG/PDF, max 2MB per file. Upload multi-page documents separately and ensure clarity.",
+    "t44": "Image Upload Instructions",
+    "t45": "Document expiring soon",
+    "t46": "Your document is about to expire. Please update it before {{expire}} to avoid any impact on your trading.",
+    "t47": "Update Now",
+    "t48": "Document Expired",
+    "t49": "Your document has expired. Please submit a valid document to restore trading ",
+    "t50": "Update Now"
+    
 
   },
   "employment": {
