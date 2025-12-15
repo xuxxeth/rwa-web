@@ -23,6 +23,7 @@ import { RESPONSE_CODE } from '@/config/constants'
 import type { ApiResponse } from '@/service/client'
 import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
+import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
@@ -204,7 +205,6 @@ const BaseInfo = memo(
     const [submiting, setSubmiting] = useState(false)
 
     const onSubmit = async (data: FormData) => {
-      
       if (type === 0) {
         // 身份证，正反面都要传
         if (!data.idCardFront) {
@@ -321,21 +321,13 @@ const BaseInfo = memo(
       preAccount.current = account
     }, [account])
 
-    
-
-    useEffect(() => {
-      return () => {
-        if (onResetRetry) onResetRetry()
-      }
-    }, [])
+    // 组件卸载时重置重试状态，使用防抖避免 StrictMode 下的重复执行
+    useDebouncedUnmount(onResetRetry)
 
     return (
       <>
         <WarningInfo />
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className='w-full mt-2'
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
             <div className=' grid grid-cols-4 font-normal gap-x-6'>
@@ -561,8 +553,7 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-1 font-normal'>
               <FormItemBox>
                 <FormItemLabel title={t('kyc.t14')} />
-                {
-                  type === 0 &&
+                {type === 0 && (
                   <div className='mt-3 flex gap-x-2 items-center mb-3'>
                     <CheckBox
                       checked={useCertificateAddress}
@@ -572,8 +563,8 @@ const BaseInfo = memo(
                     />
                     <div className='text-[rgba(255,255,255,0.6)] text-[16px]'>{t('kyc.t15')}</div>
                   </div>
-                }
-                
+                )}
+
                 {(!useCertificateAddress || type === 1) && (
                   <InputBox>
                     <KycInput

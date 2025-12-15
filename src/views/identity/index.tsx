@@ -80,7 +80,6 @@ function Identity({ account }: { account: string }) {
   useEffect(() => {
     refresh()
   }, [account])
-  
 
   const rules = useMemo(() => {
     if (kycDetail === undefined) return []
