@@ -67,10 +67,13 @@
     "less": "^4.4.1",
     "mockjs": "^1.1.0",
     "prettier": "^3.6.2",
+    "sharp": "^0.34.5",
+    "svgo": "^4.0.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
     "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-image-optimizer": "^2.0.3",
     "vite-plugin-mock": "^3.0.2",
     "vite-plugin-svgr": "^4.5.0"
   }
