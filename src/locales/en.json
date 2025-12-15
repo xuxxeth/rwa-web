@@ -280,11 +280,12 @@
       "ft": "Facial verification failed. Please complete it yourself in good lighting with your face clearly visible, then try again.",
       "rv": "Retry Verification",
       "complete": "Facial Verification Completed",
-      "toWeb": "Please view the authentication results on the web browser.",
-      "r0": "Unknown status",
-      "r1": "Verification process not completed",
-      "r2": "Verification result not passed",
-      "r3": "Verification confidence not passed"
+      "f1": "Liveness verification process was interrupted",
+      "f2": "Liveness detection failed",
+      "sub0": "Please view your authentication results on the website.",
+      "sub1": "Please go to the website to restart the verification process.",
+      "sub2": "The recognition was unclear. Please retry in a well-lit environment.",
+      "sub3": "Verification returned an abnormal result. Please resubmit your information on the website."
     },
     "result": {
       "res": "Verification Result",
