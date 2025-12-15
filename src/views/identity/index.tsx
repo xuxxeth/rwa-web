@@ -29,6 +29,7 @@ import SignatureVerify from '@/components/signature-verify'
 import { useKycExpired } from '@/hooks/useKycStatus'
 import { IDExpired } from './components/IDExpired'
 import { useSearchParams } from 'react-router-dom'
+import { ReviewInfo } from './components/ReviewInfo'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -79,6 +80,7 @@ function Identity({ account }: { account: string }) {
   useEffect(() => {
     refresh()
   }, [account])
+  
 
   const rules = useMemo(() => {
     if (kycDetail === undefined) return []

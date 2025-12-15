@@ -180,10 +180,10 @@ function AddressUpload({
 
   return (
     <div>
-      <div className='flex items-center mb-5'>
+      {/* <div className='flex items-center mb-5'>
         <Text text='uploadAddr' className='text-[18px] font-normal text-white' />
         <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
-      </div>
+      </div> */}
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard
           fileType='addressCertificates'

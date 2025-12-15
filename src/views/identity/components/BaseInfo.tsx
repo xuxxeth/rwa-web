@@ -204,8 +204,7 @@ const BaseInfo = memo(
     const [submiting, setSubmiting] = useState(false)
 
     const onSubmit = async (data: FormData) => {
-      // 1. 判断有没有上传证件照
-      const kycFiles = storage.getItem(KYC_UPLOAD_STORAGE_KEY) || {}
+      
       if (type === 0) {
         // 身份证，正反面都要传
         if (!data.idCardFront) {
@@ -629,6 +628,7 @@ const BaseInfo = memo(
           </SectionBox>
           <SectionBox className='pb-5'>
             {/* 上传地址证明 */}
+            <SectionTitle>{t('identity.upload.uploadAddr')}</SectionTitle>
             <Upload
               type='address'
               keys={addressCertification}
@@ -645,6 +645,7 @@ const BaseInfo = memo(
                 <FormItemLabel title={t('kyc.t17')} />
                 <InputBox>
                   <EmploymentSelect
+                    defaultValue={String(employment)}
                     onChange={data => {
                       setValue('employment', Number(data.code))
                     }}
