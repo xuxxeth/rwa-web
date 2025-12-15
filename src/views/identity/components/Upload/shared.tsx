@@ -323,8 +323,8 @@ export function UploadCard(props: {
       <div
         {...getRootProps({
           className: cn(
-            'dropzone flex-1 border border-[#5B5B5B] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] hover:border-[rgba(26,133,255,1)] relative',
-            // mode === 'view' ? 'disabled cursor-not-allowed' : '',
+            'dropzone flex-1 border border-[#5B5B5B] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] relative',
+            mode === 'view' ? 'disabled cursor-not-allowed' : 'hover:border-[rgba(26,133,255,1)]',
             isFileTooLarge ? 'border-[#CA3F64]' : ''
           ),
         })}
@@ -348,7 +348,7 @@ export function UploadCard(props: {
                 className='rounded-lg'
                 style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />
-              {isHover && mode === 'edit' && (
+              {mode === 'edit' && isHover && (
                 <button
                   type='button'
                   className='absolute bg-[#0E0E0E] rounded-lg cursor-pointer left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-4'

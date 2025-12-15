@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react'
+import { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import {
   Text,
   UploadCardAdd,
@@ -307,17 +307,14 @@ function ExtraInfoUpload({
                 s3Key={s3Key}
                 mode={mode}
               />
-              {index > 0 && (
+              {mode === 'edit' && index > 0 && (
                 <button
                   type='button'
-                  disabled={mode === 'view'}
                   onClick={event => {
-                    if (mode === 'view') return
                     onDelete(index)
                   }}
                   className={cn(
-                    'absolute top-0 right-0 py-3 px-4 w-[45px] h-[39px] bg-black rounded-tr-lg rounded-bl-2xl',
-                    mode === 'view' ? 'cursor-not-allowed disabled' : 'cursor-pointer'
+                    'absolute top-0 right-0 py-3 px-4 w-[45px] h-[39px] cursor-pointer bg-black rounded-tr-lg rounded-bl-2xl'
                   )}
                 >
                   <LazyImage src='/images/icons/identity/trash.png' />
@@ -326,7 +323,9 @@ function ExtraInfoUpload({
             </div>
           )
         })}
-        {atLeastOneKey.length < 4 && <UploadCardAdd onClick={onAdd} mode={mode} />}
+        {mode === 'edit' && atLeastOneKey.length < 4 && (
+          <UploadCardAdd onClick={onAdd} mode={mode} />
+        )}
       </div>
     </div>
   )

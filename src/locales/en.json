@@ -242,7 +242,7 @@
       "idFront": "Upload Front Side (Photo Page)",
       "idBack": "Upload Front Side (Photo Page)",
       "clickUpload": "Click to Upload",
-      "dragUpload": "或拖动图片到框中",
+      "dragUpload": "Or drag the image into the box",
       "tips": "Upload the ID front (portrait + emblem). Ensure it is clear, unobstructed, valid, all corners visible, JPG, under 2MB.",
       "validAddrInc": "Valid proof of address includes:",
       "addr1": "Mainland China ID or Household Registration (with address)",
