@@ -139,10 +139,12 @@ interface FormData {
 
 const BaseInfo = memo(
   ({
+    rejectReason,
     userInfo,
     refresh,
     onResetRetry,
   }: {
+    rejectReason?: string
     userInfo?: IKycSubmitData
     refresh?: () => Promise<ApiResponse<IKycDetail>>
     onResetRetry?: () => void
@@ -171,7 +173,7 @@ const BaseInfo = memo(
       firstName: userInfo?.basicInfo.firstName,
       lastName: '',
       fullName: '',
-      gendar: 0,
+      gendar: 1,
       email: '',
       type: 0,
       employment: 1,
@@ -225,7 +227,7 @@ const BaseInfo = memo(
       }
       // 无地址证明
       if (!data.addressCertification) {
-        toastError({ title: '上傳地址證明' })
+        toastError({title: t('identity.upload.uploadIncome')})
         return
       }
       const params: IKycSubmitData = {
@@ -278,16 +280,16 @@ const BaseInfo = memo(
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
           if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
-            toastSuccess({ title: '提交成功' })
+            // toastSuccess({ title: '提交成功' })
             clear()
           }
         } else {
-          toastSuccess({ title: '提交成功' })
+          // toastSuccess({ title: '提交成功' })
           clear()
           setSubmiting(false)
         }
       } else {
-        toastError({ title: res?.message || '提交失败' })
+        toastError({ title: res?.message || 'Error' })
         setSubmiting(false)
       }
     }
@@ -299,6 +301,7 @@ const BaseInfo = memo(
     }, [])
 
     useEffect(() => {
+      console.log('userInfo changed:', userInfo)
       if (userInfo && userInfo.basicInfo.firstName) {
         reset({
           ...userInfo.basicInfo,
@@ -326,7 +329,9 @@ const BaseInfo = memo(
 
     return (
       <>
-        <WarningInfo />
+        {
+          rejectReason && <WarningInfo text={rejectReason} />
+        }
         <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
@@ -339,10 +344,10 @@ const BaseInfo = memo(
                     placeholder={t('kyc.t4')}
                     error={errors.firstName?.message}
                     {...register('firstName', {
-                      required: '最大支持输入30位字符',
+                      required: t('kyc.t54', {num: 30}),
                       maxLength: {
                         value: 30,
-                        message: '最大支持输入30位字符',
+                        message: t('kyc.t54', {num: 30}),
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
@@ -368,10 +373,10 @@ const BaseInfo = memo(
                     placeholder={t('kyc.t4')}
                     error={errors.lastName?.message}
                     {...register('lastName', {
-                      required: '最大支持输入30位字符',
+                      required: t('kyc.t54', {num: 30}),
                       maxLength: {
                         value: 30,
-                        message: '最大支持输入30位字符',
+                        message: t('kyc.t54', {num: 30}),
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
@@ -397,10 +402,10 @@ const BaseInfo = memo(
                       placeholder={t('kyc.t4')}
                       error={errors.fullName?.message}
                       {...register('fullName', {
-                        required: '最大支持输入30位字符',
+                        required: t('kyc.t54', {num: 30}),
                         maxLength: {
                           value: 30,
-                          message: '最大支持输入30位字符',
+                          message: t('kyc.t54', {num: 30}),
                         },
                         pattern: {
                           value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
@@ -467,15 +472,15 @@ const BaseInfo = memo(
                     placeholder={t('kyc.t4')}
                     error={errors.email?.message}
                     {...register('email', {
-                      required: '邮箱格式不正确，请重新输入',
+                      required: t('kyc.t55'),
                       maxLength: {
                         value: 50,
-                        message: '最大支持输入50位字符',
+                        message: t('kyc.t54', {num: 50}),
                       },
                       pattern: {
                         value:
                           /^(?=[^@]{1,64}@[^@]{1,255}$)(?=.{1,50}$)[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*(?:\.[a-zA-Z]{2,})+$/,
-                        message: '邮箱格式不正确，请重新输入',
+                        message: t('kyc.t55'),
                       },
                       onChange: e => {
                         // 实时限制输入长度
@@ -501,7 +506,6 @@ const BaseInfo = memo(
                   <DoctypeSelect
                     defaultValue={String(type)}
                     onChange={data => {
-                      console.log(data)
                       setValue('type', Number(data.code))
                     }}
                   />
@@ -528,10 +532,10 @@ const BaseInfo = memo(
                     placeholder={t('kyc.t4')}
                     error={errors.no?.message}
                     {...register('no', {
-                      required: '请输入内容',
+                      required: t('kyc.t4'),
                       maxLength: {
                         value: 30,
-                        message: '最大支持输入30位字符',
+                        message: t('kyc.t54'),
                       },
                       pattern: {
                         value: /^[A-Za-z0-9]+$/,
@@ -572,10 +576,10 @@ const BaseInfo = memo(
                       placeholder={t('kyc.t4')}
                       error={errors.residentAddress?.message}
                       {...register('residentAddress', {
-                        required: '请输入内容',
+                        required: t('kyc.t4'),
                         maxLength: {
-                          value: 30,
-                          message: '最大支持输入40位字符',
+                          value: 40,
+                          message: t('kyc.t54', {num: 40}),
                         },
                         pattern: {
                           value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
@@ -619,7 +623,10 @@ const BaseInfo = memo(
           </SectionBox>
           <SectionBox className='pb-5'>
             {/* 上传地址证明 */}
-            <SectionTitle>{t('identity.upload.uploadAddr')}</SectionTitle>
+            <div className=' flex items-center mb-5'>
+              <SectionTitle>{t('identity.upload.uploadAddr')}</SectionTitle>
+              <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+            </div>
             <Upload
               type='address'
               keys={addressCertification}
@@ -653,10 +660,10 @@ const BaseInfo = memo(
                         placeholder={t('kyc.t38')}
                         error={errors.description?.message}
                         {...register('description', {
-                          required: '请输入内容',
+                          required: t('kyc.t4'),
                           maxLength: {
                             value: 30,
-                            message: '最大支持输入40位字符',
+                            message: t('kyc.t54', {num: 40}),
                           },
                           pattern: {
                             value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,

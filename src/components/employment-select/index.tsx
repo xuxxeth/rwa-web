@@ -71,17 +71,20 @@ const EmploymentSelect = memo(
           
         }}
       >
-        <div className="text-[16px] font-normal text-[#909090] mb-2 flex items-center">
-          {label || ''}
-          <div className="ml-4 flex items-center gap-x-1 cursor-pointer"
-            onClick={() => {
-              setCanEdit(true)
-            }}
-          >
-            <LazyImage src="/images/kyc/edit.png" className="w-[18px] h-[18px]" />
-            <span className="text-[#2962FF]">编辑</span>
+        {
+          mode === 'view' &&
+          <div className="text-[16px] font-normal text-[#909090] mb-2 flex items-center">
+            {label || ''}
+            <div className="ml-4 flex items-center gap-x-1 cursor-pointer"
+              onClick={() => {
+                setCanEdit(true)
+              }}
+            >
+              <LazyImage src="/images/kyc/edit.png" className="w-[18px] h-[18px]" />
+              <span className="text-[#2962FF]">编辑</span>
+            </div>
           </div>
-        </div>
+        }
         {
           mode === 'view' && !canEdit ? 
           <>

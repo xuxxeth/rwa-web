@@ -37,8 +37,8 @@ const Risk3Info = memo(
       // 1. 判断有没有上传证件照
       const files = (data.incomeCertifications || []).filter(key => key)
       // 无地址证明
-      if (files.length < 0) {
-        toastError({title: '上傳收入證明'})
+      if (files.length <= 0) {
+        toastError({title: t('identity.upload.uploadIncome')})
         return
       }
       const params: any = {

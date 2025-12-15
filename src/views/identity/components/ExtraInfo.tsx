@@ -95,16 +95,16 @@ const ExtraInfo = memo(
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
           if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
-            toastSuccess({ title: '提交成功' })
+            // toastSuccess({ title: '提交成功' })
             clear()
           }
         } else {
-          toastSuccess({ title: '提交成功' })
+          // toastSuccess({ title: '提交成功' })
           clear()
           setSubmiting(false)
         }
       } else {
-        toastError({ title: res?.message || '提交失败' })
+        toastError({ title: res?.message || 'Error' })
         setSubmiting(false)
       }
       

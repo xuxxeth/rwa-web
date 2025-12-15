@@ -493,7 +493,9 @@
     "t50": "Update Now",
     "t51": "Update Document",
     "t52": "收入證明",
-    "t53": "编辑"
+    "t53": "编辑",
+    "t54": "Maximum {{num}} characters",
+    "t55": "邮箱格式不正确，请重新输入"
   },
   "employment": {
     "t1": "退休",

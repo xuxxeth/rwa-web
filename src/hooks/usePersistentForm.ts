@@ -1,6 +1,7 @@
 
 import { useForm, type DefaultValues, type UseFormReturn } from 'react-hook-form';
 import { useCallback, useEffect, useRef } from 'react';
+import { de } from 'date-fns/locale';
 
 export function usePersistentForm<T extends Record<string, any>>(
   storageKey: string,
@@ -26,7 +27,7 @@ export function usePersistentForm<T extends Record<string, any>>(
       const savedData = localStorage.getItem(storageKey);
       if (savedData) {
         const parsedData = JSON.parse(savedData);
-        reset(parsedData);
+        reset({...defaultValues, ...parsedData} as T);
       }
     } catch (error) {
       console.error('加载表单数据失败:', error);

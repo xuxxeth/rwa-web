@@ -12,6 +12,14 @@ import { KYC_RISK_LEVEL } from "@/service/kyc/types";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
   if (!verified) {
+    if (issued) {
+      return {
+        color: "rgba(240,67,73,1)",
+        bg: "rgba(240,67,73,0.1)",
+        icon: "/images/icons/assets/issue.png",
+        text: "issue",
+      };
+    }
     return {
       color: "rgba(255,204,0,1)",
       bg: "rgba(255,204,0,0.1)",

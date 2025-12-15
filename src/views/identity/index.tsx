@@ -73,7 +73,7 @@ function Identity({ account }: { account: string }) {
 
   const refresh = async () => {
     const res = await kycApi.getKycDetail()
-    setKycDetail(res.data)
+    setKycDetail(res.data || {})
     return res
   }
 
@@ -97,7 +97,7 @@ function Identity({ account }: { account: string }) {
       // 未认证
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.NOTVERIFIED,
-        render: () => <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} />,
+        render: () => <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} rejectReason={kycDetail.rejectReason} />,
       },
       // 认证成功
       {
@@ -115,7 +115,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.INCOME &&
           riskLevel === KYC_RISK_LEVEL.HIGH,
-        render: () => <Risk3Info />,
+        render: () => <Risk3Info refresh={refresh} />,
       },
       // 认证中 - OCR Verifying
       {
@@ -134,7 +134,7 @@ function Identity({ account }: { account: string }) {
           isRetry,
         // 因为 isRetry 为 true 进入的 BaseInfo 组件，需要 BaseInfo 组件卸载的时候，执行 resetRetry, 把 isRetry 设置为 false
         render: () => (
-          <BaseInfo onResetRetry={resetRetry} refresh={refresh} userInfo={kycDetail.userInfo} />
+          <BaseInfo onResetRetry={resetRetry} refresh={refresh} userInfo={kycDetail.userInfo} rejectReason={kycDetail.rejectReason} />
         ),
       },
       // 认证中 - OCR Failed/Rejected
