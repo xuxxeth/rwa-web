@@ -35,10 +35,10 @@ const Section3Lg = memo(() => {
   const xBG = useTransform(scrollYProgress, [from, to], [1380, 878]);
 
   return (
-    <div ref={sectionRef} className="h-[2400px]">
+    <div ref={sectionRef} className="h-[2400px] hidden lg:block ">
       <div
         ref={innerRef}
-        className=" hidden lg:block h-[calc(100vh-88px)] min-h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
+        className="h-[calc(100vh-88px)] min-h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
       >
         <div className=" relative w-full h-full flex items-center justify-center">
           <div className=" absolute w-full h-full left-0 top-0 flex items-center justify-center overflow-hidden">

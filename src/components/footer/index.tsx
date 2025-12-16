@@ -11,7 +11,7 @@ export function XFooter({
 }) {
   const { t } = useTranslation()
   return (
-    <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] mt-[130px] font-normal'>
+    <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] md:mt-[130px] font-normal'>
 
     <MainLayout>
       <div className='md:flex justify-between px-5 font-normal'>
@@ -51,7 +51,7 @@ export function XFooter({
               </div>
             </a>
           </div>
-          <div className='mt-8 md:mt-0'>
+          <div className='mt-10 md:mt-0'>
             <div className=' font-semibold'>{t('About')}</div>
             
             <div className='flex items-center mt-4'>

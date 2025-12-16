@@ -6,6 +6,7 @@ import { cn } from "@/utils/tw";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTailwindBreakpoints } from "@/hooks/useBreakpoints";
 import { useMotionScrollV2 } from "@/hooks/useMotionScrollV2";
+import { is } from "date-fns/locale";
 
 const from = 0
 const to = 1
@@ -13,9 +14,13 @@ const xTransition = 'all 0.5s linear'
 
 
 export const ItemContent = memo(
-  ({ children }: { children: React.ReactNode }) => {
+  ({ children, isZh }: { children: React.ReactNode, isZh?: boolean }) => {
     return (
-      <div className="font-light text-[16px] leading-[150%] mt-[30px]">
+      <div className="font-light text-[16px] leading-[150%] mt-[30px]"
+        style={{
+          minHeight: isZh ? '100px' : 'auto'
+        }}
+      >
         {children}
       </div>
     );
@@ -30,7 +35,7 @@ export const ItemBox = memo(
         style={{ backgroundImage: `url('/images/home/new/bg-border.png')`, backgroundSize: '100% 100%' }}
       >
         <div className={cn(
-          "irregular-square px-5 py-[38px] ",
+          "irregular-square px-5 py-[38px]",
           className
         )}>
           {children}
@@ -41,7 +46,7 @@ export const ItemBox = memo(
 );
 
 const Section2Lg = memo(() => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { windowWidth } = useTailwindBreakpoints();
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
@@ -61,8 +66,11 @@ const Section2Lg = memo(() => {
     return windowWidth < 1440
   }, [windowWidth])
 
-  const xBG = useTransform(scrollYProgress, [from, to], [1261, 927]);
-  const yBG = useTransform(scrollYProgress, [from, to], [1101, 810]);
+  const isZh = useMemo(() => {
+    return i18n.language === 'zh' && windowWidth >= 1440
+  }, [i18n.language, windowWidth])
+
+  const yBG = useTransform(scrollYProgress, [from, to], [913, 810]);
 
   const logoOpacity = useTransform(scrollYProgress, [to - 0.1, to], [0, 1]);
   const logoOpacity2 = useTransform(scrollYProgress, [to - 0.001, to], [1, 0]);
@@ -114,15 +122,15 @@ const Section2Lg = memo(() => {
   })
 
   return (
-    <div ref={sectionRef} className="h-[4000px]">
+    <div ref={sectionRef} className="h-[4000px] hidden lg:block ">
       <div ref={innerRef}
-        className=" hidden lg:block h-[calc(100vh-88px)] min-h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
+        className="h-[calc(100vh-88px)] min-h-[810px] lg:px-4 xl:px-[170px] text-white sticky top-[88px]"
       >
         <div className=" relative w-full h-full flex items-center justify-center">
           <div className=" absolute w-full h-full left-0 top-0 flex items-center justify-center overflow-hidden">
             <motion.div
               style={{
-                width: doneMap.BG ? 927 : xBG,
+                // width: doneMap.BG ? 927 : xBG,
                 height: doneMap.BG ? 810 : yBG,
                 transition: 'all 0.1s linear',
                 
@@ -152,7 +160,7 @@ const Section2Lg = memo(() => {
               }}
             >
               <div className="flex justify-center flex-col items-center">
-                <TitlePrimary className="font-normal text-[28px] mb-5">
+                <TitlePrimary isZh={isZh} className="font-normal text-[28px] mb-5">
                   {t('newHome.t3')}
                 </TitlePrimary>
                 <div className="font-normal text-[20px] leading-[150%] mb-[68px] w-[763px] text-center">
@@ -183,16 +191,24 @@ const Section2Lg = memo(() => {
               >
                 <ItemBox>
                     <motion.div
+                      className="h-full"
                       style={{
                         opacity: doneMap.logo ? 0 : logoOpacity2,
                         transition: 'all 0.1s linear'
                       }}
                     >
-                      <div className=" relative z-10">
-                        <div className="w-[120px]">
+                      <div className={cn(
+                        " relative z-10 ",
+                        isZh ? ' flex flex-col justify-between h-full' : '',
+                      )}
+                        
+                      >
+                        <div className={cn(
+                          isZh ? 'w-full' : 'w-[120px]]',
+                        )}>
                           <TitlePrimary>{t('newHome.t5')}</TitlePrimary>
                         </div>
-                        <ItemContent>
+                        <ItemContent isZh={isZh}>
                           {t('newHome.t6')}
                         </ItemContent>
                       </div>
@@ -244,11 +260,16 @@ const Section2Lg = memo(() => {
                 }}
               >
                 <ItemBox
+                  className={cn(
+                    isZh ? ' flex flex-col justify-between ' : '',
+                  )}
                 >
-                  <div className="w-[170px]">
+                  <div className={cn(
+                    isZh ? 'w-full' : 'w-[170px]]',
+                  )}>
                     <TitlePrimary>{t('newHome.t7')}</TitlePrimary>
                   </div>
-                  <ItemContent>
+                  <ItemContent isZh={isZh}>
                     {t('newHome.t8')}
                   </ItemContent>
                 </ItemBox>
@@ -271,11 +292,16 @@ const Section2Lg = memo(() => {
                 }}
               >
                 <ItemBox
+                  className={cn(
+                    isZh ? ' flex flex-col justify-between ' : '',
+                  )}
                 >
-                  <div className="w-[120px]">
+                  <div className={cn(
+                    isZh ? 'w-full' : 'w-[120px]]',
+                  )}>
                     <TitlePrimary>{t('newHome.t9')}</TitlePrimary>
                   </div>
-                  <ItemContent>
+                  <ItemContent isZh={isZh}>
                     {t('newHome.t10')}
                   </ItemContent>
                 </ItemBox>
@@ -298,13 +324,16 @@ const Section2Lg = memo(() => {
                 }}
               >
                 <ItemBox
+                  className={cn(
+                    isZh ? ' flex flex-col justify-between ' : '',
+                  )}
                 >
                   <div>
                     <TitlePrimary>
-                      {t('newHome.t11')} <br /> {t('newHome.t12')}
+                      {t('newHome.t11')} {!isZh ? <br /> : null}{t('newHome.t12')}
                     </TitlePrimary>
                   </div>
-                  <ItemContent>
+                  <ItemContent isZh={isZh}>
                     <div className="">
                       {t('newHome.t13')}
                       <span className=" cursor-pointer text-[#6AFCDF]"> SlowMist 
@@ -398,13 +427,15 @@ const Section2H5 = memo(
                 </ItemBox>
 
                 <ItemBox
+                  
                 >
                   <div>
                     <TitlePrimary>
                       {t('newHome.t11')} <br /> {t('newHome.t12')}
                     </TitlePrimary>
                   </div>
-                  <ItemContent>
+                  <ItemContent
+                  >
                     <div className="">
                       {t('newHome.t13')}
                       <span className=" cursor-pointer text-[#6AFCDF]"> SlowMist 

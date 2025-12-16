@@ -190,10 +190,17 @@ const BaseInfo = memo(
       addressCertification: '',
       incomeCertifications: [],
     })
+    const firstName = watch('firstName')
+    const lastName = watch('lastName')
+    const fullName = watch('fullName')
+    const email = watch('email')
+    const no = watch('no')
     const type = watch('type')
     const gendar = watch('gendar')
     const useCertificateAddress = watch('useCertificateAddress')
+    const residentAddress = watch('residentAddress')
     const employment = watch('employment')
+    const description = watch('description')
     const idCardFront = watch('idCardFront')
     const idCardBack = watch('idCardBack')
     const idCard = watch('idCard')
@@ -343,6 +350,8 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.firstName?.message}
+                    regex='^[a-zA-Z\u4e00-\u9fa5]+$'
+                    value={firstName}
                     {...register('firstName', {
                       required: t('kyc.t54', {num: 30}),
                       maxLength: {
@@ -353,13 +362,7 @@ const BaseInfo = memo(
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
                         message: '只支持中文和英文字母',
                       },
-                      onChange: e => {
-                        console.log(e.target.value)
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30)
-                        }
-                      },
+                      
                     })}
                   />
                   <ErrorBox error={errors.firstName?.message} />
@@ -372,6 +375,8 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.lastName?.message}
+                    regex='^[a-zA-Z\u4e00-\u9fa5]+$'
+                    value={lastName}
                     {...register('lastName', {
                       required: t('kyc.t54', {num: 30}),
                       maxLength: {
@@ -401,6 +406,8 @@ const BaseInfo = memo(
                       className=''
                       placeholder={t('kyc.t4')}
                       error={errors.fullName?.message}
+                      regex='^[a-zA-Z\u4e00-\u9fa5]+$'
+                      value={fullName}
                       {...register('fullName', {
                         required: t('kyc.t54', {num: 30}),
                         maxLength: {
@@ -471,6 +478,7 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.email?.message}
+                    value={email}
                     {...register('email', {
                       required: t('kyc.t55'),
                       maxLength: {
@@ -531,6 +539,8 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.no?.message}
+                    regex='^[A-Za-z0-9]+$'
+                    value={no}
                     {...register('no', {
                       required: t('kyc.t4'),
                       maxLength: {
@@ -575,6 +585,8 @@ const BaseInfo = memo(
                       className=''
                       placeholder={t('kyc.t4')}
                       error={errors.residentAddress?.message}
+                      regex='^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$'
+                      value={residentAddress}
                       {...register('residentAddress', {
                         required: t('kyc.t4'),
                         maxLength: {
@@ -659,6 +671,8 @@ const BaseInfo = memo(
                         className=''
                         placeholder={t('kyc.t38')}
                         error={errors.description?.message}
+                        regex='^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$'
+                        value={description}
                         {...register('description', {
                           required: t('kyc.t4'),
                           maxLength: {

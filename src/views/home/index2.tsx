@@ -8,6 +8,9 @@ const Section4 = lazy(() => import("./new/Section4"));
 const Section5 = lazy(() => import("./new/Section5"));
 const Section6 = lazy(() => import("./new/Section6"));
 
+export let heroAnimatedOnce = false
+
+
 export default function Page() {
   return (
     <div className=" font-normal">

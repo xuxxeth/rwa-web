@@ -2,12 +2,18 @@ import { cn } from "@/utils/tw";
 import { memo } from "react";
 
 const TitlePrimary = memo(
-  ({ children, className }: { children: React.ReactNode, className?: string }) => {
+  ({ children, className, isZh }: { children: React.ReactNode, className?: string, isZh?: boolean }) => {
+
+    console.log('isZh', isZh);
     return (
       <h2 className={cn(
         "title-primary font-medium text-[16px] sm:leading-[150%]",
         className
-      )}>
+      )}
+        style={{
+          width: isZh ? '100%': 'auto'
+        }}
+      >
         {children}
       </h2>
     );

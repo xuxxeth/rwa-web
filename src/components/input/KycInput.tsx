@@ -1,14 +1,24 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { escapeRegExp } from "@/utils"
+import { el } from "date-fns/locale"
 
 interface KycInputProps extends React.ComponentProps<"input"> {
   error?: string
+  regex?: string
 }
 
 const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
-  ({ className, type, error, ...props }, ref) => {
-    
+  ({ className, type, error, value = '', regex, ...props }, ref) => {
+    const inputRegex = RegExp(regex || '.*')
+    const enforcer = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const nextUserInput = e.target.value
+      if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
+        e.target.value = nextUserInput
+        props.onChange && props.onChange(e)
+      } 
+    }
     return (
       <input
         type={type}
@@ -19,6 +29,10 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
         )}
         ref={ref}
         {...props}
+        value={value}
+        onChange={e => {
+          enforcer(e)
+        }}
       />
     )
   }

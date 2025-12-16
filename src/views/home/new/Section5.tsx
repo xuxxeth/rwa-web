@@ -46,7 +46,7 @@ const Section5 = memo(
     const { t } = useTranslation()
     const router = useRouter()
     const className1 = `text-[22px] lg:text-[28px] font-medium leading-[24px] lg:leading-[36px] mt-3 lg:mt-6 mb-2 lg:mb-5`
-    const className2 = `text-[14px] lg:text-[16px] font-normal leading-[18px] lg:leading-[20px] text-[rgba(255,255,255,0.6)] `
+    const className2 = `text-[14px] lg:text-[18px] font-normal leading-[18px] lg:leading-[24px] text-[rgba(255,255,255,0.6)] `
     return (
       <div className="min-h-[810px] lg:px-4 xl:px-[170px] text-white relative overflow-hidden pt-[68px]">
         <div className="flex justify-center flex-col items-center">
