@@ -1,5 +1,5 @@
 import { RISK_STATUS } from "@/config/constants";
-import { useRiskStore } from "@/stores/riskStore";
+import { useKycStore } from "@/stores/kycStore";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { riskApi } from "@/service/risk/api";
@@ -7,7 +7,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 
 export function useRiskUserConfig() {
   const { chainId, account } = useActiveWeb3()  
-  const getUserConfig = useRiskStore(state => state.getUserConfig)
+  const getUserConfig = useKycStore(state => state.getUserConfig)
   const isSignatureValid = useTradeStore(state => state.isSignatureValid)
   useEffect(() => {
     if (chainId && account || isSignatureValid) {
@@ -17,8 +17,8 @@ export function useRiskUserConfig() {
 }
 
 export function useRiskStatus() {
-  const riskUserConfig = useRiskStore(state => state.riskUserConfig)
-  const getUserConfig = useRiskStore(state => state.getUserConfig)
+  const riskUserConfig = useKycStore(state => state.riskUserConfig)
+  const getUserConfig = useKycStore(state => state.getUserConfig)
   let getCount = 0
 
   const startGetUserConfig = () => {

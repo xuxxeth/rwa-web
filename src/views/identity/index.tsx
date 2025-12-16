@@ -30,6 +30,7 @@ import { useKycExpired } from '@/hooks/useKycStatus'
 import { IDExpired } from './components/IDExpired'
 import { useSearchParams } from 'react-router-dom'
 import { ReviewInfo } from './components/ReviewInfo'
+import { useKycStore } from '@/stores/kycStore'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -81,6 +82,15 @@ function Identity({ account }: { account: string }) {
     refresh()
   }, [account])
 
+  // 根据 kycDetail 刷新 KycStatus and Conifg
+  const refetchKycStatusAndConfigIfNeed = useKycStore(
+    state => state.refetchKycStatusAndConfigIfNeed
+  )
+  useEffect(() => {
+    if (!kycDetail) return
+    refetchKycStatusAndConfigIfNeed(kycDetail)
+  }, [kycDetail])
+
   const rules = useMemo(() => {
     if (kycDetail === undefined) return []
 
@@ -129,7 +139,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.OCR &&
           status === KYC_STATUS.VERIFYING,
-        render: () => <Verifying />,
+        render: () => <Verifying refresh={refresh} />,
       },
       // 认证中 - OCR Failed/Rejected Retry
       {
@@ -194,7 +204,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.AML &&
           (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW),
-        render: () => <Verifying />,
+        render: () => <Verifying refresh={refresh} />,
       },
       // 认证中 - AML Declined (AML 驳回)
       {
@@ -210,7 +220,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.KYT &&
           status === KYC_STATUS.VERIFYING,
-        render: () => <Verifying />,
+        render: () => <Verifying refresh={refresh} />,
       },
     ]
   }, [kycDetail, expireStatus, isRetry])

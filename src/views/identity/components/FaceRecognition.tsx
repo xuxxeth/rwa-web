@@ -53,35 +53,55 @@ export default function FaceRecognition({
   useEffect(() => {
     if (isExpired || !urlInfo || !urlInfo.url || !urlInfo.expireTime || !urlInfo.bizNo) return
 
+    let timer: NodeJS.Timeout
+    let canceled = false
+
     const checkExpiration = async () => {
-      if (urlInfo.expireTime! < Date.now()) {
-        setIsExpired(true)
-      }
-      const { data: isUsed } = await kycApi.isLivenessUrlExpired(urlInfo.bizNo)
-      if (isUsed) {
-        setIsExpired(true)
+      try {
+        if (urlInfo.expireTime! < Date.now()) {
+          setIsExpired(true)
+        }
+        const { data: isUsed } = await kycApi.isLivenessUrlExpired(urlInfo.bizNo)
+
+        if (canceled) return
+
+        if (isUsed) {
+          setIsExpired(true)
+        }
+      } finally {
+        if (!canceled) {
+          timer = setTimeout(checkExpiration, 1000 * 3)
+        }
       }
     }
 
     checkExpiration()
-    const interval = setInterval(() => {
-      checkExpiration()
-    }, 1000 * 3)
-
     return () => {
-      clearInterval(interval)
+      canceled = true
+      clearTimeout(timer)
     }
   }, [isExpired, urlInfo])
 
   // 每 2s 刷新一次 kyc 详情
   useEffect(() => {
-    refreshKycDetail()
-    const interval = setInterval(() => {
-      refreshKycDetail()
-    }, 1000 * 2)
+    let timer: NodeJS.Timeout
+    let canceled = false
+
+    const loop = async () => {
+      try {
+        await refreshKycDetail()
+      } finally {
+        if (!canceled) {
+          timer = setTimeout(loop, 1000 * 2)
+        }
+      }
+    }
+
+    loop()
 
     return () => {
-      clearInterval(interval)
+      canceled = true
+      clearTimeout(timer)
     }
   }, [])
 

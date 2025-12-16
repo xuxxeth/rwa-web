@@ -14,6 +14,7 @@ import type {
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 import type { IUserCofnig } from "@/service/risk/types";
 import type { IOrderData } from "@/service/webSocket/types";
+import { type IKycDetail, type IKycStatus } from '@/service/kyc/types'
 
 export interface BaseStore {
   connectInit: boolean,
@@ -89,3 +90,17 @@ export interface RiskSTore {
   riskUserConfig: IUserCofnig | null
   getUserConfig: () => Promise<ApiResponse<IUserCofnig>>;
 }
+
+export interface KycState {
+  kycStatus: IKycStatus | null
+  kycDetail: IKycDetail | null
+  isLoading: boolean
+  error: string | null
+}
+
+export interface KycActions {
+  fetchKycStatus: () => Promise<void>
+  refetchKycStatusAndConfigIfNeed: (kycDetail: IKycDetail) => Promise<void>
+}
+
+export type KycStore = RiskSTore & KycState & KycActions

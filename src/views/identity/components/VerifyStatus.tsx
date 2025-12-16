@@ -5,7 +5,8 @@ import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
 import { useEffect, useState, type ReactNode } from 'react'
 import { isLess, parseAmount } from '@/utils'
-import { useSearchParams } from 'react-router-dom'
+import type { ApiResponse } from '@/service/client'
+import type { IKycDetail } from '@/service/kyc/types'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
 
@@ -235,8 +236,32 @@ function HotRwas() {
   )
 }
 
-export function Verifying() {
+export function Verifying({ refresh }: { refresh: () => Promise<ApiResponse<IKycDetail>> }) {
   const router = useRouter()
+
+  useEffect(() => {
+    let count = 0
+    let timer: NodeJS.Timeout
+    let canceled = false
+
+    const poll = async () => {
+      if (count >= 10 || canceled) return
+      count++
+      try {
+        await refresh()
+      } finally {
+        if (!canceled && count < 10) {
+          timer = setTimeout(poll, 1000 * 2)
+        }
+      }
+    }
+    poll()
+
+    return () => {
+      canceled = true
+      clearTimeout(timer)
+    }
+  }, [])
 
   return (
     <VerifyStatus

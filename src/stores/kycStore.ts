@@ -1,46 +1,46 @@
 import { create } from 'zustand'
 import { kycApi } from '@/service/kyc/api'
-import { KYC_RISK_LEVEL, type IKycDetail, type IKycStatus } from '@/service/kyc/types'
+import { type IKycDetail } from '@/service/kyc/types'
 import { RISK_STATUS } from '@/config/constants'
+import { type KycStore } from './types'
+import { riskApi } from '@/service/risk/api'
 
-interface KycState {
-    kycStatus: IKycStatus | null
-    kycDetail: IKycDetail | null
-    isLoading: boolean
-    error: string | null
-}
+export const useKycStore = create<KycStore>((set, get) => ({
+  kycStatus: { status: -1, expiresTime: 0 },
+  kycDetail: null,
+  isLoading: false,
+  error: null,
+  riskUserConfig: null,
+  getUserConfig: async () => {
+    const res = await riskApi.getUserConfig()
+    console.log(res)
+    if (res.code === 9401) {
+      set({ riskUserConfig: { actions: -1, verifyType: 2, verifyState: 2, blacklist: true } })
+    } else {
+      set({ riskUserConfig: res.data || {} })
+    }
 
-interface KycActions {
-    fetchKycStatus: () => Promise<void>
-}
+    return res
+  },
+  refetchKycStatusAndConfigIfNeed: async (kycDetail: IKycDetail) => {
+    const { kycStatus, fetchKycStatus, getUserConfig } = get()
+    if (kycDetail.overallStatus !== kycStatus?.status) {
+      await Promise.all([fetchKycStatus(), getUserConfig()])
+    }
+  },
+  fetchKycStatus: async () => {
+    set({ isLoading: true, error: null })
+    try {
+      const { data } = await kycApi.getKycStatus()
+      set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
 
-export const useKycStore = create<KycActions & KycState>(set => ({
-    kycStatus: {status: -1, expiresTime: 0},
-    kycDetail: null,
-    isLoading: false,
-    error: null,
-    fetchKycStatus: async () => {
-        set({ isLoading: true, error: null })
-        try {
-            const { data } = await kycApi.getKycStatus()
-            set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
-            
-            // 如果是认证中和已拒绝，则请求认证结果详情接口
-            if (data && (data.status === RISK_STATUS.VERIFYING || data.status === RISK_STATUS.REJECTED)) {
-                const { data } = await kycApi.getKycDetail()
-                set({ kycDetail: data })
-            }
-        } catch (error: any) {
-            set({ error: error.message, isLoading: false })
-        }
-    },
-    // getKycDetail: async () => {
-    //     set({ isLoading: true, error: null })
-    //     try {
-    //         const { data } = await kycApi.getKycStatus()
-    //         set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
-    //     } catch (error: any) {
-    //         set({ error: error.message, isLoading: false })
-    //     }
-    // },
+      // 如果是认证中和已拒绝，则请求认证结果详情接口
+      if (data && (data.status === RISK_STATUS.VERIFYING || data.status === RISK_STATUS.REJECTED)) {
+        const { data } = await kycApi.getKycDetail()
+        set({ kycDetail: data })
+      }
+    } catch (error: any) {
+      set({ error: error.message, isLoading: false })
+    }
+  },
 }))
