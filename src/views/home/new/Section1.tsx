@@ -4,7 +4,6 @@ import { useTailwindBreakpoints } from "@/hooks/useBreakpoints";
 import { useRouter } from "@/hooks/useRouter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { motion } from "framer-motion";
-import { i } from "node_modules/framer-motion/dist/types.d-BJcRxCew";
 import { memo, use, useEffect, useMemo, useState } from "react";
 
 const factor = 1456 / 816;
