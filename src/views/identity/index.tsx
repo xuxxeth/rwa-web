@@ -97,7 +97,13 @@ function Identity({ account }: { account: string }) {
       // 未认证
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.NOTVERIFIED,
-        render: () => <BaseInfo refresh={refresh} userInfo={kycDetail.userInfo} rejectReason={kycDetail.rejectReason} />,
+        render: () => (
+          <BaseInfo
+            refresh={refresh}
+            userInfo={kycDetail.userInfo}
+            rejectReason={kycDetail.rejectReason}
+          />
+        ),
       },
       // 认证成功
       {
@@ -134,7 +140,12 @@ function Identity({ account }: { account: string }) {
           isRetry,
         // 因为 isRetry 为 true 进入的 BaseInfo 组件，需要 BaseInfo 组件卸载的时候，执行 resetRetry, 把 isRetry 设置为 false
         render: () => (
-          <BaseInfo onResetRetry={resetRetry} refresh={refresh} userInfo={kycDetail.userInfo} rejectReason={kycDetail.rejectReason} />
+          <BaseInfo
+            onResetRetry={resetRetry}
+            refresh={refresh}
+            userInfo={kycDetail.userInfo}
+            rejectReason={kycDetail.rejectReason}
+          />
         ),
       },
       // 认证中 - OCR Failed/Rejected
@@ -157,6 +168,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.LIVENESS &&
           (status === KYC_STATUS.VERIFYING ||
+            status === KYC_STATUS.NOTVERIFIED ||
             ((status === KYC_STATUS.FAIL || status === KYC_STATUS.REJECTED) && isRetry)),
         render: () => (
           <FaceRecognition status={status} refresh={refresh} onResetRetry={resetRetry} />
