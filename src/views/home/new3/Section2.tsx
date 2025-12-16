@@ -160,7 +160,10 @@ const Section2Lg = memo(() => {
               }}
             >
               <div className="flex justify-center flex-col items-center">
-                <TitlePrimary isZh={isZh} className="font-normal text-[28px] mb-5">
+                <TitlePrimary className={cn(
+                  "font-normal text-[28px] mb-5",
+                  isZh ? 'w-[100%] text-center' : 'w-auto'
+                )}>
                   {t('newHome.t3')}
                 </TitlePrimary>
                 <div className="font-normal text-[20px] leading-[150%] mb-[68px] w-[763px] text-center">
