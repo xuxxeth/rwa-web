@@ -26,17 +26,22 @@ export default function FaceRecognition({
   >(undefined)
   const [isExpired, setIsExpired] = useState(false)
   const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   const refreshQrCode = async () => {
     const { data } = await kycApi.getLivenessUrl()
     setIsExpired(data.expireTime ? data.expireTime < Date.now() : false)
+    setErrorMsg('')
+    setIsMaxTimesReached(false)
 
     if (data.url && data.expireTime) {
-      setIsMaxTimesReached(false)
       setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
     } else {
       setUrlInfo(null)
-      setIsMaxTimesReached(true)
+      setErrorMsg(data.errorMsg || '')
+      if (!data.errorMsg && data.leftAvailableTimes === 0) {
+        setIsMaxTimesReached(true)
+      }
     }
   }
 
@@ -105,8 +110,6 @@ export default function FaceRecognition({
     }
   }, [])
 
-  useEffect(() => {}, [])
-
   if (urlInfo === undefined) return null
 
   return (
@@ -128,7 +131,7 @@ export default function FaceRecognition({
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
         <LazyImage src='/images/kyc/warning.png' className='w-5 h-5 mr-1' />
-        {t(`${faceLangPrefix}.${isMaxTimesReached ? 'times' : 'tip'}`)}
+        {errorMsg ? errorMsg : t(`${faceLangPrefix}.${isMaxTimesReached ? 'times' : 'tip'}`)}
       </div>
     </div>
   )

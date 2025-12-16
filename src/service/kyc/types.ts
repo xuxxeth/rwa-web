@@ -66,6 +66,7 @@ export interface ILivenessUrlRes {
   expireTime?: number // 活体校验 URL 过期时间，毫秒
   leftAvailableTimes: number
   bizNo?: string
+  errorMsg?: string
 }
 
 export interface IBasicInfo {
