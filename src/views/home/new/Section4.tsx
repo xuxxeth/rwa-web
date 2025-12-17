@@ -31,7 +31,7 @@ const Section4 = memo(
     }, [windowWidth])
 
     return (
-      <div className="h-[510px] sm:h-[610px] md:h-[810px] lg:px-4 xl:px-[170px] text-white relative overflow-hidden"
+      <div className="h-[510px] sm:h-[610px] md:h-[1110px] lg:h-[810px] lg:pb-0 lg:px-4 xl:px-[170px] text-white relative overflow-hidden"
         
       >
         <div className=" absolute -bottom-[0] left-0 right-0 flex justify-center w-full h-full">

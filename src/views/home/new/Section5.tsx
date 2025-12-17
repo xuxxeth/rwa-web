@@ -50,7 +50,7 @@ const Section5 = memo(
     return (
       <div className="min-h-[810px] lg:px-4 xl:px-[170px] text-white relative overflow-hidden pt-[68px]">
         <div className="flex justify-center flex-col items-center">
-          <TitlePrimary className=" font-medium text-[28px] lg:text-[36px] w-[90%] md:w-[580px] lg:w-[628px] text-center leading-[100%]">
+          <TitlePrimary className=" font-medium text-[26px] lg:text-[36px] w-[90%] md:w-[580px] lg:w-[628px] text-center leading-[100%]">
             {t('newHome.t19')}
           </TitlePrimary>
           

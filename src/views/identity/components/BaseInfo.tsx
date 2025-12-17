@@ -210,7 +210,6 @@ const BaseInfo = memo(
     const incomeCertifications = watch('incomeCertifications')
     const source = watch('source')
 
-    console.log('issueCountry:', issueCountry)
 
     const preAccount = useRef<string | undefined>(undefined)
 
@@ -240,7 +239,7 @@ const BaseInfo = memo(
         }
       }
       // 无地址证明
-      if (!data.addressCertification) {
+      if (!useCertificateAddress && !data.addressCertification) {
         toastError({title: t('kyc.t61')})
         return
       }

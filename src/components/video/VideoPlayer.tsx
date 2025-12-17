@@ -186,7 +186,7 @@ const VideoPlayer = memo(
         />
 
         {/* 自定义封面层：在未播放前显示，播放后隐藏 */}
-        {poster && (
+        {/* {poster && (
           <div
             aria-hidden
             className="video-cover transition-all "
@@ -205,17 +205,16 @@ const VideoPlayer = memo(
               zIndex: 10,
               opacity: coverVisible ? 1 : 0
             }}
-            // 点击封面尝试手动播放（用户交互可解除 autoplay 限制）
             onClick={() => {
-              // try {
-              //   videoRef.current?.play();
-              // } catch (err) {
-              //   // ignore
-              // }
+              try {
+                videoRef.current?.play();
+              } catch (err) {
+                // ignore
+              }
             }}
           >
           </div>
-        )}
+        )} */}
       </div>
     );
   }

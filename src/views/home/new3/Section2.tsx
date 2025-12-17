@@ -67,7 +67,7 @@ const Section2Lg = memo(() => {
   }, [windowWidth])
 
   const isZh = useMemo(() => {
-    return i18n.language === 'zh' && windowWidth >= 1440
+    return i18n.language === 'zh' && windowWidth >= 1024
   }, [i18n.language, windowWidth])
 
   const yBG = useTransform(scrollYProgress, [from, to], [913, 810]);
@@ -300,9 +300,10 @@ const Section2Lg = memo(() => {
                   )}
                 >
                   <div className={cn(
-                    isZh ? 'w-full' : 'w-[120px]]',
+                    isZh ? 'w-full' : 'w-[120px]',
                   )}>
-                    <TitlePrimary>{t('newHome.t9')}</TitlePrimary>
+                    <TitlePrimary
+                    >{t('newHome.t9')}</TitlePrimary>
                   </div>
                   <ItemContent isZh={isZh}>
                     {t('newHome.t10')}
@@ -380,7 +381,7 @@ const Section2H5 = memo(
           </div>
           <div className=" relative z-30 pt-[67px] md:pt-[148px] pb-[100px]">
             {/* 标题区域 */}
-            <div className="flex justify-center flex-col items-center md:px-[100px]">
+            <div className="flex justify-center flex-col items-center px-4 md:px-[100px]">
               <TitlePrimary className="font-normal text-center text-[28px] mb-5 w-[90%] leading-[36px]">
                 {t('newHome.t3')}
               </TitlePrimary>
