@@ -70,11 +70,11 @@ const ReviewInfo = memo(
       const files = (data.incomeCertifications || []).filter(key => key)
       // 无地址证明
       if (!data.addressCertification) {
-        toastError({ title: '上傳地址證明' })
+        toastError({title: t('kyc.t61')})
         return
       }
       if (files.length <= 0) {
-        toastError({title: '上傳收入證明'})
+        toastError({title: t('identity.upload.uploadIncome')})
         return
       }
       

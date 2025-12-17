@@ -34,9 +34,8 @@ const Risk3Info = memo(
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
-      // 1. 判断有没有上传证件照
       const files = (data.incomeCertifications || []).filter(key => key)
-      // 无地址证明
+      // 无收入证明
       if (files.length <= 0) {
         toastError({title: t('identity.upload.uploadIncome')})
         return
@@ -47,9 +46,7 @@ const Risk3Info = memo(
           incomeCertifications: files
         },
       }
-      console.log(data)
-      console.log(params)
-      console.log(submiting)
+
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)

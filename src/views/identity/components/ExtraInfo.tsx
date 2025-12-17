@@ -67,7 +67,7 @@ const ExtraInfo = memo(
     const onSubmit = async (data: FormData) => {
       console.log(errorList)
       if (errorList.length > 0) {
-        toastError({title: '请补充资料图片或说明'})
+        toastError({title: t('kyc.t60')})
         return
       }
 
@@ -84,9 +84,7 @@ const ExtraInfo = memo(
         }
         
       }
-      console.log(data)
-      console.log(params)
-      console.log(submiting)
+
       if (submiting) return
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)

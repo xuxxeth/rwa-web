@@ -40,19 +40,25 @@ const IDExpired = memo(
     const onSubmit = async (data: FormData) => {
       console.log(data)
       // 1. 判断有没有上传证件照
-      if (type === 0) { // 身份证，正反面都要传
+      if (type === 0) {
+        // 身份证，正反面都要传
         if (!data.idCardFront) {
-          toastError({title: '请上傳人像頁'})
+          toastError({ title: t('kyc.t56') })
           return
         }
         if (!data.idCardBack) {
-          toastError({title: '请上傳國徽面'})
+          toastError({ title: t('kyc.t57') })
+          return
+        }
+        if (!data.idCard) {
+          toastError({ title: t('kyc.t59') })
           return
         }
       }
-      if (type === 1) { // 只判断护照
+      if (type === 1) {
+        // 只判断护照
         if (!data.passport) {
-          toastError({title: '请上傳护照'})
+          toastError({ title: t('kyc.t58') })
           return
         }
       }
