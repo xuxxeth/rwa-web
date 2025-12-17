@@ -25,10 +25,14 @@ export function checkImgUploaded(uploadedRes: IUploadedRes | null) {
   return uploadedRes?.key && uploadedRes?.url
 }
 
-export const AcceptedFiles = {
+export const AcceptedImageFiles = {
   'image/jpeg': ['.jpg', '.jpeg'],
   'image/jpg': ['.jpg'],
   'image/png': ['.png'],
+}
+
+export const AcceptedFiles = {
+  ...AcceptedImageFiles,
   'application/pdf': ['.pdf'],
 }
 
@@ -126,7 +130,8 @@ export const getFileAccessUrl = async (key: string) => {
 
 export const uploadFile = async (
   file: File,
-  onProgress: (progress: number) => void
+  onProgress: (progress: number) => void,
+  shouldCheckLiveness = false
 ): Promise<{ success: boolean; key: string } | null> => {
   try {
     const fileType = file.type as FilePutMimeType
@@ -154,6 +159,13 @@ export const uploadFile = async (
         }
       },
     })
+
+    if (shouldCheckLiveness) {
+      const { data: isValid, message } = await kycApi.validateLivenessImage(data.key)
+      if (!isValid) {
+        throw new Error(message ?? 'validate livness image error')
+      }
+    }
 
     return { success: true, key: data.key }
   } catch (error) {
@@ -229,8 +241,10 @@ export function UploadCard(props: {
   s3Key?: string
   onUploaded: (res: IUploadedResV2) => void
   mode?: 'edit' | 'view'
+  shouldCheckLiveness?: boolean
+  onlyImageMimeType?: boolean
 }) {
-  const { fileType, onUploaded, s3Key, mode } = props
+  const { fileType, onUploaded, onlyImageMimeType, s3Key, mode } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -240,6 +254,7 @@ export function UploadCard(props: {
   const [previewUrl, setPreviewUrl] = useState<{ key: string; url: string } | null>(null)
 
   const [isFileTooLarge, setIsFileTooLarge] = useState(false)
+  const [isUploadFailed, setIsUploadFailed] = useState(false)
 
   const [isPdf, setIsPdf] = useState(false)
 
@@ -253,13 +268,18 @@ export function UploadCard(props: {
     setIsUploading(true)
     setUploadProgress(0)
     setIsFileTooLarge(false)
+    setIsUploadFailed(false)
 
     try {
-      const result = await uploadFile(file, progress => {
-        setUploadProgress(progress)
-      })
+      const result = await uploadFile(
+        file,
+        progress => {
+          setUploadProgress(progress)
+        },
+        props.shouldCheckLiveness
+      )
 
-      if (result) {
+      if (result && result.success && result.key) {
         const blobUrl = isFilePdf ? '' : URL.createObjectURL(file)
         onUploaded({ ...result, blobUrl })
 
@@ -272,7 +292,7 @@ export function UploadCard(props: {
         }
       }
     } catch (error) {
-      console.error('上传失败:', error)
+      setIsUploadFailed(true)
       // 上传失败时，不调用 onUploaded 函数，保持当前状态
       // onUploaded({ success: false })
     } finally {
@@ -295,7 +315,7 @@ export function UploadCard(props: {
   const { getRootProps, getInputProps } = useDropzone({
     // disables SPACE/ENTER to open the native file selection dialog
     noKeyboard: true,
-    accept: AcceptedFiles,
+    accept: onlyImageMimeType ? AcceptedImageFiles : AcceptedFiles,
     onDrop,
     onDropRejected,
     disabled: isUploading || mode === 'view',
@@ -318,6 +338,8 @@ export function UploadCard(props: {
     })
   }, [s3Key])
 
+  const isSomethingError = isFileTooLarge || isUploadFailed
+
   return (
     <>
       <div
@@ -325,7 +347,7 @@ export function UploadCard(props: {
           className: cn(
             'dropzone flex-1 border border-[#5B5B5B] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] relative',
             mode === 'view' ? 'disabled cursor-not-allowed' : 'hover:border-[rgba(26,133,255,1)]',
-            isFileTooLarge ? 'border-[#CA3F64]' : ''
+            isSomethingError ? 'border-[#CA3F64]' : ''
           ),
         })}
         onMouseEnter={() => setIsHover(true)}
@@ -370,10 +392,10 @@ export function UploadCard(props: {
             </>
           )}
         </div>
-        {isFileTooLarge && (
+        {isSomethingError && (
           <div className='mt-2 flex flex-row items-center gap-1'>
             <LazyImage className='w-3.5 h-3.5' src='/images/icons/identity/error2.png' />
-            <Text text='large' className='text-xs text-[#CA3F64]' />
+            <Text text={isFileTooLarge ? 'large' : 'fail'} className='text-xs text-[#CA3F64]' />
           </div>
         )}
       </div>

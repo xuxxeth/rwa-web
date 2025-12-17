@@ -266,7 +266,8 @@
       "passportTips": "请上传护照信息页，确保照片、姓名、证件号与有效期清晰可见，无遮挡无反光，证件有效，四角完整，JPG格式且小于2MB。",
       "reUpload": "Reupload",
       "uploading": "Uploading",
-      "large": "上传文件过大，请重新新上传"
+      "large": "The file is too large, please re-upload.",
+      "fail": "File upload failed, please try again."
     },
     "face": {
       "rg": "Facial Verification",

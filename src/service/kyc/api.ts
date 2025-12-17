@@ -14,6 +14,8 @@ import type {
 export const kycApi = {
   getLivenessUrl: () =>
     client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url'),
+  validateLivenessImage: (s3Key: string) =>
+    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/validate-image', { key: s3Key }),
   isLivenessUrlExpired: (bizNo: string) =>
     client.get<ApiResponse<boolean>>('/v1/kyc/liveness/is-expired', { bizNo: bizNo }),
   getSupportedCountries: () =>

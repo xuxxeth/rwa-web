@@ -157,8 +157,21 @@ function IdentityUpload({
   return (
     <div>
       <div className='flex flex-row gap-5 my-5'>
-        <UploadCard fileType='idFront' onUploaded={onFrontUploaded} s3Key={keys?.[0]} mode={mode} />
-        <UploadCard fileType='idBack' onUploaded={onBackUploaded} s3Key={keys?.[1]} mode={mode} />
+        <UploadCard
+          fileType='idFront'
+          shouldCheckLiveness={true}
+          onUploaded={onFrontUploaded}
+          s3Key={keys?.[0]}
+          mode={mode}
+          onlyImageMimeType={true}
+        />
+        <UploadCard
+          fileType='idBack'
+          onUploaded={onBackUploaded}
+          s3Key={keys?.[1]}
+          mode={mode}
+          onlyImageMimeType={true}
+        />
       </div>
       <Text text='tips' className='text-sm mt-2' />
     </div>
@@ -246,7 +259,13 @@ function PassportUpload({
   return (
     <div>
       <div className='flex flex-row gap-5'>
-        <UploadCard fileType='passport' onUploaded={onPassportUploaded} s3Key={keys} mode={mode} />
+        <UploadCard
+          fileType='passport'
+          shouldCheckLiveness={true}
+          onUploaded={onPassportUploaded}
+          s3Key={keys}
+          mode={mode}
+        />
         <div className='flex-1 flex flex-row items-center justify-center'>
           <Text text='passportTips' className='text-base' />
         </div>
