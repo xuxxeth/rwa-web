@@ -2,11 +2,12 @@
 
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { kycApi } from "@/service/kyc/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import type { ISupportedCountry } from "@/service/kyc/types";
+import useDebouncedUnmount from "@/hooks/useDebouncedUnmount";
 
 export type ICountryCode = {
   code: string,
@@ -36,7 +37,6 @@ const CountrySelect = memo(
     const [currentCountry, setCurrentCountry] = useState<ISupportedCountry>({key: '', value: ''})
     const [open, setOpen] = useState(false)
 
-
     useEffect(() => {
       if (defaultValue && countryList.length > 0) {
         setCurrentCode(defaultValue)
@@ -51,8 +51,10 @@ const CountrySelect = memo(
       }
     }, [defaultValue, countryList.length]) 
 
-
+    const fetchedRef = useRef(false)
     useEffect(() => {
+      if (fetchedRef.current) return
+      fetchedRef.current = true
       kycApi.getSupportedCountries()
         .then(res => {
           if (res.code === RESPONSE_CODE.SUCCESS) {

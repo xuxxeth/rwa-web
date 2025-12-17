@@ -112,6 +112,7 @@ export interface IKycDetail {
 }
 
 export interface IKycSubmitData {
+  type: number // 1-首次KYC 2-证件过期 3-交易量检查 4-复查
   basicInfo: IBasicInfo
   idInfo: IIdInfo & {
     files: {

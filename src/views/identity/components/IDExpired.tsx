@@ -58,6 +58,7 @@ const IDExpired = memo(
       }
 
       const params: any = {
+        type: 2,
         idInfo: {
           type: type,
           files: {

@@ -79,7 +79,7 @@ const ReviewInfo = memo(
       }
       
       const params: any = {
-        
+        type: 4,
         idInfo: {
           files: {
             addressCertification: data.addressCertification

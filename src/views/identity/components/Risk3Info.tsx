@@ -42,6 +42,7 @@ const Risk3Info = memo(
         return
       }
       const params: any = {
+        type: 1,
         extraInfo: {
           incomeCertifications: files
         },
@@ -57,11 +58,11 @@ const Risk3Info = memo(
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
           if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
-            toastSuccess({ title: '提交成功' })
+            // toastSuccess({ title: '提交成功' })
             clear()
           }
         } else {
-          toastSuccess({ title: '提交成功' })
+          // toastSuccess({ title: '提交成功' })
           clear()
           setSubmiting(false)
         }

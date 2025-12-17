@@ -6,6 +6,7 @@ import { memo, useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LazyImage } from "../image/LazyImage";
+import { id } from "date-fns/locale";
 
 export type IDoctypeCode = {
   code: string,
@@ -18,6 +19,7 @@ export type DoctypeSelectProps = {
   value?: string;
   onChange?: (code: IDoctypeCode) => void;
   className?: string
+  countryCode?: string
 }
 
 const DoctypeSelect = memo(
@@ -25,13 +27,17 @@ const DoctypeSelect = memo(
     defaultValue,
     value, 
     onChange, 
-    className
+    className,
+    countryCode
   }: DoctypeSelectProps) => {
     const { t } = useTranslation()
-    const idList = [
+    const idList = countryCode === 'CHN' ? [
       { code: '0', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
       { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
+    ] : [
+      { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
     ]
+    
     const [currentCode, setCurrentCode] = useState(idList[0].code)
     const [currentDoctype, setCurrentDoctype] = useState(idList[0])
     const [open, setOpen] = useState(false)
@@ -44,7 +50,7 @@ const DoctypeSelect = memo(
           setCurrentDoctype(_id)
         }
       }
-    }, [defaultValue]) 
+    }, [defaultValue, countryCode]) 
 
     return (
       <Select 

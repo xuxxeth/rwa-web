@@ -24,6 +24,8 @@ import type { ApiResponse } from '@/service/client'
 import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
+import { is } from 'date-fns/locale'
+import { i } from 'node_modules/framer-motion/dist/types.d-BJcRxCew'
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
@@ -196,6 +198,7 @@ const BaseInfo = memo(
     const email = watch('email')
     const no = watch('no')
     const type = watch('type')
+    const issueCountry = watch('issueCountry')
     const gendar = watch('gendar')
     const useCertificateAddress = watch('useCertificateAddress')
     const residentAddress = watch('residentAddress')
@@ -208,6 +211,8 @@ const BaseInfo = memo(
     const addressCertification = watch('addressCertification')
     const incomeCertifications = watch('incomeCertifications')
     const source = watch('source')
+
+    console.log('issueCountry:', issueCountry)
 
     const preAccount = useRef<string | undefined>(undefined)
 
@@ -238,6 +243,7 @@ const BaseInfo = memo(
         return
       }
       const params: IKycSubmitData = {
+        type: 1,
         basicInfo: {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -512,6 +518,7 @@ const BaseInfo = memo(
 
                 <InputBox>
                   <DoctypeSelect
+                    countryCode={issueCountry}
                     defaultValue={String(type)}
                     onChange={data => {
                       setValue('type', Number(data.code))
@@ -525,8 +532,12 @@ const BaseInfo = memo(
                 <InputBox>
                   <CountrySelect
                     placeHolder={t('kyc.t28')}
+                    defaultValue={issueCountry}
                     onChange={data => {
                       setValue('issueCountry', data.key)
+                      if (data.key !== 'CHN') {
+                        setValue('type', 1) // 非中国只能选护照
+                      }
                     }}
                   />
                 </InputBox>

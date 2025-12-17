@@ -257,7 +257,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   onClick={() => goTo('identity')}
                 >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
-                  <span className='text-[14px] font-semibold ml-2'>{verifyTip}</span>
+                  <span className='text-[14px] font-semibold ml-2'>{verifyTip || t('verified')}</span>
                 </div>
               </div>
               <Divide className='mt-[14px]' />

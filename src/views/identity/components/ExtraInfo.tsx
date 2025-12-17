@@ -78,6 +78,7 @@ const ExtraInfo = memo(
         }
       })
       const params: any = {
+        type: 3,
         extraInfo: {
           extras: extras
         }
