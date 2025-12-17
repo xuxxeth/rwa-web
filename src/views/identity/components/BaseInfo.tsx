@@ -24,8 +24,6 @@ import type { ApiResponse } from '@/service/client'
 import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
-import { is } from 'date-fns/locale'
-import { i } from 'node_modules/framer-motion/dist/types.d-BJcRxCew'
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
