@@ -81,7 +81,7 @@ function Identity({ account }: { account: string }) {
       return {
         code: 500,
         data: {
-          overallStatus: KYC_OVERALL_STATUS.VERIFYING
+          overallStatus: KYC_OVERALL_STATUS.VERIFYING,
         },
         message: null,
       }
@@ -156,7 +156,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.OCR &&
-          (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL) &&
+          status === KYC_STATUS.REJECTED &&
           isRetry,
         // 因为 isRetry 为 true 进入的 BaseInfo 组件，需要 BaseInfo 组件卸载的时候，执行 resetRetry, 把 isRetry 设置为 false
         render: () => (
@@ -173,7 +173,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.OCR &&
-          (status === KYC_STATUS.REJECTED || status === KYC_STATUS.FAIL),
+          status === KYC_STATUS.REJECTED,
         render: () => (
           <OCRVerifyFailed
             retry={() => {
@@ -187,9 +187,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.LIVENESS &&
-          (status === KYC_STATUS.VERIFYING ||
-            status === KYC_STATUS.NOTVERIFIED ||
-            ((status === KYC_STATUS.FAIL || status === KYC_STATUS.REJECTED) && isRetry)),
+          (status === KYC_STATUS.VERIFYING || (status === KYC_STATUS.REJECTED && isRetry)),
         render: () => (
           <FaceRecognition status={status} refresh={refresh} onResetRetry={resetRetry} />
         ),
@@ -198,7 +196,7 @@ function Identity({ account }: { account: string }) {
       {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-          (status === KYC_STATUS.FAIL || status === KYC_STATUS.REJECTED) &&
+          status === KYC_STATUS.REJECTED &&
           verifyType === KYC_VERIFY_TYPE.LIVENESS,
         render: () => (
           <FaceRecognitionFailed
@@ -234,7 +232,8 @@ function Identity({ account }: { account: string }) {
       },
       // 加一个兜底渲染
       {
-        match: () => overallStatus === KYC_OVERALL_STATUS.VERIFYING && status === KYC_STATUS.VERIFYING,
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING && status === KYC_STATUS.VERIFYING,
         render: () => <Verifying refresh={refresh} />,
       },
     ]

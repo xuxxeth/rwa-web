@@ -27,7 +27,7 @@ const KycState = () => {
   // 1. ocr失败，填写信息与证件信息不一致
   const ocrFail = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-      (kycDetail.status === KYC_STATUS.FAIL || kycDetail.status === KYC_STATUS.REJECTED) &&
+      kycDetail.status === KYC_STATUS.REJECTED &&
       kycDetail.verifyType === KYC_VERIFY_TYPE.OCR 
     return fail
 
