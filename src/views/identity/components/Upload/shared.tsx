@@ -128,6 +128,13 @@ export const getFileAccessUrl = async (key: string) => {
   }
 }
 
+export class LivenessCheckError extends Error {
+  constructor(message: string | null) {
+    super(message ?? 'Liveness check failed.')
+    this.name = 'LivenessCheckError'
+  }
+}
+
 export const uploadFile = async (
   file: File,
   onProgress: (progress: number) => void,
@@ -163,7 +170,7 @@ export const uploadFile = async (
     if (shouldCheckLiveness) {
       const { data: isValid, message } = await kycApi.validateLivenessImage(data.key)
       if (!isValid) {
-        throw new Error(message ?? 'validate livness image error')
+        throw new LivenessCheckError(message)
       }
     }
 
@@ -255,6 +262,7 @@ export function UploadCard(props: {
 
   const [isFileTooLarge, setIsFileTooLarge] = useState(false)
   const [isUploadFailed, setIsUploadFailed] = useState(false)
+  const [isLivenessCheckFailed, setIsLivenessCheckFailed] = useState(false)
 
   const [isPdf, setIsPdf] = useState(false)
 
@@ -269,6 +277,7 @@ export function UploadCard(props: {
     setUploadProgress(0)
     setIsFileTooLarge(false)
     setIsUploadFailed(false)
+    setIsLivenessCheckFailed(false)
 
     try {
       const result = await uploadFile(
@@ -292,7 +301,12 @@ export function UploadCard(props: {
         }
       }
     } catch (error) {
-      setIsUploadFailed(true)
+      if (error instanceof LivenessCheckError) {
+        setIsLivenessCheckFailed(true)
+      } else {
+        setIsUploadFailed(true)
+      }
+
       // 上传失败时，不调用 onUploaded 函数，保持当前状态
       // onUploaded({ success: false })
     } finally {
@@ -338,7 +352,7 @@ export function UploadCard(props: {
     })
   }, [s3Key])
 
-  const isSomethingError = isFileTooLarge || isUploadFailed
+  const isSomethingError = isFileTooLarge || isUploadFailed || isLivenessCheckFailed
 
   return (
     <>
@@ -395,7 +409,10 @@ export function UploadCard(props: {
         {isSomethingError && (
           <div className='mt-2 flex flex-row items-center gap-1'>
             <LazyImage className='w-3.5 h-3.5' src='/images/icons/identity/error2.png' />
-            <Text text={isFileTooLarge ? 'large' : 'fail'} className='text-xs text-[#CA3F64]' />
+            <Text
+              text={isFileTooLarge ? 'large' : isLivenessCheckFailed ? 'livenessFail' : 'fail'}
+              className='text-xs text-[#CA3F64]'
+            />
           </div>
         )}
       </div>

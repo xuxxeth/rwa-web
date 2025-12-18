@@ -267,7 +267,8 @@
       "reUpload": "Reupload",
       "uploading": "Uploading",
       "large": "The file is too large, please re-upload.",
-      "fail": "File upload failed, please try again."
+      "fail": "File upload failed, please try again.",
+      "livenessFail": "The image does not meet the requirements. please re-upload." 
     },
     "face": {
       "rg": "Facial Verification",

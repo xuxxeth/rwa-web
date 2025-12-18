@@ -73,9 +73,19 @@ function Identity({ account }: { account: string }) {
   }
 
   const refresh = async () => {
-    const res = await kycApi.getKycDetail()
-    setKycDetail(res.data || {})
-    return res
+    try {
+      const res = await kycApi.getKycDetail()
+      setKycDetail(res.data || {})
+      return res
+    } catch (error) {
+      return {
+        code: 500,
+        data: {
+          overallStatus: KYC_OVERALL_STATUS.VERIFYING
+        },
+        message: null,
+      }
+    }
   }
 
   useEffect(() => {
@@ -220,6 +230,11 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.KYT &&
           status === KYC_STATUS.VERIFYING,
+        render: () => <Verifying refresh={refresh} />,
+      },
+      // 加一个兜底渲染
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.VERIFYING && status === KYC_STATUS.VERIFYING,
         render: () => <Verifying refresh={refresh} />,
       },
     ]

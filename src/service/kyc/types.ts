@@ -100,7 +100,6 @@ export interface IExtraInfo {
 }
 
 export interface IKycDetail {
-  account: string
   userInfo?: IKycSubmitData
   overallStatus: KYC_OVERALL_STATUS
   riskLevel?: KYC_RISK_LEVEL
