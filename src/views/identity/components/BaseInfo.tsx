@@ -34,7 +34,7 @@ export async function retryRefresh(
   return new Promise(resolve => {
     const query = async () => {
       const result = await refresh()
-      if (result.code === RESPONSE_CODE.SUCCESS && result.data?.account) {
+      if (result.code === RESPONSE_CODE.SUCCESS && result.data?.overallStatus !== 0) {
         return resolve(result)
       }
       if (attempt < maxRetries) {
