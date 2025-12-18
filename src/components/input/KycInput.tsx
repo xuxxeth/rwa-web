@@ -2,7 +2,6 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { escapeRegExp } from "@/utils"
-import { el } from "date-fns/locale"
 
 interface KycInputProps extends React.ComponentProps<"input"> {
   error?: string

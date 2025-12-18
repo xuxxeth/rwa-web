@@ -6,7 +6,6 @@ import { cn } from "@/utils/tw";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTailwindBreakpoints } from "@/hooks/useBreakpoints";
 import { useMotionScrollV2 } from "@/hooks/useMotionScrollV2";
-import { is } from "date-fns/locale";
 
 const from = 0
 const to = 1

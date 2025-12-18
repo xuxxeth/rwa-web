@@ -4,7 +4,6 @@ import { Navigate, type RouteObject } from 'react-router-dom'
 
 // 懒加载页面
 const Home = lazy(() => import('../views/home'))
-const Home2 = lazy(() => import('../views/home/index2'))
 const LiteTrade = lazy(() => import('../views/lite-trade'))
 const Markets = lazy(() => import('../views/markets'))
 const About = lazy(() => import('../views/about'))
@@ -25,11 +24,7 @@ const Assets = lazy(() => import('../views/assets'))
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <Home2 />,
-  },
-  {
-    path: '/home2',
-    element: <Home2 />,
+    element: <Home />,
   },
   {
     path: '/markets',

@@ -1,7 +1,6 @@
 
 import { useForm, type DefaultValues, type UseFormReturn } from 'react-hook-form';
 import { useCallback, useEffect, useRef } from 'react';
-import { de } from 'date-fns/locale';
 
 export function usePersistentForm<T extends Record<string, any>>(
   storageKey: string,

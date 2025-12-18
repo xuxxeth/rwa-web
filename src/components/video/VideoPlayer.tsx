@@ -53,7 +53,7 @@ const VideoPlayer = memo(
         onPlay?.();
         setTimeout(() => {
           setCoverVisible(false);
-        }, 500)
+        }, 0)
       } catch (err) {
         // autoplay 被阻止 -> 尝试静音后再播放（大多数浏览器允许静音自动播放）
         if (!triedMutedPlay) {
@@ -64,7 +64,7 @@ const VideoPlayer = memo(
             setIsPlaying(true);
             setTimeout(() => {
               setCoverVisible(false);
-            }, 500)
+            }, 0)
             onPlay?.();
           } catch (err2) {
             // 最终无法自动播放：保持封面，report error optionally
@@ -107,7 +107,7 @@ const VideoPlayer = memo(
         setIsPlaying(true);
         setTimeout(() => {
           setCoverVisible(false);
-        }, 500)
+        }, 0)
         onPlay?.();
       };
 
@@ -179,14 +179,18 @@ const VideoPlayer = memo(
           playsInline
           // 不默认显示 controls，按需传 controls=true to show native controls
           controls={controls}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: isPlaying ? 1 : 0, transition: "opacity 0.5s ease" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: isPlaying ? 1 : 0, transition: "opacity 0.5s ease", 
+
+            position: 'relative',
+            zIndex: !coverVisible ? 5 : 1
+          }}
           // poster 属性只在未加载时显示浏览器的 poster，用我们自定义封面更可靠
           poster={poster}
 
         />
 
         {/* 自定义封面层：在未播放前显示，播放后隐藏 */}
-        {/* {poster && (
+        {poster && (
           <div
             aria-hidden
             className="video-cover transition-all "
@@ -202,8 +206,8 @@ const VideoPlayer = memo(
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              zIndex: 10,
-              opacity: coverVisible ? 1 : 0
+              zIndex: 2,
+              // opacity: coverVisible ? 1 : 0
             }}
             onClick={() => {
               try {
@@ -214,7 +218,7 @@ const VideoPlayer = memo(
             }}
           >
           </div>
-        )} */}
+        )}
       </div>
     );
   }

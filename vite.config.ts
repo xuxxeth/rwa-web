@@ -5,7 +5,8 @@ import { fileURLToPath, URL } from 'node:url'
 import viteCompression from 'vite-plugin-compression'
 import svgr from 'vite-plugin-svgr'
 import { viteMockServe } from 'vite-plugin-mock'
-import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+// import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+
 
 // https://vite.dev/config/
 // @ts-ignore
@@ -86,14 +87,24 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
+    
     build: {
       assetsDir: 'static',
       rollupOptions: {
         output: {
           manualChunks: {
-            react: ['react', 'react-dom'],
-            chart: ['@/lib/charting_library'], // TradingView 单独拆出来
+            react: ['react', 'react-dom', 'react-router-dom'],
+            'ca-common': ['ca-common-web'],
+            'vendor-chart': ['@/lib/charting_library', 'recharts'], // TradingView 单独拆出来
+            'vendor-utils': [ 'axios', 'reconnecting-websocket', 'zustand', 'date-fns', 'react-day-picker']
           },
+        },
+      },
+      minify: 'terser', // 使用terser压缩
+      terserOptions: {
+        compress: {
+          drop_console: true, // 移除 console.log
+          drop_debugger: true, // 移除 debugger
         },
       },
     },
