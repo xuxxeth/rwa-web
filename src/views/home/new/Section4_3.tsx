@@ -1,15 +1,18 @@
+import { LazyImage } from "@/components/image/LazyImage"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import type { IRwa } from "@/service/base/types"
 import { cn } from "@/utils/tw"
 import { motion, transform, useAnimation, useMotionValue, useTransform } from "framer-motion"
-import { memo, useEffect, useMemo, useRef, useState } from "react"
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import ReactDOM from "react-dom"
 
 export const TokenBox = memo(
   ({
     rwa,
-    style
-  }: { style?: any, rwa?: IRwa}) => {
+    canGo,
+    style,
+    onClick
+  }: { style?: any, rwa?: IRwa, canGo?: boolean, onClick?: () => void}) => {
     const rwaPrice = useRwaPrice(rwa?.symbol || '')
     const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
     const [isMounted, setIsMounted] = useState(false);
@@ -21,28 +24,42 @@ export const TokenBox = memo(
     if (!isMounted) return null;
 
     return ReactDOM.createPortal(
-      <div className=" border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.08)] rounded-[8px] h-[58px] px-[8px] flex flex-col justify-center
-        fixed left-[68px] top-0 text-white w-[180px] translate-x-[-45px] backdrop-blur-[60px] z-[59]"
+      <div className=" border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.08)] rounded-[8px] h-[48px] md:h-[58px] px-[8px] flex items-center justify-between
+        fixed left-[68px] top-0 text-white min-w-[140px] translate-x-[-45px] backdrop-blur-[60px] z-[59]"
         style={{
           ...style,
         }}
+        onClick={e => {
+          if (canGo && onClick) {
+            e.stopPropagation()
+            onClick()
+          }
+        }}
       >
-        <div className=" font-normal flex items-center justify-between">
-          <div className=" text-[16px]">{rwa?.symbol || '--'}</div>
-          <div className=" text-[16px]">${rwaPrice?.price || '--'}</div>
-        </div>
-        <div className=" font-normal flex items-center justify-between">
-          <div className=" text-[14px] text-[rgba(255,255,255,0.6)] mt-[2]">{rwa?.name || '--'}</div>
-          <div className={cn(
-            " text-[12px] h-[19px] rounded-[4px] min-w-[59px] px-[8px] flex items-center justify-center bg-[rgba(255,255,255,0.1)]",
-            up === 0 ? 'text-[#A1A1A1]' : up > 0
-              ? "text-[#2EBD85] "
-              : "text-[rgba(227,80,122,1)]"
-          )}>
-            {up !== 0 && (up > 0 ? '+' : '-')}
-            {Math.abs(Number(rwaPrice?.up || "0"))}%
+        <div className=" flex flex-col justify-center w-[140px]">
+          <div className=" font-normal flex items-center justify-between">
+            <div className="text-[14px] md:text-[16px]">{rwa?.symbol || '--'}</div>
+            <div className="text-[14px] md:text-[16px]">${rwaPrice?.price || '--'}</div>
+          </div>
+          <div className=" font-normal flex items-center justify-between">
+            <div className="text-[12px] md:text-[14px] text-[rgba(255,255,255,0.6)] mt-[2]">{rwa?.name || '--'}</div>
+            <div className={cn(
+              " text-[12px] h-[19px] rounded-[4px] min-w-[59px] px-[8px] flex items-center justify-center bg-[rgba(255,255,255,0.1)]",
+              up === 0 ? 'text-[#A1A1A1]' : up > 0
+                ? "text-[#2EBD85] "
+                : "text-[rgba(227,80,122,1)]"
+            )}>
+              {up !== 0 && (up > 0 ? '+' : '-')}
+              {Math.abs(Number(rwaPrice?.up || "0"))}%
+            </div>
           </div>
         </div>
+        
+        { canGo &&
+          <div className=" cursor-pointer">
+            <LazyImage src="/images/home/new/to_trade.png" className="w-[28px] h-[28px] ml-2" />
+          </div>
+        }
       </div>,
       document.body
     )
@@ -74,7 +91,6 @@ const Section4_3 = memo(
     rwaList = [],
     onClick
   }: SectionProps) => {
-    const stoping3 = useRef(false);
     const controls3_1 = useAnimation();
     const offsetDistance = useMotionValue("0%");
     const rotation = useMotionValue(0);
@@ -97,7 +113,7 @@ const Section4_3 = memo(
 
     const controls3_2 = useAnimation();
     const offsetDistance2 = useMotionValue("40%");
-    const runAnimation3_2 = async ({ run }: {run?: boolean}) => {
+    const runAnimation3_2 = async () => {
       await controls3_2.start({
         offsetDistance: "100%"
       }, {
@@ -106,13 +122,77 @@ const Section4_3 = memo(
         // delay: run ? 0 : duration3 / 8 * 3,
       });
       await controls3_2.set({ offsetDistance: "0%" });
-      runAnimation3_2({ run: true });
+      runAnimation3_2();
     };
+    const runAnimation = () => {
+      runAnimation3_1();
+      runAnimation3_2();
+    }
+    const stopAnimation = () => {
+      controls3_1.stop();
+      controls3_2.stop();
+    }
 
     useEffect(() => {
-      runAnimation3_1();
-      runAnimation3_2({});
-    }, [ controls3_1]);
+      runAnimation();
+    }, [])
+    // 点击任意空白处（非 token 元素）重新启动动画
+    useEffect(() => {
+      const handler = (e: PointerEvent) => {
+        // const target = e.target as HTMLElement | null;
+        // if (!target) return;
+        // // 如果点在 token 元素上，则不触发重启
+        // if (target.closest('[data-token-id]')) return;
+
+        // 关闭提示并恢复可点击状态，然后重新开启动画
+        setShowTip(false);
+        setCanGo(true);
+
+        runAnimation()
+      };
+
+      document.addEventListener('pointerdown', handler);
+      return () => document.removeEventListener('pointerdown', handler);
+    }, []);
+
+
+    const mouseOver = useRef(false)
+    const [canGo, setCanGo] = useState(true)
+
+    const onTokenClick = useCallback((rwa: IRwa) => {
+      if (!canGo) {
+        return
+      }
+      onClick && onClick(rwa)
+      setCanGo(false)
+    }, [canGo]) 
+
+    const handleStopAnimation = (e: MouseEvent, index: number, action?: string) => {
+      if (e.type === 'pointerenter') {
+        mouseOver.current = true
+      }
+      if (e.type === 'mousedown' && mouseOver.current) {
+        return
+      }
+      if (e.type === 'mousedown' ) {
+        setCanGo(false)
+        setShowTip(false)
+      }
+      // @ts-ignore
+      const rect = e.target.getBoundingClientRect()
+      console.log(rect)
+      setRectPos(rect)
+      stopAnimation()
+      if (index === 1) {
+        setShowTip(true)
+      }
+    }
+    const handleRunAnimation = (index: number) => {
+      runAnimation()
+      if (index === 1) {
+        setShowTip(false)
+      }
+    }
 
     return (
       <div className="w-[401px] h-[401px] relative left-[calc(50%-200.5px)] top-[calc(50%-200.5px)]"
@@ -146,15 +226,14 @@ const Section4_3 = memo(
             duration: duration3,
           }}
           onHoverStart={(e) => {
-            stoping3.current = true;
-            controls3_1.stop();
-            controls3_2.stop();
+            stopAnimation()
           }}
           onHoverEnd={async () => {
-            stoping3.current = false;
-            runAnimation3_1();
-            runAnimation3_2({run: true});
+            runAnimation()
           }} 
+          onMouseDown={() => {
+            stopAnimation()
+          }}
         >
           <img src="/images/home/new/sec4_tip1.png" className="w-[32px] h-[32px] rounded-full" alt="" />
         </motion.div>
@@ -168,24 +247,14 @@ const Section4_3 = memo(
           transition={{
             duration: duration3
           }}
-          onHoverStart={(e) => {
-            // @ts-ignore
-            const rect = e.target.getBoundingClientRect()
-            setRectPos(rect)
-            setShowTip(true)
-            controls3_1.stop();
-            controls3_2.stop();
-          }}
-          onHoverEnd={async () => {
-            setShowTip(false)
-            runAnimation3_1();
-            runAnimation3_2({run: true});
-          }}  
+          onHoverStart={(e) => handleStopAnimation(e, 1)}
+          onHoverEnd={() => handleRunAnimation(1)} 
+          onMouseDown={(e) => handleStopAnimation(e as any, 1, 'down')} 
           
         >
           {
             rwa && 
-            <div onClick={() => onClick && onClick(rwa)}>
+            <div data-token-id="1" onClick={() => onTokenClick(rwa)}>
               <img src={rwa.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
             </div>
           }
@@ -193,6 +262,10 @@ const Section4_3 = memo(
         </motion.div>
         {
           showTip && <TokenBox rwa={rwa} 
+            canGo={!canGo}
+            onClick={() => {
+              onClick && onClick(rwa)
+            }}
             style={{ left: rectPos.x, top: rectPos.y - 70 }}
           />
         }

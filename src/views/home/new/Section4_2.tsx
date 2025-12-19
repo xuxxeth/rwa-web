@@ -1,6 +1,7 @@
 import { motion, useAnimation, useMotionValue, } from "framer-motion"
-import { memo, use, useEffect, useMemo, useRef, useState } from "react"
+import { memo, use, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { TokenBox, type SectionProps } from "./Section4_3"
+import type { IRwa } from "@/service/base/types"
 
 const duration2 = 40
 
@@ -40,7 +41,7 @@ const Section4_2 = memo(
 
     const controls2_2 = useAnimation();
     const offsetDistance2 = useMotionValue("25%");
-    const runAnimation2_2 = async ({ run }: {run?: boolean}) => {
+    const runAnimation2_2 = async () => {
       await controls2_2.start({
         offsetDistance: "100%"
       }, {
@@ -49,12 +50,12 @@ const Section4_2 = memo(
         // delay: run ? 0 : duration2 / 8 * 2,
       });
       await controls2_2.set({ offsetDistance: "0%" });
-      runAnimation2_2({ run: true });
+      runAnimation2_2();
     };
 
     const controls2_3 = useAnimation();
     const offsetDistance3 = useMotionValue("40%");
-    const runAnimation2_3 = async ({ run }: {run?: boolean}) => {
+    const runAnimation2_3 = async () => {
       await controls2_3.start({
         offsetDistance: "100%"
       }, {
@@ -63,11 +64,11 @@ const Section4_2 = memo(
         // delay: run ? 0 : duration2 / 8 * 4,
       });
       await controls2_3.set({ offsetDistance: "0%" });
-      runAnimation2_3({ run: true });
+      runAnimation2_3();
     };
     const controls2_4 = useAnimation();
     const offsetDistance4 = useMotionValue("75%");
-    const runAnimation2_4 = async ({ run }: {run?: boolean}) => {
+    const runAnimation2_4 = async () => {
       await controls2_4.start({
         offsetDistance: "100%"
       }, {
@@ -76,19 +77,93 @@ const Section4_2 = memo(
         // delay: run ? 0 : duration2 / 8 * 4,
       });
       await controls2_4.set({ offsetDistance: "0%" });
-      runAnimation2_4({ run: true });
+      runAnimation2_4();
     };
-
-    useEffect(() => { 
-       runAnimation2_1();
-       runAnimation2_2({});
-       runAnimation2_3({});
-       runAnimation2_4({});
-
-     }, [] )
 
     const rwa1 = useMemo(() => rwaList && rwaList[0], [rwaList])
     const rwa2 = useMemo(() => rwaList && rwaList[1], [rwaList])
+
+    const runAnimation = () => {
+      runAnimation2_1();
+      runAnimation2_2();
+      runAnimation2_3();
+      runAnimation2_4();
+    }
+    const stopAnimation = () => {
+      controls2_1.stop();
+      controls2_2.stop();
+      controls2_3.stop();
+      controls2_4.stop();
+    }
+
+    useEffect(() => {
+      runAnimation();
+    }, [])
+    // 点击任意空白处（非 token 元素）重新启动动画
+    useEffect(() => {
+      const handler = (e: PointerEvent) => {
+        // const target = e.target as HTMLElement | null;
+        // if (!target) return;
+        // // 如果点在 token 元素上，则不触发重启
+        // if (target.closest('[data-token-id]')) return;
+
+        // 关闭提示并恢复可点击状态，然后重新开启动画
+        setShowTip(false);
+        setShowTip2(false);
+        setCanGo(true);
+
+        runAnimation()
+      };
+
+      document.addEventListener('pointerdown', handler);
+      return () => document.removeEventListener('pointerdown', handler);
+    }, []);
+
+
+    const mouseOver = useRef(false)
+    const [canGo, setCanGo] = useState(true)
+
+    const onTokenClick = useCallback((rwa: IRwa) => {
+      if (!canGo) {
+        return
+      }
+      onClick && onClick(rwa)
+      setCanGo(false)
+    }, [canGo]) 
+
+    const handleStopAnimation = (e: MouseEvent, index: number, action?: string) => {
+      if (e.type === 'pointerenter') {
+        mouseOver.current = true
+      }
+      if (e.type === 'mousedown' && mouseOver.current) {
+        return
+      }
+      if (e.type === 'mousedown' ) {
+        setCanGo(false)
+        setShowTip(false)
+        setShowTip2(false)
+      }
+      // @ts-ignore
+      const rect = e.target.getBoundingClientRect()
+      console.log(rect)
+      setRectPos(rect)
+      stopAnimation()
+      if (index === 2) {
+        setShowTip2(true)
+      }
+      if (index === 1) {
+        setShowTip(true)
+      }
+    }
+    const handleRunAnimation = (index: number) => {
+      runAnimation()
+      if (index === 2) {
+        setShowTip2(false)
+      }
+      if (index === 1) {
+        setShowTip(false)
+      }
+    }
 
     return (
       <div className="w-[537px] h-[537px] absolute left-[calc(50%-268.5px)] top-[calc(50%-268.5px)]"
@@ -121,14 +196,13 @@ const Section4_2 = memo(
             duration: duration2,
           }}
           onHoverStart={(e) => {
-            controls2_1.stop();
-            controls2_2.stop();
-            controls2_3.stop();
+            stopAnimation()
           }}
           onHoverEnd={async () => {
-            runAnimation2_1();
-            runAnimation2_2({run: true});
-            runAnimation2_3({run: true});
+            runAnimation()
+          }}
+          onMouseDown={() => {
+            stopAnimation()
           }}
         >
           <img src="/images/home/new/sec4_tip2.png" className="w-[20px] h-[20px] rounded-full" alt="" />
@@ -151,17 +225,14 @@ const Section4_2 = memo(
             // delay: duration2 / 8 * 6,
           }} 
           onHoverStart={(e) => {
-            controls2_1.stop();
-            controls2_2.stop();
-            controls2_3.stop();
-            controls2_4.stop();
+            stopAnimation()
 
           }}
           onHoverEnd={async () => {
-            runAnimation2_1();
-            runAnimation2_2({run: true});
-            runAnimation2_3({run: true});
-            runAnimation2_4({run: true});
+            runAnimation()
+          }}
+          onMouseDown={() => {
+            stopAnimation()
           }}
         >
           <img src="/images/home/new/sec4_tip3.png" className="w-[38px] h-[38px] rounded-full" alt="" />
@@ -178,28 +249,13 @@ const Section4_2 = memo(
           transition={{
             duration: duration2,
           }} 
-          onHoverStart={(e) => {
-            // @ts-ignore
-            const rect = e.target.getBoundingClientRect()
-            setRectPos(rect)
-            setShowTip2(true)
-            controls2_1.stop();
-            controls2_2.stop();
-            controls2_3.stop();
-            controls2_4.stop();
-
-          }}
-          onHoverEnd={async () => {
-            setShowTip2(false)
-            runAnimation2_1();
-            runAnimation2_2({run: true});
-            runAnimation2_3({run: true});
-            runAnimation2_4({run: true});
-          }}
+          onHoverStart={(e) => handleStopAnimation(e, 2)}
+          onHoverEnd={() => handleRunAnimation(2)} 
+          onMouseDown={(e) => handleStopAnimation(e as any, 2, 'down')}
         >
           {
             rwa2 && 
-            <div onClick={() => onClick && onClick(rwa2)}>
+            <div data-token-id="2" onClick={() => onTokenClick(rwa2)}>
               <img src={rwa2.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
             </div>
           }
@@ -215,40 +271,32 @@ const Section4_2 = memo(
           transition={{
             duration: duration2,
           }}
-          onHoverStart={(e) => {
-            // @ts-ignore
-            const rect = e.target.getBoundingClientRect()
-            setRectPos(rect)
-            setShowTip(true)
-
-            controls2_1.stop();
-            controls2_2.stop();
-            controls2_3.stop();
-            controls2_4.stop();
-
-          }}
-          onHoverEnd={async () => {
-            setShowTip(false)
-            runAnimation2_1();
-            runAnimation2_2({run: true});
-            runAnimation2_3({run: true});
-            runAnimation2_4({run: true});
-          }} 
+          onHoverStart={(e) => handleStopAnimation(e, 1)}
+          onHoverEnd={() => handleRunAnimation(1)} 
+          onMouseDown={(e) => handleStopAnimation(e as any, 1, 'down')}
         >
           {
             rwa1 && 
-            <div onClick={() => onClick && onClick(rwa1)}>
+            <div data-token-id="1" onClick={() => onTokenClick(rwa1)}>
               <img src={rwa1.icon} className="w-[60px] h-[60px] rounded-full" alt="" />
             </div>
           }
         </motion.div>
         {
           showTip && <TokenBox rwa={rwa1}
+            canGo={!canGo}
+            onClick={() => {
+              onClick && onClick(rwa1)
+            }}
             style={{ left: rectPos.x, top: rectPos.y - 70 }}
           />
         }
         {
           showTip2 && <TokenBox rwa={rwa2}
+            canGo={!canGo}
+            onClick={() => {
+              onClick && onClick(rwa2)
+            }}
             style={{ left: rectPos.x, top: rectPos.y - 70 }}
           />
         }

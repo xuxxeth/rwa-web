@@ -23,7 +23,6 @@ export function useMotionScrollV2(to: number, sectionRef: React.RefObject<HTMLEl
       // @ts-ignore
     const rect = sectionRef.current.getBoundingClientRect();
     rectY.current = rect.y;
-    console.log(rectY.current)
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) {

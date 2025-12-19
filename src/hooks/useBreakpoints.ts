@@ -3,11 +3,11 @@ import { getCurrentBreakpoint, isBreakpointUp, isBreakpointDown } from '../utils
 
 export const useTailwindBreakpoints = () => {
   const [breakpoint, setBreakpoint] = useState(getCurrentBreakpoint());
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? document.body.clientWidth : 0);
 
   useEffect(() => {
     const handleResize = () => {
-      const width = window.innerWidth;
+      const width = document.body.clientWidth;
       setWindowWidth(width);
       setBreakpoint(getCurrentBreakpoint(width));
     };

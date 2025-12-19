@@ -14,10 +14,10 @@ export let heroAnimatedOnce = false
 export default function Page() {
   return (
     <div className=" font-normal">
+
       <Section1 />
       <Section2 />
       <Section3 />
-
       <Section4 />
       <Section5 />
       <Section6 />

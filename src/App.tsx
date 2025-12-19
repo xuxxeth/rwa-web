@@ -17,8 +17,6 @@ import { useRiskUserConfig } from './hooks/useRiskStatus'
 import { Updater } from './components/Updater'
 import { useRouter } from './hooks/useRouter'
 import { HomeMenus } from './components/menu/HomeMenus'
-import { kycApi } from './service/kyc/api'
-import { riskApi } from './service/risk/api'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
