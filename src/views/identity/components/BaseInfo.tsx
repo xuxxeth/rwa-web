@@ -413,7 +413,7 @@ const BaseInfo = memo(
                       className=''
                       placeholder={t('kyc.t4')}
                       error={errors.fullName?.message}
-                      regex='^[a-zA-Z\u4e00-\u9fa5]+$'
+                      regex='^[a-zA-Z\u4e00-\u9fa5·\s_-]+$'
                       value={fullName}
                       {...register('fullName', {
                         required: t('kyc.t54', {num: 30}),
@@ -683,7 +683,7 @@ const BaseInfo = memo(
                         className=''
                         placeholder={t('kyc.t38')}
                         error={errors.description?.message}
-                        regex='^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$'
+                        regex='^[\u4e00-\u9fa5a-zA-Z0-9\s,，]{1,40}$'
                         value={description}
                         {...register('description', {
                           required: t('kyc.t4'),
@@ -692,7 +692,7 @@ const BaseInfo = memo(
                             message: t('kyc.t54', {num: 40}),
                           },
                           pattern: {
-                            value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
+                            value: /^[\u4e00-\u9fa5a-zA-Z0-9\s,，]{1,40}$/,
                             message: '只支持中文、英文字母和数字',
                           },
                           onChange: e => {
