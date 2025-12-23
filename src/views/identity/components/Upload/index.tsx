@@ -164,6 +164,7 @@ function IdentityUpload({
     <div>
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard
+          step={step}
           fileType='idFront'
           shouldCheckLiveness={true}
           onUploaded={onFrontUploaded}
@@ -273,6 +274,7 @@ function PassportUpload({
           onUploaded={onPassportUploaded}
           s3Key={keys}
           mode={mode}
+          step={step}
         />
         <div className='flex-1 flex flex-row items-center justify-center'>
           <Text text='passportTips' className='text-base' />

@@ -210,7 +210,6 @@ const BaseInfo = memo(
     const incomeCertifications = watch('incomeCertifications')
     const source = watch('source')
 
-
     const preAccount = useRef<string | undefined>(undefined)
 
     const [submiting, setSubmiting] = useState(false)
@@ -240,7 +239,7 @@ const BaseInfo = memo(
       }
       // 无地址证明
       if (!useCertificateAddress && !data.addressCertification) {
-        toastError({title: t('kyc.t61')})
+        toastError({ title: t('kyc.t61') })
         return
       }
       const params: IKycSubmitData = {
@@ -343,9 +342,7 @@ const BaseInfo = memo(
 
     return (
       <>
-        {
-          rejectReason && <WarningInfo text={rejectReason} />
-        }
+        {rejectReason && <WarningInfo text={rejectReason} />}
         <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
@@ -360,16 +357,15 @@ const BaseInfo = memo(
                     regex='^[a-zA-Z\u4e00-\u9fa5]+$'
                     value={firstName}
                     {...register('firstName', {
-                      required: t('kyc.t54', {num: 30}),
+                      required: t('kyc.t54', { num: 30 }),
                       maxLength: {
                         value: 30,
-                        message: t('kyc.t54', {num: 30}),
+                        message: t('kyc.t54', { num: 30 }),
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
                         message: '只支持中文和英文字母',
                       },
-                      
                     })}
                   />
                   <ErrorBox error={errors.firstName?.message} />
@@ -385,10 +381,10 @@ const BaseInfo = memo(
                     regex='^[a-zA-Z\u4e00-\u9fa5]+$'
                     value={lastName}
                     {...register('lastName', {
-                      required: t('kyc.t54', {num: 30}),
+                      required: t('kyc.t54', { num: 30 }),
                       maxLength: {
                         value: 30,
-                        message: t('kyc.t54', {num: 30}),
+                        message: t('kyc.t54', { num: 30 }),
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
@@ -416,10 +412,10 @@ const BaseInfo = memo(
                       regex='^[a-zA-Z\u4e00-\u9fa5·\s_-]+$'
                       value={fullName}
                       {...register('fullName', {
-                        required: t('kyc.t54', {num: 30}),
+                        required: t('kyc.t54', { num: 30 }),
                         maxLength: {
                           value: 30,
-                          message: t('kyc.t54', {num: 30}),
+                          message: t('kyc.t54', { num: 30 }),
                         },
                         pattern: {
                           value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
@@ -490,7 +486,7 @@ const BaseInfo = memo(
                       required: t('kyc.t55'),
                       maxLength: {
                         value: 50,
-                        message: t('kyc.t54', {num: 50}),
+                        message: t('kyc.t54', { num: 50 }),
                       },
                       pattern: {
                         value:
@@ -603,7 +599,7 @@ const BaseInfo = memo(
                         required: t('kyc.t4'),
                         maxLength: {
                           value: 40,
-                          message: t('kyc.t54', {num: 40}),
+                          message: t('kyc.t54', { num: 40 }),
                         },
                         pattern: {
                           value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
@@ -689,7 +685,7 @@ const BaseInfo = memo(
                           required: t('kyc.t4'),
                           maxLength: {
                             value: 30,
-                            message: t('kyc.t54', {num: 40}),
+                            message: t('kyc.t54', { num: 40 }),
                           },
                           pattern: {
                             value: /^[\u4e00-\u9fa5a-zA-Z0-9\s,，]{1,40}$/,

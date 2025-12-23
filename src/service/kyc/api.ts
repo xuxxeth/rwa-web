@@ -12,17 +12,20 @@ import type {
 } from './types'
 
 export const kycApi = {
-  getLivenessUrl: (step?: number) =>
-    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url', { type: step }),
-  validateLivenessImage: (s3Key: string) =>
-    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/validate-image', { key: s3Key }),
+  getLivenessUrl: (step: number = 1) =>
+    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url', {
+      type: step,
+    }),
+  validateLivenessImage: (s3Key: string, step: number) =>
+    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/validate-image', { key: s3Key, type: step }),
   isLivenessUrlExpired: (bizNo: string) =>
     client.get<ApiResponse<boolean>>('/v1/kyc/liveness/is-expired', { bizNo: bizNo }),
   getSupportedCountries: () =>
     client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/support-countries'),
   getKycStatus: () => client.get<ApiResponse<IKycStatus>>('/v1/kyc/status'),
   getKycDetail: () => client.get<ApiResponse<IKycDetail>>('/v1/kyc/detail-result'),
-  getKycStepDetail: (step: number) => client.post<ApiResponse<IKycDetail[]>>('/v1/kyc/detail-pending-steps', {steps: [step]}),
+  getKycStepDetail: (step: number) =>
+    client.post<ApiResponse<IKycDetail[]>>('/v1/kyc/detail-pending-steps', { steps: [step] }),
   submitKyc: (data: IKycSubmitData) => client.post<ApiResponse<null>>('/v1/kyc/submit', data),
   getFilePutUrl: (mimeType: FilePutMimeType, fileName: string) =>
     client.get<ApiResponse<IFilePutUrlRes>>('/v1/kyc/file-put-url', {

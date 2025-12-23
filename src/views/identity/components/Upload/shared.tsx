@@ -138,7 +138,8 @@ export class LivenessCheckError extends Error {
 export const uploadFile = async (
   file: File,
   onProgress: (progress: number) => void,
-  shouldCheckLiveness = false
+  shouldCheckLiveness: boolean = false,
+  step: number = 1
 ): Promise<{ success: boolean; key: string } | null> => {
   try {
     const fileType = file.type as FilePutMimeType
@@ -168,7 +169,7 @@ export const uploadFile = async (
     })
 
     if (shouldCheckLiveness) {
-      const { data: isValid, message } = await kycApi.validateLivenessImage(data.key)
+      const { data: isValid, message } = await kycApi.validateLivenessImage(data.key, step)
       if (!isValid) {
         throw new LivenessCheckError(message)
       }
@@ -250,6 +251,7 @@ export function UploadCard(props: {
   mode?: 'edit' | 'view'
   shouldCheckLiveness?: boolean
   onlyImageMimeType?: boolean
+  step?: number
 }) {
   const { fileType, onUploaded, onlyImageMimeType, s3Key, mode } = props
 
@@ -285,7 +287,8 @@ export function UploadCard(props: {
         progress => {
           setUploadProgress(progress)
         },
-        props.shouldCheckLiveness
+        props.shouldCheckLiveness,
+        props.step
       )
 
       if (result && result.success && result.key) {
