@@ -22,13 +22,16 @@ const QRCode = ({ value, size = 200, className }: QRCodeProps) => {
         type: 'square',
       },
       backgroundOptions: {
-        color: '#ffffff',
+        color: '#fff',
       },
       imageOptions: {
         crossOrigin: 'anonymous',
         margin: 0,
       },
     })
+    if (ref.current) {
+      qrCode.current.append(ref.current)
+    }
   }, [])
 
   useEffect(() => {
