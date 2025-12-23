@@ -1,6 +1,6 @@
 import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
-import { QRCodeSVG } from 'qrcode.react'
+import QRCode from '@/components/qrcode'
 import { useEffect, useState, type ReactNode } from 'react'
 import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
@@ -117,9 +117,7 @@ export default function FaceRecognition({
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
       <div className='m-4 self-center relative box-content w-[224px] h-[224px]'>
-        {!isMaxTimesReached && urlInfo && urlInfo.url && (
-          <QRCodeSVG value={urlInfo.url} size={224} />
-        )}
+        {!isMaxTimesReached && urlInfo && urlInfo.url && <QRCode value={urlInfo.url} size={224} />}
         {isMaxTimesReached ? (
           <MaxTimesReached />
         ) : isExpired ? (
@@ -153,8 +151,6 @@ function QrCodeExpirted({ refresh }: { refresh: () => Promise<void> }) {
   )
 }
 
-const resultLangPrefix = 'identity.result'
-
 // 二维码失效
 function QrCodeInvalid() {
   const { t } = useTranslation()
@@ -164,7 +160,7 @@ function QrCodeInvalid() {
 function MaxTimesReached() {
   return (
     <>
-      <QRCodeSVG
+      <QRCode
         value={'You have reached today’s verification limit. Please try again tomorrow.'}
         size={224}
       />
