@@ -79,11 +79,11 @@ function Identity({ account }: { account: string }) {
     try {
       const res = await kycApi.getKycDetail()
       if (res?.data) {
-        if (!res.data.userInfo && pendingStepRef.current) {
+        if (!res.data.userInfo || pendingStepRef.current) {
           const stepRes = await kycApi.getKycStepDetail(pendingStepRef.current)
           const stepData = stepRes.data[0] ? stepRes.data[0] : {}
           // @ts-ignore
-          stepData.overallStatus = stepData.applyStatus
+          stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
           res.data = {
             ...res.data,
             ...stepData
