@@ -9,6 +9,7 @@ import { useRouter } from "@/hooks/useRouter";
 import { useKycRiskLevel, useKycStatus } from "@/hooks/useKycStatus";
 import { useVerifyTip } from "../market-trading/VerifyIdentity";
 import { KYC_RISK_LEVEL } from "@/service/kyc/types";
+import { usePendingStep } from "@/hooks/usePendingStep";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
   if (!verified) {
@@ -46,6 +47,7 @@ function getVerificationStatusClassName(verified: boolean, issued: boolean) {
 export function VerificationStatus(props: {
   verified: boolean;
   issued: boolean;
+  onClick?: () => void
 }) {
   const { t } = useTranslation();
   const { verified, issued } = props;
@@ -53,19 +55,21 @@ export function VerificationStatus(props: {
     verified,
     issued
   );
+  const { verifyTip } = useVerifyTip()
 
   return (
     <div
       className={cn(
-        "flex items-center gap-1 justify-center py-1 px-2 rounded-sm text-xs"
+        "flex items-center gap-1 justify-center py-1 px-2 rounded-sm text-xs cursor-pointer"
       )}
       style={{
         color,
         background: bg,
       }}
+      onClick={() => props.onClick && props.onClick()}
     >
       <LazyImage src={icon} className="w-3.5 h-3.5" />
-      <span>{t(text)}</span>
+      <span>{verifyTip || t(text)}</span>
     </div>
   );
 }
@@ -76,7 +80,7 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
   const { riskStatus } = useRiskStatus()
   const { kycStatus } = useKycStatus()
   const kycRiskLevel = useKycRiskLevel()
-
+  const pendingStep = usePendingStep()
   const startVerification = () => {
     router.push('/identity')
   }
@@ -86,7 +90,9 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
       riskStatus === RISK_STATUS.DEFAULT ? null :
       isSignatureValid && riskStatus !== RISK_STATUS.NOTSIGN ? 
         <div className="flex flex-row gap-4">
-          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} />
+          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED && !pendingStep.expired} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} 
+             onClick={startVerification}
+          />
           {kycStatus !== RISK_STATUS.VERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
         </div> :
         <SignButton refreshIsSignatureValid={() => {

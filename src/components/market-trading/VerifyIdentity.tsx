@@ -6,12 +6,13 @@ import { useRouter } from "@/hooks/useRouter";
 import { RISK_STATUS } from "@/config/constants";
 import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
 import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
+import { usePendingStep } from "@/hooks/usePendingStep";
 
 export const useVerifyTip = function() {
   const { t } = useTranslation()
   const { expired, expiring } = useKycExpired()
   const { kycStatus } = useKycStatus()
-  
+  const pendingStep = usePendingStep()
   const verifyTip = useMemo(() => {
     let text = ''
     // 认证被拒绝
@@ -23,7 +24,7 @@ export const useVerifyTip = function() {
       text = t("identity.verifyID")
     }
     // 认证已过期
-    if (kycStatus === KYC_OVERALL_STATUS.EXPIRED) {
+    if (kycStatus === KYC_OVERALL_STATUS.EXPIRED || pendingStep.expired) {
       text = t('kyc.t51')
     }
 

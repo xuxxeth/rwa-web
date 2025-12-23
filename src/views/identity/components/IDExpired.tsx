@@ -21,9 +21,11 @@ const IDExpired = memo(
   ({
     userInfo,
     refresh,
+    expired
   }: {
     userInfo?: IKycSubmitData
     refresh?: () => Promise<ApiResponse<IKycDetail>>
+    expired?: boolean
   }) => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
@@ -64,7 +66,7 @@ const IDExpired = memo(
       }
 
       const params: any = {
-        type: 2,
+        type: expired ? 2 : 1,
         idInfo: {
           type: type,
           files: {
@@ -85,11 +87,11 @@ const IDExpired = memo(
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
           if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
-            // toastSuccess({ title: '提交成功' })
+            expired && toastSuccess({ title: '提交成功' })
             clear()
           }
         } else {
-          // toastSuccess({ title: '提交成功' })
+          expired && toastSuccess({ title: '提交成功' })
           clear()
           setSubmiting(false)
         }

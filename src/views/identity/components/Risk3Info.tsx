@@ -41,7 +41,7 @@ const Risk3Info = memo(
         return
       }
       const params: any = {
-        type: 1,
+        type: 1, // 1, 3
         extraInfo: {
           incomeCertifications: files
         },

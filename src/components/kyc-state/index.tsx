@@ -3,13 +3,13 @@ import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react"; // 关闭按钮图标（可换）
 import { Button } from "../ui/button";
-import { kycApi } from "@/service/kyc/api";
 import { LazyImage } from "../image/LazyImage";
 import { KYC_OVERALL_STATUS, KYC_RISK_LEVEL, KYC_STATUS, KYC_VERIFY_TYPE, type IKycStatus } from "@/service/kyc/types";
 import { useFetchKycStatus, useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
 import { useKycStore } from "@/stores/kycStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
+import { usePendingStep } from "@/hooks/usePendingStep";
 
 const NO_SHOW_PATH = ['/identity']
 
@@ -21,6 +21,7 @@ const KycState = () => {
   const kycDetail = useKycStore(state => state.kycDetail)
   const isNotShow = useMemo(() => NO_SHOW_PATH.includes(router.location.pathname), [router.location.pathname])
   const { expired, expiring, desc } = useKycExpired()
+  const pendingStep = usePendingStep()
 
   useFetchKycStatus()
 
@@ -60,7 +61,7 @@ const KycState = () => {
   
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if (expired && !show) {
+    if ((expired || pendingStep.expired) && !show) {
       setContent({
         title: t('kyc.t48'),
         content: t('kyc.t49', { expire: desc }),
@@ -82,7 +83,7 @@ const KycState = () => {
 
     if (!kycDetail || isNotShow || show) return
 
-    if (ocrIncome) {
+    if (ocrIncome || pendingStep.risk3) {
       setContent({
         title: t('kyc.t29'),
         content: t('kyc.t32'),
@@ -122,7 +123,7 @@ const KycState = () => {
     }
     
     
-  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc]);
+  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc, pendingStep]);
 
   const close = () => setShow(false);
 

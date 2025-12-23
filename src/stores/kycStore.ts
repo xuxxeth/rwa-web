@@ -6,14 +6,13 @@ import { type KycStore } from './types'
 import { riskApi } from '@/service/risk/api'
 
 export const useKycStore = create<KycStore>((set, get) => ({
-  kycStatus: { status: -1, expiresTime: 0 },
+  kycStatus: { status: -1, expiresTime: 0, pendingSteps: [] },
   kycDetail: null,
   isLoading: false,
   error: null,
   riskUserConfig: null,
   getUserConfig: async () => {
     const res = await riskApi.getUserConfig()
-    console.log(res)
     if (res.code === 9401) {
       set({ riskUserConfig: { actions: -1, verifyType: 2, verifyState: 2, blacklist: true } })
     } else {
@@ -32,6 +31,7 @@ export const useKycStore = create<KycStore>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const { data } = await kycApi.getKycStatus()
+      
       set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
 
       // 如果是认证中和已拒绝，则请求认证结果详情接口

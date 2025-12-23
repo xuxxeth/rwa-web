@@ -13,6 +13,7 @@ import { KycTextarea } from "@/components/input/KycTextarea"
 import { useFieldArray } from "react-hook-form"
 import type { ApiResponse } from "@/service/client"
 import type { IKycDetail } from "@/service/kyc/types"
+import { usePendingStep } from "@/hooks/usePendingStep"
 
 function findEmptyItemIndices(list: IExtraInfoItem[]) {
   return list
@@ -42,6 +43,7 @@ const ExtraInfo = memo(
     refresh?: () => Promise<ApiResponse<IKycDetail>>
   }) => {
     const { t } = useTranslation()
+    const pendingStep = usePendingStep()
     const { toastSuccess, toastError  } = useToast()
     const { register, handleSubmit, watch, setValue, clear, control, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       extraList: [
@@ -78,7 +80,7 @@ const ExtraInfo = memo(
         }
       })
       const params: any = {
-        type: 3,
+        type: pendingStep.step ? 3 : 1,
         extraInfo: {
           extras: extras
         }
@@ -136,6 +138,8 @@ const ExtraInfo = memo(
                           <KycInput 
                             className=""
                             placeholder={t('kyc.t4')}
+                            value={extraList[index].name}
+                            regex="^[0-9a-zA-Z\u4e00-\u9fa5]+$"
                             error={errors.extraList?.[index]?.name?.message}
                             {
                               ...register(`extraList.${index}.name`, {

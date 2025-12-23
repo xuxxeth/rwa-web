@@ -15,6 +15,16 @@ export const KYC_OVERALL_STATUS = {
 }
 
 export type KYC_OVERALL_STATUS = (typeof KYC_OVERALL_STATUS)[keyof typeof KYC_OVERALL_STATUS]
+
+// 2-证件过期，3-交易量触发，4-复审
+export const PENDING_STEPS = {
+  EXPIRED: 2,
+  RISK3: 3,
+  REVIEW: 4
+}
+export type PENDING_STEPS = (typeof PENDING_STEPS)[keyof typeof PENDING_STEPS]
+export type PENDING_STEPS_LIST = PENDING_STEPS[]
+
 // -1 未签名 0 未认证, 1 认证中, 2 已通过, 3 已失败, 4 人工审核中, 5 已过期, 6-已拒绝, 7 - 已驳回
 export const KYC_STATUS = {
   DEFAULT: -1,
@@ -45,6 +55,7 @@ export const KYC_VERIFY_TYPE = {
   LIVENESS: 'LIVENESS',
   AML: 'AML',
   KYT: 'KYT',
+  ID_INFO: 'ID_INFO',
 }
 export type KYC_VERIFY_TYPE = (typeof KYC_VERIFY_TYPE)[keyof typeof KYC_VERIFY_TYPE]
 
@@ -59,6 +70,7 @@ export type KYC_PENDING_MATERIALS =
 export interface IKycStatus {
   status: KYC_STATUS
   expiresTime: number // 过期时间，毫秒
+  pendingSteps: PENDING_STEPS_LIST
 }
 
 export interface ILivenessUrlRes {

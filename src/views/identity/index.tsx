@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, type ReactNode } from 'react'
+import { useEffect, useState, useMemo, type ReactNode, useRef } from 'react'
 import { MainLayout } from '@/layouts/main'
 import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
@@ -31,6 +31,7 @@ import { IDExpired } from './components/IDExpired'
 import { useSearchParams } from 'react-router-dom'
 import { ReviewInfo } from './components/ReviewInfo'
 import { useKycStore } from '@/stores/kycStore'
+import { usePendingStep } from '@/hooks/usePendingStep'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -67,6 +68,8 @@ function Identity({ account }: { account: string }) {
   const [searchParams] = useSearchParams()
   const isRetryFromUrl = searchParams.get('retry') === 'true'
   const [isRetry, setIsRetry] = useState(isRetryFromUrl)
+  const pendingStep = usePendingStep()
+  const pendingStepRef = useRef(0)
 
   const resetRetry = () => {
     setIsRetry(prev => (prev === true ? false : prev))
@@ -75,7 +78,19 @@ function Identity({ account }: { account: string }) {
   const refresh = async () => {
     try {
       const res = await kycApi.getKycDetail()
-      setKycDetail(res.data || {})
+      if (res?.data) {
+        if (!res.data.userInfo && pendingStepRef.current) {
+          const stepRes = await kycApi.getKycStepDetail(pendingStepRef.current)
+          const stepData = stepRes.data[0] ? stepRes.data[0] : {}
+          // @ts-ignore
+          stepData.overallStatus = stepData.applyStatus
+          res.data = {
+            ...res.data,
+            ...stepData
+          }
+        }
+      }
+      setKycDetail(res?.data || {})
       return res
     } catch (error) {
       return {
@@ -89,8 +104,11 @@ function Identity({ account }: { account: string }) {
   }
 
   useEffect(() => {
+    if (pendingStep.step) {
+      pendingStepRef.current = pendingStep.step
+    }
     refresh()
-  }, [account])
+  }, [account, pendingStep.step])
 
   // 根据 kycDetail 刷新 KycStatus and Conifg
   const refetchKycStatusAndConfigIfNeed = useKycStore(
@@ -111,8 +129,9 @@ function Identity({ account }: { account: string }) {
       {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.EXPIRED ||
-          (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring),
-        render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} />,
+          (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring) ||
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.ID_INFO,
+        render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} expired={pendingStep.expired} />,
       },
       // 未认证
       {
