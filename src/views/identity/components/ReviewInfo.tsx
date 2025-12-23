@@ -1,13 +1,10 @@
 
 import { LazyImage } from "@/components/image/LazyImage"
-import { KycInput } from "@/components/input/KycInput"
 import { Button } from "@/components/ui/button"
 import { usePersistentForm } from "@/hooks/usePersistentForm"
 import { useTranslation } from "@/hooks/useTranslation"
 import { memo, use, useEffect, useMemo, useState } from "react"
 import { Upload } from "./Upload"
-import storage from "@/utils/storage"
-import { KYC_UPLOAD_STORAGE_KEY } from "./Upload/shared"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import type { IKycDetail, IKycSubmitData } from "@/service/kyc/types"
@@ -16,6 +13,7 @@ import { ErrorBox, FormItemBox, FormItemLabel, InputBox, retryRefresh, SectionBo
 import { EditInput } from "@/components/input/EditInput"
 import { EmploymentSelect } from "@/components/employment-select"
 import type { ApiResponse } from "@/service/client"
+import { usePendingStep } from "@/hooks/usePendingStep"
 
 
 interface FormData {
@@ -41,16 +39,7 @@ const ReviewInfo = memo(
   }) => {
     const { t } = useTranslation()
     const { toastSuccess, toastError  } = useToast()
-    const [dateOptions, setDateOptions] = useState({
-      minDate: 0,
-      maxDate: 0,
-      defaultDate: 0
-    })
-    const genderList = [
-      {value: '1', label: t('gender.male')},
-      {value: '0', label: t('gender.female')},
-
-    ]
+    
     const { register, handleSubmit, watch, setValue, reset, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       employment: 1,
       addressCertification: '',

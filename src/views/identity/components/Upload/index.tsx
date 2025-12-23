@@ -30,11 +30,13 @@ export function Upload({
   type,
   keys,
   mode = 'edit',
+  step,
   onChanged = (keys: string | string[]) => ({}),
 }: {
   type: 'identity' | 'passport' | 'address' | 'extra'
   keys?: string[] | string
   mode?: 'edit' | 'view'
+  step?: number
   onChanged?: (keys: string | string[]) => void
 }) {
   // identity keys 是数组，0 是正面，1 是反面
@@ -43,6 +45,7 @@ export function Upload({
       <IdentityUpload
         keys={keys as string[]}
         mode={mode}
+        step={step}
         onChanged={onChanged as (keys: string[]) => void}
       />
     )
@@ -52,6 +55,7 @@ export function Upload({
       <PassportUpload
         keys={keys as string}
         mode={mode}
+        step={step}
         onChanged={onChanged as (keys: string) => void}
       />
     )
@@ -80,10 +84,12 @@ export function Upload({
 function IdentityUpload({
   keys,
   mode,
+  step,
   onChanged,
 }: {
   keys?: string[]
   mode?: 'edit' | 'view'
+  step?: number
   onChanged: (keys: string[]) => void
 }) {
   const keyToBlobUrlMap = useRef<{ [key: string]: string }>({})
@@ -246,10 +252,12 @@ function AddressUpload({
 function PassportUpload({
   keys,
   mode,
+  step,
   onChanged,
 }: {
   keys?: string
   mode?: 'edit' | 'view'
+  step?: number
   onChanged: (keys: string) => void
 }) {
   const onPassportUploaded = (uploadedRes: IUploadedResV2) => {

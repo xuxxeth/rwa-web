@@ -12,8 +12,8 @@ import type {
 } from './types'
 
 export const kycApi = {
-  getLivenessUrl: () =>
-    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url'),
+  getLivenessUrl: (step?: number) =>
+    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url', { type: step }),
   validateLivenessImage: (s3Key: string) =>
     client.get<ApiResponse<boolean>>('/v1/kyc/liveness/validate-image', { key: s3Key }),
   isLivenessUrlExpired: (bizNo: string) =>

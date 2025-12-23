@@ -6,6 +6,7 @@ import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
 import { KYC_STATUS } from '@/service/kyc/types'
 import type { ApiResponse } from '@/service/client'
+import { usePendingStep } from '@/hooks/usePendingStep'
 
 const faceLangPrefix = 'identity.face'
 
@@ -27,9 +28,10 @@ export default function FaceRecognition({
   const [isExpired, setIsExpired] = useState(false)
   const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const pendingStep = usePendingStep()
 
   const refreshQrCode = async () => {
-    const { data } = await kycApi.getLivenessUrl()
+    const { data } = await kycApi.getLivenessUrl(pendingStep.step || 1)
     setIsExpired(data.expireTime ? data.expireTime < Date.now() : false)
     setErrorMsg('')
     setIsMaxTimesReached(false)

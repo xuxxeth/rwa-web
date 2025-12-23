@@ -12,6 +12,7 @@ import {
   Text,
 } from './Upload/shared'
 import type { ApiResponse } from "@/service/client"
+import { usePendingStep } from "@/hooks/usePendingStep"
 
 interface FormData {
   incomeCertifications?: string[]
@@ -25,6 +26,7 @@ const Risk3Info = memo(
     refresh?: () => Promise<ApiResponse<IKycDetail>>
   }) => {
     const { t } = useTranslation()
+    const pendingStep = usePendingStep()
     const { toastSuccess, toastError  } = useToast()
     const { handleSubmit, watch, setValue, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       incomeCertifications: []
@@ -80,6 +82,7 @@ const Risk3Info = memo(
             <Text text='extraTips' className='text-sm mt-2' />
           </div>
           <Upload
+            step={pendingStep.step}
             type='extra'
             keys={incomeCertifications}
             onChanged={keys => {

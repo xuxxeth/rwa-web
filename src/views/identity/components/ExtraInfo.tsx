@@ -174,6 +174,7 @@ const ExtraInfo = memo(
                       </div>
                     </div>
                     <Upload type="extra" 
+                      step={pendingStep.step}
                       mode="edit"
                       keys={extraList[index].files}  
                       onChanged={keys => {

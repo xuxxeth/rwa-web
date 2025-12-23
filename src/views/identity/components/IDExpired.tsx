@@ -9,6 +9,7 @@ import type { IKycDetail, IKycSubmitData } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
 import { retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
 import type { ApiResponse } from "@/service/client"
+import { usePendingStep } from "@/hooks/usePendingStep"
 
 interface FormData {
   idCardFront?: string
@@ -28,6 +29,7 @@ const IDExpired = memo(
     expired?: boolean
   }) => {
     const { t } = useTranslation()
+    const pendingStep = usePendingStep()
     const { toastSuccess, toastError  } = useToast()
     const { register, handleSubmit, watch, reset, setValue, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
     });
@@ -36,7 +38,7 @@ const IDExpired = memo(
     const idCard = watch('idCard')
     const passport = watch('passport')
     const type = useMemo(() => userInfo?.idInfo.type ?? 0, [userInfo])
-
+    
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
@@ -121,6 +123,7 @@ const IDExpired = memo(
           <SectionTitle>{t('kyc.t24')}</SectionTitle>
           {/* 上传证件 */}
           <Upload
+            step={pendingStep.step}
             type={type === 1 ? 'passport' : 'identity'}
             keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
             onChanged={keys => {
