@@ -39,6 +39,15 @@ export const useKycStore = create<KycStore>((set, get) => ({
         const { data } = await kycApi.getKycDetail()
         set({ kycDetail: data })
       }
+      // 如果有子流程
+      if (data.pendingSteps.length > 0) {
+        const stepRes = await kycApi.getKycStepDetail(data.pendingSteps[0])
+        const stepData = stepRes.data[0] ? stepRes.data[0] : {}
+        // @ts-ignore
+        stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
+        // @ts-ignore
+        set({ kycDetail: stepData })
+      }
     } catch (error: any) {
       set({ error: error.message, isLoading: false })
     }

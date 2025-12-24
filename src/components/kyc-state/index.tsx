@@ -80,10 +80,20 @@ const KycState = () => {
       })
       setShow(true)
     }
+    if (pendingStep.risk3) {
+      setContent({
+        title: t('kyc.t29'),
+        content: t('kyc.t32'),
+        btnText: t('kyc.t33'),
+        btn: 'upload'
+      })
+      setShow(true)
+      return
+    }
 
     if (!kycDetail || isNotShow || show) return
 
-    if (ocrIncome || pendingStep.risk3) {
+    if (ocrIncome) {
       setContent({
         title: t('kyc.t29'),
         content: t('kyc.t32'),

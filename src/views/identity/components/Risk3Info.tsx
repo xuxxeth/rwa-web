@@ -43,7 +43,7 @@ const Risk3Info = memo(
         return
       }
       const params: any = {
-        type: 1, // 1, 3
+        type: pendingStep.step ? 3 : 1, // 1, 3
         extraInfo: {
           incomeCertifications: files
         },

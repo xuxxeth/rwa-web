@@ -79,7 +79,7 @@ function Identity({ account }: { account: string }) {
     try {
       const res = await kycApi.getKycDetail()
       if (res?.data) {
-        if (!res.data.userInfo || pendingStepRef.current) {
+        if (pendingStepRef.current) {
           const stepRes = await kycApi.getKycStepDetail(pendingStepRef.current)
           const stepData = stepRes.data[0] ? stepRes.data[0] : {}
           // @ts-ignore
@@ -130,7 +130,8 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.EXPIRED ||
           (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring) ||
-          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.ID_INFO,
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.ID_INFO ||
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.OCR && status === KYC_STATUS.REJECTED,
         render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} expired={pendingStep.expired} />,
       },
       // 未认证
