@@ -240,7 +240,7 @@
       "uploadId": "Upload ID Document",
       "uploadAddr": "Upload Proof of Address",
       "idFront": "Upload Front Side (Photo Page)",
-      "idBack": "Upload Front Side (Photo Page)",
+      "idBack": "Upload the emblem side (Photo Page)",
       "clickUpload": "Click to Upload",
       "dragUpload": "Or drag the image into the box",
       "tips": "Upload the ID front (portrait + emblem). Ensure it is clear, unobstructed, valid, all corners visible, JPG, under 2MB.",
