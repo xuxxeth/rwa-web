@@ -23,7 +23,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
   },
   refetchKycStatusAndConfigIfNeed: async (kycDetail: IKycDetail) => {
     const { kycStatus, fetchKycStatus, getUserConfig } = get()
-    if (kycDetail.overallStatus !== kycStatus?.status) {
+    const oldKyDetail = get().kycDetail
+    if (kycDetail.overallStatus !== kycStatus?.status || kycDetail.status !== oldKyDetail?.status) {
       await Promise.all([fetchKycStatus(), getUserConfig()])
     }
   },

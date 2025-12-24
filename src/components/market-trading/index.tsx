@@ -7,6 +7,7 @@ import { useBaseStore } from "@/stores/baseStore";
 import { MARKET_STATUS, RISK_STATUS } from "@/config/constants";
 import { VerifyIdentity } from "./VerifyIdentity";
 import { useKycStatus } from "@/hooks/useKycStatus";
+import { usePendingStep } from "@/hooks/usePendingStep";
 
 type MarketTradingProps = {
   align?: string
@@ -17,6 +18,7 @@ const MarketTrading = memo(
     const { t } = useTranslation()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const { kycStatus } = useKycStatus()
+    const pendingStep = usePendingStep()
     
     const marketInfo = useMemo(() => {
       let _icon = ''
@@ -51,7 +53,7 @@ const MarketTrading = memo(
       }
     }, [marketTradeState, t])
     if (!marketInfo.info) return null
-    if (kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN) return <VerifyIdentity riskStatus={kycStatus} />
+    if (kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN || pendingStep.step) return <VerifyIdentity riskStatus={kycStatus} />
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center pl-4",

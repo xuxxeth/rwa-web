@@ -81,9 +81,10 @@ function Identity({ account }: { account: string }) {
       if (res?.data) {
         if (pendingStepRef.current) {
           const stepRes = await kycApi.getKycStepDetail(pendingStepRef.current)
-          const stepData = stepRes.data[0] ? stepRes.data[0] : {}
-          // @ts-ignore
+          const stepData = stepRes.data[0] ? stepRes.data[0] : {} as IKycDetail
+
           stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
+          if (stepData.status === undefined) stepData.status = -1
           res.data = {
             ...res.data,
             ...stepData
@@ -97,6 +98,7 @@ function Identity({ account }: { account: string }) {
         code: 500,
         data: {
           overallStatus: KYC_OVERALL_STATUS.VERIFYING,
+          applyStatus: KYC_OVERALL_STATUS.VERIFYING,
         },
         message: null,
       }
@@ -131,7 +133,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.EXPIRED ||
           (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring) ||
           overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.ID_INFO ||
-          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.OCR && status === KYC_STATUS.REJECTED,
+          pendingStep.step && overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.OCR && status === KYC_STATUS.REJECTED,
         render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} expired={pendingStep.expired} />,
       },
       // 未认证
@@ -240,7 +242,7 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.AML &&
           status === KYC_STATUS.DECLINED,
-        render: () => <ExtraInfo />,
+        render: () => <ExtraInfo reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser} refresh={refresh} />,
       },
       // 认证中 - KYT Verifying
       {

@@ -13,11 +13,13 @@ import { usePendingStep } from "@/hooks/usePendingStep";
 
 const NO_SHOW_PATH = ['/identity']
 
+const defaultContent = {title: '', content: '', btnText: '', btn: ''}
+
 const KycState = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const [show, setShow] = useState(false);
-  const [content, setContent] = useState({title: '', content: '', btnText: '', btn: ''})
+  const [content, setContent] = useState(defaultContent)
   const kycDetail = useKycStore(state => state.kycDetail)
   const isNotShow = useMemo(() => NO_SHOW_PATH.includes(router.location.pathname), [router.location.pathname])
   const { expired, expiring, desc } = useKycExpired()
@@ -58,10 +60,10 @@ const KycState = () => {
     return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
 
   }, [kycDetail])
-  
+
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if ((expired || pendingStep.expired) && !show) {
+    if ((pendingStep.expired) && !show) {
       setContent({
         title: t('kyc.t48'),
         content: t('kyc.t49', { expire: desc }),
@@ -80,7 +82,7 @@ const KycState = () => {
       })
       setShow(true)
     }
-    if (pendingStep.risk3) {
+    if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED) && !show) {
       setContent({
         title: t('kyc.t29'),
         content: t('kyc.t32'),
@@ -90,8 +92,9 @@ const KycState = () => {
       setShow(true)
       return
     }
-
-    if (!kycDetail || isNotShow || show) return
+    setShow(false)
+    setContent(defaultContent)
+    if (!kycDetail || isNotShow || show || pendingStep.step) return
 
     if (ocrIncome) {
       setContent({
@@ -131,8 +134,8 @@ const KycState = () => {
       })
       setShow(true)
     }
-    
-    
+    setShow(false)
+    setContent(defaultContent)
   }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc, pendingStep]);
 
   const close = () => setShow(false);
@@ -147,7 +150,7 @@ const KycState = () => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      {show && !isNotShow && (
+      {show && !isNotShow && content.title  && (
         <motion.div
           initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}

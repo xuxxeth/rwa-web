@@ -38,9 +38,11 @@ interface FormData {
 
 const ExtraInfo = memo(
   ({
-    refresh
+    refresh,
+    reviewCommentToUser
   }: {
-    refresh?: () => Promise<ApiResponse<IKycDetail>>
+    refresh?: () => Promise<ApiResponse<IKycDetail>>,
+    reviewCommentToUser?: string
   }) => {
     const { t } = useTranslation()
     const pendingStep = usePendingStep()
@@ -61,8 +63,6 @@ const ExtraInfo = memo(
     const errorList = findEmptyItemIndices(extraList) || []
 
     console.log(extraList, errorList)
-
-    const [errorIndexs, setErrorIndexs] = useState<number[]>([])
 
     const [submiting, setSubmiting] = useState(false)
     
@@ -121,8 +121,9 @@ const ExtraInfo = memo(
         {/* <SectionBox className="pb-5"> */}
           <SectionTitle>{t('kyc.t25')}</SectionTitle>
           <div className="bg-[#0E0E0E] rounded-[4px] flex items-center px-[24px] py-[12px] my-5">
-            {t('kyc.t26')}
+            { reviewCommentToUser || t('kyc.t26')}
           </div>
+          
           {
             fields.map((item, index) => {
               return (

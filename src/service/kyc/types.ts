@@ -114,6 +114,7 @@ export interface IExtraInfo {
 export interface IKycDetail {
   userInfo?: IKycSubmitData
   overallStatus: KYC_OVERALL_STATUS
+  applyStatus: KYC_OVERALL_STATUS
   riskLevel?: KYC_RISK_LEVEL
   verifyType?: KYC_VERIFY_TYPE
   pendingMaterials?: KYC_PENDING_MATERIALS
@@ -134,6 +135,9 @@ export interface IKycSubmitData {
   incomeInfo: IIncomeInfo
   extraInfo: IExtraInfo
   approvedProtocols?: string[]
+  reviewInfo?: {
+    reviewCommentToUser: string
+  }
   // TODO: 待补充其他字段
 }
 

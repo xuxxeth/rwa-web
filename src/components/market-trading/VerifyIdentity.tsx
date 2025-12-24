@@ -24,12 +24,12 @@ export const useVerifyTip = function() {
       text = t("identity.verifyID")
     }
     // 认证已过期
-    if (kycStatus === KYC_OVERALL_STATUS.EXPIRED || pendingStep.expired) {
+    if (kycStatus === KYC_OVERALL_STATUS.EXPIRED || pendingStep.step) {
       text = t('kyc.t51')
     }
 
     return text
-  }, [t, kycStatus, expired, expiring])
+  }, [t, kycStatus, expired, expiring, pendingStep.step])
 
   return {
     verifyTip

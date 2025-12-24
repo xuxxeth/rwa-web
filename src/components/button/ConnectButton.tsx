@@ -61,6 +61,7 @@ export function WalletItem({
 
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
   const router = useRouter()
   const { toastError, toastSuccess } = useToast()
   const { wallets, chainId, account, handleConnect, handleDisConnect } = useActiveWeb3()
@@ -183,6 +184,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     )
 
   const goTo = (action: string) => {
+    setOpen(false)
     if (action === 'assets') {
       router.push('/assets')
     }
@@ -206,7 +208,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           {account || t('Connect Wallet')}
         </div>
       ) : (
-        <HoverCard>
+        <HoverCard
+          open={open}
+          onOpenChange={(isOpen) => {
+            setOpen(isOpen)
+          }}
+        >
           <HoverCardTrigger asChild>
             <div
               className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'

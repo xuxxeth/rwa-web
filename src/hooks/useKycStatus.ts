@@ -37,23 +37,26 @@ export function useKycStatus() {
 export function useKycExpired() {
   const kycStatus = useKycStore(state => state.kycStatus)
 
-  const expires = Number(kycStatus?.expiresTime)
-  if (expires <= 0) {
-    return {
-      expiring: false,
-      expired: false,
-      expiresTime: 0,
-      desc: ''
+  return useMemo(() => {
+    const expires = Number(kycStatus?.expiresTime)
+    if (expires <= 0) {
+      return {
+        expiring: false,
+        expired: false,
+        expiresTime: 0,
+        desc: ''
+      }
     }
-  }
-  const now = Date.now() / 1000
+    const now = Date.now() / 1000
+    
+    return {
+      expiring: expires - ID_EXPIRES < now && expires > now,
+      expired: kycStatus?.status === RISK_STATUS.EXPIRED,
+      expiresTime: kycStatus?.expiresTime,
+      desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
+    }
+  }, [kycStatus])
   
-  return {
-    expiring: expires - ID_EXPIRES < now && expires > now,
-    expired: kycStatus?.status === RISK_STATUS.EXPIRED,
-    expiresTime: kycStatus?.expiresTime,
-    desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
-  }
 }
 
 export function useKycRiskLevel() {

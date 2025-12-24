@@ -32,19 +32,22 @@ export default function FaceRecognition({
 
   const refreshQrCode = async () => {
     const { data } = await kycApi.getLivenessUrl(pendingStep.step || 1)
-    setIsExpired(data.expireTime ? data.expireTime < Date.now() : false)
-    setErrorMsg('')
-    setIsMaxTimesReached(false)
+    if (data) {
+      setIsExpired(data.expireTime ? data.expireTime < Date.now() : false)
+      setErrorMsg('')
+      setIsMaxTimesReached(false)
 
-    if (data.url && data.expireTime) {
-      setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
-    } else {
-      setUrlInfo(null)
-      setErrorMsg(data.errorMsg || '')
-      if (!data.errorMsg && data.leftAvailableTimes === 0) {
-        setIsMaxTimesReached(true)
+      if (data.url && data.expireTime) {
+        setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
+      } else {
+        setUrlInfo(null)
+        setErrorMsg(data.errorMsg || '')
+        if (!data.errorMsg && data.leftAvailableTimes === 0) {
+          setIsMaxTimesReached(true)
+        }
       }
     }
+    
   }
 
   useEffect(() => {
@@ -77,7 +80,7 @@ export default function FaceRecognition({
         }
       } finally {
         if (!canceled) {
-          timer = setTimeout(checkExpiration, 1000 * 3)
+          timer = setTimeout(checkExpiration, 1000 * 5)
         }
       }
     }
@@ -99,7 +102,7 @@ export default function FaceRecognition({
         await refreshKycDetail()
       } finally {
         if (!canceled) {
-          timer = setTimeout(loop, 1000 * 2)
+          timer = setTimeout(loop, 1000 * 5)
         }
       }
     }
@@ -112,22 +115,29 @@ export default function FaceRecognition({
     }
   }, [])
 
-  if (urlInfo === undefined) return null
+  // if (urlInfo === undefined) return null
 
   return (
     <div className='p-8 bg-[#0E0E0E] rounded-lg flex flex-col gap-5'>
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
-      <div className='m-4 self-center relative box-content w-[224px] h-[224px]'>
-        {!isMaxTimesReached && urlInfo && urlInfo.url && <QRCode value={urlInfo.url} size={224} />}
-        {isMaxTimesReached ? (
-          <MaxTimesReached />
-        ) : isExpired ? (
-          <QrCodeMask>
-            <QrCodeExpirted refresh={refreshQrCode} />
-          </QrCodeMask>
-        ) : null}
-      </div>
+      {
+        urlInfo ? 
+          <div className='m-4 self-center relative box-content w-[224px] h-[224px]'>
+            {!isMaxTimesReached && urlInfo && urlInfo.url && <QRCode value={urlInfo.url} size={224} />}
+            {isMaxTimesReached ? (
+              <MaxTimesReached />
+            ) : isExpired ? (
+              <QrCodeMask>
+                <QrCodeExpirted refresh={refreshQrCode} />
+              </QrCodeMask>
+            ) : null}
+          </div> : 
+          <div className='m-4 self-center relative box-content w-[224px] h-[224px] flex items-center justify-center'>
+            <LazyImage src='/images/icons/identity/refresh.png' className='w-[23px] h-7 animate-spin' />
+          </div>
+      }
+      
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
         <LazyImage src='/images/kyc/warning.png' className='w-5 h-5 mr-1' />

@@ -20,6 +20,8 @@ import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { RISK_STATUS } from "@/config/constants";
 import { useTrading } from "@/hooks/useTrading";
 import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
+import { usePendingStep } from "@/hooks/usePendingStep";
+import { PENDING_STEPS } from "@/service/kyc/types";
 
 type ConverBodyProps = {
   action?: string
@@ -43,10 +45,12 @@ export function ConverBody({
   const outputToken = useTradeStore(state => state.outputToken)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
+  const pendingStep = usePendingStep()
   const action = useTradeStore(state => state.activeConvertTab)
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
+
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken?.address, outputToken?.address])
 
   const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
@@ -200,11 +204,16 @@ export function ConverBody({
           (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || 
           isMinOrMax.min || isMinOrMax.max || 
           inputToken?.state === 1 ||
-          riskStatus !== RISK_STATUS.VERIFIED, 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action]
+          riskStatus !== RISK_STATUS.VERIFIED ||
+          pendingStep.step === PENDING_STEPS.EXPIRED ||
+          pendingStep.step === PENDING_STEPS.RISK3
+          
+          , 
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action, pendingStep.step]
   )
 
   const buttonText = useMemo(() => {
+    if (pendingStep.step) return t('kyc.t51')
     if (riskStatus === RISK_STATUS.NOTVERIFIED) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
@@ -218,7 +227,7 @@ export function ConverBody({
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, riskStatus, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, riskStatus, pendingStep.step, i18n.language])
 
   return (
     <div className="mt-2">

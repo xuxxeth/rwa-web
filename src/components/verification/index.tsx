@@ -8,7 +8,7 @@ import { RISK_STATUS } from "@/config/constants";
 import { useRouter } from "@/hooks/useRouter";
 import { useKycRiskLevel, useKycStatus } from "@/hooks/useKycStatus";
 import { useVerifyTip } from "../market-trading/VerifyIdentity";
-import { KYC_RISK_LEVEL } from "@/service/kyc/types";
+import { KYC_RISK_LEVEL, KYC_STATUS } from "@/service/kyc/types";
 import { usePendingStep } from "@/hooks/usePendingStep";
 
 function getVerificationStatusClassName(verified: boolean, issued: boolean) {
@@ -89,10 +89,15 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
     {
       riskStatus === RISK_STATUS.DEFAULT ? null :
       isSignatureValid && riskStatus !== RISK_STATUS.NOTSIGN ? 
+        
         <div className="flex flex-row gap-4">
-          <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED && !pendingStep.expired} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} 
-             onClick={startVerification}
-          />
+          {
+            kycStatus === KYC_STATUS.VERIFIED ?
+              <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED && !pendingStep.expired} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} 
+              onClick={startVerification}
+            /> : null 
+          }
+          
           {kycStatus !== RISK_STATUS.VERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
         </div> :
         <SignButton refreshIsSignatureValid={() => {
