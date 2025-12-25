@@ -248,12 +248,13 @@ export function UploadCard(props: {
   fileType: UploadFileType
   s3Key?: string
   onUploaded: (res: IUploadedResV2) => void
+  onDelete?: () => void
   mode?: 'edit' | 'view'
   shouldCheckLiveness?: boolean
   onlyImageMimeType?: boolean
   step?: number
 }) {
-  const { fileType, onUploaded, onlyImageMimeType, s3Key, mode } = props
+  const { fileType, onUploaded, onDelete, onlyImageMimeType, s3Key, mode } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -265,8 +266,16 @@ export function UploadCard(props: {
   const [isFileTooLarge, setIsFileTooLarge] = useState(false)
   const [isUploadFailed, setIsUploadFailed] = useState(false)
   const [isLivenessCheckFailed, setIsLivenessCheckFailed] = useState(false)
+  const [isFileTypeInvalid, setIsFileTypeInvalid] = useState(false)
 
   const [isPdf, setIsPdf] = useState(false)
+
+  const resetStatus = () => {
+    setIsFileTooLarge(false)
+    setIsUploadFailed(false)
+    setIsLivenessCheckFailed(false)
+    setIsFileTypeInvalid(false)
+  }
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return
@@ -277,9 +286,7 @@ export function UploadCard(props: {
 
     setIsUploading(true)
     setUploadProgress(0)
-    setIsFileTooLarge(false)
-    setIsUploadFailed(false)
-    setIsLivenessCheckFailed(false)
+    resetStatus()
 
     try {
       const result = await uploadFile(
@@ -318,12 +325,16 @@ export function UploadCard(props: {
   }, [])
 
   const onDropRejected = (fileRejections: FileRejection[]) => {
+    resetStatus()
     if (fileRejections.length > 0) {
       const { errors } = fileRejections[0]
       if (errors.length > 0) {
         const { code } = errors[0]
         if (code === 'file-too-large') {
           setIsFileTooLarge(true)
+        }
+        if (code === 'file-invalid-type') {
+          setIsFileTypeInvalid(true)
         }
       }
     }
@@ -358,7 +369,8 @@ export function UploadCard(props: {
     })
   }, [s3Key])
 
-  const isSomethingError = isFileTooLarge || isUploadFailed || isLivenessCheckFailed
+  const isSomethingError =
+    isFileTooLarge || isUploadFailed || isLivenessCheckFailed || isFileTypeInvalid
 
   return (
     <>
@@ -390,6 +402,20 @@ export function UploadCard(props: {
                 className='rounded-lg'
                 style={{ opacity: isHover ? 0.1 : 1, maxWidth: '100%', maxHeight: '100%' }}
               />
+              {mode === 'edit' && (
+                <button
+                  type='button'
+                  onClick={event => {
+                    event.stopPropagation()
+                    onDelete?.()
+                  }}
+                  className={cn(
+                    'absolute top-0 right-0 py-3 px-4 w-[45px] h-[39px] cursor-pointer bg-black rounded-tr-lg rounded-bl-2xl'
+                  )}
+                >
+                  <LazyImage src='/images/icons/identity/trash.png' />
+                </button>
+              )}
               {mode === 'edit' && isHover && (
                 <button
                   type='button'
@@ -413,10 +439,18 @@ export function UploadCard(props: {
           )}
         </div>
         {isSomethingError && (
-          <div className='mt-2 flex flex-row items-center gap-1'>
+          <div className='mt-1 flex flex-row items-center gap-1'>
             <LazyImage className='w-3.5 h-3.5' src='/images/icons/identity/error2.png' />
             <Text
-              text={isFileTooLarge ? 'large' : isLivenessCheckFailed ? 'livenessFail' : 'fail'}
+              text={
+                isFileTooLarge
+                  ? 'large'
+                  : isLivenessCheckFailed
+                    ? 'livenessFail'
+                    : isFileTypeInvalid
+                      ? 'typeInvalid'
+                      : 'fail'
+              }
               className='text-xs text-[#CA3F64]'
             />
           </div>

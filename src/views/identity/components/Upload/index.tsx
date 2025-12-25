@@ -144,12 +144,21 @@ function IdentityUpload({
     }
   }
 
+  const onFrontDelete = () => {
+    debugger
+    onChangedInternal(0, '')
+  }
+
   const onBackUploaded = (res: IUploadedResV2) => {
     if (res && res.key) {
       keyToBlobUrlMap.current[res.key] = res?.blobUrl ?? ''
       onChangedInternal(1, res?.key ?? '')
       setIsDirty(true)
     }
+  }
+
+  const onBackDelete = () => {
+    onChangedInternal(1, '')
   }
 
   useEffect(() => {
@@ -168,6 +177,7 @@ function IdentityUpload({
           fileType='idFront'
           shouldCheckLiveness={true}
           onUploaded={onFrontUploaded}
+          onDelete={onFrontDelete}
           s3Key={keys?.[0]}
           mode={mode}
           onlyImageMimeType={true}
@@ -175,12 +185,13 @@ function IdentityUpload({
         <UploadCard
           fileType='idBack'
           onUploaded={onBackUploaded}
+          onDelete={onBackDelete}
           s3Key={keys?.[1]}
           mode={mode}
           onlyImageMimeType={true}
         />
       </div>
-      <Text text='tips' className='text-sm mt-2' />
+      <Text text='tips' className='text-sm mt-3' />
     </div>
   )
 }
@@ -325,11 +336,11 @@ function ExtraInfoUpload({
   }
 
   return (
-    <div>
-      <div className='grid grid-cols-2 gap-x-6 gap-y-5'>
+    <div className='pb-2'>
+      <div className='grid grid-cols-2 gap-x-6 gap-y-6'>
         {atLeastOneKey.map((s3Key, index) => {
           return (
-            <div className='relative' key={s3Key === '' ? index : s3Key}>
+            <div className='relative' key={index}>
               <UploadCard
                 fileType='incomeCertificates'
                 onUploaded={uploadedRes => onUploaded(uploadedRes, index)}

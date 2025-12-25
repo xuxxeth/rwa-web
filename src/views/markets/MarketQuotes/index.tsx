@@ -20,9 +20,6 @@ import {
 import RwaStateButton from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
-import MarketQuoteError from './error'
-import { bscTestnet } from '@/hooks/useCaCommon'
-import { marketQuoteOptions } from '@/queries'
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useRwaTokens } from '@/hooks/useTokens'
 import wsService from '@/service/webSocket/service'
@@ -62,8 +59,8 @@ export default function MarketQuotes() {
         (acc, item) => {
           acc[symbolToLower(item.S)] = {
             price: truncate(item.p, 2),
-            // item.p 最新价 itme.o 今开价
-            // up = (最新价 - 今开价) - 1
+            // item.p 最新价 itme.pc 昨日收盘价
+            // up = (最新价 - 昨日收盘价) - 1
             up:
               item.p && item.pc
                 ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
