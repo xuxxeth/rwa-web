@@ -322,7 +322,7 @@ const ReviewInfo = memo(
               keys={incomeCertifications}
               onChanged={keys => {
                 // const _keys = (keys as string[]).filter(key => key)
-                keys.length > 0 && setValue('incomeCertifications', keys as string[])
+                setValue('incomeCertifications', keys as string[])
               }}
             />
           </SectionBox>

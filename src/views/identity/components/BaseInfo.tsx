@@ -208,6 +208,7 @@ const BaseInfo = memo(
     const passport = watch('passport')
     const addressCertification = watch('addressCertification')
     const incomeCertifications = watch('incomeCertifications')
+
     const source = watch('source')
 
     const preAccount = useRef<string | undefined>(undefined)
@@ -646,13 +647,14 @@ const BaseInfo = memo(
             <Upload
               type={type === 1 ? 'passport' : 'identity'}
               keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
+
               onChanged={keys => {
                 if (type === 1) {
-                  keys[0] && setValue('passport', keys as string)
+                  setValue('passport', keys as string)
                 } else {
-                  keys[0] && setValue('idCardFront', keys[0])
-                  keys[1] && setValue('idCardBack', keys[1])
-                  keys[2] && setValue('idCard', keys[2])
+                  setValue('idCardFront', keys[0])
+                  setValue('idCardBack', keys[1])
+                  setValue('idCard', keys[2])
                 }
               }}
             />
@@ -747,7 +749,7 @@ const BaseInfo = memo(
               keys={incomeCertifications}
               onChanged={keys => {
                 // const _keys = (keys as string[]).filter(key => key)
-                keys.length > 0 && setValue('incomeCertifications', keys as string[])
+                setValue('incomeCertifications', keys as string[])
               }}
             />
             <div className='flex items-center text-base text-[#909090] py-3'>

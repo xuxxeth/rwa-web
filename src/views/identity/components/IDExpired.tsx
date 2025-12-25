@@ -128,11 +128,11 @@ const IDExpired = memo(
             keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
             onChanged={keys => {
               if (type === 1) {
-                keys[0] && setValue('passport', keys as string)
+                setValue('passport', keys as string)
               } else {
-                keys[0] && setValue('idCardFront', keys[0])
-                keys[1] && setValue('idCardBack', keys[1])
-                keys[2] && setValue('idCard', keys[2])
+                setValue('idCardFront', keys[0])
+                setValue('idCardBack', keys[1])
+                setValue('idCard', keys[2])
               }
             }}
           />

@@ -407,6 +407,7 @@ export function UploadCard(props: {
                   type='button'
                   onClick={event => {
                     event.stopPropagation()
+                    setPreviewUrl(null)
                     onDelete?.()
                   }}
                   className={cn(

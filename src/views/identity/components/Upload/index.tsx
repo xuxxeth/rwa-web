@@ -145,7 +145,6 @@ function IdentityUpload({
   }
 
   const onFrontDelete = () => {
-    debugger
     onChangedInternal(0, '')
   }
 

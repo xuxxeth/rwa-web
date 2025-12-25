@@ -39,7 +39,17 @@ export function usePersistentForm<T extends Record<string, any>>(
       if (clearRef.current) return
       try {
         if (defaultValues?.firstName) return
-        localStorage.setItem(storageKey, JSON.stringify(data));
+            
+        const _data = {
+          ...data,
+          idCardFront: '',
+          idCardBack: '',
+          idCard: '',
+          passport: '',
+          addressCertification: '',
+          incomeCertifications: ''
+        }
+        localStorage.setItem(storageKey, JSON.stringify(_data));
       } catch (error) {
         console.error('保存表单数据失败:', error);
       }

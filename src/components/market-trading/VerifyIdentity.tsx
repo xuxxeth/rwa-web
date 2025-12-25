@@ -14,7 +14,7 @@ export const useVerifyTip = function() {
   const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
   const verifyTip = useMemo(() => {
-    let text = ''
+    let text = t('identity.verifyID')
     // 认证被拒绝
     if (kycStatus === KYC_OVERALL_STATUS.REJECTED) {
       text = t('kyc.t27')

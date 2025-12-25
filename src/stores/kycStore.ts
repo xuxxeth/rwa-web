@@ -33,7 +33,7 @@ export const useKycStore = create<KycStore>((set, get) => ({
     try {
       const { data } = await kycApi.getKycStatus()
       
-      set({ kycStatus: data || { status: 0, expiresTime: 0 }, isLoading: false })
+      set({ kycStatus: data || { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
 
       // 如果是认证中和已拒绝，则请求认证结果详情接口
       if (data && (data.status === RISK_STATUS.VERIFYING || data.status === RISK_STATUS.REJECTED)) {
@@ -54,6 +54,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
         set( {kycDetail: null })
       }
     } catch (error: any) {
+      set({ kycStatus: { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
+      set( {kycDetail: null })
       set({ error: error.message, isLoading: false })
     }
   },

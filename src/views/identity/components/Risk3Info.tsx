@@ -86,7 +86,7 @@ const Risk3Info = memo(
             type='extra'
             keys={incomeCertifications}
             onChanged={keys => {
-              keys.length > 0 && setValue('incomeCertifications', keys as string[])
+              setValue('incomeCertifications', keys as string[])
             }}
           />
           

@@ -23,6 +23,7 @@ import { useRouter } from '@/hooks/useRouter'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 import { useAppStore } from '@/stores/appStore'
 import { useVerifyTip } from '../market-trading/VerifyIdentity'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
 
 export function WalletItem({
   wallet,
@@ -87,6 +88,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const setIsWalletConnecting = useAppStore(state => state.setIsWalletConnecting)
 
   const { verifyTip } = useVerifyTip()
+  const [ isSignatureValid ] = useSignatureValidStatus()
 
   // 默认执行一次连接钱包操作
   useEffect(() => {
@@ -264,7 +266,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   onClick={() => goTo('identity')}
                 >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
-                  <span className='text-[14px] font-semibold ml-2'>{verifyTip || t('verified')}</span>
+                  <span className='text-[14px] font-semibold ml-2'>{!isSignatureValid ? t('identity.verifyID') : (verifyTip || t('verified'))}</span>
                 </div>
               </div>
               <Divide className='mt-[14px]' />
