@@ -60,7 +60,7 @@ const KycState = () => {
     return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
 
   }, [kycDetail])
-
+  
   // 显示后 10 秒自动隐藏
   useEffect(() => {
     if ((pendingStep.expired) && !show) {
@@ -71,6 +71,7 @@ const KycState = () => {
         btn: 'edit'
       })
       setShow(true)
+      return
     }
 
     if (expiring && !show) {
@@ -81,6 +82,7 @@ const KycState = () => {
         btn: 'edit'
       })
       setShow(true)
+      return
     }
     if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED) && !show) {
       setContent({
@@ -92,9 +94,15 @@ const KycState = () => {
       setShow(true)
       return
     }
-    setShow(false)
-    setContent(defaultContent)
-    if (!kycDetail || isNotShow || show || pendingStep.step) return
+    if (!kycDetail && !pendingStep.step) {
+      setShow(false)
+      setContent(defaultContent)
+    }
+    if (!kycDetail || isNotShow || show || pendingStep.step) {
+      
+      return
+    } 
+
 
     if (ocrIncome) {
       setContent({
@@ -115,6 +123,7 @@ const KycState = () => {
         btn: 'edit'
       })
       setShow(true)
+      return
     }
     if (amlDeclined) {
       setContent({
@@ -124,6 +133,7 @@ const KycState = () => {
         btn: 'edit'
       })
       setShow(true)
+      return
     }
     if (liveNessReject) {
       setContent({
@@ -133,6 +143,7 @@ const KycState = () => {
         btn: 'edit'
       })
       setShow(true)
+      return
     }
     setShow(false)
     setContent(defaultContent)

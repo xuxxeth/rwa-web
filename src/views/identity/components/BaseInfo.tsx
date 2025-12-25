@@ -421,6 +421,22 @@ const BaseInfo = memo(
                           value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
                           message: '只支持中文和英文字母',
                         },
+                        validate: value => {
+                          if (!firstName || !lastName) return true
+
+                          const normalize = (str: string) =>
+                            str.replace(/\s+/g, '').toLowerCase()
+
+                          const full = normalize(value)
+                          const first = normalize(firstName)
+                          const last = normalize(lastName)
+
+                          if (!full.includes(first) || !full.includes(last)) {
+                            return t('kyc.t62') || '全名需包含名和姓'
+                          }
+
+                          return true
+                        },
                         onChange: e => {
                           // 实时限制输入长度
                           if (e.target.value.length > 30) {

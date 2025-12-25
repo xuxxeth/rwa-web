@@ -39,6 +39,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
       if (data && (data.status === RISK_STATUS.VERIFYING || data.status === RISK_STATUS.REJECTED)) {
         const { data } = await kycApi.getKycDetail()
         set({ kycDetail: data })
+      } else {
+        set( {kycDetail: null })
       }
       // 如果有子流程
       if (data.pendingSteps.length > 0) {
@@ -48,6 +50,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
         stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
         // @ts-ignore
         set({ kycDetail: stepData })
+      } else {
+        set( {kycDetail: null })
       }
     } catch (error: any) {
       set({ error: error.message, isLoading: false })
