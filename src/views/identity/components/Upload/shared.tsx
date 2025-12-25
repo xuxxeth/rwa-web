@@ -340,7 +340,10 @@ export function UploadCard(props: {
   })
 
   useEffect(() => {
-    if (!s3Key) return
+    if (!s3Key) {
+      setPreviewUrl(null)
+      return
+    }
     //  如果本地已经有了 previewUrl 且 key 相同，直接返回
     if (previewUrl && s3Key === previewUrl.key) return
 

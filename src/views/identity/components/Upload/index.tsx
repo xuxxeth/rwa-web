@@ -329,7 +329,7 @@ function ExtraInfoUpload({
       <div className='grid grid-cols-2 gap-x-6 gap-y-5'>
         {atLeastOneKey.map((s3Key, index) => {
           return (
-            <div className='relative' key={atLeastOneKey.length + '' + index}>
+            <div className='relative' key={s3Key === '' ? index : s3Key}>
               <UploadCard
                 fileType='incomeCertificates'
                 onUploaded={uploadedRes => onUploaded(uploadedRes, index)}
