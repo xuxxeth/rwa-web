@@ -48,85 +48,8 @@ export function Text(props: { text: string; className?: string }) {
   )
 }
 
-export function useUploadedRes(
-  fileType: UploadFileType,
-  key?: string
-): [IUploadedRes | null, (res: IUploadedRes | null) => void] {
-  const [uploadedRes, setUploadedRes] = useState<IUploadedRes | null>(() => {
-    if (!key) return null
-    return {
-      success: true,
-      key,
-    }
-  })
-
-  const onUploaded = (res: IUploadedRes | null) => {
-    setUploadedRes(res)
-  }
-
-  useEffect(() => {
-    if (!key) return
-    if (uploadedRes?.key === key) return
-    getUploadedFileUrl(key).then(res => {
-      if (res) {
-        setUploadedRes({ success: true, ...res[0] })
-      }
-    })
-  }, [key])
-
-  return [uploadedRes, onUploaded]
-}
-
 // 2M
 const MAX_FILE_SIZE = 1024 * 1024 * 2
-
-export function useUploadedArrRes(props: {
-  fileType: UploadFileType
-  keys?: string[]
-}): [
-  Array<IUploadedRes | null>,
-  (idx: number, res: IUploadedRes | null) => void,
-  () => void,
-  (idx: number) => void,
-] {
-  const [uploadedRes, setUploadedRes] = useState<Array<IUploadedRes | null>>(() => {
-    if (!props.keys || props.keys.length === 0) return [null]
-    return props.keys.map(key => ({ success: true, key }))
-  })
-  // const [isFetched, setIsFetched] = useState(false)
-
-  const onUploaded = (idx: number, res: IUploadedRes | null) => {
-    setUploadedRes(prev => {
-      const newRes = [...prev]
-      newRes[idx] = res
-      return newRes
-    })
-  }
-
-  useEffect(() => {
-    if (!props.keys || props.keys.length === 0) return
-    getUploadedFileUrl(props.keys).then(res => {
-      if (res) {
-        setUploadedRes(res.map(item => ({ success: true, ...item })))
-      }
-      // setIsFetched(true)
-    })
-  }, [])
-
-  const onAdd = () => setUploadedRes([...uploadedRes, null])
-  const onDelete = (idx: number) => setUploadedRes(uploadedRes.filter((_, i) => i !== idx))
-
-  return [uploadedRes, onUploaded, onAdd, onDelete]
-}
-
-export const getFileAccessUrl = async (key: string) => {
-  try {
-    const { data: accessUrls } = await kycApi.getFileAccessUrl(key)
-    return accessUrls
-  } catch (error) {
-    return undefined
-  }
-}
 
 export class LivenessCheckError extends Error {
   constructor(message: string | null) {
@@ -213,18 +136,6 @@ export const saveUploadKey = (
   }
 }
 
-export async function getUploadedFileUrl(keys: string | string[]) {
-  try {
-    keys = Array.isArray(keys) ? keys.join(',') : keys
-    const accessUrl = await getFileAccessUrl(keys)
-    if (!accessUrl) return []
-    return accessUrl
-  } catch (error) {
-    console.error('Failed to get key from keys', keys)
-    return []
-  }
-}
-
 export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'view' }) {
   return (
     <button
@@ -248,7 +159,7 @@ export function UploadCard(props: {
   fileType: UploadFileType
   s3Key?: string
   onUploaded: (res: IUploadedResV2) => void
-  onDelete?: () => void
+  onDelete: (s3Key: string) => void
   mode?: 'edit' | 'view'
   shouldCheckLiveness?: boolean
   onlyImageMimeType?: boolean
@@ -357,16 +268,6 @@ export function UploadCard(props: {
     }
     //  如果本地已经有了 previewUrl 且 key 相同，直接返回
     if (previewUrl && s3Key === previewUrl.key) return
-
-    getUploadedFileUrl(s3Key).then(urls => {
-      if (urls.length > 0) {
-        const url = urls[0].url
-
-        const isFilePdf = s3Key.includes('.pdf')
-        setIsPdf(isFilePdf)
-        setPreviewUrl({ key: s3Key, url: url })
-      }
-    })
   }, [s3Key])
 
   const isSomethingError =
@@ -407,8 +308,7 @@ export function UploadCard(props: {
                   type='button'
                   onClick={event => {
                     event.stopPropagation()
-                    setPreviewUrl(null)
-                    onDelete?.()
+                    onDelete(previewUrl.key)
                   }}
                   className={cn(
                     'absolute top-0 right-0 py-3 px-4 w-[45px] h-[39px] cursor-pointer bg-black rounded-tr-lg rounded-bl-2xl'

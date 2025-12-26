@@ -32,8 +32,6 @@ export const kycApi = {
       mimeType: mimeType,
       name: fileName,
     }),
-  getFileAccessUrl: (keys: string) =>
-    client.get<ApiResponse<IFillAccessUrlRes[]>>('/v1/kyc/file-access-url', { keys: keys }),
 
   getAgreementsAccepted: () => client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
 

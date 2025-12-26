@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState, useLayoutEffect } from 'react'
-import {
-  Text,
-  UploadCardAdd,
-  UploadCard,
-  type IUploadedResV2,
-  uploadFile,
-  getUploadedFileUrl,
-} from './shared'
+import { Text, UploadCardAdd, UploadCard, type IUploadedResV2, uploadFile } from './shared'
 import { mergeTwoImageFromUrls, cn } from '@/utils'
 import { LazyImage } from '@/components/image/LazyImage'
 
@@ -101,19 +94,11 @@ function IdentityUpload({
   const handleMergeImage = async (key1: string, key2: string) => {
     try {
       const map: { [key: string]: string } = {}
-      const keysToGetUrl = []
       map[key1] = keyToBlobUrlMap.current[key1]
       map[key2] = keyToBlobUrlMap.current[key2]
 
-      if (!map[key1]) keysToGetUrl.push(key1)
-      if (!map[key2]) keysToGetUrl.push(key2)
-
-      if (keysToGetUrl.length > 0) {
-        const urls = await getUploadedFileUrl(keysToGetUrl)
-        urls.map(item => {
-          map[item.key] = item.url
-        })
-      }
+      // 合成照片时，需要确保两个 key 都有 url
+      if (!map[key1] || !map[key2]) return ''
 
       const mergedFile = await mergeTwoImageFromUrls(map[key1], map[key2])
       const mergedRes = await uploadFile(mergedFile, () => {})
@@ -144,7 +129,8 @@ function IdentityUpload({
     }
   }
 
-  const onFrontDelete = () => {
+  const onFrontDelete = (s3Key: string) => {
+    delete keyToBlobUrlMap.current[s3Key]
     onChangedInternal(0, '')
   }
 
@@ -156,7 +142,8 @@ function IdentityUpload({
     }
   }
 
-  const onBackDelete = () => {
+  const onBackDelete = (s3Key: string) => {
+    delete keyToBlobUrlMap.current[s3Key]
     onChangedInternal(1, '')
   }
 
@@ -208,16 +195,17 @@ function AddressUpload({
     onChanged(res?.key ?? '')
   }
 
+  const onAddrDelete = (s3Key: string) => {
+    onChanged('')
+  }
+
   return (
     <div>
-      {/* <div className='flex items-center mb-5'>
-        <Text text='uploadAddr' className='text-[18px] font-normal text-white' />
-        <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
-      </div> */}
       <div className='flex flex-row gap-5 my-5'>
         <UploadCard
           fileType='addressCertificates'
           onUploaded={onAddrUploaded}
+          onDelete={onAddrDelete}
           s3Key={keys}
           mode={mode}
         />
@@ -275,6 +263,10 @@ function PassportUpload({
     onChanged(uploadedRes?.key ?? '')
   }
 
+  const onPassportDelete = (s3Key: string) => {
+    onChanged('')
+  }
+
   return (
     <div>
       <div className='flex flex-row gap-5'>
@@ -282,6 +274,7 @@ function PassportUpload({
           fileType='passport'
           shouldCheckLiveness={true}
           onUploaded={onPassportUploaded}
+          onDelete={onPassportDelete}
           s3Key={keys}
           mode={mode}
           step={step}
@@ -328,9 +321,19 @@ function ExtraInfoUpload({
     onChanged(newKeys)
   }
 
-  const onDelete = (idx: number) => {
+  // 删除图片
+  const onImageDelete = (s3Key: string) => {
+    debugger
+    let newKeys = getNewKeys()
+    newKeys = newKeys.map(item => (item !== s3Key ? item : ''))
+    onChanged(newKeys)
+  }
+
+  // 删除 uploadCard
+  const onUploadCardDelete = (index: number) => {
+    debugger
     const newKeys = getNewKeys()
-    newKeys.splice(idx, 1)
+    newKeys.splice(index, 1)
     onChanged(newKeys)
   }
 
@@ -343,14 +346,15 @@ function ExtraInfoUpload({
               <UploadCard
                 fileType='incomeCertificates'
                 onUploaded={uploadedRes => onUploaded(uploadedRes, index)}
+                onDelete={onImageDelete}
                 s3Key={s3Key}
                 mode={mode}
               />
-              {mode === 'edit' && index > 0 && (
+              {mode === 'edit' && index > 0 && !s3Key && (
                 <button
                   type='button'
-                  onClick={event => {
-                    onDelete(index)
+                  onClick={() => {
+                    onUploadCardDelete(index)
                   }}
                   className={cn(
                     'absolute top-0 right-0 py-3 px-4 w-[45px] h-[39px] cursor-pointer bg-black rounded-tr-lg rounded-bl-2xl'
