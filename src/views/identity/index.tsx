@@ -162,15 +162,19 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.INCOME &&
-          riskLevel === KYC_RISK_LEVEL.HIGH,
+          status === KYC_STATUS.VERIFYING,
         render: () => <Risk3Info refresh={refresh} />,
       },
       // 认证中 - OCR Verifying
       {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-          verifyType === KYC_VERIFY_TYPE.OCR &&
-          status === KYC_STATUS.VERIFYING,
+          (verifyType === KYC_VERIFY_TYPE.OCR &&
+          status === KYC_STATUS.VERIFYING) || 
+          // 认证后，子流程需要重新提交收入证明材料
+          (verifyType === KYC_VERIFY_TYPE.INCOME &&
+          status === KYC_STATUS.REVIEW)
+          ,
         render: () => <Verifying refresh={refresh} />,
       },
       // 认证中 - OCR Failed/Rejected Retry

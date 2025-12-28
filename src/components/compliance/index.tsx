@@ -105,9 +105,9 @@ const Compliance = () => {
                     </div>
                     <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
                       {t('identity.aggree1')}
-                      <a href="" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t15')}》</a>
+                      <a href="/documents/cyberalpha-terms-of-service.pdf" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t15')}》</a>
                       {t('compliance.t17')}
-                      <a href="" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t16')}》</a>
+                      <a href="/documents/cyberalpha-privacy-policy.pdf" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t16')}》</a>
                     </div>
                   </div>
                 </div>
