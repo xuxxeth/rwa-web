@@ -162,7 +162,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.INCOME &&
-          status === KYC_STATUS.VERIFYING,
+          (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.EXPIRED || status === KYC_STATUS.DECLINED),
         render: () => <Risk3Info refresh={refresh} />,
       },
       // 认证中 - OCR Verifying
