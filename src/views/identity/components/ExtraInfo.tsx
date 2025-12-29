@@ -14,6 +14,7 @@ import { useFieldArray } from "react-hook-form"
 import type { ApiResponse } from "@/service/client"
 import type { IKycDetail } from "@/service/kyc/types"
 import { usePendingStep } from "@/hooks/usePendingStep"
+import { WarningInfo } from "./WarningInfo"
 
 function findEmptyItemIndices(list: IExtraInfoItem[]) {
   return list
@@ -120,10 +121,9 @@ const ExtraInfo = memo(
         
         {/* <SectionBox className="pb-5"> */}
           <SectionTitle>{t('kyc.t25')}</SectionTitle>
-          <div className="bg-[#0E0E0E] rounded-[4px] flex items-center px-[24px] py-[12px] my-5">
-            { reviewCommentToUser || t('kyc.t26')}
+          <div className=" my-5">
+            <WarningInfo text={reviewCommentToUser || t('kyc.t26')} />
           </div>
-          
           {
             fields.map((item, index) => {
               return (

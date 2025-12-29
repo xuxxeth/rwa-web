@@ -12,11 +12,12 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
   ({ className, type, error, value = '', regex, ...props }, ref) => {
     const inputRegex = RegExp(regex || '.*')
     const enforcer = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const nextUserInput = e.target.value
-      if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
-        e.target.value = nextUserInput
-        props.onChange && props.onChange(e)
-      } 
+      // const nextUserInput = e.target.value
+      // if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
+      //   e.target.value = nextUserInput
+      //   props.onChange && props.onChange(e)
+      // } 
+      props.onChange && props.onChange(e)
     }
     return (
       <input

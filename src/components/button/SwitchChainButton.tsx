@@ -79,7 +79,7 @@ export function SwitchButton() {
             
           >
             <img src={getChainIconById(String(selected.id))} className="w-6 mr-2 rounded-full" alt="" />
-            <span >{selected.name}</span>
+            <span >{selected.displayName}</span>
             <img src="/images/icons/down.png" className={cn(
               "w-3 ml-4 mr-2 transition-all",
               open ? ' rotate-180' : ''
@@ -114,7 +114,7 @@ export function SwitchButton() {
                 return (
                   <ChainItem 
                     key={chain.id} 
-                    title={chain.name} 
+                    title={chain.displayName} 
                     icon={chain.icon}
                     disabled={chain.state === 0}
                     selected={selected?.id === chain.id} 

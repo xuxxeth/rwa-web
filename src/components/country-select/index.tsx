@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 import { kycApi } from "@/service/kyc/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import type { ISupportedCountry } from "@/service/kyc/types";
-import useDebouncedUnmount from "@/hooks/useDebouncedUnmount";
+import { LazyImage } from "../image/LazyImage";
 
 export type ICountryCode = {
   code: string,
@@ -23,6 +23,8 @@ export type CountrySelectProps = {
   className?: string
   placeHolder?: string
 }
+
+const pngCode = ['SAU']
 
 const CountrySelect = memo(
   ({
@@ -96,10 +98,13 @@ const CountrySelect = memo(
         >
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentCode ? (
-              <>
+              <div className=" flex items-center gap-x-2">
                 {/* <span className=" text-[24px]">{currentCountry.icon}</span> */}
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <LazyImage src={`/images/country/${currentCountry.key}.${ pngCode.includes(currentCountry.key) ? 'png' : 'svg'}`} className="w-6" />
+                </div>
                 <span className=" font-normal md:text-[16px]">{currentCountry.value}</span>
-              </>
+              </div>
             ) : (
               <span className="md:text-[1.04vw] text-5">{placeHolder || 'Please select'} </span>
             )}
@@ -109,8 +114,10 @@ const CountrySelect = memo(
           {countryList.map(code => (
             <SelectItem key={code.key} value={code.key}>
               <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
-                <div>
-                  {/* <span className=" text-[20px]">{code.icon}</span> */}
+                <div className=" flex items-center gap-x-2">
+                  <div className="w-6 h-6 flex items-center justify-center">
+                    <LazyImage src={`/images/country/${code.key}.${ pngCode.includes(code.key) ? 'png' : 'svg'}`} className="w-6" />
+                  </div>
                   <span>{code.value}</span>
                 </div>
                 <span

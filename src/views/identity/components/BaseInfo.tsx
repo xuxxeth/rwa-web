@@ -198,6 +198,7 @@ const BaseInfo = memo(
     const type = watch('type')
     const issueCountry = watch('issueCountry')
     const gendar = watch('gendar')
+    const dob = watch('dob')
     const useCertificateAddress = watch('useCertificateAddress')
     const residentAddress = watch('residentAddress')
     const employment = watch('employment')
@@ -311,8 +312,8 @@ const BaseInfo = memo(
     useEffect(() => {
       const dateOptions = calcYearDate()
       setDateOptions(dateOptions)
-      setValue('dob', format(dateOptions.maxDate, FormatStr))
-    }, [])
+      // setValue('dob', dob || format(dateOptions.maxDate, FormatStr))
+    }, [dob])
 
     useEffect(() => {
       console.log('userInfo changed:', userInfo)
@@ -480,7 +481,7 @@ const BaseInfo = memo(
                       activeColor='#FFFFFF'
                       className='h-[44px]'
                       placeholder={t('identity.selectDate')}
-                      userSelectedDate={dateOptions.defaultDate}
+                      userSelectedDate={dob ? new Date(dob).getTime() : dateOptions.maxDate}
                       onUserSelectedDateChanged={value => {
                         if (value) {
                           setValue('dob', format(value, FormatStr))
