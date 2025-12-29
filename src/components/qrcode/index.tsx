@@ -4,10 +4,11 @@ import { useEffect, useRef } from 'react'
 interface QRCodeProps {
   value: string
   size?: number
+  margin?: number
   className?: string
 }
 
-const QRCode = ({ value, size = 200, className }: QRCodeProps) => {
+const QRCode = ({ value, size = 200, margin = 0, className }: QRCodeProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const qrCode = useRef<QRCodeStyling | null>(null)
 
@@ -16,6 +17,7 @@ const QRCode = ({ value, size = 200, className }: QRCodeProps) => {
       width: size,
       height: size,
       data: value,
+      margin,
       type: 'svg',
       dotsOptions: {
         color: '#000000',
@@ -40,9 +42,10 @@ const QRCode = ({ value, size = 200, className }: QRCodeProps) => {
         data: value,
         width: size,
         height: size,
+        margin,
       })
     }
-  }, [value, size])
+  }, [value, size, margin])
 
   return <div ref={ref} className={className}></div>
 }

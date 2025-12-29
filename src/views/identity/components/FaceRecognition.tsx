@@ -41,13 +41,12 @@ export default function FaceRecognition({
         setUrlInfo({ url: data.url, expireTime: data.expireTime, bizNo: data.bizNo! })
       } else {
         setUrlInfo(null)
-        setErrorMsg(data.errorMsg || '')
-        if (!data.errorMsg && data.leftAvailableTimes === 0) {
+        setErrorMsg(data.errorMsg ?? '')
+        if (data.leftAvailableTimes === 0 && data.errorMsg) {
           setIsMaxTimesReached(true)
         }
       }
     }
-    
   }
 
   useEffect(() => {
@@ -86,6 +85,7 @@ export default function FaceRecognition({
     }
 
     checkExpiration()
+
     return () => {
       canceled = true
       clearTimeout(timer)
@@ -115,29 +115,21 @@ export default function FaceRecognition({
     }
   }, [])
 
-  // if (urlInfo === undefined) return null
+  const showQrcode = !isMaxTimesReached && urlInfo && urlInfo.url
 
   return (
     <div className='p-8 bg-[#0E0E0E] rounded-lg flex flex-col gap-5'>
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
-      {
-        urlInfo ? 
-          <div className='m-4 self-center relative box-content w-[224px] h-[224px]'>
-            {!isMaxTimesReached && urlInfo && urlInfo.url && <QRCode value={urlInfo.url} size={224} />}
-            {isMaxTimesReached ? (
-              <MaxTimesReached />
-            ) : isExpired ? (
-              <QrCodeMask>
-                <QrCodeExpirted refresh={refreshQrCode} />
-              </QrCodeMask>
-            ) : null}
-          </div> : 
-          <div className='m-4 self-center relative box-content w-[224px] h-[224px] flex items-center justify-center'>
-            <LazyImage src='/images/icons/identity/refresh.png' className='w-[23px] h-7 animate-spin' />
-          </div>
-      }
-      
+      <div className='m-4 self-center relative w-[224px] h-[224px]'>
+        {showQrcode && <QRCode value={urlInfo.url} size={224} margin={0} />}
+        {showQrcode && isExpired && (
+          <QrCodeMask>
+            <QrCodeExpirted refresh={refreshQrCode} />
+          </QrCodeMask>
+        )}
+        {isMaxTimesReached && <MaxTimesReached />}
+      </div>
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
         <LazyImage src='/images/kyc/warning.png' className='w-5 h-5 mr-1' />

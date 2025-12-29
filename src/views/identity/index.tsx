@@ -81,13 +81,13 @@ function Identity({ account }: { account: string }) {
       if (res?.data) {
         if (pendingStepRef.current) {
           const stepRes = await kycApi.getKycStepDetail(pendingStepRef.current)
-          const stepData = stepRes.data[0] ? stepRes.data[0] : {} as IKycDetail
+          const stepData = stepRes.data[0] ? stepRes.data[0] : ({} as IKycDetail)
 
           stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
           if (stepData.status === undefined) stepData.status = -1
           res.data = {
             ...res.data,
-            ...stepData
+            ...stepData,
           }
         }
       }
@@ -132,9 +132,19 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.EXPIRED ||
           (overallStatus === KYC_OVERALL_STATUS.VERIFIED && expireStatus.expiring) ||
-          overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.ID_INFO ||
-          pendingStep.step && overallStatus === KYC_OVERALL_STATUS.VERIFYING && verifyType === KYC_VERIFY_TYPE.OCR && status === KYC_STATUS.REJECTED,
-        render: () => <IDExpired userInfo={kycDetail.userInfo} refresh={refresh} expired={pendingStep.expired} />,
+          (overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+            verifyType === KYC_VERIFY_TYPE.ID_INFO) ||
+          (pendingStep.step &&
+            overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+            verifyType === KYC_VERIFY_TYPE.OCR &&
+            status === KYC_STATUS.REJECTED),
+        render: () => (
+          <IDExpired
+            userInfo={kycDetail.userInfo}
+            refresh={refresh}
+            expired={pendingStep.expired}
+          />
+        ),
       },
       // 未认证
       {
@@ -162,19 +172,19 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.INCOME &&
-          (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.EXPIRED || status === KYC_STATUS.DECLINED),
+          (status === KYC_STATUS.VERIFYING ||
+            status === KYC_STATUS.EXPIRED ||
+            status === KYC_STATUS.DECLINED),
         render: () => <Risk3Info refresh={refresh} />,
       },
       // 认证中 - OCR Verifying
       {
         match: () =>
-          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-          (verifyType === KYC_VERIFY_TYPE.OCR &&
-          status === KYC_STATUS.VERIFYING) || 
+          (overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+            verifyType === KYC_VERIFY_TYPE.OCR &&
+            status === KYC_STATUS.VERIFYING) ||
           // 认证后，子流程需要重新提交收入证明材料
-          (verifyType === KYC_VERIFY_TYPE.INCOME &&
-          status === KYC_STATUS.REVIEW)
-          ,
+          (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW),
         render: () => <Verifying refresh={refresh} />,
       },
       // 认证中 - OCR Failed/Rejected Retry
@@ -246,7 +256,12 @@ function Identity({ account }: { account: string }) {
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.AML &&
           status === KYC_STATUS.DECLINED,
-        render: () => <ExtraInfo reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser} refresh={refresh} />,
+        render: () => (
+          <ExtraInfo
+            reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser}
+            refresh={refresh}
+          />
+        ),
       },
       // 认证中 - KYT Verifying
       {
