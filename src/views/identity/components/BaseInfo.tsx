@@ -308,11 +308,21 @@ const BaseInfo = memo(
         setSubmiting(false)
       }
     }
+    const dobRef = useRef(dob)
+    const dobInitRef = useRef(false)
 
+    useEffect(() => {
+      dobRef.current = dob // 每次更新时同步
+    }, [dob])
     useEffect(() => {
       const dateOptions = calcYearDate()
       setDateOptions(dateOptions)
-      // setValue('dob', dob || format(dateOptions.maxDate, FormatStr))
+      if (!dobInitRef.current) {
+        dobInitRef.current = true
+        setTimeout(() => {
+          setValue('dob', dobRef.current || format(dateOptions.maxDate, FormatStr))
+        }, 500)
+      }
     }, [dob])
 
     useEffect(() => {
