@@ -1,8 +1,7 @@
 // hooks/useNetworkStatus.ts
 import { useEffect, useMemo } from 'react';
 import { useNetworkStore } from '../stores/networkStore';
-import { useClient } from 'ca-common-web';
-import type { PublicClient } from 'viem';
+import { useClient, type PublicClient } from 'ca-common-web';
 
 export function useNetworkStatus(options?: {
   autoStart?: boolean;

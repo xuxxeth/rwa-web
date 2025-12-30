@@ -1,6 +1,6 @@
 // stores/networkStore.ts
 import { create } from 'zustand';
-import type { PublicClient } from 'viem';
+import type { PublicClient } from 'ca-common-web';
 
 interface NetworkState {
   isOnline: boolean;
