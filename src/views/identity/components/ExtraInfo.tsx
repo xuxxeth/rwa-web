@@ -30,7 +30,7 @@ function findEmptyItemIndices(list: IExtraInfoItem[]) {
 export type IExtraInfoItem = {
   name: string,
   files?: string[],
-  description?: string
+  description: string
 }
 
 interface FormData {
@@ -62,8 +62,6 @@ const ExtraInfo = memo(
     const extraList = watch('extraList')
 
     const errorList = findEmptyItemIndices(extraList) || []
-
-    console.log(extraList, errorList)
 
     const [submiting, setSubmiting] = useState(false)
     
@@ -144,17 +142,16 @@ const ExtraInfo = memo(
                             error={errors.extraList?.[index]?.name?.message}
                             {
                               ...register(`extraList.${index}.name`, {
-                                required: '最大支持输入30位字符',
+                                required: t('kyc.t54', { num: 30 }),
                                 maxLength: {
                                   value: 30,
-                                  message: "最大支持输入30位字符"
+                                  message: t('kyc.t54', { num: 30 }),
                                 },
                                 pattern: {
                                   value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                                  message: "只支持中文和英文字母"
+                                  message: t('kyc.t64')
                                 },
                                 onChange: (e) => {
-                                  console.log(e.target.value)
                                   // 实时限制输入长度
                                   if (e.target.value.length > 30) {
                                     e.target.value = e.target.value.slice(0, 30);
@@ -186,20 +183,28 @@ const ExtraInfo = memo(
                       <div className="text-[16px]">{t('kyc.t42')}</div>
                     </div>
                     <InputBox>
-                      <KycTextarea placeholder="请输入" 
+                      <KycTextarea placeholder={t('kyc.t4')} 
                         {
                           ...register(`extraList.${index}.description`, {
-                            pattern: {
-                              value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,200}$/,
-                              message: '支持中文英文数字输入，最大支持输入200字符',
+                            required: true,
+                            validate: value => {
+                              // 空值：不校验，直接通过
+                              if (!value || !value.trim()) return true
+
+                              // 有值：按规则校验
+                              const regex = /^[\u4e00-\u9fa5a-zA-Z0-9]{1,200}$/
+                              return (
+                                regex.test(value) || t('kyc.t63')
+                              )
                             },
                           })
                           
                         }
                       />
                     </InputBox>
+                    <ErrorBox error={errors.extraList?.[index]?.description?.message}/>
                     {
-                      errorList.includes(index) && <ErrorBox error={'资料图片和说明至少提交一个'}/>
+                      errorList.includes(index) && <ErrorBox error={t('kyc.t65')}/>
                     }
                     
                   </SectionBox>

@@ -505,7 +505,11 @@
     "t59": "The document information is incorrect; please upload it again.",
     "t60": "Please provide additional information, images, or descriptions.",
     "t61": "Please upload proof of address",
-    "t62": "Enter your full name (First Name + Last Name)"
+    "t62": "Enter your full name (First Name + Last Name)",
+    "t63": "Supports Chinese, English, and numeric input, with a maximum of 200 characters.",
+    "t64": "Only Chinese and English letters are supported.",
+    "t65": "At least one of the document photo and description must be submitted.",
+    "t66": "Only numeric and alphabetic characters are supported."
   },
   "employment": {
     "t1": "Retired",

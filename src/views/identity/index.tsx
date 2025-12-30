@@ -155,6 +155,7 @@ function Identity({ account }: { account: string }) {
             userInfo={kycDetail.userInfo}
             rejectReason={kycDetail.rejectReason}
           />
+          
         ),
       },
       // 认证成功

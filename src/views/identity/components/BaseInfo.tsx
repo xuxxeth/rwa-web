@@ -326,7 +326,6 @@ const BaseInfo = memo(
     }, [dob])
 
     useEffect(() => {
-      console.log('userInfo changed:', userInfo)
       if (userInfo && userInfo.basicInfo.firstName) {
         reset({
           ...userInfo.basicInfo,
@@ -366,7 +365,6 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.firstName?.message}
-                    regex='^[a-zA-Z\u4e00-\u9fa5]+$'
                     value={firstName}
                     {...register('firstName', {
                       required: t('kyc.t54', { num: 30 }),
@@ -376,7 +374,7 @@ const BaseInfo = memo(
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                        message: '只支持中文和英文字母',
+                        message: t('kyc.t64'),
                       },
                     })}
                   />
@@ -390,7 +388,6 @@ const BaseInfo = memo(
                     className=''
                     placeholder={t('kyc.t4')}
                     error={errors.lastName?.message}
-                    regex='^[a-zA-Z\u4e00-\u9fa5]+$'
                     value={lastName}
                     {...register('lastName', {
                       required: t('kyc.t54', { num: 30 }),
@@ -400,7 +397,7 @@ const BaseInfo = memo(
                       },
                       pattern: {
                         value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
-                        message: '只支持中文和英文字母',
+                        message: t('kyc.t64'),
                       },
                       onChange: e => {
                         // 实时限制输入长度
@@ -421,7 +418,6 @@ const BaseInfo = memo(
                       className=''
                       placeholder={t('kyc.t4')}
                       error={errors.fullName?.message}
-                      regex='^[a-zA-Z\u4e00-\u9fa5·\s_-]+$'
                       value={fullName}
                       {...register('fullName', {
                         required: t('kyc.t54', { num: 30 }),
@@ -431,7 +427,7 @@ const BaseInfo = memo(
                         },
                         pattern: {
                           value: /^[a-zA-Z\u4e00-\u9fa5·\s_-]+$/,
-                          message: '只支持中文和英文字母',
+                          message: t('kyc.t64'),
                         },
                         validate: value => {
                           if (!firstName || !lastName) return true
@@ -578,20 +574,14 @@ const BaseInfo = memo(
                     regex='^[A-Za-z0-9]+$'
                     value={no}
                     {...register('no', {
-                      required: t('kyc.t4'),
+                      required: t('kyc.t54', { num: 30 }),
                       maxLength: {
                         value: 30,
-                        message: t('kyc.t54'),
+                        message: t('kyc.t54', { num: 30 }),
                       },
                       pattern: {
                         value: /^[A-Za-z0-9]+$/,
-                        message: '仅支持数字字母输入',
-                      },
-                      onChange: e => {
-                        // 实时限制输入长度
-                        if (e.target.value.length > 30) {
-                          e.target.value = e.target.value.slice(0, 30)
-                        }
+                        message: t('kyc.t66'),
                       },
                     })}
                   />
@@ -631,7 +621,7 @@ const BaseInfo = memo(
                         },
                         pattern: {
                           value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
-                          message: '只支持中文和英文字母',
+                          message: t('kyc.t64'),
                         },
                         onChange: e => {
                           // 实时限制输入长度
