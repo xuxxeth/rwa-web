@@ -15,6 +15,9 @@ export const useVerifyTip = function() {
   const pendingStep = usePendingStep()
   const verifyTip = useMemo(() => {
     let text = t('identity.verifyID')
+    if (kycStatus === KYC_OVERALL_STATUS.VERIFIED) {
+      text = t('verified')
+    }
     // 认证被拒绝
     if (kycStatus === KYC_OVERALL_STATUS.REJECTED) {
       text = t('kyc.t27')
@@ -27,6 +30,7 @@ export const useVerifyTip = function() {
     if (kycStatus === KYC_OVERALL_STATUS.EXPIRED || pendingStep.step) {
       text = t('kyc.t51')
     }
+    
 
     return text
   }, [t, kycStatus, expired, expiring, pendingStep.step])

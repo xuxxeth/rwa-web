@@ -30,7 +30,7 @@ export function useTokenBalances() {
       (acc, cur, index) => {
         acc[symbolToLower(tokenList[index].symbol)] = {
           origin: String(cur.balance),
-          balance: formatAmount(String(cur.balance), 6, tokenList[index].precision),
+          balance: formatAmount(String(cur.balance), tokenList[index].decimals, tokenList[index].precision),
         }
         return acc
       },
@@ -49,6 +49,7 @@ export function useTokenBalances() {
 
   useEffect(() => {
     if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0) {
+
       // @ts-ignore
       getTokensData(account, [...tokenList, ...rwaRwaList])
     }

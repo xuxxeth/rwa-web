@@ -13,6 +13,7 @@ import {
 } from './Upload/shared'
 import type { ApiResponse } from "@/service/client"
 import { usePendingStep } from "@/hooks/usePendingStep"
+import { WarningInfo } from "./WarningInfo"
 
 interface FormData {
   incomeCertifications?: string[]
@@ -21,9 +22,11 @@ interface FormData {
 
 const Risk3Info = memo(
   ({
-    refresh
+    refresh,
+    reviewCommentToUser
   }: {
     refresh?: () => Promise<ApiResponse<IKycDetail>>
+    reviewCommentToUser?: string
   }) => {
     const { t } = useTranslation()
     const pendingStep = usePendingStep()
@@ -77,6 +80,13 @@ const Risk3Info = memo(
         
         <SectionBox>
           <SectionTitle>{t('kyc.t19')}</SectionTitle>
+          {
+            reviewCommentToUser && 
+            <div className=" my-5">
+              <WarningInfo text={reviewCommentToUser } />
+            </div>
+          }
+          
           <div className="my-5">
             <Text text='uploadIncome' className=' text-white' />
             <Text text='extraTips' className='text-sm mt-2' />

@@ -176,7 +176,7 @@ function Identity({ account }: { account: string }) {
           (status === KYC_STATUS.VERIFYING ||
             status === KYC_STATUS.EXPIRED ||
             status === KYC_STATUS.DECLINED),
-        render: () => <Risk3Info refresh={refresh} />,
+        render: () => <Risk3Info refresh={refresh} reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser} />,
       },
       // 认证中 - OCR Verifying
       {

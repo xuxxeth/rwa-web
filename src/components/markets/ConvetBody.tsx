@@ -56,8 +56,8 @@ export function ConverBody({
   const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
 
   const approveAmount = useMemo(() => {
-    return orderValue ? parseAmount(orderValue) : '0'
-  }, [orderValue, inputToken])
+    return orderValue ? parseAmount(orderValue, outputToken?.decimals) : '0'
+  }, [orderValue, outputToken])
 
   console.log('orderValue: ', orderValue, approveAmount)
   console.log('approveToken: ', paymentToken)
