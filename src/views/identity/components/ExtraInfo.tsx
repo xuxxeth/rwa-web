@@ -66,7 +66,6 @@ const ExtraInfo = memo(
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
-      console.log(errorList)
       if (errorList.length > 0) {
         toastError({title: t('kyc.t60')})
         return
@@ -75,7 +74,7 @@ const ExtraInfo = memo(
       const extras = data.extraList.map(extra => {
         return {
           ...extra,
-          files: extra.files?.map(file => file)
+          files: extra.files?.filter(file => file)
         }
       })
       const params: any = {
@@ -131,14 +130,13 @@ const ExtraInfo = memo(
                       <div>
                         <div className="flex items-end justify-between font-normal mb-2">
                           <div className="text-[16px]">{t('kyc.t40')} </div>
-                          <div className="text-[12px] text-[#909090]">0/30</div>
+                          <div className="text-[12px] text-[#909090]">{extraList[index].name.length}/30</div>
                         </div>
                         <InputBox >
                           <KycInput 
                             className=""
                             placeholder={t('kyc.t4')}
                             value={extraList[index].name}
-                            regex="^[0-9a-zA-Z\u4e00-\u9fa5]+$"
                             error={errors.extraList?.[index]?.name?.message}
                             {
                               ...register(`extraList.${index}.name`, {
@@ -151,12 +149,7 @@ const ExtraInfo = memo(
                                   value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
                                   message: t('kyc.t64')
                                 },
-                                onChange: (e) => {
-                                  // 实时限制输入长度
-                                  if (e.target.value.length > 30) {
-                                    e.target.value = e.target.value.slice(0, 30);
-                                  }
-                                }
+                                
                               })
                               
                             }
@@ -186,7 +179,7 @@ const ExtraInfo = memo(
                       <KycTextarea placeholder={t('kyc.t4')} 
                         {
                           ...register(`extraList.${index}.description`, {
-                            required: true,
+                            required: false,
                             validate: value => {
                               // 空值：不校验，直接通过
                               if (!value || !value.trim()) return true

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { kycApi } from '@/service/kyc/api'
-import { type IKycDetail } from '@/service/kyc/types'
+import { KYC_STATUS, type IKycDetail } from '@/service/kyc/types'
 import { RISK_STATUS } from '@/config/constants'
 import { type KycStore } from './types'
 import { riskApi } from '@/service/risk/api'
@@ -35,8 +35,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
       
       set({ kycStatus: data || { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
 
-      // 如果是认证中和已拒绝，则请求认证结果详情接口
-      if (data && (data.status === RISK_STATUS.VERIFYING || data.status === RISK_STATUS.REJECTED)) {
+      // 如果是认证中\已过期\驳回
+      if (data && (data.status === KYC_STATUS.VERIFYING || data.status === KYC_STATUS.EXPIRED || data.status === KYC_STATUS.DECLINED)) {
         const { data } = await kycApi.getKycDetail()
         set({ kycDetail: data })
       } else {

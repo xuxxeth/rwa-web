@@ -323,7 +323,6 @@ function ExtraInfoUpload({
 
   // 删除图片
   const onImageDelete = (s3Key: string) => {
-    debugger
     let newKeys = getNewKeys()
     newKeys = newKeys.map(item => (item !== s3Key ? item : ''))
     onChanged(newKeys)
@@ -331,7 +330,6 @@ function ExtraInfoUpload({
 
   // 删除 uploadCard
   const onUploadCardDelete = (index: number) => {
-    debugger
     const newKeys = getNewKeys()
     newKeys.splice(index, 1)
     onChanged(newKeys)
