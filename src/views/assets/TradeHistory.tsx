@@ -241,7 +241,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[] }> = [
   {
     key: 'tradeValue',
     sortable: false,
-    render: (item: ITrade) => <ValueCell value={item.amount} />,
+    render: (item: ITrade) => <ValueCell value={item.amount} currency={item.currency} />,
   },
   {
     key: 'time',

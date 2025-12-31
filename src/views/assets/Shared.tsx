@@ -47,11 +47,11 @@ export function OrderTypeCell(props: { orderType: OrderType }) {
   return <TextCell text={orderType === 0 ? t('assets.order.limit') : t('assets.order.market')} />
 }
 
-export function ValueCell(props: { value: string }) {
-  const { value } = props
+export function ValueCell(props: { value: string, currency?: string }) {
+  const { value, currency } = props
   return (
     <TextCell
-      text={value === '0' ? textSuffix(value, 'USDT') : textSuffix(toFixed(value, 2), 'USDT')}
+      text={value === '0' ? textSuffix(value, currency ?? 'USDT') : textSuffix(toFixed(value, 2), currency ?? 'USDT')}
     />
   )
 }

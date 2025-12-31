@@ -276,7 +276,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'filledValue',
     breakOnSpace: false,
     sortable: false,
-    render: (item: IOrder) => <ValueCell value={item.settledAmount} />,
+    render: (item: IOrder) => <ValueCell value={item.settledAmount} currency={item.currency} />,
   },
   {
     key: 'executionTime',

@@ -28,6 +28,7 @@ export interface IOpenOrder {
   txTime: number
   txHash: string
   reason: string
+  currency: string
 }
 
 export interface IOrder {
@@ -55,6 +56,7 @@ export interface IOrder {
   txTime: number
   tradeTime: number
   txHash: string
+  currency: string
 }
 
 export interface ITrade {
@@ -71,4 +73,5 @@ export interface ITrade {
   txHash: string
   txTime: number
   reason: string
+  currency: string
 }

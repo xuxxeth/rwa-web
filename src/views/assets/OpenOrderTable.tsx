@@ -222,7 +222,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'filledValue',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} />,
+    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} currency={item.currency} />,
   },
   {
     key: 'orderTime',
