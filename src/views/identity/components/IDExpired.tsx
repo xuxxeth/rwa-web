@@ -120,7 +120,8 @@ const IDExpired = memo(
       <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
         
         <SectionBox className="pb-5">
-          <SectionTitle>{t('kyc.t24')}</SectionTitle>
+          <SectionTitle>{(pendingStep.step ? t('kyc.t241') : t('kyc.t242')) + t('kyc.t24')}</SectionTitle>
+          <div className="h-5"></div>
           {/* 上传证件 */}
           <Upload
             step={pendingStep.step}

@@ -21,7 +21,8 @@ import { RISK_STATUS } from "@/config/constants";
 import { useTrading } from "@/hooks/useTrading";
 import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
-import { PENDING_STEPS } from "@/service/kyc/types";
+import { KYC_OVERALL_STATUS, PENDING_STEPS } from "@/service/kyc/types";
+import { useKycStatus } from "@/hooks/useKycStatus";
 
 type ConverBodyProps = {
   action?: string
@@ -45,6 +46,7 @@ export function ConverBody({
   const outputToken = useTradeStore(state => state.outputToken)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
+  const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
   const action = useTradeStore(state => state.activeConvertTab)
   const { account } = useActiveWeb3()
@@ -205,16 +207,16 @@ export function ConverBody({
           isMinOrMax.min || isMinOrMax.max || 
           inputToken?.state === 1 ||
           riskStatus !== RISK_STATUS.VERIFIED ||
-          pendingStep.step === PENDING_STEPS.EXPIRED ||
+          kycStatus !== KYC_OVERALL_STATUS.VERIFIED ||
           pendingStep.step === PENDING_STEPS.RISK3
           
           , 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action, pendingStep.step]
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, kycStatus, action, pendingStep.step]
   )
 
   const buttonText = useMemo(() => {
-    if (pendingStep.step) return t('kyc.t51')
-    if (riskStatus === RISK_STATUS.NOTVERIFIED) return t('identity.verifyID')
+    // if (pendingStep.step) return t('kyc.t51')
+    if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
@@ -227,7 +229,7 @@ export function ConverBody({
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, riskStatus, pendingStep.step, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, kycStatus, pendingStep.step, i18n.language])
 
   return (
     <div className="mt-2">

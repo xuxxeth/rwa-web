@@ -102,7 +102,7 @@ const OrderItem = memo(
                 {t('Filled Value')}
               </div>
               <div className=" text-white">
-                {formatNumberWithCommas(order.settledAmount, 3)} {' USDT'}
+                {formatNumberWithCommas(order.settledAmount, 3)} {order.currency}
               </div>
             </OrderItemWRap>
             <OrderItemWRap>
