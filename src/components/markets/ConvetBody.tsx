@@ -22,7 +22,7 @@ import { useTrading } from "@/hooks/useTrading";
 import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
 import { KYC_OVERALL_STATUS, PENDING_STEPS } from "@/service/kyc/types";
-import { useKycStatus } from "@/hooks/useKycStatus";
+import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
 
 type ConverBodyProps = {
   action?: string
@@ -48,6 +48,7 @@ export function ConverBody({
   const { riskStatus } = useRiskStatus()
   const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
+  const { expired } = useKycExpired()
   const action = useTradeStore(state => state.activeConvertTab)
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
@@ -215,7 +216,7 @@ export function ConverBody({
   )
 
   const buttonText = useMemo(() => {
-    // if (pendingStep.step) return t('kyc.t51')
+    if (expired) return t('kyc.t51')
     if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
@@ -229,7 +230,7 @@ export function ConverBody({
     if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, kycStatus, pendingStep.step, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, kycStatus, pendingStep.step, expired, i18n.language])
 
   return (
     <div className="mt-2">

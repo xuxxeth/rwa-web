@@ -10,6 +10,7 @@ import { RESPONSE_CODE } from "@/config/constants"
 import { retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
 import type { ApiResponse } from "@/service/client"
 import { usePendingStep } from "@/hooks/usePendingStep"
+import { WarningInfo } from "./WarningInfo"
 
 interface FormData {
   idCardFront?: string
@@ -22,11 +23,13 @@ const IDExpired = memo(
   ({
     userInfo,
     refresh,
-    expired
+    expired,
+    reviewCommentToUser
   }: {
     userInfo?: IKycSubmitData
     refresh?: () => Promise<ApiResponse<IKycDetail>>
     expired?: boolean
+    reviewCommentToUser?: string
   }) => {
     const { t } = useTranslation()
     const pendingStep = usePendingStep()
@@ -42,7 +45,6 @@ const IDExpired = memo(
     const [submiting, setSubmiting] = useState(false)
     
     const onSubmit = async (data: FormData) => {
-      console.log(data)
       // 1. 判断有没有上传证件照
       if (type === 0) {
         // 身份证，正反面都要传
@@ -120,7 +122,13 @@ const IDExpired = memo(
       <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
         
         <SectionBox className="pb-5">
-          <SectionTitle>{(pendingStep.step ? t('kyc.t241') : t('kyc.t242')) + t('kyc.t24')}</SectionTitle>
+          <SectionTitle>{(expired ? t('kyc.t242') : t('kyc.t241')) + t('kyc.t24')}</SectionTitle>
+          {
+            reviewCommentToUser && 
+            <div className=" my-t">
+              <WarningInfo text={reviewCommentToUser } />
+            </div>
+          }
           <div className="h-5"></div>
           {/* 上传证件 */}
           <Upload

@@ -4,6 +4,7 @@ import { useActiveWeb3 } from "./useActiveWe3";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useKycStore } from "@/stores/kycStore";
 import { formatSecondsToDateTime } from "@/utils/format";
+import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
 
 export function useFetchKycStatus() {
   const { chainId, account } = useActiveWeb3()  
@@ -51,7 +52,7 @@ export function useKycExpired() {
     
     return {
       expiring: expires - ID_EXPIRES < now && expires > now,
-      expired: kycStatus?.status === RISK_STATUS.EXPIRED,
+      expired: kycStatus?.status === KYC_OVERALL_STATUS.EXPIRED,
       expiresTime: kycStatus?.expiresTime,
       desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
     }

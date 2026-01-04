@@ -30,7 +30,7 @@ const KycState = () => {
   // 1. ocr失败，填写信息与证件信息不一致
   const ocrFail = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-      kycDetail.status === KYC_STATUS.REJECTED &&
+      (kycDetail.status === KYC_STATUS.DECLINED || kycDetail.status === KYC_STATUS.REJECTED) &&
       kycDetail.verifyType === KYC_VERIFY_TYPE.OCR 
     return fail
 
@@ -45,36 +45,39 @@ const KycState = () => {
 
   }, [kycDetail])
   // 3. 
+
+  const liveNessReject = useMemo(() => {
+    const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+      (kycDetail.status === KYC_STATUS.DECLINED ||  kycDetail.status === KYC_STATUS.VERIFYING) &&
+      kycDetail.verifyType === KYC_VERIFY_TYPE.LIVENESS
+    return fail
+
+  }, [kycDetail])
+
   const amlDeclined = useMemo(() => {
     const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
       (kycDetail.status === KYC_STATUS.DECLINED) &&
       kycDetail.verifyType === KYC_VERIFY_TYPE.AML
-    return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
+    return fail 
 
   }, [kycDetail])
 
-  const liveNessReject = useMemo(() => {
-    const fail = kycDetail && kycDetail.overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-      (kycDetail.status === KYC_STATUS.REJECTED) &&
-      kycDetail.verifyType === KYC_VERIFY_TYPE.LIVENESS
-    return fail && kycDetail?.riskLevel === KYC_RISK_LEVEL.HIGH
-
-  }, [kycDetail])
   
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if ((pendingStep.expired) && !show) {
+    if (expired && !show) {
       setContent({
         title: t('kyc.t48'),
         content: t('kyc.t49', { expire: desc }),
         btnText: t('kyc.t50'),
         btn: 'edit'
       })
+      
       setShow(true)
       return
     }
 
-    if (expiring && !show) {
+    if ((pendingStep.expired) && !show) {
       setContent({
         title: t('kyc.t45'),
         content: t('kyc.t46', { expire: desc }),
@@ -84,16 +87,17 @@ const KycState = () => {
       setShow(true)
       return
     }
-    if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED) && !show) {
-      setContent({
-        title: t('kyc.t29'),
-        content: t('kyc.t32'),
-        btnText: t('kyc.t33'),
-        btn: 'upload'
-      })
-      setShow(true)
-      return
-    }
+
+    // if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED || kycDetail?.status === KYC_STATUS.VERIFYING) && !show) {
+    //   setContent({
+    //     title: t('kyc.t25'),
+    //     content: t('kyc.t32'),
+    //     btnText: t('kyc.t33'),
+    //     btn: 'upload'
+    //   })
+    //   setShow(true)
+    //   return
+    // }
     if (!kycDetail && !pendingStep.step) {
       setShow(false)
       setContent(defaultContent)
@@ -148,6 +152,13 @@ const KycState = () => {
     setShow(false)
     setContent(defaultContent)
   }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc, pendingStep]);
+
+  useEffect(() => {
+    if (isNotShow) {
+      setShow(false)
+      setContent(defaultContent)
+    }
+  }, [isNotShow])
 
   const close = () => setShow(false);
 

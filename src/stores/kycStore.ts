@@ -42,17 +42,21 @@ export const useKycStore = create<KycStore>((set, get) => ({
       } else {
         set( {kycDetail: null })
       }
-      // 如果有子流程
-      if (data.pendingSteps.length > 0) {
-        const stepRes = await kycApi.getKycStepDetail(data.pendingSteps[0])
-        const stepData = stepRes.data[0] ? stepRes.data[0] : {}
-        // @ts-ignore
-        stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
-        // @ts-ignore
-        set({ kycDetail: stepData })
-      } else {
-        set( {kycDetail: null })
+
+      if (data && data.pendingSteps?.length > 0) {
+        // 如果有子流程
+        if (data.pendingSteps?.length > 0) {
+          const stepRes = await kycApi.getKycStepDetail(data.pendingSteps[0])
+          const stepData = stepRes.data[0] ? stepRes.data[0] : {}
+          // @ts-ignore
+          stepData.overallStatus = stepData.applyStatus || res.data?.overallStatus
+          // @ts-ignore
+          set({ kycDetail: stepData })
+        } else {
+          set( {kycDetail: null })
+        }
       }
+      
     } catch (error: any) {
       set({ kycStatus: { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
       set( {kycDetail: null })

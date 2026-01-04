@@ -5,7 +5,6 @@ import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
 import { kycApi } from '@/service/kyc/api'
 import {
-  KYC_RISK_LEVEL,
   KYC_VERIFY_TYPE,
   KYC_OVERALL_STATUS,
   KYC_STATUS,
@@ -64,7 +63,6 @@ function IdentityEntry() {
 function Identity({ account }: { account: string }) {
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
   const expireStatus = useKycExpired()
-
   const [searchParams] = useSearchParams()
   const isRetryFromUrl = searchParams.get('retry') === 'true'
   const [isRetry, setIsRetry] = useState(isRetryFromUrl)
@@ -142,7 +140,8 @@ function Identity({ account }: { account: string }) {
           <IDExpired
             userInfo={kycDetail.userInfo}
             refresh={refresh}
-            expired={pendingStep.expired}
+            expired={expireStatus.expired}
+            reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser}
           />
         ),
       },
