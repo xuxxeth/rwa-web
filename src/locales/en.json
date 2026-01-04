@@ -288,7 +288,9 @@
       "sub0": "Please view your authentication results on the website.",
       "sub1": "Please go to the website to restart the verification process.",
       "sub2": "The recognition was unclear. Please retry in a well-lit environment.",
-      "sub3": "Verification returned an abnormal result. Please resubmit your information on the website."
+      "sub3": "Verification returned an abnormal result. Please resubmit your information on the website.",
+      "getQr": "Get QR code",
+      "toast1": "QR code obtained successfully. Remaining number of retrievals: {{times}}"
     },
     "result": {
       "res": "Verification Result",

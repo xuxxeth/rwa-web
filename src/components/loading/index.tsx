@@ -20,6 +20,54 @@ export function SpinLoading(props: { className?: string }) {
   return <SpinSVG className={cn('animate-spin duration-2000', props.className)} />
 }
 
+// 环形 Loading (一直转圈)
+export function CircleLoading({
+  size = 20,
+  strokeWidth = 2,
+  className,
+}: {
+  size?: number
+  strokeWidth?: number
+  className?: string
+}) {
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  // 显示 1/4 圆弧
+  const offset = circumference * 0.75
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      className={cn('animate-spin duration-[1200ms]', className)}
+      viewBox={`0 0 ${size} ${size}`}
+    >
+      {/* 背景轨道 */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke='currentColor'
+        strokeWidth={strokeWidth}
+        fill='none'
+        className='opacity-20'
+      />
+      {/* 高亮圆弧 */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke='currentColor'
+        strokeWidth={strokeWidth}
+        fill='none'
+        strokeLinecap='round'
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+      />
+    </svg>
+  )
+}
+
 // 环形进度条
 export function CircularProgress({
   progress = 0,
