@@ -214,12 +214,10 @@ export function UploadCard(props: {
         onUploaded({ ...result, blobUrl })
 
         // 上传成功后，生成预览 URL, 优先使用本地的 url
-        if (result && !isFilePdf) {
-          setPreviewUrl({
-            key: result.key,
-            url: blobUrl,
-          })
-        }
+        setPreviewUrl({
+          key: result.key,
+          url: isFilePdf ? '/images/icons/identity/pdf.png' : blobUrl,
+        })
       }
     } catch (error) {
       if (error instanceof LivenessCheckError) {
