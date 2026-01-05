@@ -1,21 +1,24 @@
+import { useTranslation } from "@/hooks/useTranslation"
 import { useId } from "react"
 
-export function Section4() {
+export default function Section4() {
+  const { t } = useTranslation()
+  
   const descList = [
     {
-      title: 'Built on Trust and Transparency',
+      title: t('home.text10'),
       desc: [
-        {text: 'Tokenized with 1:1 Real-World Backing', icon: './images/home/icon_bt_1.png'},
-        {text: 'Held Safely by Third-Party Broker', icon: './images/home/icon_bt_2.png'},
-        {text: 'Full Redemption Guarantee', icon: './images/home/icon_bt_3.png'},
+        {text: t('home.text11'), icon: '/images/home/icon_bt_1.png'},
+        {text: t('home.text12'), icon: '/images/home/icon_bt_2.png'},
+        {text: t('home.text13'), icon: '/images/home/icon_bt_3.png'},
       ]
     },
     {
-      title: 'Unchained Potential',
+      title: t('home.text14'),
       desc: [
-        {text: 'ERC-20 Compatible & Fully Transferable', icon: './images/home/icon_up_1.png'},
-        {text: 'Composable Across DeFi Ecosystems', icon: './images/home/icon_up_2.png'},
-        {text: 'Cross-Chain Ready by Design', icon: './images/home/icon_up_3.png'},
+        {text: t('home.text15'), icon: '/images/home/icon_up_1.png'},
+        {text: t('home.text16'), icon: '/images/home/icon_up_2.png'},
+        {text: t('home.text17'), icon: '/images/home/icon_up_3.png'},
       ]
     }
   ]
@@ -24,9 +27,9 @@ export function Section4() {
 
   return (
     <div className=" mt-[130px] text-white relative overflow-hidden pb-[130px]">
-      <div className="text-[44px] font-semibold capitalize text-center">Composable, mintable, burnable tokens</div>
+      <div className="text-[36px] font-medium capitalize text-center">{t('home.text8')}</div>
       <div className="flex justify-center">
-        <div className=" text-center text-[#D4D4D4] text-[18px] capitalize w-[906px] mt-6">fully backed 1:1 by real-world assets, enabling seamless on-chain transferability and unlocking new possibilities in decentralized finance.</div>
+        <div className=" font-normal text-center text-[#D4D4D4] text-[18px] capitalize w-[906px] mt-6">{t('home.text9')}</div>
       </div>
       <div className="mt-[46px] flex justify-center">
         <div className=" grid grid-cols-2 gap-x-[87px]">
@@ -55,7 +58,7 @@ export function Section4() {
         </div>
       </div>
 
-      <img src="./images/home/section4.png" className="w-[447px] h-[895px] absolute right-0 bottom-0 -mb-[447px]" alt="" />
+      <img src="/images/home/section4.png" className="w-[447px] h-[895px] absolute right-0 bottom-0 -mb-[447px]" alt="" />
     </div>
   )
 }

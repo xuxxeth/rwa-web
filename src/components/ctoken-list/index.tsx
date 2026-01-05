@@ -2,10 +2,19 @@ import { memo, useId, useMemo, useState } from "react"
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
-import { SortButton } from "../sort-button"
-import { cn } from "@/lib/utils"
+import { useRwas } from "@/hooks/useRwaBalances";
+import type { IRwa } from "@/service/base/types";
+import { formatTokenAmountWithCommas } from "@/utils/format";
+import { multiply, sortByBalanceAndPrice, symbolToLower } from "@/utils";
+import { useBaseStore } from "@/stores/baseStore";
+import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { SortButton } from "../sort-button-svg";
+import { useTableSort } from "@/hooks/useTableHelper";
+import { cn } from "@/lib/utils";
+import { ScrollBox } from "../scroll-box";
+import { NoData } from "../markets/NoData";
 
-type CTokenProps = {
+export type CTokenProps = {
   stock: string,
   rwa: string,
   icon: string,
@@ -16,124 +25,200 @@ type CTokenProps = {
   state?: string
 }
 
+export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
+  const tokenPrice = useRwaPrice(symbol);
+  const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
+  return (
+    <div className="">
+      <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
+      <div className="flex items-center gap-x-[4px]">
+        {/* {
+          up !== 0 &&
+            <img
+              src={up > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
+              className="w-[6px]"
+            />
+        } */}
+        
+        <span
+          className={
+            up === 0 ? 'text-[#A1A1A1]' : up > 0
+              ? "text-[#50E3C2] text-[12px]"
+              : "text-[rgba(227,80,122,1)] text-[12px]"
+          }
+        >
+          {up !== 0 && (up > 0 ? '+' : '-')}
+          {Math.abs(Number(tokenPrice?.up || "0"))}%
+        </span>
+      </div>
+    </div>
+  );
+});
+export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string; pricePrecision: number }) => {
+  const tokenBalance = useTokenBalance(symbol)?.balance ?? "0";
+  const tokenPrice = useRwaPrice(symbol)?.price ?? "0";
+
+  const total = multiply(tokenBalance, tokenPrice);
+
+  return (
+    <div className="text-right">
+      <div className="text-[16px] font-medium leading-[24px]">
+        {formatTokenAmountWithCommas(tokenBalance)}
+      </div>
+      <div className="text-[12px] text-[rgba(255,255,255,0.6)]">
+        ≈ ${formatTokenAmountWithCommas(total, pricePrecision)}
+      </div>
+    </div>
+  );
+});
+
 const CTokenItem = memo(
 
-  ({ token }: {token: CTokenProps}) => {
+  ({ token, onClick }: {token: IRwa, onClick?: (token: IRwa) => void}) => {
     const { t } = useTranslation()
     const marketInfo = useMemo(() => {
       const state = token.state
       let _icon = ''
       let _info = ''
-      if (state === 'open') {
+      if (state === 0) {
         _icon = '/images/icons/market/market_open.png'
-        _info = t('Open')
+        _info = t("Open")
       }
-      if (state === 'pre') {
-        _icon = '/images/icons/market/market_pre.png'
-        _info = t('Pre-Market')
-      }
-      if (state === 'after') {
-        _icon = '/images/icons/market/market_after.png'
-        _info = t('After Hours')
-      }
-      if (state === 'close') {
-        _icon = '/images/icons/market/market_close.png'
-        _info = t('Market Closed')
-      }
-      if (state === 'lock') {
+      // if (state === 1) {
+      //   _icon = '/images/icons/market/market_pre.png'
+      //   _info = t("Pre-Market")
+      // }
+      // if (state === 2) {
+      //   _icon = '/images/icons/market/market_after.png'
+      //   _info = t("After Hours")
+      // }
+      // if (state === 3) {
+      //   _icon = '/images/icons/market/market_close.png'
+      //   _info = t("Market Closed")
+      // }
+      if (state === 1) {
         _icon = '/images/icons/market/market_lock.png'
-        _info = t('Trading Halt')
+        _info = t("Trading Halt")
       }
       return {
         icon: _icon,
         info: _info
       }
     }, [token])
-
-    const marketIcon = useMemo(() => {
-      let _icon = ''
-      if (token.state === 'pre') {
-        _icon = '/images/icons/market/market_pre.png'
-      }
-      if (token.state === 'after') {
-        _icon = '/images/icons/market/market_pre.png'
-      }
-    }, [token])
-
-
+    
     return (
-      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2">
-        <div className="flex items-center gap-x-2 w-1/3">
-          <LazyImage src={token.icon} className="w-10 h-10" />
+      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
+        onClick={() => {
+          onClick && onClick(token)
+        }}
+      >
+        <div className="flex items-center gap-x-2 w-1/3 shrink-0">
+          <div className="w-10 h-10 shrink-0">
+            <LazyImage src={token.icon} className="w-10 h-10 rounded-full" />
+          </div>
           <div>
-            <div className=" text-[16px] font-semibold leading-[24px]">{token.rwa}</div>
-            <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.stock}</div>
+            <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>
+            <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.name}</div>
           </div>
         </div>
-        <div className="w-1/3">
-          <div className="flex items-center gap-x-2">
-            <span className=" text-[16px] font-medium">${token.price}</span>
-            <div className="flex items-center gap-x-[4px]">
-              <LazyImage src={Number(token.up) > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"} className="w-[6px]" />
-              <span className={cn(
-                " font-normal text-[12px]",
-                Number(token.up) > 0 ? 'text-[#50E3C2]' : 'text-[rgba(227,80,122,1)]'
-              )}>2.98%</span>
-            </div>
-          </div>
-          <div className="h-[15px] bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
-            <LazyImage src={marketInfo.icon} className="w-[12px]" />
-            <span className="text-[9px] font-medium">{marketInfo.info}</span>
-          </div>
+        <div className="w-1/3 flex items-center gap-x-2">
+          <CTokenPrice symbol={token.symbol} />
+          {
+            token.state === 1 && 
+              <div className="h-[15px] shrink-0 bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
+                <LazyImage src={marketInfo.icon} className="w-[12px]" />
+                <span className="text-[9px] font-medium">{marketInfo.info}</span>
+              </div>
+          }
+
         </div>
         <div className="w-1/3 text-right">
-          <div className=" text-[16px] font-medium leading-[24px]">{token.balance}</div>
-          <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{'≈ $'}{token.balance}</div>
+          <CTokenBalance symbol={token.symbol} pricePrecision={token.precision} />
         </div>
       </div>
     )
   }
 )
 
+type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
 const CTokenList = memo(
-  () => {
-    const tokenList: CTokenProps[] = [
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-      {stock: 'Apple', rwa: 'AAPLc', icon: '/images/tokens/aaplc.png', price: '203.22', up: '2.98', balance: '100.3', state: 'pre'},
-      {stock: 'Tesla', rwa: 'TSLAc', icon: '/images/tokens/tslac.png', price: '203.22', up: '2.98', balance: '100.3', state: 'after'},
-      {stock: 'NVIDIA', rwa: 'NVIDIAc', icon: '/images/tokens/nvdac.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'open'},
-      {stock: 'Amazon', rwa: 'AMZNc', icon: '/images/tokens/amznc.png', price: '203.22', up: '-2.98', lock: 1, balance: '100.3', state: 'lock'},
-    ]
+  ({ from, onClick }: { from?: string, onClick?: (token: IRwa) => void}) => {
+    const { t } = useTranslation()
+    const { sort, onSortChange } = useTableSort<SortableField>()
+    
+    const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
+    const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
+
     const _id = useId()
+    const rwaList = useRwas()
+    const rwaListWithBalance = useMemo(() => {
+      return rwaList.filter(rwa => rwa.state < 2).map(rwa => {
+        return {
+          ...rwa,
+          ...tokenWithBalance[symbolToLower(rwa.symbol)],
+          ...tokenWithPrice[symbolToLower(rwa.symbol)]
+        }
+      })
+    }, [rwaList, tokenWithBalance, tokenWithPrice])
 
     const [filterHolding, setFilterHolding] = useState(false)
     const filterTokens = useMemo(() => {
-      return filterHolding ? tokenList.filter(token => Number(token.balance) > 0) : tokenList
-    }, [tokenList, filterHolding])
+      return filterHolding ? sortByBalanceAndPrice(rwaListWithBalance.filter(token => Number(token.balance) > 0)) : rwaListWithBalance
+    }, [rwaListWithBalance, filterHolding])
+
+    const sortTokens = useMemo(() => {
+      if (sort?.order) {
+        return filterTokens.sort((token1, token2) => {
+          const up1 = Math.abs(Number(token1.up))
+          const up2 = Math.abs(Number(token2.up))
+          return sort.order === 'asc' ? up1 - up2 : up2 - up1
+        })
+      }
+      return filterTokens
+    }, [sort, filterTokens])
+
     return (
       <div className="min-w-[443px]">
         <div className=" flex items-center">
-          <CheckBox onChange={setFilterHolding} />
-          <span className=" text-[12px] font-normal ml-1">Holdings Only</span>
+          <CheckBox onChange={setFilterHolding} checked={filterHolding} />
+          <span onClick={() => {
+            setFilterHolding(!filterHolding)
+          }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal">
-            <div className="w-1/3">Name</div>
-            <div className="flex items-center gap-x-[6px] w-1/3">Change <SortButton /></div>
-            <div className="w-1/3 text-right">Holdings</div>
+          <div className=" flex items-center justify-between text-[12px] font-normal pr-4">
+            <div className="w-1/3">{t("Name")}</div>
+            <div className="flex items-center w-1/3 cursor-pointer"
+              onClick={() => {
+                onSortChange('price')
+              }}
+              >{t("Change")}
+              <div className="text-[rgba(255,255,255,0.6)]"><SortButton order={sort?.order} /></div>
+            </div>
+            <div className="w-1/3 text-right">{t("Holdings")}</div>
           </div>
-          {
-            filterTokens.slice(0, 6).map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token}  />)
-          }
+          <div className={cn(
+            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-4",
+            from === "StockSelect" ? "h-[50vh]" : ""
+          )}>
+            {
+              sortTokens.map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+            }
+            {
+              sortTokens.length <= 0 && <div className="py-[100px]"><NoData /></div>
+            }
+          </div>
+          
         </div>
+        {/* <Pagination currentPage={currentPage} totalPage={totalPage} 
+          onPrevClick={() => { 
+            if (currentPage > 0) {
+              setCurrentPage(currentPage - 1)
+            }
+          }} 
+          onNextClick={() => setCurrentPage(currentPage + 1)} 
+        /> */}
       </div>
     )
   }

@@ -27,7 +27,7 @@ export function useToast() {
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <LazyImage src={type === 'error' ? '/images/icons/toast/error.png' : '/images/icons/toast/success.png'} className='w-6 h-6' />
             <div className='break-words'>
-              <div className=" font-normal text-[16px]">{title}{title}</div>
+              <div className=" font-normal text-[16px]">{title}</div>
             </div>
           </div>
           <div className='flex items-center gap-3 shrink-0'>
@@ -53,7 +53,7 @@ export function useToast() {
           
         </div>
       )
-    }, { duration: duration || 5000 })
+    }, { duration: duration || 3000 })
   }
   function toastSuccess({ title, btnText, onClick, duration }: CustomToastOptions) {
     toastFun({title, btnText, onClick, duration, type: 'success'})

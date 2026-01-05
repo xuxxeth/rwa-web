@@ -23,7 +23,6 @@ const datafeed = {
   // UFQ2HGN5Q2BQ7YL1
   // @ts-ignore
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
-    console.log(1111111)
     try {
       const data = await fetchAAPL();
       onHistoryCallback(data, { noData: false });

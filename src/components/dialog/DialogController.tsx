@@ -9,7 +9,6 @@ import {
   DialogClose
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-
 // 全局控制器
 export const dialogController = {
   open: () => {},
@@ -18,7 +17,6 @@ export const dialogController = {
 
 export function useShowDialog() {
   const [open, setOpen] = useState(false)
-
   return {
     open,
     setOpen,
@@ -27,27 +25,41 @@ export function useShowDialog() {
   }
 }
 
+
 export function DialogController({
   children,
   title,
   topFixed,
+  top,
   open,
+  className,
+  headerClassName,
   openChange
 }: {
   children?: React.ReactNode;
-  title?: string
+  title?: React.ReactNode
   topFixed?: boolean
+  top?: number
   open: boolean
+  className?: string
+  headerClassName?: string
   openChange: (open: boolean) => void
 }) {
+  
+  // useBodyScrollLock(open)
 
   return (
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent className={cn(
         'rounded-[16px]',
-        topFixed ? 'top-[20%] translate-y-[0]' : ''
-      )}>
-        <DialogHeader>
+        topFixed ? 'top-[4vh] translate-y-[0]' : '',
+        className
+      )}
+      >
+        <DialogHeader className={cn(
+          "",
+          headerClassName
+        )}>
           <DialogTitle>{title || ''}</DialogTitle>
         </DialogHeader>
         

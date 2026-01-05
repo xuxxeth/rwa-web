@@ -7,10 +7,6 @@ import {
 
 export const WalletProvider = Provider
 
-export function useChains() {
-  return defaultChains
-}
-
 export function useTestnetChains() {
   return [bscTestnet, xLayerTestnet]
 }

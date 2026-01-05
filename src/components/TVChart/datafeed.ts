@@ -7,7 +7,24 @@ import type {
   PeriodParams,
 } from "@/lib/charting_library/charting_library";
 
-import chartTable from './chartTable2.json'
+import { klineApi } from "@/service/kline/api";
+import { RESPONSE_CODE } from "@/config/constants";
+import wsService from "@/service/webSocket/service";
+
+export function keyToMinutes(key: string): number {
+  const map: Record<string, number> = {
+    "1": 1,
+    "5": 5,
+    "15": 15,
+    // "45",
+    "60": 60,
+    "1D": 24 * 60,        // 1 day = 1440 minutes
+    "1W": 7 * 24 * 60,    // 1 week = 10080 minutes
+    "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
+  };
+
+  return map[key.toUpperCase()] ?? 15; // 未匹配返回 0
+}
 
 export function tagSession(item: any) {
   const date = new Date(item.time * 1000);
@@ -26,19 +43,6 @@ export function tagSession(item: any) {
   return "off"; // 非交易时段
 }
 
-
-const getChartTable = (data: any) => {
-  // @ts-ignore
-  if (window.initBar && data.from !== 'getMarks') {
-    return {
-      table: []
-    }
-  }
-  // @ts-ignore
-  window.initBar = true
-  return chartTable
-}
-
 const lastBarsCache = new Map<string, Bar>();
 const _minPrice: Number = 0;
 const _maxPrice: Number = 0;
@@ -49,13 +53,21 @@ const configurationData: DatafeedConfiguration = {
     "1",
     "5",
     "15",
-    "45",
+    // "45",
     "60",
-    "240",
-    "1440",
+    // "1440",
+    '1D', '1W', '1M'
   ] as ResolutionString[],
 
 };
+
+let lastRequestTime = 0;
+let currentSymbol = ''
+const requestInterval = 1500; // 设置请求时间间隔，单位：毫秒
+let hasLoadedInitialData = false;
+let subscribeBarOn = ''
+let subscribeBarFn: any = undefined
+const wsListeners = new Map<string, any>()
 
 export function getDataFeed({
   pairIndex,
@@ -78,20 +90,19 @@ export function getDataFeed({
       _onResolveErrorCallback,
       _extension,
     ) => {
-
       // Symbol information object
       const symbolInfo: LibrarySymbolInfo = {
-        ticker: name,
-        name: name,
-        description: name,
+        ticker: symbolName || name || '',
+        name: symbolName || name || '',
+        description: symbolName || name || '',
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
         "session": "0400-2000",
         "timezone": "America/New_York",
         minmov: 1,
-        pricescale: 1000000000,
-        exchange: "",
+        pricescale: 10000,
+        exchange: "RWA",
         has_intraday: true,
         visible_plots_set: 'ohlc',
         has_weekly_and_monthly: true,
@@ -105,17 +116,17 @@ export function getDataFeed({
       setTimeout(() => onSymbolResolvedCallback(symbolInfo));
     },
     getMarks: async (symbolInfo, from, to, onDataCallback) => {
-      const data = await getChartTable({from: 'getMarks'});
-      const marks = data.table
-        .filter(d => tagSession(d) !== "regular") // 只标记盘前和盘后
-        .map(d => ({
-          id: d.time.toString(),
-          time: d.time,
-          color: tagSession(d) === "pre" ? "blue" : "purple",
-          text: tagSession(d).toUpperCase()
-        }));
+      // const data = await getChartTable({from: 'getMarks'});
+      // const marks = data.table
+      //   .filter(d => tagSession(d) !== "regular") // 只标记盘前和盘后
+      //   .map(d => ({
+      //     id: d.time.toString(),
+      //     time: d.time,
+      //     color: tagSession(d) === "pre" ? "blue" : "purple",
+      //     text: tagSession(d).toUpperCase()
+      //   }));
       // @ts-ignore
-      onDataCallback(marks);
+      onDataCallback([]);
     },
     getBars: async (
       symbolInfo,
@@ -124,40 +135,51 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      console.log('get bar')      
+      const currentTime = Date.now();
+      // 防止过于频繁的请求
+      // if (currentTime - lastRequestTime < requestInterval) {
+      //   console.log("请求过于频繁，跳过本次请求");
+      //   return;
+      // }
+      // 更新最后请求时间
+      lastRequestTime = currentTime;
+      // if (initialLoadComplete) {
+      //   return
+      // }
+      if (symbolInfo.name !== currentSymbol) {
+        currentSymbol = symbolInfo.name;
+        lastBarsCache.delete(symbolInfo.name);
+      } 
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const chartTable: any = await getChartTable({
-          token,
-          pairIndex,
-          from,
-          to,
-          range: +resolution,
-          countBack
-        });
-
-        if (!chartTable || !chartTable.table) {
+        const res = await klineApi.getCandles({ stock: token.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
+        const _data = res?.data || []
+        if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
           return;
         }
-
-        let bars = chartTable.table.map((bar: { time: number; }) => ({
-          ...bar,
-          time: bar.time * 1000, // Convert from seconds to milliseconds
-        }));
+        let bars = _data.reverse().map((bar: any) => {
+          return {
+            "time": bar.t * 1000,
+            "open": bar.o,
+            "high": bar.h,
+            "low": bar.l,
+            "close": bar.c,
+            "volume": bar.volume ?? 0,
+          }
+        })
 
         if (firstDataRequest) {
           lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
         }
+        onHistoryCallback(bars, { noData: bars.length < countBack ? true : false });
 
-        onHistoryCallback(bars, { noData: false });
-
-        if (!initialLoadComplete) {
-          initialLoadComplete = true;
-        }
-        return;
+        // if (!initialLoadComplete) {
+        //   initialLoadComplete = true;
+        // }
       } catch (error) {
+        console.log(error)
         // @ts-ignore
         onErrorCallback(error);
       }
@@ -170,19 +192,37 @@ export function getDataFeed({
       subscriberUID,
       onResetCacheNeededCallback,
     ) => {
-      // subscribeOnStream(
-      //   symbolInfo,
-      //   resolution,
-      //   onRealtimeCallback,
-      //   subscriberUID,
-      //   onResetCacheNeededCallback,
-      //   lastBarsCache.get(symbolInfo.name)!,
-      //   pairIndex,
-      // );
+
+      console.log('symbolInfo: ', symbolInfo, resolution)
+      let _resolution = `${resolution}m`
+      if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
+        _resolution = resolution.toLowerCase()
+      }
+      const key = `candle.${symbolInfo.name}_${_resolution}`
+      const listener = (data: any) => { 
+        if (data.c > 0) {
+          onRealtimeCallback({
+            "time": data.E,
+            "open": data.o,
+            "high": data.h,
+            "low": data.l,
+            "close": data.c,
+            "volume": 0,
+          })
+        }
+      }
+      wsListeners.set(subscriberUID, { key, listener })
+      // @ts-ignore
+      wsService.on(key, listener)
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
-      // unsubscribeFromStream(subscriberUID);
+      
+      const sub = wsListeners.get(subscriberUID)
+      if (sub) {
+        wsService.off(sub.key, sub.listener)
+        wsListeners.delete(subscriberUID)
+      }
     },
   };
 }
