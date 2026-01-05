@@ -611,7 +611,6 @@ const BaseInfo = memo(
                       className=''
                       placeholder={t('kyc.t4')}
                       error={errors.residentAddress?.message}
-                      regex='^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$'
                       value={residentAddress}
                       {...register('residentAddress', {
                         required: t('kyc.t4'),
@@ -698,7 +697,6 @@ const BaseInfo = memo(
                         className=''
                         placeholder={t('kyc.t38')}
                         error={errors.description?.message}
-                        regex='^[\u4e00-\u9fa5a-zA-Z0-9\s,，]{1,40}$'
                         value={description}
                         {...register('description', {
                           required: t('kyc.t4'),
