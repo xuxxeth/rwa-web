@@ -2,7 +2,7 @@
 
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LazyImage } from "../image/LazyImage";
@@ -30,13 +30,15 @@ const DoctypeSelect = memo(
     className,
     countryCode
   }: DoctypeSelectProps) => {
-    const { t } = useTranslation()
-    const idList = countryCode === 'CHN' ? [
-      { code: '0', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
-      { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
-    ] : [
-      { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
-    ]
+    const { t, i18n } = useTranslation()
+    const idList = useMemo(() => {
+      return countryCode === 'CHN' ? [
+        { code: '0', label: t('identity.identityCard'), icon: '/images/icons/identity/id.png' },
+        { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
+      ] : [
+        { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
+      ]
+    }, [t]) 
     
     const [currentCode, setCurrentCode] = useState(idList[0].code)
     const [currentDoctype, setCurrentDoctype] = useState(idList[0])
@@ -50,7 +52,7 @@ const DoctypeSelect = memo(
           setCurrentDoctype(_id)
         }
       }
-    }, [defaultValue, countryCode]) 
+    }, [defaultValue, countryCode, i18n.language]) 
 
     return (
       <Select 

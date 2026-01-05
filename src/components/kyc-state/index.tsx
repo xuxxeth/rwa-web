@@ -65,7 +65,7 @@ const KycState = () => {
   
   // 显示后 10 秒自动隐藏
   useEffect(() => {
-    if (expired && !show) {
+    if (expired) {
       setContent({
         title: t('kyc.t48'),
         content: t('kyc.t49', { expire: desc }),
@@ -77,7 +77,7 @@ const KycState = () => {
       return
     }
 
-    if ((pendingStep.expired) && !show) {
+    if ((pendingStep.expired)) {
       setContent({
         title: t('kyc.t45'),
         content: t('kyc.t46', { expire: desc }),
@@ -102,7 +102,7 @@ const KycState = () => {
       setShow(false)
       setContent(defaultContent)
     }
-    if (!kycDetail || isNotShow || show || pendingStep.step) {
+    if (!kycDetail || isNotShow || pendingStep.step) {
       
       return
     } 

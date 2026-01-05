@@ -31,6 +31,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ReviewInfo } from './components/ReviewInfo'
 import { useKycStore } from '@/stores/kycStore'
 import { usePendingStep } from '@/hooks/usePendingStep'
+import { useTranslation } from '@/hooks/useTranslation'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -61,6 +62,8 @@ function IdentityEntry() {
 }
 
 function Identity({ account }: { account: string }) {
+  const { i18n } = useTranslation()
+  
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
   const expireStatus = useKycExpired()
   const [searchParams] = useSearchParams()
@@ -68,6 +71,7 @@ function Identity({ account }: { account: string }) {
   const [isRetry, setIsRetry] = useState(isRetryFromUrl)
   const pendingStep = usePendingStep()
   const pendingStepRef = useRef(0)
+  const kycDetailInit = useRef(false)
 
   const resetRetry = () => {
     setIsRetry(prev => (prev === true ? false : prev))
@@ -89,9 +93,11 @@ function Identity({ account }: { account: string }) {
           }
         }
       }
+      kycDetailInit.current = true
       setKycDetail(res?.data || {})
       return res
     } catch (error) {
+      kycDetailInit.current = true
       return {
         code: 500,
         data: {
@@ -101,6 +107,7 @@ function Identity({ account }: { account: string }) {
         message: null,
       }
     }
+    
   }
 
   useEffect(() => {
@@ -109,6 +116,13 @@ function Identity({ account }: { account: string }) {
     }
     refresh()
   }, [account, pendingStep.step])
+
+  // 切换语言， 重新拉取认证详情
+  useEffect(() => {
+    if (kycDetailInit.current) {
+      refresh()
+    }
+  }, [i18n.language])
 
   // 根据 kycDetail 刷新 KycStatus and Conifg
   const refetchKycStatusAndConfigIfNeed = useKycStore(

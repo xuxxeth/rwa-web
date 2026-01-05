@@ -48,13 +48,13 @@ export function useKycExpired() {
         desc: ''
       }
     }
-    const now = Date.now() / 1000
+    const now = Date.now()
     
     return {
       expiring: expires - ID_EXPIRES < now && expires > now,
       expired: kycStatus?.status === KYC_OVERALL_STATUS.EXPIRED,
       expiresTime: kycStatus?.expiresTime,
-      desc: formatSecondsToDateTime(kycStatus?.expiresTime || 0)
+      desc: formatSecondsToDateTime(Math.floor((kycStatus?.expiresTime || 0) / 1000))
     }
   }, [kycStatus])
   

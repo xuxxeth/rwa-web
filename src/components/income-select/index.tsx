@@ -25,7 +25,7 @@ const IncomeSelect = memo(
     onChange, 
     className
   }: IncomeSelectProps) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const dataList = [
       { code: '1', label: t('income.t1')},
       { code: '2', label: t('income.t2')},
@@ -51,7 +51,7 @@ const IncomeSelect = memo(
           setCurrentItem(_id)
         }
       }
-    }, [defaultValue]) 
+    }, [defaultValue, i18n.language]) 
 
     return (
       <Select 

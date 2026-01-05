@@ -30,7 +30,7 @@ const EmploymentSelect = memo(
     mode,
     label
   }: EmploymentSelectProps) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const dataList = [
       { code: '1', label: t('employment.t1')},
       { code: '2', label: t('employment.t2')},
@@ -51,7 +51,7 @@ const EmploymentSelect = memo(
           onChange && onChange(_id)
         }
       }
-    }, [defaultValue]) 
+    }, [defaultValue, i18n.language]) 
 
     return (
       <Select 
