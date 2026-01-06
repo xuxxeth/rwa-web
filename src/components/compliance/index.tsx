@@ -38,7 +38,7 @@ const Compliance = () => {
   const handleAggree = async () => {
 
     setLoading(true)
-    const res = await kycApi.postAgreementsAccept('v1')
+    const res = await kycApi.postAgreementsAccept(PRIVACY_SERVICE.privacy.version, PRIVACY_SERVICE.userService.version)
     setLoading(false)
     if (res?.code === RESPONSE_CODE.SUCCESS) {
       setShow(false)
