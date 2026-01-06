@@ -26,6 +26,9 @@ export function usePersistentForm<T extends Record<string, any>>(
       const savedData = localStorage.getItem(storageKey);
       if (savedData) {
         const parsedData = JSON.parse(savedData);
+        if (!parsedData.extraList || parsedData.extraList.length <= 0) {
+          parsedData.extraList = [{ name: "", description: "", files: [] }]
+        }
         reset({...defaultValues, ...parsedData} as T);
       }
     } catch (error) {
@@ -39,7 +42,7 @@ export function usePersistentForm<T extends Record<string, any>>(
       if (clearRef.current) return
       try {
         if (defaultValues?.firstName) return
-        const _extraList = (data.extraList || []).map((item: any) => ({...item, files: []}))    
+        const _extraList = (data.extraList || [{ name: "", description: "", files: [] }]).map((item: any) => ({...item, files: []}))    
         const _data = {
           ...data,
           idCardFront: '',

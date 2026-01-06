@@ -36,12 +36,12 @@ export const TokenBox = memo(
           }
         }}
       >
-        <div className=" flex flex-col justify-center w-[140px]">
-          <div className=" font-normal flex items-center justify-between">
+        <div className=" flex flex-col justify-center min-w-[140px]">
+          <div className=" font-normal flex items-center justify-between shrink-0">
             <div className="text-[14px] md:text-[16px]">{rwa?.symbol || '--'}</div>
             <div className="text-[14px] md:text-[16px]">${rwaPrice?.price || '--'}</div>
           </div>
-          <div className=" font-normal flex items-center justify-between">
+          <div className=" font-normal flex items-center justify-between gap-x-2">
             <div className="text-[12px] md:text-[14px] text-[rgba(255,255,255,0.6)] mt-[2]">{rwa?.name || '--'}</div>
             <div className={cn(
               " text-[12px] h-[19px] rounded-[4px] min-w-[59px] px-[8px] flex items-center justify-center bg-[rgba(255,255,255,0.1)]",

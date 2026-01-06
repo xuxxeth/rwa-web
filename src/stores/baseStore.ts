@@ -58,7 +58,7 @@ export const useBaseStore = create<BaseStore>()(
       // 使用 websocket 数据更新 token 价格
       setTokenWithPriceByWebSocketData: (data: IRwaPrice[]) => {
         const rwaList = get().rwaList
-        if (rwaList.length === 0 || data.length !== rwaList.length) return
+        if (rwaList.length === 0) return
         const tokenWithPrices: Record<string, ITokenWithPrice> = data.reduce(
           (acc, cur) => {
             const rwa = rwaList.find(item => checkSymbolEqual(item.symbol, cur.S))
