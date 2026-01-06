@@ -139,18 +139,9 @@ export default function FaceRecognition({
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
       <div className='m-4 self-center relative w-[224px] h-[224px]'>
-        {isLoading && <CircleLoading className='absolute inset-0 m-auto' />}
-        {!isLoading && showQrcode && (
-          <>
-            <QRCode value={urlInfo.url} size={224} margin={0} />
-            {isExpired && (
-              <QrCodeMask>
-                <QrCodeExpirted refresh={refreshQrCode} isLoading={isLoading} />
-              </QrCodeMask>
-            )}
-          </>
-        )}
-        {urlInfo === undefined && !isLoading && (
+        {isLoading ? (
+          <CircleLoading className='absolute inset-0 m-auto' />
+        ) : urlInfo === undefined ? (
           <>
             <QRCode value='click to get qr code' size={224} />
             <QrCodeMask>
@@ -159,8 +150,18 @@ export default function FaceRecognition({
               </div>
             </QrCodeMask>
           </>
-        )}
-        {isMaxTimesReached && <MaxTimesReached />}
+        ) : isMaxTimesReached ? (
+          <MaxTimesReached />
+        ) : showQrcode ? (
+          <>
+            <QRCode value={urlInfo.url} size={224} margin={0} />
+            {isExpired && (
+              <QrCodeMask>
+                <QrCodeExpirted refresh={refreshQrCode} isLoading={isLoading} />
+              </QrCodeMask>
+            )}
+          </>
+        ) : null}
       </div>
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
