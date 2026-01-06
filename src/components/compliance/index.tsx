@@ -9,6 +9,7 @@ import { RESPONSE_CODE } from "@/config/constants"
 import { useToast } from "@/hooks/useToast"
 import { useActiveWeb3 } from "@/hooks/useActiveWe3"
 import { useSignatureValidStatus } from "@/hooks/useSignature"
+import { PRIVACY_SERVICE } from "@/config/privacyService"
 
 const Compliance = () => {
   const { t } = useTranslation()
@@ -105,9 +106,9 @@ const Compliance = () => {
                     </div>
                     <div className="text-[rgba(255,255,255,0.6)] text-[16px]">
                       {t('identity.aggree1')}
-                      <a href="/documents/cyberalpha-terms-of-service.pdf" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t15')}》</a>
+                      <a href={PRIVACY_SERVICE.userService.url} target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t15')}》</a>
                       {t('compliance.t17')}
-                      <a href="/documents/cyberalpha-privacy-policy.pdf" target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t16')}》</a>
+                      <a href={PRIVACY_SERVICE.privacy.url} target="_blank" className="text-[rgba(26,133,255,1)]">《{t('compliance.t16')}》</a>
                     </div>
                   </div>
                 </div>

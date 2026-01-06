@@ -70,7 +70,7 @@ const IDExpired = memo(
       }
 
       const params: any = {
-        type: expired ? 2 : 1,
+        type: (expired || pendingStep.step) ? 2 : 1,
         idInfo: {
           type: type,
           files: {
@@ -125,7 +125,7 @@ const IDExpired = memo(
           <SectionTitle>{(expired ? t('kyc.t242') : t('kyc.t241')) + t('kyc.t24')}</SectionTitle>
           {
             reviewCommentToUser && 
-            <div className=" my-t">
+            <div className=" mt-5">
               <WarningInfo text={reviewCommentToUser } />
             </div>
           }

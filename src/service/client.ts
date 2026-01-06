@@ -5,7 +5,7 @@ import {
   type ErrorHandlers,
 } from '@/config/constants'
 import axios from 'axios'
-import { bscTestnet } from '@/hooks/useCaCommon'
+import { defaultChains, bscTestnet } from '@/hooks/useCaCommon'
 
 import type {
   InternalAxiosRequestConfig,
@@ -38,6 +38,7 @@ export interface ApiResponse<T> {
 }
 
 export const PATH_URL = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE
+const isTiko = PATH_URL.includes('tiko.cc')
 
 const abortControllerMap: Map<string, AbortController> = new Map()
 
@@ -69,10 +70,9 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
     req.headers.set('Authorization', auth)
   }
-  const chainId = localStorage.getItem('D11-Chain-Id') ?? bscTestnet.id
+  const chainId = localStorage.getItem('CA-Chain-Id') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id) 
   const lng = storage.getItem('CA_LANGUAGE') || 'en'
 
-  req.headers.set('D11-Chain-Id', chainId)
   req.headers.set('CA-Chain-Id', chainId)
   req.headers.set('Accept-Language', lng)
 
