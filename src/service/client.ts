@@ -38,7 +38,7 @@ export interface ApiResponse<T> {
 }
 
 export const PATH_URL = import.meta.env.DEV ? '' : import.meta.env.VITE_API_BASE
-const isTiko = PATH_URL.includes('tiko.cc')
+export const isTiko = import.meta.env.VITE_API_BASE.includes('tiko.cc')
 
 const abortControllerMap: Map<string, AbortController> = new Map()
 
