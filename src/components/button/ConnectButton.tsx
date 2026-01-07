@@ -1,202 +1,269 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Divide } from '../divide'
-import { useTranslation } from '@/hooks/useTranslation'
-import { formatTokenAmountWithCommas, shortenAddress } from '@/utils'
-import { useActiveWeb3 } from '@/hooks/useActiveWe3'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import storage from '@/utils/storage'
-import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { cn } from '@/lib/utils'
-import { ConnectorType, useQrCodeData, type WalletConfig } from '@/hooks/useCaCommon'
-import { useToast } from '@/hooks/useToast'
-import { DialogController } from '@/components/dialog/DialogController'
-import { LazyImage } from '../image/LazyImage'
-import { useUSDT } from '@/hooks/useTokens'
-import CopyButton from './copyButton'
-import { useTokenBalance } from '@/hooks/useTokenBalances'
-import { useBaseStore } from '@/stores/baseStore'
+import storage from '@/utils/storage'
+import {
+  CONNECT_ACCOUNT,
+  CONNECTOR_TYPE,
+  WALLET_UUID,
+} from '@/config/constants'
+import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
+import { useToast } from '@/hooks/useToast'
+import { useActiveWeb3 } from '@/hooks/useActiveWe3'
+import {
+  ConnectorType,
+  useQrCodeData,
+  type WalletConfig,
+} from '@/hooks/useCaCommon'
+import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
+import { DialogController } from '@/components/dialog/DialogController'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
+import { Divide } from '../divide'
+import { LazyImage } from '../image/LazyImage'
+import CopyButton from './copyButton'
+import {
+  shortenAddress,
+  formatTokenAmountWithCommas,
+} from '@/utils'
+import { useUSDT } from '@/hooks/useTokens'
+import { useTokenBalance } from '@/hooks/useTokenBalances'
 import { useVerifyTip } from '../market-trading/VerifyIdentity'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
+export function WalletItem({ wallet, selected, onClick, }: { wallet: any, selected?: boolean, onClick?: () => void }) { const { t } = useTranslation(); return ( <div onClick={() => onClick && onClick()} className={cn( 'flex items-center justify-between py-4 cursor-pointer font-semibold text-[#FFFFFF] hover:bg-[#10141C] rounded-[8px] p-4' )} > <div className='flex items-center'> {wallet.info.icon && ( <img src={wallet.info.icon} className='w-[40px] h-[40px] mr-4' alt='' /> )} <span className='text-[16px] font-semibold'>{wallet.info.name}</span> </div> {wallet.detected && ( <div className=' flex items-center gap-x-2'> <span className=' font-normal text-[#6C86AD] text-[14px]'>{t('Detected')}</span> <LazyImage src='/images/icons/arrow-right.png' className='w-[7px]' /> </div> )} </div> ) }
 
-export function WalletItem({
-  wallet,
-  selected,
-  onClick,
-}: {
-  wallet: any
-  selected?: boolean
-  onClick?: () => void
-}) {
-  const { t } = useTranslation()
 
-  return (
-    <div
-      onClick={() => onClick && onClick()}
-      className={cn(
-        'flex items-center justify-between py-4 cursor-pointer font-semibold text-[#FFFFFF] hover:bg-[#10141C] rounded-[8px] p-4'
-      )}
-    >
-      <div className='flex items-center'>
-        {wallet.info.icon && (
-          <img src={wallet.info.icon} className='w-[40px] h-[40px] mr-4' alt='' />
-        )}
-        <span className='text-[16px] font-semibold'>{wallet.info.name}</span>
-      </div>
+/* ================= WalletStatus（按你要求） ================= */
 
-      {wallet.detected && (
-        <div className=' flex items-center gap-x-2'>
-          <span className=' font-normal text-[#6C86AD] text-[14px]'>{t('Detected')}</span>
-          <LazyImage src='/images/icons/arrow-right.png' className='w-[7px]' />
-        </div>
-      )}
-    </div>
-  )
-}
+const WalletStatus = {
+  IDLE: 'IDLE',
+  CONNECTING: 'CONNECTING',
+  CONNECTED: 'CONNECTED',
+  WRONG_NETWORK: 'WRONG_NETWORK',
+} as const
+
+type WalletStatus = (typeof WalletStatus)[keyof typeof WalletStatus]
+
+/* ================= 主组件 ================= */
 
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
   const router = useRouter()
-  const { toastError, toastSuccess } = useToast()
-  const { wallets, chainId, account, handleConnect, handleDisConnect } = useActiveWeb3()
-  const chains = useBaseStore(state => state.chainList)
-  const showConnect = useBaseStore(state => state.showConnect)
-  const setShowConnect = useBaseStore(state => state.setShowConnect)
-  // const connectInit = useBaseStore(state => state.connectInit)
-  // const setConnectInit = useBaseStore(state => state.setConnectInit)
+  const { toastSuccess, toastError } = useToast()
 
-  const currentWallet = useBaseStore(state => state.currentWallet)
-  const setCurrentWallet = useBaseStore(state => state.setCurrentWallet)
-  const hasConnected = useRef<boolean>(false)
-  const [connectorType, setConnectorType] = useState<ConnectorType | undefined>()
+  const {
+    wallets,
+    account,
+    chainId,
+    handleConnect,
+    handleDisConnect,
+  } = useActiveWeb3()
+
+  const chains = useBaseStore(s => s.chainList)
+  const showConnect = useBaseStore(s => s.showConnect)
+  const setShowConnect = useBaseStore(s => s.setShowConnect)
+  const currentWallet = useBaseStore(s => s.currentWallet)
+  const setCurrentWallet = useBaseStore(s => s.setCurrentWallet)
+
+  const setIsWalletConnecting = useAppStore(
+    s => s.setIsWalletConnecting
+  )
+
+  const [status, setStatus] = useState<WalletStatus>(
+    WalletStatus.IDLE
+  )
+  const prevStatusRef = useRef<WalletStatus>(WalletStatus.IDLE)
+
+  const [connectorType, setConnectorType] = useState<
+    ConnectorType | undefined
+  >(undefined)
+  const [hoverOpen, setHoverOpen] = useState(false)
+
+  const isManualConnect = useRef(false)
+
+  const networkText = useMemo(
+    () => chains.map(c => c.displayName).join(' / '),
+    [chains]
+  )
 
   const usdtToken = useUSDT()
-  const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
-
-  const network = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains])
-
-  const disconnectInit = useRef(false)
-  const connectInit = useRef(false)
-  const clickConnect = useRef(false)
-  const onceRef = useRef(false)
-
-  const setIsWalletConnecting = useAppStore(state => state.setIsWalletConnecting)
+  const usdtBalance = useTokenBalance(
+    usdtToken?.symbol ?? ''
+  )
 
   const { verifyTip } = useVerifyTip()
-  const [ isSignatureValid ] = useSignatureValidStatus()
+  const [isSignatureValid] = useSignatureValidStatus()
 
-  // 默认执行一次连接钱包操作
+
   useEffect(() => {
-    if (wallets.length > 0 && !account && !hasConnected.current) {
-      const walletUUID = storage.getItem(WALLET_UUID)
-      const connectorType = storage.getItem(CONNECTOR_TYPE)
-      if (walletUUID && connectorType) {
-        const wallet = wallets.find(wallet => wallet.info.name === walletUUID)
+    if (!account || !chainId) {
+      setStatus(WalletStatus.IDLE)
+      return
+    }
 
-        if (!wallet) return
-        if (connectorType === ConnectorType.Injected && !wallet.detected) return
+    const supported = chains.some(
+      c => c.id === chainId
+    )
 
-        hasConnected.current = true
-        setCurrentWallet(wallet)
-        // @ts-ignore
-        handleConnect(connectorType, wallet)
-      } else {
+    setStatus(
+      supported
+        ? WalletStatus.CONNECTED
+        : WalletStatus.WRONG_NETWORK
+    )
+  }, [account, chainId, chains])
+
+
+  useEffect(() => {
+    const prevStatus = prevStatusRef.current
+
+    switch (status) {
+      case WalletStatus.CONNECTED:
         setIsWalletConnecting(false)
-      }
-    } else if (!hasConnected.current) {
-      setIsWalletConnecting(false)
-    }
+        setShowConnect(false)
+        storage.setItem(CONNECT_ACCOUNT, account!)
 
-    if (account) {
-      setIsWalletConnecting(false)
-      // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
-      if (!connectInit.current && clickConnect.current && !onceRef.current) {
-        onceRef.current = true
-        toastSuccess({
-          title: t('connectSuccess'),
-        })
-        setTimeout(() => {
-          connectInit.current = true
-          disconnectInit.current = false
-        }, 1000)
-      }
-      storage.setItem(CONNECT_ACCOUNT, account)
-    }
-  }, [wallets, chainId, account, handleConnect])
+        if (isManualConnect.current) {
+          toastSuccess({ title: t('connectSuccess') })
+          isManualConnect.current = false
+        }
+        break
 
-  useEffect(() => {
-    if (account && connectInit.current) {
-      // 判断chainId是不是支持的链
-      const chain = chains.find(chain => chain.id === chainId)
-      if (!chain) {
-        handleDisConnect()
-        connectInit.current = false
-        // 请切换到支持的链
+      case WalletStatus.WRONG_NETWORK:
         toastError({
-          title: t('switchNetwork', { network: network }),
+          title: t('switchNetwork', { network: networkText }),
         })
+        handleDisConnect()
+        break
+
+      case WalletStatus.IDLE:
+        setIsWalletConnecting(false)
+
+        // ⭐⭐ 核心修复点 ⭐⭐
+        if (prevStatus === WalletStatus.CONNECTED) {
+          toastError({
+            title: t('walletDisconnect'),
+          })
+        }
+        break
+    }
+
+    prevStatusRef.current = status
+  }, [status])
+
+
+  useEffect(() => {
+    if (!wallets.length || account) return
+
+    const walletUUID = storage.getItem(WALLET_UUID)
+    const connector = storage.getItem(
+      CONNECTOR_TYPE
+    ) as ConnectorType | null
+
+    if (!walletUUID || !connector) return
+
+    if (connector !== ConnectorType.Injected) {
+      return
+    }
+
+    const wallet = wallets.find(
+      w => w.info.name === walletUUID
+    )
+    if (!wallet) return
+
+    if (
+      connector === ConnectorType.Injected &&
+      !wallet.detected
+    ) {
+      return
+    }
+    setCurrentWallet(wallet)
+    setStatus(WalletStatus.CONNECTING)
+    setIsWalletConnecting(true)
+
+    handleConnect(connector, wallet)
+  }, [wallets])
+
+  const connectWallet = async (wallet: WalletConfig) => {
+    isManualConnect.current = true
+    setCurrentWallet(wallet)
+    setIsWalletConnecting(true)
+    setStatus(WalletStatus.CONNECTING)
+
+    if (wallet.detected) {
+      if (!wallet.provider) {
+        console.error(
+          'Injected wallet missing provider'
+        )
+        setIsWalletConnecting(false)
+        return
       }
-    }
-  }, [account, chainId, chains, handleDisConnect])
-  
-  useEffect(() => {
-    if (!account && !disconnectInit.current && connectInit.current) {
-      disconnectInit.current = true
-      toastError({
-        title: t('walletDisconnect'),
-      })
-      setTimeout(() => {
-        connectInit.current = false
-      }, 1000)
-    }
-  }, [account])
 
-  useEffect(() => {
-    if (account && showConnect) {
-      setShowConnect(false)
-    }
-    if (account && connectorType) {
-      setConnectorType(undefined)
-    }
-  }, [account, showConnect])
+      setConnectorType(ConnectorType.Injected)
+      storage.setItem(
+        CONNECTOR_TYPE,
+        ConnectorType.Injected
+      )
+      storage.setItem(
+        WALLET_UUID,
+        wallet.info.name
+      )
 
-  useEffect(() => {
-    if (!showConnect) {
-      setConnectorType(undefined)
+      await handleConnect(
+        ConnectorType.Injected,
+        wallet
+      )
+      return
     }
-  }, [showConnect])
 
-  const isShwoingQrCode = connectorType === ConnectorType.WalletConnect
+    setConnectorType(ConnectorType.WalletConnect)
+    storage.setItem(
+      CONNECTOR_TYPE,
+      ConnectorType.WalletConnect
+    )
+    storage.setItem(
+      WALLET_UUID,
+      wallet.info.name
+    )
+
+    await handleConnect(
+      ConnectorType.WalletConnect,
+      wallet
+    )
+  }
+
+
+  const goTo = (path: string) => {
+    setHoverOpen(false)
+    router.push(path)
+  }
+
+  const isShowingQrCode =
+    connectorType === ConnectorType.WalletConnect
+
   const dialogTitle =
-    isShwoingQrCode && currentWallet ? (
+    isShowingQrCode && currentWallet ? (
       <div className='flex items-center justify-center relative'>
         <LazyImage
           onClick={() => setConnectorType(undefined)}
           className='w-6 h-6 absolute left-0 top-0 cursor-pointer'
           src='/images/icons/back.png'
         />
-        <span className='text-base/6 font-semibold'>{currentWallet.info.name}</span>
+        <span className='text-base font-semibold'>
+          {currentWallet.info.name}
+        </span>
       </div>
     ) : (
-      <span className='text-base/6 font-semibold'>{t('Connect Wallet')}</span>
+      <span className='text-base font-semibold'>
+        {t('Connect Wallet')}
+      </span>
     )
 
-  const goTo = (action: string) => {
-    setOpen(false)
-    if (action === 'assets') {
-      router.push('/assets')
-    }
-    if (action === 'identity') {
-      router.push('/identity')
-    }
-  }
+  /* ================= 渲染（UI 原样） ================= */
 
   return (
     <>
@@ -206,45 +273,44 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             'h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer',
             props.connectBtnClassName
           )}
-          onClick={() => {
-            setShowConnect(true)
-          }}
+          onClick={() => setShowConnect(true)}
         >
-          {account || t('Connect Wallet')}
+          {t('Connect Wallet')}
         </div>
       ) : (
         <HoverCard
-          open={open}
-          onOpenChange={(isOpen) => {
-            setOpen(isOpen)
-          }}
+          open={hoverOpen}
+          onOpenChange={setHoverOpen}
         >
           <HoverCardTrigger asChild>
-            <div
-              className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'
-              onClick={() => {}}
-            >
+            <div className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'>
               {currentWallet?.info?.icon && (
-                <img src={currentWallet?.info?.icon} className='w-6 mr-2' alt='' />
+                <img
+                  src={currentWallet.info.icon}
+                  className='w-6 mr-2'
+                />
               )}
               <div className='w-full h-full bg-[rgba(255,255,255,0.1)] rounded-[6px] px-2 flex items-center justify-center'>
                 {shortenAddress(account)}
               </div>
             </div>
           </HoverCardTrigger>
+
           <HoverCardContent
             align='end'
             className='bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2 -mr-[16px]'
           >
-            <div
-              className='bg-[#131823] rounded-[8px] pt-4 text-white'
+            <div className='bg-[#131823] rounded-[8px] text-white'
               style={{ boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)' }}
             >
-              <div className=' px-4'>
+              <div className='px-4'>
                 <div className='flex items-center justify-between py-3'>
                   <div className=' text-sm font-semibold'>{shortenAddress(account)}</div>
-                  <CopyButton copyText={account} />
+                  <CopyButton
+                    copyText={account}
+                  />
                 </div>
+
                 <div className='py-3'>
                   <div className='flex items-center'>
                     <img src='/images/tokens/usdt.png' className='w-5 h-5' alt='' />
@@ -257,6 +323,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   </div>
                   <div className='text-[#6C86AD] text-sm leading-6'>{t('Total USDT Balance')}</div>
                 </div>
+
                 <div
                   className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('assets')}
@@ -264,6 +331,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
                   <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
                 </div>
+
                 <div
                   className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('identity')}
@@ -272,12 +340,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <span className='text-[14px] font-semibold ml-2'>{!isSignatureValid ? t('identity.verifyID') : (verifyTip || t('verified'))}</span>
                 </div>
               </div>
-              <Divide className='mt-[14px]' />
+
+              <Divide />
+
               <div
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
-                  clickConnect.current = false
-                  onceRef.current = false
                   await handleDisConnect()
                 }}
               >
@@ -289,50 +357,37 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         </HoverCard>
       )}
 
-      <DialogController topFixed title={dialogTitle} open={showConnect} openChange={setShowConnect}>
+      <DialogController
+        topFixed
+        open={showConnect}
+        openChange={(open) => {
+          setShowConnect(open)
+
+          if (!open) {
+            setTimeout(() => {
+              setConnectorType(undefined)
+            }, 500);
+            
+          }
+        }}
+
+        title={dialogTitle}
+      >
         <div className='rounded-[8px] pt-4 text-white w-[402px]'>
-          {connectorType === ConnectorType.WalletConnect ? (
+          {connectorType ===
+          ConnectorType.WalletConnect ? (
             <QrCodeView currentWallet={currentWallet} />
           ) : (
             <div className='px-4'>
-              {wallets.map(wallet => {
-                return (
-                  <WalletItem
-                    key={wallet.info.name}
-                    wallet={wallet}
-                    onClick={async () => {
-                      clickConnect.current = true
-                      setCurrentWallet(wallet)
-
-                      // 已检测到钱包，使用插件钱包直接连接
-                      if (wallet.detected) {
-                        // @ts-ignore
-                        const chainId = parseInt(wallet.provider.chainId, 16)
-                        const chain = chains.find(chain => Number(chain.id) === chainId)
-                        
-                        if (chain) {
-                          // @ts-ignore
-                          setConnectorType(ConnectorType.Injected)
-                          await handleConnect(ConnectorType.Injected, wallet)
-                          hasConnected.current = true
-                          setCurrentWallet(wallet)
-                        } else {
-                          toastError({
-                            title: t('switchNetwork', { network: network }),
-                          })
-                        }
-                      }
-
-                      // 未检测到钱包，使用 WalletConnect 连接
-                      if (!wallet.detected) {
-                        setConnectorType(ConnectorType.WalletConnect)
-                        await handleConnect(ConnectorType.WalletConnect, wallet)
-                        hasConnected.current = true
-                      }
-                    }}
-                  />
-                )
-              })}
+              {wallets.map(wallet => (
+                <WalletItem
+                  key={wallet.info.name}
+                  wallet={wallet}
+                  onClick={() =>
+                    connectWallet(wallet)
+                  }
+                />
+              ))}
             </div>
           )}
         </div>
@@ -340,6 +395,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     </>
   )
 }
+
 
 function QrCodeView(props: { currentWallet: WalletConfig }) {
   const { t } = useTranslation()
