@@ -54,6 +54,19 @@ export function FaceRecognitionFailed(props: { retry: () => void }) {
   )
 }
 
+export function OCRVerifyLimit() {
+  const router = useRouter()
+  return (
+    <VerifyStatus
+      type='failed'
+      title='f'
+      detail='t67'
+      btnText='h'
+      btnOnClick={() => router.push('/')}
+    />
+  )
+}
+
 export function VerifyFailed() {
   const router = useRouter()
   return (

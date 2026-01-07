@@ -1,7 +1,7 @@
 import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
 import QRCode from '@/components/qrcode'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { kycApi } from '@/service/kyc/api'
 import type { IKycDetail } from '@/service/kyc/types'
 import { KYC_STATUS } from '@/service/kyc/types'
@@ -35,8 +35,15 @@ export default function FaceRecognition({
   const [errorMsg, setErrorMsg] = useState('')
   const pendingStep = usePendingStep()
 
+  const clickLockRef = useRef(false)
+
   const refreshQrCode = async () => {
     try {
+      if (clickLockRef.current || isLoading) return
+
+      // 加锁
+      clickLockRef.current = true
+
       setIsLoading(true)
       const { data } = await kycApi.getLivenessUrl(pendingStep.step || 1)
       if (data) {
@@ -59,6 +66,7 @@ export default function FaceRecognition({
       }
     } finally {
       setIsLoading(false)
+      clickLockRef.current = false
     }
   }
 
@@ -131,18 +139,9 @@ export default function FaceRecognition({
       <div className='text-lg'>{t(`${faceLangPrefix}.rg`)}</div>
       <div className='text-base text-60'>{t(`${faceLangPrefix}.title`)}</div>
       <div className='m-4 self-center relative w-[224px] h-[224px]'>
-        {isLoading && <CircleLoading className='absolute inset-0 m-auto' />}
-        {showQrcode && (
-          <>
-            <QRCode value={urlInfo.url} size={224} margin={0} />
-            {isExpired && (
-              <QrCodeMask>
-                <QrCodeExpirted refresh={refreshQrCode} />
-              </QrCodeMask>
-            )}
-          </>
-        )}
-        {urlInfo === undefined && !isLoading && (
+        {isLoading ? (
+          <CircleLoading className='absolute inset-0 m-auto' />
+        ) : urlInfo === undefined ? (
           <>
             <QRCode value='click to get qr code' size={224} />
             <QrCodeMask>
@@ -151,8 +150,18 @@ export default function FaceRecognition({
               </div>
             </QrCodeMask>
           </>
-        )}
-        {isMaxTimesReached && <MaxTimesReached />}
+        ) : isMaxTimesReached ? (
+          <MaxTimesReached />
+        ) : showQrcode ? (
+          <>
+            <QRCode value={urlInfo.url} size={224} margin={0} />
+            {isExpired && (
+              <QrCodeMask>
+                <QrCodeExpirted refresh={refreshQrCode} isLoading={isLoading} />
+              </QrCodeMask>
+            )}
+          </>
+        ) : null}
       </div>
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
@@ -165,7 +174,7 @@ export default function FaceRecognition({
             refreshQrCode()
           }}
           disabled={isLoading}
-          className='w-[402px] disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 text-white m-auto border border-white rounded-lg cursor-pointer'
+          className='w-[402px] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none px-6 py-2 text-white m-auto border border-white rounded-lg cursor-pointer'
         >
           {t(`${faceLangPrefix}.getQr`)}
         </button>
@@ -175,13 +184,20 @@ export default function FaceRecognition({
 }
 
 // 二维码过期
-function QrCodeExpirted({ refresh }: { refresh: () => Promise<void> }) {
+function QrCodeExpirted({
+  refresh,
+  isLoading,
+}: {
+  refresh: () => Promise<void>
+  isLoading: boolean
+}) {
   const { t } = useTranslation()
   return (
     <div className='relative w-[150px] flex flex-row items-center justify-center'>
       <button
         onClick={refresh}
-        className='w-[62px] h-[62px] cursor-pointer bg-[#1D1D1D] rounded-lg'
+        disabled={isLoading}
+        className='w-[62px] h-[62px] cursor-pointer bg-[#1D1D1D] rounded-lg disabled:cursor-not-allowed'
       >
         <LazyImage src='/images/icons/identity/refresh.png' className='w-[23px] h-7 m-auto' />
         <div className='absolute left-0 w-full bottom-[-30px] text-[10px] text-white'>

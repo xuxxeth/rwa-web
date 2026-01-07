@@ -56,5 +56,5 @@ export const kycApi = {
   getAgreementsAccepted: () => client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
 
   postAgreementsAccept: (privacy: string, userService: string) =>
-    client.post<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accept?privacy=' + privacy + '&userService=' + userService),
+    client.post<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accept?privacy=' + privacy + '&user-service=' + userService, {privacy, 'user-service': userService}),
 }
