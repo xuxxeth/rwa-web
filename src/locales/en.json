@@ -308,7 +308,8 @@
       "pre2": "How to make your first trade",
       "hot": "Popular Assets",
       "rs": "Retry Submit",
-      "rv": "Retry Verify"
+      "rv": "Retry Verify",
+      "t67": "Identity verification is temporarily unavailable. Please try again later."
     },
     "firstName": "First Name",
     "lastName": "Last Name",

@@ -19,6 +19,7 @@ import {
   VerifySucceeded,
   VerifyFailed,
   Verifying,
+  OCRVerifyLimit,
 } from './components/VerifyStatus'
 import { useAccount, useChainId } from 'ca-common-web'
 import { useAppStore } from '@/stores/appStore'
@@ -139,6 +140,7 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
+      
       // 已过期/即将过期
       {
         match: () =>
@@ -180,6 +182,11 @@ function Identity({ account }: { account: string }) {
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
         render: () => <VerifyFailed />,
+      },
+      // OCR次数用完了, status返回特殊的状态8，且在ocr阶段
+      {
+        match: () => status === 8 && verifyType === KYC_VERIFY_TYPE.OCR,
+        render: () => <OCRVerifyLimit />,
       },
       // 认证中 - Income High Risk
       {
