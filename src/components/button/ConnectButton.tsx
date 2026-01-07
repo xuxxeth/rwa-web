@@ -84,6 +84,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   const disconnectInit = useRef(false)
   const connectInit = useRef(false)
+  const clickConnect = useRef(false)
+  const onceRef = useRef(false)
 
   const setIsWalletConnecting = useAppStore(state => state.setIsWalletConnecting)
 
@@ -115,8 +117,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     if (account) {
       setIsWalletConnecting(false)
       // 如果connectInit没有初始化，说明是第一次连接钱包，有个toast提示
-      if (!connectInit.current) {
-        connectInit.current = true
+      if (!connectInit.current && clickConnect.current && !onceRef.current) {
+        onceRef.current = true
         toastSuccess({
           title: t('connectSuccess'),
         })
@@ -143,6 +145,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       }
     }
   }, [account, chainId, chains, handleDisConnect])
+  
   useEffect(() => {
     if (!account && !disconnectInit.current && connectInit.current) {
       disconnectInit.current = true
@@ -273,6 +276,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
               <div
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
+                  clickConnect.current = false
+                  onceRef.current = false
                   await handleDisConnect()
                 }}
               >
@@ -296,6 +301,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                     key={wallet.info.name}
                     wallet={wallet}
                     onClick={async () => {
+                      clickConnect.current = true
                       setCurrentWallet(wallet)
 
                       // 已检测到钱包，使用插件钱包直接连接
@@ -303,6 +309,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                         // @ts-ignore
                         const chainId = parseInt(wallet.provider.chainId, 16)
                         const chain = chains.find(chain => Number(chain.id) === chainId)
+                        
                         if (chain) {
                           // @ts-ignore
                           setConnectorType(ConnectorType.Injected)
