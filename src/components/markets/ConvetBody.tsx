@@ -147,7 +147,7 @@ export function ConverBody({
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true, skipSimulate: true})
+    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: false, skipSimulate: true})
     setBuying(false)
     console.log(result)
     const orderType = params.tradeType === TradeType.MARKET ? t('limit') : t('market')

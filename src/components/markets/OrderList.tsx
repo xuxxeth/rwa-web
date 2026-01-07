@@ -81,7 +81,7 @@ const OrderList = memo(
         setCancelOrderId(String(orderId))
         // TODO: 需要在 ca-common-web 里修复
         // @ts-ignore
-        const result = await cancelOrder(orderId, { wait: true, skipSimulate: true })
+        const result = await cancelOrder(orderId, { wait: false, skipSimulate: true })
         if (result && result?.code !== 9200) {
           // @ts-ignore
           const errorMessage = result.data?.message
