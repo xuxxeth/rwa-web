@@ -1,4 +1,4 @@
-import { useAccount, useChainId, useConnect, useDisconnect, useWallets } from '@/hooks/useCaCommon'
+import { useAccount, useChainId, useConnect, useDisconnect, useWallets, useInitialized } from '@/hooks/useCaCommon'
 
 import { useCallback } from 'react'
 import type { ConnectorType, WalletConfig } from '@/hooks/useCaCommon'
@@ -11,13 +11,22 @@ export function useActiveWeb3() {
   const disConnect = useDisconnect()
   const account = useAccount() as unknown as string | undefined
   const chainId = useChainId()
+  const initialized = useInitialized()
 
   const handleConnect = useCallback(
     async (connectorType: ConnectorType, wallet: WalletConfig) => {
-      storage.setItem(CONNECTOR_TYPE, connectorType)
-      storage.setItem(WALLET_UUID, wallet.info.name)
-      storage.setItem(LATEST_WALLET_UUID, wallet.info.name)
-      await connect(connectorType, wallet)
+      try {
+        await connect(connectorType, wallet)
+        // 这里应该是连接成功之后，才存储状态
+        storage.setItem(CONNECTOR_TYPE, connectorType)
+        storage.setItem(WALLET_UUID, wallet.info.name)
+        storage.setItem(LATEST_WALLET_UUID, wallet.info.name)
+      } catch (error) {
+        storage.removeItem(WALLET_UUID)
+        storage.removeItem(CONNECTOR_TYPE)
+        storage.removeItem(LATEST_WALLET_UUID)
+        throw error
+      }
     },
     [connect]
   )
@@ -29,6 +38,7 @@ export function useActiveWeb3() {
   }, [disConnect])
 
   return {
+    initialized,
     wallets,
     account,
     chainId,

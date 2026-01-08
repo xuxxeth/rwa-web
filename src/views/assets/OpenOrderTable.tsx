@@ -268,7 +268,7 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
   const handleCancelOrder = async () => {
     try {
       setIsCanceling(true)
-      const res = await cancelOrder(orderId, { wait: false, skipSimulate: true })
+      const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
         toastSuccess({
           title: t('assets.order.cancelOrderSuccess'),
