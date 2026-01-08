@@ -111,6 +111,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const handleConnect = useCallback(
     async (connectorType: ConnectorType, wallet: WalletConfig) => {
       try {
+        setIsQrCodeInvalid(false)
         await rwaHandleConnect(connectorType, wallet)
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
