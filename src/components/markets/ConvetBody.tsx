@@ -1,7 +1,7 @@
 import { CurrencyInputPanel } from "@/components/input/CurrencyInputPanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EstimatedInfo } from "../../views/lite-trade/components/EstimatedInfo";
 import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
@@ -13,7 +13,7 @@ import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
-import { useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
@@ -23,6 +23,7 @@ import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
 import { KYC_OVERALL_STATUS, PENDING_STEPS } from "@/service/kyc/types";
 import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
+import type { IRwa, IRwaPrice, ITokenWithPrice } from "@/service/base/types";
 
 type ConverBodyProps = {
   action?: string
@@ -56,11 +57,31 @@ export function ConverBody({
 
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken?.address, outputToken?.address])
 
-  const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
+  const rwaPrice = useRwaPrice(inputToken?.symbol || '')
+  const initPrice = useRef(false)
+  // const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
+  const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
+
+  useEffect(() => {
+    if (rwaPrice && !initPrice.current) {
+      initPrice.current = true
+      setInputTokenPrice(rwaPrice)
+    }
+  }, [rwaPrice])
+  const preToken = useRef<IRwa | null>(null)
+  useEffect(() => {
+
+    if (inputToken && preToken.current?.symbol !== inputToken?.symbol) {
+      preToken.current = inputToken
+      setInputTokenPrice(rwaPrice)
+    }
+  }, [inputToken, rwaPrice])
 
   const approveAmount = useMemo(() => {
-    return orderValue ? parseAmount(orderValue, outputToken?.decimals) : '0'
-  }, [orderValue, outputToken])
+    return action === 'buy' ?
+            (orderValue ? parseAmount(orderValue, outputToken?.decimals) : '0') :
+            (inputSize ? parseAmount(inputSize, inputToken?.decimals) : '0')
+  }, [orderValue, inputSize, outputToken, inputToken, action, ])
 
   console.log('orderValue: ', orderValue, approveAmount)
   console.log('approveToken: ', paymentToken)
@@ -80,16 +101,17 @@ export function ConverBody({
   
   useEffect(() => {
     if (inputTokenPrice) {
-      updateLimitPrice(inputTokenPrice.price ?? '0')
+      updateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
     }
   }, [inputToken, inputTokenPrice, updateLimitPrice])
   
   useEffect(() => {
     if (Number(limitPrice) && Number(inputSize)) {
       const result = new BigNumber(limitPrice)
-        .multipliedBy(inputSize)
-        .decimalPlaces(6, BigNumber.ROUND_DOWN) // 保留 6 位小数，向下取整
-      setOrderValue(result.toFixed())
+          .multipliedBy(inputSize)
+          .decimalPlaces(6, BigNumber.ROUND_DOWN) // 保留 6 位小数，向下取整
+        setOrderValue(result.toFixed())
+      
     } else {
       setOrderValue('')
     }
@@ -147,9 +169,8 @@ export function ConverBody({
     }
     console.log(params)
     setBuying(true)
-    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: false, skipSimulate: true})
+    const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true, skipSimulate: true})
     setBuying(false)
-    console.log(result)
     const orderType = params.tradeType === TradeType.MARKET ? t('limit') : t('market')
     const orderSide = params.side === SideType.BUYLIMIT ? t('Buy') : t('Sell')
     
