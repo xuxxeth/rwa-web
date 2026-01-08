@@ -173,20 +173,11 @@ function Identity({ account }: { account: string }) {
           
         ),
       },
-      // 认证成功
-      {
-        match: () => overallStatus === KYC_OVERALL_STATUS.VERIFIED,
-        render: () => <VerifySucceeded />,
-      },
+      
       // 认证失败
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
         render: () => <VerifyFailed />,
-      },
-      // OCR次数用完了, status返回特殊的状态8，且在ocr阶段
-      {
-        match: () => status === 8 && verifyType === KYC_VERIFY_TYPE.OCR,
-        render: () => <OCRVerifyLimit />,
       },
       // 认证中 - Income High Risk
       {
@@ -291,6 +282,11 @@ function Identity({ account }: { account: string }) {
           verifyType === KYC_VERIFY_TYPE.KYT &&
           status === KYC_STATUS.VERIFYING,
         render: () => <Verifying refresh={refresh} />,
+      },
+      // 认证成功
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.VERIFIED,
+        render: () => <VerifySucceeded />,
       },
       // 加一个兜底渲染
       {

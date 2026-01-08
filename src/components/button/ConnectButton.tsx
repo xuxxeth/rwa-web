@@ -133,6 +133,13 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setStatus(supported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
   }, [account, chainId, chains])
 
+  const hasInitializedRef = useRef(false)
+  useEffect(() => {
+    if (initialized) {
+      hasInitializedRef.current = true
+    }
+  }, [initialized])
+
   useEffect(() => {
     const prevStatus = prevStatusRef.current
 
@@ -158,8 +165,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       case WalletStatus.IDLE:
         setIsWalletConnecting(false)
 
-        // ⭐⭐ 核心修复点 ⭐⭐
-        if (prevStatus === WalletStatus.CONNECTED) {
+        if (hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
           toastError({
             title: t('walletDisconnect'),
           })
