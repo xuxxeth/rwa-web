@@ -88,7 +88,7 @@ const Financials = memo(
         baseApi.getIndicators(inputToken.stockId)
           .then(res => {
             // @ts-ignore
-            setIndicatorsData(res?.data?.indicators || {})
+            setIndicatorsData(res?.data?.indicators || [])
           })
       }
       
