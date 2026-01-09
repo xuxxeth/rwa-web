@@ -163,8 +163,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         break
 
       case WalletStatus.IDLE:
-        setIsWalletConnecting(false)
-
+        
         if (hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
           toastError({
             title: t('walletDisconnect'),
@@ -211,16 +210,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       }
 
       setConnectorType(ConnectorType.Injected)
-      storage.setItem(CONNECTOR_TYPE, ConnectorType.Injected)
-      storage.setItem(WALLET_UUID, wallet.info.name)
 
       await handleConnect(ConnectorType.Injected, wallet)
       return
     }
 
     setConnectorType(ConnectorType.WalletConnect)
-    storage.setItem(CONNECTOR_TYPE, ConnectorType.WalletConnect)
-    storage.setItem(WALLET_UUID, wallet.info.name)
 
     await handleConnect(ConnectorType.WalletConnect, wallet)
   }
