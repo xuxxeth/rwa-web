@@ -16,7 +16,8 @@ export function XFooter({
     <MainLayout>
       <div className='md:flex justify-between px-5 font-normal'>
         <div>
-          <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' />
+          {/* <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' /> */}
+          <LazyImage src={'/images/logo_temp.png'} className='w-[60px]' alt='' />
           <div className=' hidden md:block'>
             <a href='mailto:contact@cyberalpha.cc'>
               <div className='flex items-center my-4'>
