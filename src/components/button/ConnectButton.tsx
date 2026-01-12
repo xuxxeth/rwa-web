@@ -117,6 +117,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         if (connectorType === ConnectorType.WalletConnect) {
           setIsQrCodeInvalid(true)
         }
+      } finally {
+        setIsWalletConnecting(false)
       }
     },
     [rwaHandleConnect]
@@ -163,7 +165,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         break
 
       case WalletStatus.IDLE:
-        
         if (hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
           toastError({
             title: t('walletDisconnect'),
@@ -181,7 +182,11 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     const walletUUID = storage.getItem(WALLET_UUID)
     const connector = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
 
-    if (!walletUUID || !connector) return
+    // 默认 isWalletConnecting 为 true, 如果发现不需要重连，把 isWalletConnecting 设为 false
+    if (!walletUUID || !connector) {
+      setIsWalletConnecting(false)
+      return
+    }
 
     const wallet = wallets.find(w => w.info.name === walletUUID)
     if (!wallet) return
