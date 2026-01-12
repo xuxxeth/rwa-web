@@ -172,6 +172,9 @@
         "cancelled": "已撤單",
         "filled": "完全成交",
         "rejected": "已拒絕",
+        "rejected2": "廢單",
+        "systemInitiated": "系統發起",
+        "marketCloseCancelled": "收市撤單",
         "pendingCancel": "撤單中"
       },
 

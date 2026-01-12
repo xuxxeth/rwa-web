@@ -11,7 +11,7 @@ import {
 import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed } from '@/utils'
-import type { OrderType, RiskType } from '@/service/scan/types'
+import type { IOrder, OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 import { NoData } from '@/components/markets/NoData'
 
@@ -55,6 +55,24 @@ export function ValueCell(props: { value: string, currency?: string }) {
     />
   )
 }
+
+export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
+  const { t } = useTranslation()
+  if (reason === 0) return null
+
+  const reasonMap: Record<number, string> = {
+    1: 'systemInitiated',
+    2: 'marketCloseCancelled',
+    3: 'rejected2',
+  }
+
+  const key = reasonMap[reason]
+
+  if (!key) return null
+
+  return <TextCell text={t(`assets.order.state.${key}`)} />
+}
+
 
 export function SideCell(props: { side: 0 | 1 }) {
   const { t } = useTranslation()

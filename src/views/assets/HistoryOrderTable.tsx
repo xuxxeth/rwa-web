@@ -24,6 +24,7 @@ import {
   TokenFilterItem,
   isRiskLocked,
   RiskLockFlag,
+  ReasonCell
 } from './Shared'
 import { textPrefix, textSuffix, toFixed, formatTimestamp } from '@/utils/format'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
@@ -295,12 +296,13 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'txHash',
     sortable: false,
-    width: 130,
+    width: 140,
     render: (item: IOrder) => <TxHashCell hash={item.txHash} />,
   },
   {
     key: 'details',
     sortable: false,
-    render: () => null,
+    width: 80,
+    render: (item: IOrder) => <ReasonCell reason={item.reason} />,
   },
 ]

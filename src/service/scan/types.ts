@@ -52,7 +52,7 @@ export interface IOrder {
   settledAmount: string
   // 成交数量
   settledSize: string
-  reason: string
+  reason: 0 | 1 | 2 | 3
   txTime: number
   tradeTime: number
   txHash: string

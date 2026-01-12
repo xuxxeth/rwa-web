@@ -175,6 +175,8 @@
         "filled": "Filled",
         "partiallyFilledAndCancelled": "Partially Filled & Cancelled",
         "rejected": "Rejected",
+        "rejected2": "Rejected",
+        "systemInitiated": "System Initiated",
         "marketCloseCancelled": "Market Close Cancelled",
         "pendingCancel": "Cancelling"
       },
