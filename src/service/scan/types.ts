@@ -10,6 +10,8 @@ export type RiskType = 0 | 1
 // 0 Day(当日有效) 1 GTD(指定日期有效) 2 GTC(一直有效)
 export type Tif = 0 | 1 | 2
 
+export type Reason = 0 | 1 | 2 | 3
+
 export interface IOpenOrder {
   id: number
   chainId: number
@@ -27,7 +29,7 @@ export interface IOpenOrder {
   settledSize: string
   txTime: number
   txHash: string
-  reason: string
+  reason: Reason
   currency: string
 }
 
@@ -52,7 +54,7 @@ export interface IOrder {
   settledAmount: string
   // 成交数量
   settledSize: string
-  reason: 0 | 1 | 2 | 3
+  reason: Reason
   txTime: number
   tradeTime: number
   txHash: string
@@ -72,6 +74,6 @@ export interface ITrade {
   stockId: number
   txHash: string
   txTime: number
-  reason: string
+  reason: Reason
   currency: string
 }
