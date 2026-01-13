@@ -53,7 +53,7 @@ const MarketTrading = memo(
       }
     }, [marketTradeState, t])
     if (!marketInfo.info) return null
-    if (kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN || pendingStep.step) return <VerifyIdentity riskStatus={kycStatus} />
+    if (kycStatus !== RISK_STATUS.ISSUE && kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN || pendingStep.step) return <VerifyIdentity riskStatus={kycStatus} />
     return (
       <BoxCard className={cn(
         "rounded-[4px] h-[48px] py-0 flex items-center pl-4",
