@@ -19,10 +19,10 @@ export function XFooter({
           {/* <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' /> */}
           <LazyImage src={'/images/logo_temp.png'} className='w-[60px]' alt='' />
           <div className=' hidden md:block'>
-            <a href='mailto:contact@cyberalpha.cc'>
+            <a href='mailto:contact@tiko.cc'>
               <div className='flex items-center my-4'>
                 <img src='/images/icons/e_mail.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
+                <div className='text-80 ml-2'>contact@tiko.cc</div>
               </div>
             </a>
             <div className=' text-base text-80'>

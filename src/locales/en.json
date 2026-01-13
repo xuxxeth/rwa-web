@@ -311,7 +311,8 @@
       "hot": "Popular Assets",
       "rs": "Retry Submit",
       "rv": "Retry Verify",
-      "t67": "Identity verification is temporarily unavailable. Please try again later."
+      "t67": "Identity verification is temporarily unavailable. Please try again later.",
+      "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc"
     },
     "firstName": "First Name",
     "lastName": "Last Name",

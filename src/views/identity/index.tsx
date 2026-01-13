@@ -19,7 +19,7 @@ import {
   VerifySucceeded,
   VerifyFailed,
   Verifying,
-  OCRVerifyLimit,
+  VerifyIssue,
 } from './components/VerifyStatus'
 import { useAccount, useChainId } from 'ca-common-web'
 import { useAppStore } from '@/stores/appStore'
@@ -178,6 +178,10 @@ function Identity({ account }: { account: string }) {
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
         render: () => <VerifyFailed />,
+      },
+      {
+        match: () => overallStatus === KYC_OVERALL_STATUS.ISSUE,
+        render: () => <VerifyIssue />,
       },
       // 认证中 - Income High Risk
       {

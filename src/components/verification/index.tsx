@@ -79,7 +79,6 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
   const { kycStatus } = useKycStatus()
-  const kycRiskLevel = useKycRiskLevel()
   const pendingStep = usePendingStep()
   const startVerification = () => {
     router.push('/identity')
@@ -92,13 +91,13 @@ export function Verification(props: { verified: boolean; issued: boolean }) {
         
         <div className="flex flex-row gap-4">
           {
-            kycStatus === KYC_STATUS.VERIFIED ?
-              <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED && !pendingStep.expired} issued={kycRiskLevel === KYC_RISK_LEVEL.HIGH} 
+            (kycStatus === KYC_STATUS.VERIFIED || kycStatus === RISK_STATUS.ISSUE) ?
+              <VerificationStatus verified={kycStatus === RISK_STATUS.VERIFIED && !pendingStep.expired} issued={kycStatus === RISK_STATUS.ISSUE} 
               onClick={startVerification}
             /> : null 
           }
           
-          {kycStatus !== RISK_STATUS.VERIFIED && <StartVerificationButton verifying={false} onClick={startVerification} />}
+          {kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.ISSUE && <StartVerificationButton verifying={false} onClick={startVerification} />}
         </div> :
         <SignButton refreshIsSignatureValid={() => {
           refreshIsSignatureValid()

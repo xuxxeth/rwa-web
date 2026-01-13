@@ -21,6 +21,8 @@ import { useVerifyTip } from '../market-trading/VerifyIdentity'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { CircleLoading } from '@/components/loading'
 import QRCode from '@/components/qrcode'
+import { useKycStatus } from '@/hooks/useKycStatus'
+import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
 
 export function WalletItem({
   wallet,
@@ -104,6 +106,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
 
   const { verifyTip } = useVerifyTip()
+  const { kycStatus } = useKycStatus()
   const [isSignatureValid] = useSignatureValidStatus()
 
   const [isQrCodeInvalid, setIsQrCodeInvalid] = useState(false)
@@ -313,7 +316,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   onClick={() => goTo('identity')}
                 >
                   <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
-                  <span className='text-[14px] font-semibold ml-2'>
+                  <span className={cn(
+                    'text-[14px] font-semibold ml-2',
+                    kycStatus === KYC_OVERALL_STATUS.ISSUE ? 'text-[#CA3F64]' : ""
+                  )}
+
+                  >
                     {!isSignatureValid ? t('identity.verifyID') : verifyTip || t('verified')}
                   </span>
                 </div>

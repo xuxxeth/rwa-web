@@ -12,6 +12,7 @@ export const KYC_OVERALL_STATUS = {
   // FAIL: 3,
   EXPIRED: 5, // 已过期
   REJECTED: 6, // 已拒绝
+  ISSUE: 9, // 黑名单
 }
 
 export type KYC_OVERALL_STATUS = (typeof KYC_OVERALL_STATUS)[keyof typeof KYC_OVERALL_STATUS]
@@ -36,6 +37,7 @@ export const KYC_STATUS = {
   EXPIRED: 5, // 已过期
   REJECTED: 6, // 已拒绝
   DECLINED: 7, // 已驳回
+  
 }
 export type KYC_STATUS = (typeof KYC_STATUS)[keyof typeof KYC_STATUS]
 export type KYC_GENDER = 0 | 1 // 0 女, 1 男

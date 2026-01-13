@@ -30,6 +30,10 @@ export const useVerifyTip = function() {
     if (kycStatus === KYC_OVERALL_STATUS.EXPIRED || pendingStep.step) {
       text = t('kyc.t51')
     }
+    // 风控黑名单
+    if (kycStatus === KYC_OVERALL_STATUS.ISSUE) {
+      text = t('issue')
+    }
     
 
     return text

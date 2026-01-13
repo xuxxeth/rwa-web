@@ -39,7 +39,8 @@ export const RISK_STATUS = {
   REJECTED: 3,
   REVIEW: 4,
   EXPIRED: 5,
-  NOTSIGN: 6
+  NOTSIGN: 6,
+  ISSUE: 9
 }
 
 export type Address = `0x${string}`

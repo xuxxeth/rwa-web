@@ -27,6 +27,7 @@ export function useKycStatus() {
     if (status === 3) return RISK_STATUS.REJECTED
     if (status === 4) return RISK_STATUS.REVIEW
     if (status === 5) return RISK_STATUS.EXPIRED
+    if (status === 9) return RISK_STATUS.ISSUE
     // 0 未认证
     return RISK_STATUS.NOTVERIFIED
   }, [status])
