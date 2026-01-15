@@ -21,9 +21,7 @@ function AccountDetail(props: { estimatedBalance: string; chainId: number }) {
         <div className='flex-1'>
           <div className='text-base/6 text-60 font-normal mb-2'>{t('assets.walletAddress')}</div>
           <div className='flex flex-row gap-2'>
-            <span className='text-xl/7.5 font-bold text-white'>
-              {shortenAddress(account)}
-            </span>
+            <span className='text-xl/7.5 font-bold text-white'>{shortenAddress(account)}</span>
             <CopyButton copyText={account} />
             <a
               href={chain?.blockExplorers?.default?.url}
@@ -32,7 +30,7 @@ function AccountDetail(props: { estimatedBalance: string; chainId: number }) {
               className='flex flex-row items-center px-2 gap-1 bg-[rgba(69,122,255,0.2)] rounded-sm cursor-pointer'
             >
               <LazyImage className='w-3.5 h-3.5' src='/images/icons/assets/bsc_scan_logo.png' />
-              <span>{chain?.blockExplorers?.default?.name}</span>
+              <span className='text-xs'>{chain?.blockExplorers?.default?.name}</span>
             </a>
           </div>
         </div>
