@@ -128,6 +128,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   )
 
   useEffect(() => {
+    console.log("wallet debugger3: account is", account)
+    console.log("wallet debugger4: chainId is", chainId)
     if (!account || !chainId) {
       setStatus(WalletStatus.IDLE)
       return
@@ -164,6 +166,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         toastError({
           title: t('switchNetwork', { network: networkText }),
         })
+        console.log('wallet debugger2: network does not match, disconnect wallet')
         handleDisConnect()
         break
 

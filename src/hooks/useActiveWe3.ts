@@ -32,6 +32,7 @@ export function useActiveWeb3() {
   )
 
   const handleDisConnect = useCallback(async () => {
+    console.log('wallet debugger1: web exec handleDisConnect')
     storage.removeItem(WALLET_UUID)
     storage.removeItem(CONNECTOR_TYPE)
     await disConnect()
