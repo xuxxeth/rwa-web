@@ -14,7 +14,7 @@ export function Menus() {
       <div className="flex items-center">
         {/* <img src="./images/logo_text.png" className="w-[206px]" alt="" /> */}
         {/* <img onClick={() => router.push('/')} src="/images/logo_text.png" className="w-[206px] cursor-pointer" alt="" /> */}
-        <img onClick={() => router.push('/')} src="/images/logo_temp.png" className="w-[60px] cursor-pointer" alt="" />
+        <img onClick={() => router.push('/')} src="/images/logo_dark_v2.svg" className="w-[55px] cursor-pointer" alt="" />
         <div className=" flex items-center gap-x-[80px] ml-20">
           {/* <MenusItem
             title={t("Homepage")}

@@ -11,7 +11,7 @@ export function HomeMenus() {
       <div className="flex items-center">
         {/* <img src="./images/logo_text.png" className="w-[206px]" alt="" /> */}
         {/* <img src="/images/home/new/logo.png" className="w-[140px] sm:w-[171px] lg:w-[206px]" alt="" /> */}
-        <img src="/images/logo_temp.png" className="w-[60px]" alt="" />
+        <img src="/images/logo_dark_v2.svg" className="w-[55px]" alt="" />
         
       </div>
       <div className="flex items-center gap-x-2 shrink-0">
