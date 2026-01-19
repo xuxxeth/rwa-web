@@ -154,7 +154,6 @@ const Section4_1 = memo(
       }
       // @ts-ignore
       const rect = e.target.getBoundingClientRect()
-      console.log(rect)
       setRectPos(rect)
       stopAnimation()
       if (index === 4) {

@@ -28,22 +28,6 @@ const Updater = memo(
       }
     }, [newOrder, freshTokenBalances])
 
-
-    const setTokenWithPriceByWebSocketData = useBaseStore(
-        state => state.setTokenWithPriceByWebSocketData
-      )
-    const setStockWithPriceByWebSocketData = useBaseStore(
-      (state) => state.setStockWithPriceByWebSocketData
-    );
-    const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
-    
-    useWssOn('summary', (data: any) => {
-      setTokenWithPriceByWebSocketData(data || [])
-      setStockWithPriceByWebSocketData(data || [])
-      stableTokenWithPrice(data || [])
-    })
-
-
     const preAccount = useRef<string | undefined>(undefined)
     useEffect(() => {
       if (account && preAccount.current && account !== preAccount.current) {

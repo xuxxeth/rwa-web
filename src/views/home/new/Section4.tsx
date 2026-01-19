@@ -8,12 +8,28 @@ import { useBaseStore } from "@/stores/baseStore"
 import { useTradeStore } from "@/stores/tradeStore"
 import type { IRwa } from "@/service/base/types"
 import { useTailwindBreakpoints } from "@/hooks/useBreakpoints"
+import { useWssOn } from "@/hooks/useWssOn"
+import { useWssStore } from "@/stores/wssStore"
 
 const Section4 = memo(
   () => {
     const router = useRouter()
     const rwaList = useBaseStore(state => state.rwaList)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
+
+    const setTokenWithPriceByWebSocketData = useBaseStore(
+        state => state.setTokenWithPriceByWebSocketData
+      )
+    const setStockWithPriceByWebSocketData = useBaseStore(
+      (state) => state.setStockWithPriceByWebSocketData
+    );
+    const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+    
+    useWssOn('summary', (data: any) => {
+      setTokenWithPriceByWebSocketData(data || [])
+      setStockWithPriceByWebSocketData(data || [])
+      stableTokenWithPrice(data || [])
+    })
 
     const handleClick = useCallback((rwa: IRwa) => {
       updateInputToken(rwa)

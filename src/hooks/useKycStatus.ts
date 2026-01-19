@@ -1,10 +1,11 @@
-import { ID_EXPIRES, RISK_STATUS } from "@/config/constants";
+import { CONNECT_ACCOUNT, ID_EXPIRES, RISK_STATUS } from "@/config/constants";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useKycStore } from "@/stores/kycStore";
 import { formatSecondsToDateTime } from "@/utils/format";
 import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
+import storage from "@/utils/storage";
 
 export function useFetchKycStatus() {
   const { chainId, account } = useActiveWeb3()  
@@ -12,6 +13,7 @@ export function useFetchKycStatus() {
   const isSignatureValid = useTradeStore(state => state.isSignatureValid)
   useEffect(() => {
     if (chainId && account || isSignatureValid) {
+      storage.setItem(CONNECT_ACCOUNT, account!)
       fetchKycStatus()
     }
   }, [chainId, account, isSignatureValid])

@@ -100,7 +100,7 @@ export const calcYearDate = function () {
   const minDate = new Date(now.getFullYear() - 65, now.getMonth(), now.getDate()).getTime()
 
   // 计算最大日期（18岁 —— 最晚生日）
-  const maxDate = new Date(now.getFullYear() - 18, now.getMonth(), now.getDate()).getTime()
+  const maxDate = new Date(now.getFullYear() - 18, now.getMonth(), now.getDate() + 1).getTime()
 
   return {
     minDate,
@@ -244,6 +244,13 @@ const BaseInfo = memo(
         toastError({ title: t('kyc.t61') })
         return
       }
+      // 这里要再次判断一下dob，防止用户修改系统时间绕过前端校验
+      const dobDate = new Date(data.dob).getTime()
+      if (dobDate < dateOptions.minDate || dobDate > dateOptions.maxDate) { 
+        toastError({ title: t('kyc.t67') })
+        return
+      }
+
       const params: IKycSubmitData = {
         type: 1,
         basicInfo: {

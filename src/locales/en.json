@@ -517,7 +517,8 @@
     "t63": "Supports Chinese, English, and numeric input, with a maximum of 200 characters.",
     "t64": "Only Chinese and English letters are supported.",
     "t65": "At least one of the document photo and description must be submitted.",
-    "t66": "Only numeric and alphabetic characters are supported."
+    "t66": "Only numeric and alphabetic characters are supported.",
+    "t67": "Incorrect Date of Birth"
   },
   "employment": {
     "t1": "Retired",
