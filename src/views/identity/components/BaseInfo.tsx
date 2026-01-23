@@ -70,13 +70,15 @@ export const FormItemBox = ({ children }: { children: React.ReactNode }) => {
 export const FormItemLabel = ({
   children,
   title,
+  hide
 }: {
   children?: React.ReactNode
   title?: string
+  hide?: boolean
 }) => {
   return (
     <div className='flex items-center text-[#909090] text-[16px] font-normal'>
-      {children || title} <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+      {children || title} {hide && <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>}
     </div>
   )
 }
@@ -670,7 +672,10 @@ const BaseInfo = memo(
             {/* 上传地址证明 */}
             <div className=' flex items-center mb-5'>
               <SectionTitle>{t('identity.upload.uploadAddr')}</SectionTitle>
-              <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+              {
+                !useCertificateAddress && <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>
+              }
+              
             </div>
             <Upload
               type='address'
