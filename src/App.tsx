@@ -30,7 +30,7 @@ export function RoutesWrapper() {
 }
 
 const HOME_MENUS_PATH = ['/']
-const NO_MENUS_PATH = ['/liveness-complete']
+const NO_MENUS_PATH = ['/kyc/liveness-complete']
 
 function App() {
   const { t, i18n } = useTranslation()

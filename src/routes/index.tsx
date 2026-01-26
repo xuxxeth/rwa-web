@@ -61,7 +61,7 @@ const routes: RouteObject[] = [
     element: <Identity />,
   },
   {
-    path: '/liveness-complete',
+    path: '/kyc/liveness-complete',
     element: <LivenessComplete />,
   },
   {
