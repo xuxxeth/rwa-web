@@ -15,16 +15,16 @@ import {
 
 export const kycApi = {
   getLivenessUrl: (step: number = 1) =>
-    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/liveness/create-liveness-url', {
+    client.get<ApiResponse<ILivenessUrlRes>>('/v1/kyc/api/liveness/create-liveness-url', {
       type: step,
     }),
   validateLivenessImage: (s3Key: string, step: number) =>
-    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/validate-image', { key: s3Key, type: step }),
+    client.get<ApiResponse<boolean>>('/v1/kyc/api/liveness/validate-image', { key: s3Key, type: step }),
   isLivenessUrlExpired: (bizNo: string) =>
-    client.get<ApiResponse<boolean>>('/v1/kyc/liveness/is-expired', { bizNo: bizNo }),
+    client.get<ApiResponse<boolean>>('/v1/kyc/api/liveness/is-expired', { bizNo: bizNo }),
   getSupportedCountries: () =>
-    client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/support-countries'),
-  getKycStatus: () => !isTiko ? client.get<ApiResponse<IKycStatus>>('/v1/kyc/status') : ({
+    client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/public/support-countries'),
+  getKycStatus: () => !isTiko ? client.get<ApiResponse<IKycStatus>>('/v1/kyc/api/status') : ({
       code: RESPONSE_CODE.SUCCESS,
       data: {
         status: KYC_OVERALL_STATUS.VERIFIED,
@@ -34,7 +34,7 @@ export const kycApi = {
       message: null,
     }),
   
-  getKycDetail: () => !isTiko ? client.get<ApiResponse<IKycDetail>>('/v1/kyc/detail-result') : ({
+  getKycDetail: () => !isTiko ? client.get<ApiResponse<IKycDetail>>('/v1/kyc/api/detail-result') : ({
       code: RESPONSE_CODE.SUCCESS,
       data: {
         overallStatus: KYC_OVERALL_STATUS.VERIFIED,
@@ -45,16 +45,16 @@ export const kycApi = {
       message: null,
     }),
   getKycStepDetail: (step: number) =>
-    client.post<ApiResponse<IKycDetail[]>>('/v1/kyc/detail-pending-steps', { steps: [step] }),
-  submitKyc: (data: IKycSubmitData) => client.post<ApiResponse<null>>('/v1/kyc/submit', data),
+    client.post<ApiResponse<IKycDetail[]>>('/v1/kyc/api/detail-pending-steps', { steps: [step] }),
+  submitKyc: (data: IKycSubmitData) => client.post<ApiResponse<null>>('/v1/kyc/api/submit', data),
   getFilePutUrl: (mimeType: FilePutMimeType, fileName: string) =>
-    client.get<ApiResponse<IFilePutUrlRes>>('/v1/kyc/file-put-url', {
+    client.get<ApiResponse<IFilePutUrlRes>>('/v1/kyc/api/file-put-url', {
       mimeType: mimeType,
       name: fileName,
     }),
 
-  getAgreementsAccepted: () => client.get<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accepted'),
+  getAgreementsAccepted: () => client.get<ApiResponse<IPrivacyRes>>('/v1/uc/api/agreements/accepted'),
 
   postAgreementsAccept: (privacy: string, userService: string) =>
-    client.post<ApiResponse<IPrivacyRes>>('/v1/uc/agreements/accept?privacy=' + privacy + '&user-service=' + userService, {privacy, 'user-service': userService}),
+    client.post<ApiResponse<IPrivacyRes>>('/v1/uc/api/agreements/accept?privacy=' + privacy + '&user-service=' + userService, {privacy, 'user-service': userService}),
 }

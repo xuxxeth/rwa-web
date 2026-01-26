@@ -10,7 +10,7 @@ import { type ErrorHandlers } from '@/config/constants'
 export const scanApi = {
   getOpenOrders: async (filters?: IOpenOrderFilter, errorHandlers?: ErrorHandlers) => {
     return await client.get<ApiResponse<IOpenOrder[]>>(
-      '/v1/scan/orders',
+      '/v1/scan/api/orders',
       {
         ...filters,
       },
@@ -20,7 +20,7 @@ export const scanApi = {
 
   getOrderHistory: (filters?: IOpenOrderHistoryFilter, errorHandlers?: ErrorHandlers) =>
     client.get<ApiResponse<IOrder[]>>(
-      '/v1/scan/history-orders',
+      '/v1/scan/api/history-orders',
       {
         ...filters,
       },
@@ -29,7 +29,7 @@ export const scanApi = {
 
   getTrades: (filters?: ITradeHistoryFilter, errorHandlers?: ErrorHandlers) =>
     client.get<ApiResponse<ITrade[]>>(
-      '/v1/scan/trades',
+      '/v1/scan/api/trades',
       {
         ...filters,
       },

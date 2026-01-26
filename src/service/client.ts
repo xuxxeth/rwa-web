@@ -52,7 +52,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const url = req.url || ''
   req.signal = controller.signal
   abortControllerMap.set(url, controller)
-  const needAuth = url.includes('/scan/') || url.includes('/kyc/') // ✅ 判断 URL 是否需要授权
+  const needAuth = url.includes('/scan/api/') || url.includes('/kyc/api/') // ✅ 判断 URL 是否需要授权
   const account = storage.getItem(CONNECT_ACCOUNT)
   const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
   // ✅ 如果存在 account 但没有签名信息，则中止请求
