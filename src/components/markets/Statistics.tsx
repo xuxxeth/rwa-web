@@ -100,7 +100,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
           },
         ].map(({ title, value, tooltip }) => {
           return (
-            <div className='inline-block w-[20%] text-sm/4.5 font-normal'>
+            <div key={title} className='inline-block w-[20%] text-sm/4.5 font-normal'>
               <IconWithTooltip
                 tooltip={t(`companyProfile.${tooltip}`)}
                 triggerClassName='inline-flex justify-start'

@@ -1,5 +1,5 @@
 import { useI18nLanguage, useTranslation } from '@/hooks/useTranslation'
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useId, useRef, useState } from 'react'
 import { StatisticsItem } from './StatisticsItem'
 import { cn } from '@/lib/utils'
 import { useTradeStore } from '@/stores/tradeStore'
@@ -35,6 +35,8 @@ const Profile = memo(({ from }: { from?: string }) => {
     }
   }, [inputToken?.stockId, i18n.language])
 
+  const _id = useId()
+
   return (
     <>
       <div className='p-3 bg-gray-900 rounded-[4px] mt-2'>
@@ -55,11 +57,12 @@ const Profile = memo(({ from }: { from?: string }) => {
               },
               { title: 'chairman', value: profileData?.chairman },
             ],
-          ].map(item => {
+          ].map((item, index) => {
             return (
-              <div className='flex-1 border-y border-gray-850'>
+              <div key={`profile-${_id}-${index}`} className='flex-1 border-y border-gray-850'>
                 {item.map(({ title, value }, idx) => (
                   <div
+                    key={title}
                     className={cn(
                       'w-full flex flex-col gap-1 text-sm/4.5 font-normal py-2',
                       idx === 0 ? 'mb-2' : 'border-t border-t-gray-850'

@@ -2,6 +2,10 @@ import { memo } from "react"
 import { Input } from "../../ui/input"
 import { cn } from "@/lib/utils"
 
+export function normalizeInput(raw: string) {
+  return raw.replace(/。/g, '.')
+}
+
 type NumberInputProps = {
   disabled?: boolean
   value: string | number
@@ -24,8 +28,9 @@ const NumberInput = memo(
   }: NumberInputProps) => {
   const inputRegex = RegExp(regex)
   const enforcer = (nextUserInput: string) => {
-    if (nextUserInput === '' || inputRegex.test(nextUserInput)) {
-      onInput(nextUserInput)
+    const normalized = normalizeInput(nextUserInput)
+    if (normalized === '' || inputRegex.test(normalized)) {
+      onInput(normalized)
     }
   }    
 
