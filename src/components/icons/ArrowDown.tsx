@@ -4,9 +4,8 @@ import { memo } from "react"
 const IconArrowDown = memo(
   ({ open }: {open?: boolean}) => {
     return (
-      <img src={open ? "/images/icons/down.png" : "/images/icons/down-60.png"} className={cn(
-        "w-3 ml-2 transition-all",
-        open ? ' rotate-180' : ''
+      <img src={open ? "/images/v2/icons/arrow-down-active.png" : "/images/v2/icons/arrow-down.png"} className={cn(
+        "w-4 ml-2 transition-all",
       )} alt="" />
     )
   }

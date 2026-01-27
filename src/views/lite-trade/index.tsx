@@ -46,12 +46,13 @@ function LiteTrade() {
 
   return (
     <>
-      <MainLayout>
-        <div className=" bg-[rgba(7,8,13,1)] min-h-[100vh] text-white px-[120px]">
+      
+        <div className="  min-h-[100vh] text-white">
           <MarketTrading/>
+          <MainLayout>
           <div className="pt-5 flex gap-x-10">
             <div className="w-[580px]">
-              <BoxCard className="min-h-[600px] rounded-[32px] p-6">
+              <BoxCard className="min-h-[600px] rounded-[32px] p-6 bg-[rgba(255,255,255,0.0)]">
                 {
                   showKline ? <KlineBody /> : <InvestBody /> 
                 }
@@ -59,7 +60,7 @@ function LiteTrade() {
               </BoxCard>
             </div>
             <div className="flex-1 shrink-0">
-              <BoxCard className="min-h-[448px] rounded-[32px]">
+              <BoxCard className="min-h-[448px] rounded-[32px] bg-[rgba(255,255,255,0.0)]">
                 <ConvertTabs onChange={(tab) => setAction(tab.key)} />
                 <div className="flex items-center justify-between mt-2">
                   <div className="text-[20px] font-medium">{t('limit')}</div>
@@ -96,16 +97,17 @@ function LiteTrade() {
             </div>
             
           </div>
+          </MainLayout>
+
         </div>
 
-      </MainLayout>
       <XFooter />
+      
       <DialogController
         className="p-0"
-        headerClassName="px-6 pt-6"
+        headerClassName="px-4 pt-5"
         topFixed
-        top={1}
-        title={t("assets.tabList.orderHistory")}
+        title={'订单确认'}
         open={orderDialog.open}
         openChange={orderDialog.setOpen}
       > 

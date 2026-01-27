@@ -2,32 +2,23 @@ import { BetweenText } from "@/components/between-text"
 import { LazyImage } from "@/components/image/LazyImage"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
-import type { IMarket, IRwa, IToken } from "@/service/base/types"
 import { memo } from "react"
 
 type EstimatedInfoProps = {
-  marketInfo: IMarket
-  inputToken: IRwa | null
-  outputToken: IToken | null
+  estimatedFee: string
+  networkFeeInNative: string
   expires: number,
   onEdit?: () => void
 }
 
 const EstimatedInfo = memo(
-  ({ inputToken, outputToken, expires, marketInfo, onEdit }: EstimatedInfoProps) => {
+  ({ estimatedFee, networkFeeInNative, onEdit }: EstimatedInfoProps) => {
     const { t } = useTranslation()
-    const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
+    // const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
     return (
-      <div className="bg-[rgba(6,7,10,0.3)] rounded-[16px] p-4 mt-2 text-white font-normal text-[14px] flex flex-col gap-y-2">
+      <div className="pt-3 mt-2 text-white font-normal text-[14px] flex flex-col gap-y-2">
+        
         {/* <BetweenText 
-          left={<div className="flex items-center">
-                {t('Rete')}
-                  <LazyImage src="/images/icons/info.png" className="w-[15px] ml-1" />
-                </div>
-          }
-          right={'0.485049404 AMZNc'}
-        /> */}
-        <BetweenText 
           left={t("Rate")}
           right={
             <div className="flex items-center">
@@ -37,15 +28,11 @@ const EstimatedInfo = memo(
               <span>1 {inputToken?.symbol || '-'} = {inputTokenPrice?.price || '--'} {outputToken?.symbol || '--'}</span>
             </div>
           }
-        />
-        <BetweenText 
-          left={t("Network Fee")}
-          right={`${marketInfo.networkFeeInNative} BNB` }
-        />
+        /> */}
         <BetweenText 
           left={t("Expires in")}
           right={
-            <div className="h-[32px] flex justify-center rounded-[8px] items-center px-2 bg-[rgba(0,149,255,0.1)] text-[#0095FF] text-[14px] font-normal cursor-pointer"
+            <div className=""
               onClick={() => {
                 // onEdit && onEdit()
               }}
@@ -55,6 +42,15 @@ const EstimatedInfo = memo(
             </div>
           }
         />
+        <BetweenText 
+          left={t('v2.tx.t28')}
+          right={`${estimatedFee} USDT` }
+        />
+        <BetweenText 
+          left={t("Network Fee")}
+          right={`${networkFeeInNative} BNB` }
+        />
+        
       </div>
     )
   }

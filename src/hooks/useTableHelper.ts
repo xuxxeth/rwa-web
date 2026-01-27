@@ -32,6 +32,7 @@ export function useTableSort<SortableField extends string>() {
 }
 
 export function usePaginationData<TData>(
+  pageSize: number,
   config: Array<{
     key: string
     sorter?: (a: TData, b: TData) => (order: Order) => number
@@ -41,7 +42,6 @@ export function usePaginationData<TData>(
   defaultSort?: (item1: TData, item2: TData) => number
 ) {
   const [page, setPage] = useState(1)
-  const pageSize = 20
 
   const sorter = useMemo(() => {
     if (!sort) return undefined

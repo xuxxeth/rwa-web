@@ -4,7 +4,7 @@ import { scanApi } from '@/service/scan/api'
 import { type ITrade, type IOpenOrder, type IOrder } from '@/service/scan/types'
 import {
   type IOpenOrderFilter,
-  type IOpenOrderHistoryFilter,
+  type IOrderHistoryFilter,
   type ITradeHistoryFilter,
 } from '@/stores/orderFilterStore'
 import { type ErrorHandlers } from '@/config/constants'
@@ -33,6 +33,55 @@ export function openOrderOptions(
       const data = await scanApi.getOpenOrders(filters)
       return data?.data || []
     },
+    enabled: chainId !== null && isSignatureValid,
+  })
+}
+
+export function infiniteOrderOptions<T extends { orderId: string }, F extends { after?: string }>(
+  api: (filters: F, errorHandlers?: ErrorHandlers) => Promise<{ data: T[] }>,
+  account: string,
+  chainId: number,
+  isSignatureValid: boolean,
+  scrollId: (item: T) => string,
+  filters?: F,
+  errorHandlers?: ErrorHandlers
+) {
+  return infiniteQueryOptions<
+    {
+      data: T[]
+      nextPage: string | undefined
+    },
+    Error,
+    InfiniteData<
+      {
+        data: T[]
+        nextPage: string | undefined
+      },
+      string | undefined
+    >,
+    [string, string, number, F | undefined],
+    string | undefined
+  >({
+    queryKey: [api.name, account, chainId, filters],
+    queryFn: async ({ pageParam }) => {
+      // pageParam 是前一页的最后一个orderId，初始值为undefined
+      const data = await api(
+        {
+          ...filters,
+          after: pageParam,
+        } as F,
+        errorHandlers
+      )
+      const orders = data?.data ?? []
+      const hasNextPage = orders.length > 0
+      const nextPageParams = hasNextPage ? scrollId(orders[orders.length - 1]) : undefined
+      return {
+        data: orders,
+        nextPage: nextPageParams,
+      }
+    },
+    initialPageParam: undefined,
+    getNextPageParam: lastPage => lastPage?.nextPage,
     enabled: chainId !== null && isSignatureValid,
   })
 }
@@ -80,7 +129,7 @@ export function infiniteOpenOrderOptions(
     },
     initialPageParam: undefined,
     getNextPageParam: lastPage => lastPage?.nextPage,
-    enabled: chainId !== null && isSignatureValid
+    enabled: chainId !== null && isSignatureValid,
   })
 }
 
@@ -88,7 +137,7 @@ export function orderHistoryOptions(
   account: string,
   chainId: number,
   isSignatureValid: boolean,
-  filters?: IOpenOrderHistoryFilter
+  filters?: IOrderHistoryFilter
 ) {
   return queryOptions({
     queryKey: ['orderHistory', account, chainId, filters],
@@ -104,7 +153,7 @@ export function infiniteOrderHistoryOptions(
   account: string,
   chainId: number,
   isSignatureValid: boolean,
-  filters?: IOpenOrderHistoryFilter,
+  filters?: IOrderHistoryFilter,
   errorHandlers?: ErrorHandlers
 ) {
   return infiniteQueryOptions<
@@ -120,7 +169,7 @@ export function infiniteOrderHistoryOptions(
       },
       string | undefined
     >,
-    [string, string, number, IOpenOrderHistoryFilter | undefined],
+    [string, string, number, IOrderHistoryFilter | undefined],
     string | undefined
   >({
     queryKey: ['infiniteOrderHistory', account, chainId, filters],
@@ -201,6 +250,6 @@ export function infiniteTradeHistoryOptions(
     },
     initialPageParam: undefined,
     getNextPageParam: lastPage => lastPage?.nextPage,
-    enabled: chainId !== null && isSignatureValid
+    enabled: chainId !== null && isSignatureValid,
   })
 }

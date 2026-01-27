@@ -26,8 +26,8 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <img src="/images/icons/selected_down.png" className={cn(
-        "w-[12px]",
+      <img src="/images/v2/icons/arrow-down.png" className={cn(
+        "w-[16px]",
         props.open ? " rotate-180" : ""
       )} />
       {/* <ChevronDown className={cn(

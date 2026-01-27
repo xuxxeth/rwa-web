@@ -58,13 +58,13 @@ const VerifyIdentity = memo(
     
     return (
       <BoxCard className={cn(
-        "rounded-[4px] h-[48px] py-0 flex items-center pl-4 bg-[rgba(255,106,0,0.1)]",
+        "h-[40px] py-0 flex items-center pl-4 bg-[rgba(243,161,63,0.2)]",
         align === 'left' ? 'justify-start' : 'justify-center'
       )}>
         <div className="flex items-center gap-x-2">
-          <div className=" font-medium text-[14px]">{t('identity.verifyTip')}</div>
+          <div className=" font-normal text-[14px]">{t('identity.verifyTip')}</div>
         </div>
-        <button className="cursor-pointer px-4 py-2 text-sm/4 font-semibold rounded-lg text-black bg-[rgba(156,255,58,1)] ml-4"
+        <button className="cursor-pointer px-4 py-1 text-xs font-semibold rounded-[4px] text-black bg-[rgba(156,255,58,1)] ml-4"
           onClick={() => {
             router.push('/identity')
           }}

@@ -25,18 +25,8 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"], // 全局默认字体
-      },
-      colors: {
-        stockrise: 'rgba(80,227,194,1)',
-        stockfall: 'rgba(227,80,122,1)',
-        stockeven: 'rgba(161,161,161,1)'
       }
     },
   },
-  plugins: [require("tw-animate-css")],
-  safelist: [
-    'text-stockrise',
-    'text-stockfall',
-    'text-stockeven'
-  ]
+  plugins: [require("tw-animate-css")]
 };

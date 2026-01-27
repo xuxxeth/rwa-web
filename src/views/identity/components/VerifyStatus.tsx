@@ -174,10 +174,10 @@ function TradePrepare() {
   const { t } = useTranslation()
   return (
     <div className='flex flex-col gap-4 text-base text-[#1A85FF]'>
-      <a href='#pre1' target='_blank' className='flex flex-row items-center gap-1.5'>
+      <a href='https://tiko.gitbook.io/tiko-docs/faq/how-to-prepare-for-trading-on-tiko' target='_blank' className='flex flex-row items-center gap-1.5'>
         {t(`${langPrefix}.pre1`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
       </a>
-      <a href='#pre2' target='_blank' className='flex flex-row items-center gap-1.5'>
+      <a href='https://tiko.gitbook.io/tiko-docs/faq/how-to-buy-my-first-u.s.-stock-on-tiko-step-by-step' target='_blank' className='flex flex-row items-center gap-1.5'>
         {t(`${langPrefix}.pre2`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
       </a>
     </div>

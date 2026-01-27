@@ -4,7 +4,7 @@ import { Navigate, type RouteObject } from 'react-router-dom'
 
 // 懒加载页面
 const Home = lazy(() => import('../views/home'))
-const LiteTrade = lazy(() => import('../views/lite-trade'))
+const LiteTrade = lazy(() => import('../views/lite-trade/indexv2'))
 const Markets = lazy(() => import('../views/markets'))
 const About = lazy(() => import('../views/about'))
 const KLine = lazy(() => import('../views/kline'))
@@ -18,7 +18,8 @@ const MarketQuotes = lazy(() => import('../views/markets/MarketQuotes'))
 const Identity = lazy(() => import('../views/identity'))
 const LivenessComplete = lazy(() => import('../views/identity/LivenessComplete'))
 
-const Assets = lazy(() => import('../views/assets'))
+// const Assets = lazy(() => import('../views/assets'))
+const Portfolio = lazy(() => import('../views/assets/v2'))
 
 // 路由表
 const routes: RouteObject[] = [
@@ -53,8 +54,12 @@ const routes: RouteObject[] = [
     element: <LiteTrade />,
   },
   {
-    path: '/assets',
-    element: <Assets />,
+    path: '/portfolio',
+    element: <Portfolio />,
+  },
+  {
+    path: '/order',
+    element: <Portfolio />,
   },
   {
     path: '/identity',

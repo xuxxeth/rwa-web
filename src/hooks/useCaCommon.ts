@@ -2,7 +2,6 @@ import {
   WalletProvider as Provider,
   xLayerTestnet,
   bscTestnet,
-  defaultChains
 } from 'ca-common-web'
 
 export const WalletProvider = Provider

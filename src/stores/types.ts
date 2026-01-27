@@ -13,7 +13,7 @@ import type {
 } from "@/service/base/types";
 import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 import type { IUserCofnig } from "@/service/risk/types";
-import type { IOrderData } from "@/service/webSocket/types";
+import type { IOrderData, ISummaryData, ISummaryDataItem } from "@/service/webSocket/types";
 import { type IKycDetail, type IKycStatus } from '@/service/kyc/types'
 
 export interface BaseStore {
@@ -67,6 +67,9 @@ export interface TradeStore {
   expires: number;
   activeConvertTab: 'buy' | 'sell';
   isSignatureValid: boolean;
+  txStep: number;
+  txError: string;
+  txSuccess: {type: string, msg: string, tx: string};
   updateInputToken: (rwa: IRwa) => void;
   updateOutputToken: (token: IToken) => void;
   updateLimitPrice: (price: string) => void;
@@ -74,6 +77,9 @@ export interface TradeStore {
   updateExpires: (expires: number) => void;
   updateActiveConvertTab: (tab: 'buy' | 'sell') => void;
   setIsSignatureValid: (valid: boolean) => void
+  setTxStep: (step: number) => void
+  setTxError: (msg: string) => void
+  setTxSuccess: (type: string, msg: string, tx: string) => void
 }
 
 export interface WssStore {
@@ -81,9 +87,11 @@ export interface WssStore {
   stableTokenWithPrice: Record<string, ITokenWithPrice>;
   tokenWithPrice: Record<string, ITokenWithPrice>;
   newOrder: IOrderData | null;
+  originSummary: ISummaryDataItem[];
   setStableTokenWithPrice: (data: IRwaPrice[]) => void;
   getCandles: (params: ICandlesParams) => Promise<ApiResponse<ICandlesItem[]>>;
   updateNewOrder: (order: IOrderData) => void;
+  updateOriginSummary: (data: ISummaryDataItem[]) => void;
 }
 
 export interface RiskSTore {

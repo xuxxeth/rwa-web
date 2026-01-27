@@ -1,4 +1,5 @@
-import { CurrencyInputPanel } from "@/components/input/CurrencyInputPanel";
+import { CurrencyInputPanel } from "@/components/v2/input/CurrencyInputPanel";
+import { CurrencyInputPanel as CurrencyInputPanelLite } from "@/components/input/CurrencyInputPanel";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -7,13 +8,13 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { isGreater, isLess, parseAmount, truncateUP } from "@/utils";
+import { formatTokenAmountWithCommas, isGreater, isLess, parseAmount, truncateUP } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
 import { useToast } from "@/hooks/useToast";
-import { useRwaPrice, useStableRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
+import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
@@ -23,7 +24,16 @@ import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
 import { KYC_OVERALL_STATUS, PENDING_STEPS } from "@/service/kyc/types";
 import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
-import type { IRwa, IRwaPrice, ITokenWithPrice } from "@/service/base/types";
+import type { IRwa, ITokenWithPrice } from "@/service/base/types";
+import { useTxToast } from "@/hooks/useTxToast";
+import { MarketCloseTip } from "./MarketCloseTip";
+import { PriceChangeTab } from "./PriceChangeTab";
+import { useCalcFee } from "@/hooks/useCalcFee";
+import { USDTSelect } from "../usdt-select";
+import { OrderConfirm } from "../order-confirm";
+import { useSettingStore } from "@/stores/settingStore";
+import { ConvertAction } from "./ConvertAction";
+import { useKycStore } from "@/stores/kycStore";
 
 type ConverBodyProps = {
   action?: string
@@ -34,17 +44,21 @@ export function ConverBody({
   from
 }: ConverBodyProps) {
   const { t, i18n } = useTranslation()
-  const { toastError, toastSuccess } = useToast()
+  const { toastError } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
+  const riskUserConfig = useKycStore(state => state.riskUserConfig)
   const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
   const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
   const updateInputSize = useTradeStore(state => state.updateInputSize)
   const updateExpires = useTradeStore(state => state.updateExpires)
+  const setTxError = useTradeStore(state => state.setTxError)
+  const setTxSuccess = useTradeStore(state => state.setTxSuccess)
   const limitPrice = useTradeStore(state => state.limitPrice)
   const inputSize = useTradeStore(state => state.inputSize)
   const expires = useTradeStore(state => state.expires)
   const inputToken = useTradeStore(state => state.inputToken)
   const outputToken = useTradeStore(state => state.outputToken)
+  const showConfirm = useSettingStore(state => state.showConfirm)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
   const { kycStatus } = useKycStatus()
@@ -53,6 +67,7 @@ export function ConverBody({
   const action = useTradeStore(state => state.activeConvertTab)
   const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
+  const orderDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
 
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken?.address, outputToken?.address])
@@ -77,17 +92,52 @@ export function ConverBody({
     }
   }, [inputToken, rwaPrice])
 
+  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee } = useCalcFee(orderValue, inputSize, action === 'buy')
+
   const approveAmount = useMemo(() => {
     return action === 'buy' ?
-            (orderValue ? parseAmount(orderValue, outputToken?.decimals) : '0') :
+            (orderValue ? parseAmount(parseFloat(orderValue) + parseFloat(estimatedFee), outputToken?.decimals) : '0') :
             (inputSize ? parseAmount(inputSize, inputToken?.decimals) : '0')
-  }, [orderValue, inputSize, outputToken, inputToken, action, ])
+  }, [orderValue, inputSize, outputToken, inputToken, action, estimatedFee])
 
-  console.log('orderValue: ', orderValue, approveAmount)
-  console.log('approveToken: ', paymentToken)
 
-  const { placeOrder, approve, refetchAllowance, approvalState, allowance } = useTrading(paymentToken as `0x${string}`, BigInt(approveAmount))
-  console.log(approvalState, allowance)
+  const { toastTxSteps, dismissTxToast } = useTxToast()
+  const setTxStep = useTradeStore(state => state.setTxStep)
+
+
+
+  const { placeOrder, txStep, approvalState, allowance, refetchAllowance } = useTrading(paymentToken as `0x${string}`, BigInt(approveAmount))
+  // 交易流程未开始，不执行更新step操作
+  const stepStartRef = useRef(false)
+
+  useEffect(() => {
+    if (stepStartRef.current) {
+      setTxStep(txStep)
+    }
+  }, [txStep])
+
+  const handleStartStep = useCallback(() => {
+    stepStartRef.current = true
+    dismissTxToast()
+    setTxError('')
+    setTxSuccess('', '', '')
+    setTxStep(approvalState === 3 ? 1 : 0)
+    
+  }, [setTxStep, approvalState])
+  // 结束后重置step和状态
+  // type: 成功 or 失败
+  const handleEndStep = useCallback((type?: string, message?: string) => {
+    dismissTxToast()
+    setTxError('')
+    setTxSuccess('', '', '')
+    setTimeout(() => {
+      stepStartRef.current = false
+      setTxStep(approvalState === 3 ? 1 : 0)
+      refetchAllowance()
+    }, 500)
+
+  }, [setTxStep, approvalState, refetchAllowance])
+
   const hanleInputPrice = useCallback(async (value: string) => {
     updateLimitPrice(value)
   }, [])
@@ -119,41 +169,24 @@ export function ConverBody({
   }, [limitPrice, inputSize])
 
   const [buying, setBuying] = useState(false)
-  const [approveInsufficient, setApproveInsufficient] = useState(false)
-  const handleApprove = useCallback(async () => {
-    setBuying(true)
-    const result = await approve()
-    if (result && result?.code === 9200) {
-      // toastSuccess({title: t('approveSuccess')})
-      // 这里再查询下授权额度？
-      const _allowance = await refetchAllowance()
-      if (isLess(_allowance.toString(), approveAmount)) {
-        setApproveInsufficient(false)
-        toastError({
-          title: t('appErr.apIns')
-        })
-      } else {
-        toastSuccess({title: t('approveSuccess')})
-      }
-    } else {
-      // @ts-ignore
-      const errorMessage = result.data?.message
-      if (errorMessage) {
-        toastError({
-          title: t('appErr.approveError') + t(`appErr.${errorMessage}`),
-        })
-      } else {
-        toastError({
-          // @ts-ignore
-          title: result.data?.name || t('appErr.UnknownErro'),
-        })
-      }
-    }
-    setBuying(false)
-    setApproveInsufficient(true)
-  }, [approveAmount, approve, refetchAllowance]) 
+  // riskUserConfig.actions // 1. 只能买，2. 只能卖
 
   const handlePlaceOrder = useCallback(async () => {
+    // 禁止交易
+    if (riskUserConfig?.actions === 0) {
+      toastError({title: t('v2.tx.t39')})
+      return
+    }
+    // 禁止卖
+    if (riskUserConfig?.actions === 1) {
+      toastError({title: t('v2.tx.t41')})
+      return
+    }
+    // 禁止买
+    if (riskUserConfig?.actions === 2) {
+      toastError({title: t('v2.tx.t40')})
+      return
+    }
     const params = {
       stockId: String(inputToken?.stockId),
       tradeType: TradeType.LIMIT,
@@ -167,39 +200,53 @@ export function ConverBody({
       price: parseAmount(truncateUP(limitPrice, 2)),   // 1 usdt
       size: parseAmount(inputSize)    // 10
     }
-    console.log(params)
+    // const orderType = params.tradeType !== TradeType.MARKET ? t('limit') : t('market')
+    // const message = t('v2.tx.s', { orderType })
+     
+
+    // console.log('new order info', message)
+    // return
     setBuying(true)
+    handleStartStep()
+    toastTxSteps({action: 'place', approveed: approvalState === 3, onClick: handleEndStep})
     const result = await placeOrder(params, {value: parseAmount(marketInfo.networkFeeInNative, 18), wait: true, skipSimulate: true})
+    console.log('place order result: ', result)
     setBuying(false)
-    const orderType = params.tradeType === TradeType.MARKET ? t('limit') : t('market')
-    const orderSide = params.side === SideType.BUYLIMIT ? t('Buy') : t('Sell')
-    
+    // const orderType = params.tradeType === TradeType.MARKET ? t('limit') : t('market')
+    // const orderSide = params.side === SideType.BUYLIMIT ? t('Buy') : t('Sell')
+    // const message = t('orderSuccess2', { orderType, orderSide, orderAmount: orderValue, tokenName: inputToken?.name })
+
     if (result && result?.code === 9200) {
       freshTokenBalances()
       updateInputSize('')
+      // 交易成功，延迟3秒后再关闭toast，避免用户看不到结果
+      // setTimeout(() => {
+      //   handleEndStep()
+      // }, 3000)
       // const message = t('orderSuccess2', { orderType, orderSide, orderAmount: orderValue, tokenName: inputToken?.name })
-      // toastSuccess({title: message})
 
-      toastSuccess({title: t('orderSuccess')})
     } else {
       // const message = t('orderFail', { orderType, orderSide: orderSide.toLowerCase()})
-      // toastError({title: message})
+      
       // @ts-ignore
       const errorMessage = result.data?.message
-      if (errorMessage) {
-        toastError({
-          title:  t('appErr.signError') + t(`appErr.${errorMessage}`),
-        })
-      } else {
-        toastError({
-          // @ts-ignore
-          title: result.data?.name || t('appErr.placeOrderFail'),
-        })
-      }
+      const txMessage = errorMessage ? t(`appErr.${errorMessage}`) : t('appErr.placeOrderFail')
+      
+      setTxError(txMessage)
       
     }
  
-  }, [orderValue, limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, placeOrder, freshTokenBalances, t])
+  }, [
+    approvalState, orderValue, limitPrice, inputSize, expires, action, paymentToken, inputToken, outputToken, marketInfo, 
+    riskUserConfig,
+    placeOrder, 
+    freshTokenBalances, 
+    handleStartStep,
+    handleEndStep,
+    updateInputSize,
+    
+    t
+  ])
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
   const actionText = useMemo(() => (action === 'buy' ? t('Buy') : t('Sell')), [action, t])
@@ -238,7 +285,7 @@ export function ConverBody({
 
   const buttonText = useMemo(() => {
     if (expired) return t('kyc.t51')
-    if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED) return t('identity.verifyID')
+    if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED || kycStatus === KYC_OVERALL_STATUS.VERIFYING) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
@@ -248,78 +295,178 @@ export function ConverBody({
     if (isMinOrMax.max) return t('amountMax', { amount: inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol })
     if (isInsufficient) return i18n.language === 'zh' ? outputToken?.symbol + ' ' + t("Insufficient") : t("Insufficient") + ' ' + outputToken?.symbol
     if (isSellInsufficient) return i18n.language === 'zh' ? inputToken?.symbol + ' ' + t("Insufficient") :  t("Insufficient") + ' ' + inputToken?.symbol
-    if (approvalState !== 3) return t("approve")
+    // if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
   }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, kycStatus, pendingStep.step, expired, i18n.language])
 
+  const handleChangePrice = useCallback((value: number) => {
+    // 所有的价格变化都以inputTokenPrice?.price为基础
+    const basePrice = inputTokenPrice?.price ?? '0'
+    if (Number(basePrice) && value !== 0) {
+      const changeValue = new BigNumber(basePrice)
+          .multipliedBy(Math.abs(value))
+          .dividedBy(100)
+          .decimalPlaces(2, BigNumber.ROUND_UP) // 保留 2 位小数，向上取整
+      const newPrice = value > 0 ?
+        new BigNumber(basePrice).plus(changeValue).toFixed(2) :
+        new BigNumber(basePrice).minus(changeValue).isLessThan(0) ? '0' :
+        new BigNumber(basePrice).minus(changeValue).toFixed(2)
+      updateLimitPrice(newPrice)
+    } else if (value === 0) {
+      // 点击最新价
+      if (inputTokenPrice) {
+        updateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
+      }
+    }
+  }, [inputTokenPrice, updateLimitPrice])
+
+
+
   return (
-    <div className="mt-2">
-      <CurrencyInputPanel
-        value={limitPrice}
-        from={from}
-        mode="price"
-        label={t('Limit price')}
-        onUserInput={hanleInputPrice}
-      />
-      <div className="h-2"></div>
-      <CurrencyInputPanel 
-        value={inputSize}
-        regex="^\d*$"
-        from={from}
-        label={t('Quantity')}
-        placeholder={t('Whole shares only')}
-        onUserInput={hanleInputQuantity}
-        isInsufficient={isSellInsufficient}
-        quantityValue={orderValue}
-      />
-      <div className="h-2"></div>
-      <CurrencyInputPanel
-        from={from}
-        mode="out"
-        label={t('Order Value')}
-        value={orderValue}
-        isInsufficient={isInsufficient}
-        orderValue={orderValue}
-      />
+    <div className={cn(
+      "mt-2",
+      from === 'lite-trade' ? 'mt-0' : ''
+    )}>
       {
-        Number(orderValue) > 0 && 
-          <EstimatedInfo
-            marketInfo={marketInfo}
-            inputToken={inputToken}
-            outputToken={outputToken}
-            expires={expires}
-            onEdit={() => {
-            expiresDialog.show()
-          }} />
+        from === 'markets' && <>
+          <CurrencyInputPanel
+            value={limitPrice}
+            from={from}
+            mode="price"
+            label={t('v2.tx.t24')}
+            onUserInput={hanleInputPrice}
+          />
+          <PriceChangeTab onChange={handleChangePrice} />
+          <div className="h-3"></div>
+          <CurrencyInputPanel 
+            value={inputSize}
+            regex="^\d*$"
+            from={from}
+            type="size"
+            label={t('v2.tx.t25')}
+            placeholder={'0'}
+            onUserInput={hanleInputQuantity}
+            isInsufficient={isSellInsufficient}
+            quantityValue={orderValue}
+          />
+          <div className="h-3"></div>
+          <USDTSelect 
+            label={action === 'buy' ? t('v2.tx.t26') : t('v2.tx.t27')}
+            orderValue={orderValue}
+          />
+          
+        </>
       }
       
       {
+        from === 'lite-trade' && <>
+          <CurrencyInputPanelLite
+            value={limitPrice}
+            from={from}
+            mode="price"
+            label={t('v2.tx.t24')}
+            placeholder={t('Enter Limit Price')}
+            onUserInput={hanleInputPrice}
+            handleChangePrice={handleChangePrice}
+          />
+          <div className="h-1"></div>
+          <div className={cn(
+            "flex flex-col",
+            action === 'buy' ? 'flex-col-reverse' : ' '
+          )}>
+            <CurrencyInputPanelLite 
+              value={inputSize}
+              regex="^\d*$"
+              from={from}
+              label={action === 'sell' ? t('v2.tx.t26') : t('v2.tx.t27')}
+              placeholder={t('Enter an amount')}
+              onUserInput={hanleInputQuantity}
+              isInsufficient={isSellInsufficient}
+              quantityValue={orderValue}
+              action={action}
+            />
+            <div className="h-1 relative">
+              <ConvertAction />
+            </div>
+            <CurrencyInputPanelLite
+              from={from}
+              mode="out"
+              label={action === 'buy' ? t('v2.tx.t26') : t('v2.tx.t27')}
+              value={orderValue}
+              isInsufficient={isInsufficient}
+              orderValue={orderValue}
+              action={action}
+            />
+          </div>
+          
+        </>
+      }
+      <div>
+        <div className={cn(
+          " flex items-center justify-between text-[12px] mt-3 text-[#9DA3AF] px-3",
+        )}>
+          <div>{t('avbl')}: </div>
+          <div>
+            <span className={cn(
+              "text-[#FFFFFF]",
+              isInsufficient ? "text-[#CA3F64]" : ""
+            )}> 
+              {
+                action === 'buy' ?
+                formatTokenAmountWithCommas(outputTokenBalance?.balance || '0') :
+                formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')
+              }
+              <span className="ml-1">
+                {
+                  action === 'buy' ? outputToken?.symbol : inputToken?.symbol
+                }
+              </span>
+              
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      {
         !account ? 
-          <div className="mt-4"><ConnectButtonText /></div> :
+          <div className="mt-3"><ConnectButtonText /></div> :
           !isSignatureValid ?
-          <SignButton className="mt-4 w-full h-[56px] rounded-[16px] text-[16px]" refreshIsSignatureValid={() => {
+          <SignButton className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]" refreshIsSignatureValid={() => {
             refreshIsSignatureValid()
           }} /> :
           <Button variant={buttonVariant} 
             loading={buying}
             className={cn(
-              "w-full mt-4 ",
-              from === 'markets' ? 'h-[52px]' : ''
+              "w-full mt-3 ",
+              from === 'markets' ? 'h-[40px]' : '',
+              action === 'buy' ? 'bg-[rgba(37,167,80,0.2)] text-[#2EE4A7]' : 'bg-[rgba(202,63,100,0.2)] text-[#F63C6B]'
             )}
             disabled={disabled || buying}
             onClick={() => {
-              if (approvalState === 3) {
-                handlePlaceOrder()
-              } else {
-                handleApprove()
+              if (showConfirm) {
+                orderDialog.setOpen(true)
+                return
               }
+              handlePlaceOrder()
             }}
           >
             { buttonText }
             
           </Button>
       }
+      {
+        Number(orderValue) > 0 && 
+          <EstimatedInfo
+            estimatedFee={estimatedFee}
+            networkFeeInNative={marketInfo.networkFeeInNative}
+            expires={expires}
+            onEdit={() => {
+            expiresDialog.show()
+          }} />
+      }
+      <MarketCloseTip />
+
       <DialogController
         title={t("Expires in")}
         open={expiresDialog.open}
@@ -329,6 +476,29 @@ export function ConverBody({
           updateExpires(value)
           expiresDialog.hide()
         } } />
+      </DialogController>
+      <DialogController
+        className="p-0"
+        headerClassName="px-4 pt-4"
+        
+        title={t('v2.tx.t29')}
+        open={orderDialog.open}
+        openChange={orderDialog.setOpen}
+      > 
+        <OrderConfirm 
+          action={action}
+          orderValue={orderValue}
+          platformFee={platformFee}
+          brokerageFee={brokerageFee}
+          tradingActivityFee={tradingActivityFee}
+          estimatedFee={estimatedFee}
+          networkFeeInNative={marketInfo.networkFeeInNative}
+          onClick={() => {
+            orderDialog.hide()
+            handlePlaceOrder()
+          }}
+        />
+        
       </DialogController>
     </div>
   )

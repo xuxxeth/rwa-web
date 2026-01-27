@@ -144,7 +144,7 @@ export function formatToQuarterLabel(dateStr: string | number) {
   else if (month >= 7 && month <= 9) quarter = 3
   else if (month >= 10 && month <= 12) quarter = 4
 
-  return `Q${quarter} ’${String(year).slice(2)}`
+  return `Q${quarter} ${String(year)}`
 }
 
 export const TEN_MINUTES = 10 * 60 * 1000

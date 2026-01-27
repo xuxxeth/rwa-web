@@ -18,6 +18,7 @@ import { Updater } from './components/Updater'
 import { useRouter } from './hooks/useRouter'
 import { HomeMenus } from './components/menu/HomeMenus'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
+import { createPortal } from 'react-dom'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -79,7 +80,11 @@ function App() {
         !isNoMenus && (isHomeMenus ? <HomeMenus /> : <Menus />)
       }
       <RoutesWrapper />
-      <Toaster position='top-center' />
+      {createPortal(
+        <Toaster position='top-right' />,
+        document.getElementById('toast-root')!
+      )}
+      
       <Updater />
 
     </>

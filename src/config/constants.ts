@@ -69,9 +69,9 @@ const chartStyleOverrides = ['candleStyle', 'hollowCandleStyle', 'haStyle'].redu
 )
 
 export const chartOverrides = {
-  "paneProperties.background": "#06070A",
-  "paneProperties.backgroundGradientStartColor": "#06070A",
-  "paneProperties.backgroundGradientEndColor": "#06070A",
+  "paneProperties.background": "#131416",
+  "paneProperties.backgroundGradientStartColor": "#131416",
+  "paneProperties.backgroundGradientEndColor": "#131416",
   "paneProperties.backgroundType": "solid",
   "paneProperties.vertGridProperties.color": "rgba(35,38,59,1)",
   "paneProperties.vertGridProperties.style": 2,

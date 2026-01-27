@@ -6,6 +6,7 @@ declare global {
     TradingView: {
       widget: (options: any) => any;
     };
+    currentToastId: string | number | null
   }
 }
 

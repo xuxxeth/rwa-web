@@ -2,7 +2,7 @@ import client, { type ApiResponse } from '../client'
 import type { IOrder, ITrade, IOpenOrder } from './types'
 import type {
   IOpenOrderFilter,
-  IOpenOrderHistoryFilter,
+  IOrderHistoryFilter,
   ITradeHistoryFilter,
 } from '@/stores/orderFilterStore'
 import { type ErrorHandlers } from '@/config/constants'
@@ -18,7 +18,7 @@ export const scanApi = {
     )
   },
 
-  getOrderHistory: (filters?: IOpenOrderHistoryFilter, errorHandlers?: ErrorHandlers) =>
+  getOrderHistory: (filters?: IOrderHistoryFilter, errorHandlers?: ErrorHandlers) =>
     client.get<ApiResponse<IOrder[]>>(
       '/v1/scan/api/history-orders',
       {

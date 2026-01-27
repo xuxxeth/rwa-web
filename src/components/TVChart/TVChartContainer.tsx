@@ -4,6 +4,8 @@ import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IBasic
 import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
+import storage from "@/utils/storage";
+import { useTranslation } from "@/hooks/useTranslation";
 
 let initChart: any
 
@@ -13,6 +15,7 @@ export const TVChartContainer = memo(
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
     const dataFeedRef = useRef<IBasicDataFeed | null>(null)
     const tvWidgetReady = useRef(false)
+    const { i18n } = useTranslation()
     
     useEffect(() => {
       let mounted = true;
@@ -24,6 +27,7 @@ export const TVChartContainer = memo(
 
       initChart = (rwa?: IRwa) => {
         const elem = chartContainerRef.current;
+        const language = storage.getItem('CA_LANGUAGE') || 'en'
         if (!mounted || !elem) {
           initTimer = window.setTimeout(initChart, 100);
           return;
@@ -36,7 +40,7 @@ export const TVChartContainer = memo(
           debug: false,
           datafeed: dataFeedRef.current,
           theme: "dark",
-          locale:"en",
+          locale: language,
           container: elem,
           library_path: `/libraries/charting_library/`,
           loading_screen: {
@@ -58,6 +62,9 @@ export const TVChartContainer = memo(
             // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
             // "volume.volume.transparency": 30,   
           },
+          "favorites": {
+              "intervals": ["5", "15",] as ResolutionString[], // 默认收藏的时间周期
+          },
          
 
         };
@@ -69,10 +76,10 @@ export const TVChartContainer = memo(
               // priceScale?.setAutoScale(true)
             // tvWidgetRef.current?.setDebugMode(true);
             tvWidgetRef.current?.applyOverrides({
-              "paneProperties.background": "#06070A",
+              "paneProperties.background": "#131416",
               "paneProperties.backgroundType": "solid",
-              "paneProperties.backgroundGradientStartColor": "#06070A",
-              "paneProperties.backgroundGradientEndColor": "#06070A",
+              "paneProperties.backgroundGradientStartColor": "#131416",
+              "paneProperties.backgroundGradientEndColor": "#131416",
             });
             const chart = tvWidgetRef.current?.activeChart();
             if (chart) {
@@ -152,11 +159,24 @@ export const TVChartContainer = memo(
       }
     }, [token?.symbol])
 
+    // ✅ 当语言变化时，重新初始化图表
+    useEffect(() => {
+      if (tvWidgetRef.current && tvWidgetReady.current) {
+        tvWidgetRef.current.remove();
+        tvWidgetRef.current = null;
+        dataFeedRef.current = null
+        tvWidgetReady.current = false
+        initChart && initChart(token)
+      }
+    }, [i18n.language])
+
     return (
       <div className={cn(
-        " relative text-white",
-        from === 'market' ? "h-[600px]" : "h-[300px]"
+        " relative text-white px-4",
+        from === 'market' ? "h-[500px]" : "h-[300px]"
       )}>
+        <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
+        <div className=" absolute w-4 h-1 -right-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
         <div
           className="h-full"
           ref={chartContainerRef}

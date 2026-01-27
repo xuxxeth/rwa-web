@@ -1,7 +1,7 @@
 import { SmallButton } from "@/components/button/SmallButton"
 import { TradingChart } from "@/components/TVChart/TradingChart"
 import { useTranslation } from "@/hooks/useTranslation"
-import { memo, useMemo } from "react"
+import { memo, useEffect, useMemo } from "react"
 import { Statistics } from "./Statistics"
 import { Profile } from "./Profile"
 import { useTradeStore } from "@/stores/tradeStore"
@@ -9,7 +9,29 @@ import { useRwaPrice } from "@/hooks/useTokenBalances"
 import type { IRwa } from "@/service/base/types"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/useRouter"
-import { StockSelect } from "./StockSelect"
+import { StockDialog } from "./StockDialog"
+import { useRwaSummary } from "@/hooks/useRwaSummary"
+import { useStockStore } from "@/stores/stockStore"
+import { PreMarketOpen } from "./PreMarketOpen"
+import IconWithTooltip from "../icon-tooltip"
+import wsService from "@/service/webSocket/service"
+
+export const LabelWrap = memo(
+  ({ children, tooltip }: { children: React.ReactNode, tooltip?: string }) => {
+    if (!tooltip) return (
+      <div className="text-[12px] font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
+        {children}
+      </div>
+    )
+    return (
+      <IconWithTooltip tooltip={tooltip}>
+        <div className="text-[12px] font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
+          {children}
+        </div>
+      </IconWithTooltip>
+    )
+  }
+)
 
 const RwaItemPrice = memo(
   ({ data, from }: { data: IRwa, from?: string}) => {
@@ -21,20 +43,19 @@ const RwaItemPrice = memo(
 
     return (
       <div className={cn(
-        " text-right",
-        isPro ? "flex items-center gap-x-5" : ""
+        " ",
+        up === 0 ? 'text-[#A1A1A1]' : up > 0
+              ? "text-[#25A750] text-[12px]"
+              : "text-[#CA3F64] text-[12px]",
       )}>
         <div className={cn(
-          "text-[20px] font-medium leading-[100%]",
-          isPro ? " text-[36px] " : ""
+          "text-[20px] font-semibold leading-[100%]",
+          isPro ? " text-[18px] " : ""
         )}>${rwaPrice.price || '--'}</div>
         <span
           className={cn(
-            "leading-[100%]",
-            up === 0 ? 'text-[#A1A1A1]' : up > 0
-              ? "text-[#50E3C2] text-[12px]"
-              : "text-[rgba(227,80,122,1)] text-[12px]",
-            isPro ? " text-[20px] " : ""
+            "leading-[100%] font-normal",
+            isPro ? " text-[14px] " : ""
           )
             
             
@@ -53,15 +74,59 @@ export const StockInfo = memo(
     const { t } = useTranslation()
     const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
+
+    const inputSummary = useRwaSummary(inputToken)
+
+    const stockData = useStockStore(state => state.stockData)
+
+    // useEffect(() => {
+    //   if (inputToken?.symbol) {
+    //     // @ts-ignore
+    //     wsService.on(`realtime.${inputToken.symbol}`, data => {
+    //       console.log(data)
+    //     })
+    //   }
+    // }, [inputToken])
+
     return (
-      <div className="flex justify-between text-white">
-        <StockSelect from={from} />
+      <div className="flex justify-between text-white pl-4">
+        <StockDialog from={from} />
         <div className={cn(
-          " flex items-center gap-x-5",
+          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4",
         )}>
+          
           {
             inputToken && <RwaItemPrice from={from} data={inputToken} />
           }
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
+            <div className="mt-1">{stockData?.marketCap || '--'}</div>
+          </div>
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
+            <div className="mt-1">{stockData?.peTtm || '--'}</div>
+          </div>
+          {/* <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
+            <div className="mt-1">{stockData?.peStatic || '--'}</div>
+          </div> */}
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
+            <div className="mt-1">${inputSummary?.o || '--'}</div>
+          </div>
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t191')}>{t('v2.tx.t19')}</LabelWrap>
+            <div className="mt-1">${inputSummary?.pc || '--'}</div>
+          </div>
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t201')}>{t('v2.tx.t20')}</LabelWrap>
+            <div className="mt-1">${inputSummary?.h || '--'}</div>
+          </div>
+          <div className=" shrink-0">
+            <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t21')}</LabelWrap>
+            <div className="mt-1">${inputSummary?.l || '--'}</div>
+          </div>
+          <PreMarketOpen />
           {
             from !== 'pro-trading' && 
               <SmallButton onClick={() => {
@@ -81,7 +146,7 @@ export const StockInfo = memo(
 const KlineBody = memo(
   () => {
     return (
-      <div>
+      <div className="bg-[#131416]">
         <StockInfo />
         <div className="mt-4">
           <TradingChart />

@@ -1,7 +1,11 @@
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { SideType, TradeType } from "@/hooks/useCaCommon";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
-import { useWssOn } from "@/hooks/useWssOn";
+import { useToast } from "@/hooks/useToast";
+import { useTranslation } from "@/hooks/useTranslation";
+import { getCurrentToastId } from "@/hooks/useTxToast";
 import { useBaseStore } from "@/stores/baseStore";
+import { useTradeStore } from "@/stores/tradeStore";
 import { useWssStore } from "@/stores/wssStore";
 import storage from "@/utils/storage";
 import { KYC_UPLOAD_STORAGE_KEY } from "@/views/identity/components/Upload/shared";
@@ -18,15 +22,37 @@ const Updater = memo(
     // } = useNetworkStatus({
     //   interval: 15000 // 15秒检查一次
     // });
+    const { toastSuccess } = useToast()
+    const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const newOrder = useWssStore(state => state.newOrder)
+    const setTxSuccess = useTradeStore(state => state.setTxSuccess)
     const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
+
     useEffect(() => {
       if (newOrder) {
         console.log('new order info: ', newOrder)
+        const orderType = newOrder.y === 'LIMIT' ? t('limit') : t('market')
+        // const orderSide = newOrder.S === 'BUY' ? t('Buy') : t('Sell')
+        if (newOrder.x === 'NEW' || newOrder.x === 'CANCELLED') {
+          let message = t('v2.tx.s', { orderType })
+          if (newOrder.x === 'CANCELLED') {
+            message = t('v2.tx.t11')
+          }
+          const toastId = getCurrentToastId()
+          console.log('new order info', toastId, message)
+          if (toastId) {
+            setTxSuccess('success', message, newOrder.hx)
+          } else {
+            toastSuccess({ title: message, tx: newOrder.hx })
+          }
+          
+        }
+        
+        
         freshTokenBalances()
       }
-    }, [newOrder, freshTokenBalances])
+    }, [newOrder, freshTokenBalances, t])
 
     const preAccount = useRef<string | undefined>(undefined)
     useEffect(() => {

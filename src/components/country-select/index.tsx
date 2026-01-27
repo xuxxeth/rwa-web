@@ -8,6 +8,7 @@ import { kycApi } from "@/service/kyc/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import type { ISupportedCountry } from "@/service/kyc/types";
 import { LazyImage } from "../image/LazyImage";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export type ICountryCode = {
   code: string,
@@ -34,10 +35,12 @@ const CountrySelect = memo(
     className,
     placeHolder
   }: CountrySelectProps) => {
+    const { t } = useTranslation()
     const [countryList, setCountryList] = useState<ISupportedCountry[]>([])
     const [currentCode, setCurrentCode] = useState('')
     const [currentCountry, setCurrentCountry] = useState<ISupportedCountry>({key: '', value: ''})
     const [open, setOpen] = useState(false)
+    const [searchText, setSearchText] = useState('')
 
     useEffect(() => {
       if (defaultValue && countryList.length > 0) {
@@ -110,8 +113,23 @@ const CountrySelect = memo(
             )}
           </div>
         </SelectTrigger>
-        <SelectContent className=" border-none">
-          {countryList.map(code => (
+        <SelectContent className="border-none p-0">
+          <div className="sticky top-0 z-50 p-2 border-b border-[rgba(255,255,255,0.1)]">
+            <input 
+              type="text"
+              placeholder={t('kyc.t4')}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="text-[14px] w-full px-3 py-2 rounded-[6px] bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.2)] text-white placeholder-[#9DA3AF] focus:outline-none focus:border-white"
+            />
+          </div>
+          <div className="max-h-[300px] overflow-y-auto">
+            {countryList
+              .filter(code => 
+                code.value.toLowerCase().includes(searchText.toLowerCase()) || 
+                code.key.toLowerCase().includes(searchText.toLowerCase())
+              )
+              .map(code => (
             <SelectItem key={code.key} value={code.key}>
               <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
                 <div className=" flex items-center gap-x-2">
@@ -130,7 +148,8 @@ const CountrySelect = memo(
                 </span>
               </div>
             </SelectItem>
-          ))}
+              ))}
+          </div>
         </SelectContent>
       </Select>
     )

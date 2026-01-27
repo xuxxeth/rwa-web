@@ -1,5 +1,5 @@
 import type { Address } from "@/config/constants";
-import { useTrading as useTradingCommon, useTradeUtils as useTradeUtilsCommon } from "@/hooks/useCaCommon";
+import { useTradingV2, useTradeUtilsV2 as useTradeUtilsCommon } from "@/hooks/useCaCommon";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { useBaseStore } from "@/stores/baseStore";
 import { useMemo } from "react";
@@ -12,14 +12,12 @@ export function useTrading(token: Address, amount: BigInt) {
     return chain?.contract as Address
   }, [chainId, chainList])
 
-  console.log('chain trading: ', trading)
-
-  const { placeOrder, approve, refetchAllowance, approvalState, allowance } = useTradingCommon(token, trading, amount)
+  const { placeOrder, refetchAllowance, txStep, approvalState, allowance } = useTradingV2(token, trading, amount)
 
   return {
     placeOrder,
-    approve,
     refetchAllowance,
+    txStep,
     approvalState,
     allowance
   }
@@ -33,10 +31,11 @@ export function useTradeUtils() {
     return chain?.contract as Address
   }, [chainId, chainList])
 
-  const { cancelOrder } = useTradeUtilsCommon(trading)
+  const { cancelOrder, txStep } = useTradeUtilsCommon(trading)
 
   return {
-    cancelOrder
+    cancelOrder,
+    txStep
   }
 }
 

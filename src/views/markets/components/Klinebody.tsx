@@ -1,25 +1,68 @@
-import { Financials } from "@/components/markets/Financials"
 import { StockInfo } from "@/components/markets/Klinebody"
-import { Profile } from "@/components/markets/Profile"
-import { Statistics } from "@/components/markets/Statistics"
 import { TradingChart } from "@/components/TVChart/TradingChart"
-import { memo } from "react"
+import { useTranslation } from "@/hooks/useTranslation"
+import { cn } from "@/utils/tw"
+import { lazy, memo, useState, Suspense } from "react"
+
+const OrderInTrade = lazy(() => import("./Order"));
+const LazyStatistics = lazy(() => import("@/components/markets/Statistics").then(m => ({ default: m.Statistics })))
+const LazyProfile = lazy(() => import("@/components/markets/Profile").then(m => ({ default: m.Profile })))
+const LazyFinancials = lazy(() => import("@/components/markets/Financials").then(m => ({ default: m.Financials })))
 
 const KlineBody = memo(
   ({ from }: { from?: string }) => {
-
+    const { t } = useTranslation()
+    const [activeTab, setActiveTab] = useState<string>('kline')
     return (
-      <div>
+      <div className="w-full">
         <StockInfo from="pro-trading" />
-        <div className="mt-4">
-          <TradingChart from={from} />
+        <div className="h-1 bg-[#1A1B1E]"></div>
+        <div className="py-2">
+          <div
+            className={cn(
+              'gap-1 flex-0 mx-4 p-1 rounded-[8px] inline-flex flex-row items-center border border-[#232427]',
+            )}
+          >
+            {[
+              {
+                key: 'kline',
+              },
+              {
+                key: 'com' ,
+              },
+            ].map(({ key }) => {
+              return (
+                <div
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={cn(
+                    'text-sm/4.5 rounded-[6px] cursor-pointer px-2 py-[2px] font-medium text-[#9DA3AF]',
+                    activeTab === key ? 'bg-[#383A40] text-white' : ''
+                  )}
+                >
+                  {t(`v2.tx.${key}`)}
+                </div>
+              )
+            })}
+          </div>
         </div>
-        <Statistics from={from} />
-        <Profile from={from} />
-        <Financials />
+        <div hidden={activeTab !== 'kline'} className="w-full">
+          <TradingChart from={from} />
+          <div className="h-1 bg-[#1A1B1E]"></div>
+          <OrderInTrade />
+        </div>
+
+        <div hidden={activeTab !== 'com'} className="px-4">
+          <LazyStatistics from={from} />
+          <LazyProfile from={from} />
+          <LazyFinancials />
+        </div>
+        
+        
       </div>
     )
   }
 )
+
 
 export { KlineBody }

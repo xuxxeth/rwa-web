@@ -43,7 +43,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
   }, [])
 
   const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
-    usePaginationData<IAssetItem>(assetTableConfig, assetsList, sort, defaultSort)
+    usePaginationData<IAssetItem>(20, assetTableConfig, assetsList, sort, defaultSort)
 
   return (
     <>

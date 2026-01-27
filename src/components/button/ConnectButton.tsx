@@ -14,15 +14,14 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 import { Divide } from '../divide'
 import { LazyImage } from '../image/LazyImage'
 import CopyButton from './copyButton'
-import { shortenAddress, formatTokenAmountWithCommas } from '@/utils'
-import { useUSDT } from '@/hooks/useTokens'
-import { useTokenBalance } from '@/hooks/useTokenBalances'
+import { shortenAddress } from '@/utils'
 import { useVerifyTip } from '../market-trading/VerifyIdentity'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { CircleLoading } from '@/components/loading'
 import QRCode from '@/components/qrcode'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
+import { usePendingStep } from '@/hooks/usePendingStep'
 
 export function WalletItem({
   wallet,
@@ -57,8 +56,6 @@ export function WalletItem({
   )
 }
 
-/* ================= WalletStatus（按你要求） ================= */
-
 const WalletStatus = {
   IDLE: 'IDLE',
   CONNECTING: 'CONNECTING',
@@ -68,13 +65,10 @@ const WalletStatus = {
 
 type WalletStatus = (typeof WalletStatus)[keyof typeof WalletStatus]
 
-/* ================= 主组件 ================= */
-
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
-  const { toastSuccess, toastError } = useToast()
-
+  const { toastSuccess, toastError, toastWarning, toastInfo } = useToast()
   const {
     wallets,
     account,
@@ -102,14 +96,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   const networkText = useMemo(() => chains.map(c => c.displayName).join(' / '), [chains])
 
-  const usdtToken = useUSDT()
-  const usdtBalance = useTokenBalance(usdtToken?.symbol ?? '')
-
   const { verifyTip } = useVerifyTip()
-  const { kycStatus } = useKycStatus()
   const [isSignatureValid] = useSignatureValidStatus()
-
   const [isQrCodeInvalid, setIsQrCodeInvalid] = useState(false)
+
+  const { kycStatus } = useKycStatus()
+  const pendingStep = usePendingStep()
 
   const handleConnect = useCallback(
     async (connectorType: ConnectorType, wallet: WalletConfig) => {
@@ -128,8 +120,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   )
 
   useEffect(() => {
-    console.log("wallet debugger3: account is", account)
-    console.log("wallet debugger4: chainId is", chainId)
     if (!account || !chainId) {
       setStatus(WalletStatus.IDLE)
       return
@@ -142,10 +132,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   const hasInitializedRef = useRef(false)
   useEffect(() => {
-    if (initialized) {
+    if (initialized && account && chainId) {
       hasInitializedRef.current = true
     }
-  }, [initialized])
+  }, [initialized, account, chainId])
 
   useEffect(() => {
     const prevStatus = prevStatusRef.current
@@ -166,7 +156,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         toastError({
           title: t('switchNetwork', { network: networkText }),
         })
-        console.log('wallet debugger2: network does not match, disconnect wallet')
         handleDisConnect()
         break
 
@@ -215,7 +204,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
     if (wallet.detected) {
       if (!wallet.provider) {
-        console.error('Injected wallet missing provider')
         setIsWalletConnecting(false)
         return
       }
@@ -252,28 +240,42 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       <span className='text-base font-semibold'>{t('Connect Wallet')}</span>
     )
 
-  /* ================= 渲染（UI 原样） ================= */
-
   return (
     <>
       {!account ? (
         <div
           className={cn(
-            'h-[40px] flex items-center px-6 bg-[#9CFF3A] text-sm font-semibold rounded-[8px] cursor-pointer',
+            'h-[36px] flex items-center px-6 bg-[#9CFF3A] text-sm font-medium rounded-[8px] cursor-pointer',
             props.connectBtnClassName
           )}
-          onClick={() => setShowConnect(true)}
+          onClick={() => {
+            setShowConnect(true)
+            setHoverOpen(false)
+            // toastTxSteps({duration: 100000, action: 'cancel', approveed: true})
+          }}
+          onMouseEnter={e => {
+            e.stopPropagation()
+            e.preventDefault()
+            setHoverOpen(false)
+          }}
+          onMouseOver={e => {
+            e.stopPropagation()
+            e.preventDefault()
+          }}
         >
           {t('Connect Wallet')}
         </div>
       ) : (
         <HoverCard open={hoverOpen} onOpenChange={setHoverOpen}>
           <HoverCardTrigger asChild>
-            <div className='h-[40px] flex items-center px-2 py-1 bg-[rgba(255,255,255,0.1)] text-sm font-semibold rounded-[8px] cursor-pointer text-white'>
+            <div className={cn(
+              'h-[36px] flex items-center px-2 py-1 bg-[#191B1E] text-sm font-semibold rounded-[8px] cursor-pointer text-white',
+              hoverOpen ? "bg-[#383A40]" : ""
+            )}>
               {currentWallet?.info?.icon && (
                 <img src={currentWallet.info.icon} className='w-6 mr-2' />
               )}
-              <div className='w-full h-full bg-[rgba(255,255,255,0.1)] rounded-[6px] px-2 flex items-center justify-center'>
+              <div className='w-full h-full rounded-[6px] px-2 flex items-center justify-center'>
                 {shortenAddress(account)}
               </div>
             </div>
@@ -281,19 +283,18 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
           <HoverCardContent
             align='end'
-            className='bg-[rgba(0,0,0,0)] w-[230px] border-none pt-2 -mr-[16px]'
+            className='bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]'
           >
             <div
-              className='bg-[#131823] rounded-[8px] text-white'
-              style={{ boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)' }}
+              className='bg-[#131416] border border-[#232427] rounded-[8px] pt-2 text-white'
             >
-              <div className='px-4'>
+              <div className='px-5 pb-2'>
                 <div className='flex items-center justify-between py-3'>
-                  <div className=' text-sm font-semibold'>{shortenAddress(account)}</div>
+                  <div className=' text-sm font-medium'>{shortenAddress(account)}</div>
                   <CopyButton copyText={account} />
                 </div>
 
-                <div className='py-3'>
+                {/* <div className='py-3'>
                   <div className='flex items-center'>
                     <img src='/images/tokens/usdt.png' className='w-5 h-5' alt='' />
                     <span className='text-[18px] font-semibold ml-2'>
@@ -304,30 +305,42 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                     </span>
                   </div>
                   <div className='text-[#6C86AD] text-sm leading-6'>{t('Total USDT Balance')}</div>
-                </div>
-
-                <div
-                  className='flex items-center py-3 cursor-pointer'
-                  onClick={() => goTo('assets')}
-                >
-                  <img src='/images/icons/assets.png' className='w-[14px] h-[14px]' alt='' />
-                  <span className='text-[14px] font-semibold ml-2'>{t('My Assets')}</span>
-                </div>
-
+                </div> */}
                 <div
                   className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('identity')}
                 >
-                  <img src='/images/icons/user-check.png' className='w-[14px] h-[14px]' alt='' />
-                  <span className={cn(
-                    'text-[14px] font-semibold ml-2',
-                    kycStatus === KYC_OVERALL_STATUS.ISSUE ? 'text-[#CA3F64]' : ""
-                  )}
-
-                  >
-                    {!isSignatureValid ? t('identity.verifyID') : verifyTip || t('verified')}
-                  </span>
+                  <div className={cn(
+                    ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
+                    kycStatus === KYC_OVERALL_STATUS.VERIFIED ? 'bg-[#25A750]' :
+                    kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step ? 'bg-[#CA3F64]' : 'bg-[#FFB219]'
+                  )}>
+                    <img src={
+                      kycStatus === KYC_OVERALL_STATUS.VERIFIED ? '/images/v2/icons/verify.png' :
+                      (kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step) ? '/images/v2/icons/issue.png' : '/images/v2/icons/unverify.png'
+                    } className='w-[20px] h-[14px]' alt='' />
+                    <span className='text-[12px] font-medium ml-1 text-black'>
+                      {!isSignatureValid ? t('identity.verifyID') : verifyTip || t('verified')}
+                    </span>
+                  </div>
+                  
                 </div>
+                <div
+                  className='flex items-center py-3 cursor-pointer'
+                  onClick={() => goTo('portfolio')}
+                >
+                  <img src='/images/v2/icons/assets.png' className='w-[16px] h-[16px]' alt='' />
+                  <span className='text-[14px] font-medium ml-2'>{t('v2.hd.h2')}</span>
+                </div>
+                <div
+                  className='flex items-center py-3 cursor-pointer'
+                  onClick={() => goTo('order')}
+                >
+                  <img src='/images/v2/icons/order.png' className='w-[16px] h-[16px]' alt='' />
+                  <span className='text-[14px] font-medium ml-2'>{t('v2.hd.h1')}</span>
+                </div>
+
+                
               </div>
 
               <Divide />
@@ -339,7 +352,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />
-                <div className='ml-2 text-sm font-semibold'>{t('Disconnect')}</div>
+                <div className='ml-2 text-sm font-medium'>{t('Disconnect')}</div>
               </div>
             </div>
           </HoverCardContent>

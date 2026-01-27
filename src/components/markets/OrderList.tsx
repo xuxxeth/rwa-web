@@ -13,6 +13,8 @@ import { ScrollBox } from '../scroll-box'
 import { useTradeUtils } from '@/hooks/useTrading'
 import { useWssStore } from '@/stores/wssStore'
 import { type OrderChanged, checkOrderChangedEqual } from '@/views/assets/Shared'
+import { useTxToast } from '@/hooks/useTxToast'
+import { useTradeStore } from '@/stores/tradeStore'
 
 const limit = 3
 
@@ -52,8 +54,10 @@ const OrderList = memo(({ show, onClose }: { show: Boolean; onClose?: () => void
 
   const [openOrderList, setOpenOrderList] = useState<IOpenOrder[]>([])
   const [after, setAfter] = useState('')
-  const { cancelOrder } = useTradeUtils()
+  const { cancelOrder, txStep } = useTradeUtils()
   const { toastSuccess, toastError } = useToast()
+  const setTxError = useTradeStore(state => state.setTxError)
+  const setTxSuccess = useTradeStore(state => state.setTxSuccess)
   const [isCanceling, setIsCanceling] = useState(false)
   const [cancelOrderId, setCancelOrderId] = useState('')
   const [loading, setLoading] = useState(true)
@@ -130,37 +134,62 @@ const OrderList = memo(({ show, onClose }: { show: Boolean; onClose?: () => void
     }
   }, [show])
 
+  const { toastTxSteps, dismissTxToast } = useTxToast()
+  const setTxStep = useTradeStore(state => state.setTxStep)
+  const stepStartRef = useRef(false)
+
+  useEffect(() => {
+    if (stepStartRef.current) {
+      setTxStep(txStep)
+    }
+  }, [txStep])
+  const handleStartStep = useCallback(() => {
+    stepStartRef.current = true
+    dismissTxToast()
+    setTxError('')
+    setTxSuccess('', '', '')
+
+    setTxStep(1)
+  }, [setTxStep])
+  // 结束后重置step和状态
+  // type: 成功 or 失败
+  const handleEndStep = useCallback(() => {
+
+    dismissTxToast()
+    setTxError('')
+    setTxSuccess('', '', '')
+    setTimeout(() => {
+      stepStartRef.current = false
+      setTxStep(1)
+    }, 500)
+
+  }, [setTxStep])
+
   const handleCancelOrder = useCallback(
     async (orderId: string) => {
       try {
         if (isCanceling) return
         setIsCanceling(true)
         setCancelOrderId(String(orderId))
-        // TODO: 需要在 ca-common-web 里修复
-        // @ts-ignore
+        handleStartStep()
+        toastTxSteps({action: 'cancel', approveed: true, onClick: handleEndStep})
+        
         const result = await cancelOrder(orderId, { wait: true, skipSimulate: true })
         if (result && result?.code !== 9200) {
+          
           // @ts-ignore
           const errorMessage = result.data?.message
-          if (errorMessage) {
-            toastError({
-              title: t(`appErr.${errorMessage}`),
-            })
-          } else {
-            toastError({
-              title: t('assets.order.cancelOrderFailed'),
-            })
-          }
+          setTxError(errorMessage ? t(`appErr.${errorMessage}`) : t('assets.order.cancelOrderFailed'))
+
         } else {
+          
           // 本地更新订单状态
           const _orderIndex = openOrderList.findIndex(order => order.orderId === orderId)
           if (_orderIndex > -1) {
             openOrderList[_orderIndex].state = 8
           }
           setOpenOrderList([...openOrderList])
-          toastSuccess({
-            title: t('assets.order.cancelOrderSuccess'),
-          })
+          
         }
       } catch (error) {
         console.log('cancel order error', error)
@@ -168,7 +197,7 @@ const OrderList = memo(({ show, onClose }: { show: Boolean; onClose?: () => void
         setIsCanceling(false)
       }
     },
-    [t, isCanceling, openOrderList]
+    [t, isCanceling, openOrderList, handleStartStep, handleEndStep, cancelOrder, toastError]
   )
 
   // 注释掉 polling 操作了

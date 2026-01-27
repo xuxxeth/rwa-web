@@ -13,7 +13,7 @@ export type Tif = 0 | 1 | 2
 export type Reason = 0 | 1 | 2 | 3
 
 export interface IOpenOrder {
-  id: number
+  id: string
   chainId: number
   orderId: string
   stockId: number
@@ -34,7 +34,7 @@ export interface IOpenOrder {
 }
 
 export interface IOrder {
-  id: number
+  id: string
   orderId: string
   chainId: number
   stockId: number

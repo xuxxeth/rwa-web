@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { BoxCard } from "../BoxCard";
 import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -8,6 +8,7 @@ import { MARKET_STATUS, RISK_STATUS } from "@/config/constants";
 import { VerifyIdentity } from "./VerifyIdentity";
 import { useKycStatus } from "@/hooks/useKycStatus";
 import { usePendingStep } from "@/hooks/usePendingStep";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 
 type MarketTradingProps = {
   align?: string
@@ -16,10 +17,11 @@ type MarketTradingProps = {
 const MarketTrading = memo(
   ({  align = 'center' }: MarketTradingProps) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const { kycStatus } = useKycStatus()
     const pendingStep = usePendingStep()
-    
+    const [show, setShow] = useState(true)
     const marketInfo = useMemo(() => {
       let _icon = ''
       let _info = ''
@@ -52,21 +54,22 @@ const MarketTrading = memo(
         info: _info
       }
     }, [marketTradeState, t])
-    if (!marketInfo.info) return null
-    if (kycStatus !== RISK_STATUS.ISSUE && kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN || pendingStep.step) return <VerifyIdentity riskStatus={kycStatus} />
+    if (!marketInfo.info || !show) return <div className="bg-[#1A1B1E] h-1"></div>
+    
+    if (account && kycStatus !== RISK_STATUS.ISSUE && kycStatus !== RISK_STATUS.VERIFIED && kycStatus !== RISK_STATUS.NOTSIGN || pendingStep.step)  return <VerifyIdentity riskStatus={kycStatus} />
     return (
       <BoxCard className={cn(
-        "rounded-[4px] h-[48px] py-0 flex items-center pl-4",
+        " h-[40px] py-0 flex items-center pl-4 relative",
         align === 'left' ? 'justify-start h-[40px]' : 'justify-center'
       )}>
         <div className="flex items-center gap-x-2">
           <div className=" shrink-0">
             {
-              marketInfo.icon && <LazyImage src={marketInfo.icon} className="w-6" />
+              marketInfo.icon && <LazyImage src={marketInfo.icon} className="w-4" />
             }
             
           </div>
-          <div className=" font-medium text-[14px]">{marketInfo.info}</div>
+          <div className=" font-normal text-[14px]">{marketInfo.info}</div>
         </div>
         {
           // state === 'lock' && 
@@ -79,7 +82,11 @@ const MarketTrading = memo(
           //     </div>
           //   </div>
         }
-        
+        <div className=" absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
+          onClick={() => setShow(false)}
+        >
+          <LazyImage src="/images/v2/icons/close.png" className="w-[14px] h-[14px]" />
+        </div>
       </BoxCard>
     )
   }

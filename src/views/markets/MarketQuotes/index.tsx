@@ -2,8 +2,6 @@ import { MainLayout } from '@/layouts/main'
 import ConentLayout from '@/layouts/content'
 import { MarketTrading } from '@/components/market-trading'
 import { useTranslation } from '@/hooks/useTranslation'
-import { useQuery } from '@tanstack/react-query'
-import { useChainId } from '@/hooks/useCaCommon'
 import { LazyImage } from '@/components/image/LazyImage'
 import { type Order, useTableSort, usePaginationData } from '@/hooks/useTableHelper'
 import {
@@ -16,8 +14,8 @@ import {
   type Change,
   symbolToLower,
   multiply,
+  formatLargeNumber,
 } from '@/utils'
-import RwaStateButton from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import { TableHeader, TableBody } from '@/components/table-header'
@@ -29,6 +27,9 @@ import { useEffect, useState } from 'react'
 import { truncate, divide, subtract } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import { useTradeStore } from '@/stores/tradeStore'
+import IconWithTooltip from '@/components/icon-tooltip'
+import SearchFilter from './SearchFilter'
+import NoRecord from '@/components/no-record'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -42,16 +43,30 @@ export default function MarketQuotes() {
 
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
-  const marketQuotes: IMarketQuote[] = rwaList.map(rwa => {
-    const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+  const [searchText, setSearchText] = useState('')
 
-    return {
-      ...rwa,
-      price: quote?.price,
-      up: quote?.up,
-      dailyHigh: quote?.dailyHigh,
-    }
-  })
+  const marketQuotes: IMarketQuote[] = rwaList
+    .filter(
+      rwa => !searchText || rwa.symbol.toLowerCase().includes(searchText.trim().toLowerCase())
+    )
+    .map(rwa => {
+      const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+
+      return {
+        ...rwa,
+        price: quote?.price,
+        up: quote?.up,
+        dailyHigh: quote?.dailyHigh,
+        dailyLow: quote?.dailyLow,
+        weekUp: quote?.weekUp,
+        marketCap: quote?.price
+          ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
+          : undefined,
+        floatCap: quote?.price
+          ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
+          : undefined,
+      }
+    })
 
   useEffect(() => {
     const listener = (data: ISummaryData) => {
@@ -66,6 +81,13 @@ export default function MarketQuotes() {
                 ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
                 : '0',
             dailyHigh: item.h ? truncate(item.h, 2) : '0',
+            dailyLow: item.l ? truncate(item.l, 2) : '0',
+            // 周涨跌幅
+            // weekUp = (item.p 最新价 - item.wc 上周收盘价) - 1
+            weekUp:
+              item.p && item.wc
+                ? truncate(multiply(subtract(divide(item.p, item.wc), 1), 100), 2)
+                : '0',
           }
           return acc
         },
@@ -84,40 +106,57 @@ export default function MarketQuotes() {
   }, [])
 
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
-    usePaginationData<IMarketQuote>(MarketQuotesList, marketQuotes, sort)
+    usePaginationData<IMarketQuote>(20, MarketQuotesList, marketQuotes, sort)
+
+  const [isAll, setIsAll] = useState(true)
 
   return (
     <MainLayout>
       <ConentLayout>
-        <div className='px-5'>
+        <div>
           <MarketTrading align='center' />
+          <SearchFilter
+            searchText={searchText}
+            onSearchChange={setSearchText}
+            isAll={isAll}
+            onFilterChange={setIsAll}
+          />
           <TableHeader<SortableField, IMarketQuote, unknown>
             lngPrefix='marketQuotes'
             config={MarketQuotesList}
             sort={sort}
+            className='px-6'
             onSortChange={onSortChange}
+            thClassName={'text-xs/[15px] text-gray-400 font-normal'}
           />
+          {paginatedData.length === 0 && <NoRecord />}
           <div>
             <TableBody<IMarketQuote, unknown>
               data={paginatedData}
               config={MarketQuotesList}
               extra={{} as unknown}
               getKey={(item: IMarketQuote) => item.symbol}
-              className='cursor-pointer hover:bg-white/4'
+              className='px-6 cursor-pointer hover:bg-white/4'
               onClick={(item: IMarketQuote) => {
                 updateInputToken(item)
                 router.push('/markets/trading/' + symbolToLower(item.symbol))
               }}
             />
           </div>
-          <div className='px-5 py-1 mt-2 text-sm/5.5'>{t('marketQuotes.quoteInfo')}</div>
+          {paginatedData.length > 0 && (
+            <div className='px-6 py-2 mt-2 mb-4 text-sm/4.5 font-normal text-gray-400'>
+              {t('marketQuotes.quoteInfo')}
+            </div>
+          )}
           {totalPage > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPage={totalPage}
-              onPrevClick={onPrevClick}
-              onNextClick={onNextClick}
-            />
+            <div className='mt-4'>
+              <Pagination
+                currentPage={currentPage}
+                totalPage={totalPage}
+                onPrevClick={onPrevClick}
+                onNextClick={onNextClick}
+              />
+            </div>
           )}
         </div>
       </ConentLayout>
@@ -125,20 +164,24 @@ export default function MarketQuotes() {
   )
 }
 
-function QuoteName(props: { logo: string; name: string }) {
+function QuoteName(props: { logo: string; symbol: string; name: string }) {
   return (
     <>
-      <LazyImage src={props.logo} className='w-10 h-10 mr-2 rounded-[50%]' />
-      <TextCell text={props.name} />
+      <LazyImage src='/images/v2/icons/collect.png' className='w-4 h-4 mr-3' />
+      <LazyImage src={props.logo} className='w-12 h-12 mr-2 rounded-[50%]' />
+      <div className='flex flex-col'>
+        <TextCell text={props.symbol} className='text-base/5 text-white font-normal' />
+        <TextCell text={props.name} className='text-xs/[15px] text-gray-400 font-normal' />
+      </div>
     </>
   )
 }
 
 function TextCell(props: { text: string; className?: string; icon?: string }) {
   return (
-    <div className={cn('flex flex-row gap-1 items-center ', props.className)}>
+    <div className={cn('flex flex-row gap-1 items-center', props.className)}>
       {props.icon && <LazyImage className='w-2 h-2' src={props.icon} />}
-      <span className='text-base/6 h-6 font-medium'>{props.text}</span>
+      <span>{props.text}</span>
     </div>
   )
 }
@@ -146,36 +189,54 @@ function TextCell(props: { text: string; className?: string; icon?: string }) {
 function getColorAndIcon(change: Change) {
   switch (change) {
     case 0:
-      return { color: 'stock-even', icon: '' }
+      return { color: 'text-gray-400', icon: '' }
     case 1:
-      return { color: 'stock-rise', icon: '/images/convert/price_up.png' }
+      return { color: 'text-green-50', icon: '/images/convert/price_up.png' }
     case -1:
-      return { color: 'stock-fall', icon: '/images/convert/price_down.png' }
+      return { color: 'text-red-50', icon: '/images/convert/price_down.png' }
     default:
-      return { color: 'stock-even', icon: '' }
+      return { color: 'text-gray-400', icon: '' }
   }
 }
 
 function TextCellWithColor(props: { text: string; change: Change; withIcon: boolean }) {
   const { icon, color } = getColorAndIcon(props.change)
 
-  return <TextCell text={props.text} className={color} icon={props.withIcon ? icon : ''} />
+  return (
+    <TextCell
+      className={cn('text-sm/4.5 font-normal', color)}
+      text={props.text}
+      icon={props.withIcon ? icon : ''}
+    />
+  )
 }
 const MarketQuotesList = [
   {
     key: 'name',
     sortable: true,
-    render: (item: IMarketQuote) => <QuoteName logo={item.icon || ''} name={item.name} />,
+    width: 246,
+    render: (item: IMarketQuote) => (
+      <>
+        <QuoteName logo={item.icon || ''} symbol={item.symbol} name={item.name} />
+        {item.state === 1 && (
+          <IconWithTooltip
+            triggerClassName='ml-2'
+            icon='/images/v2/icons/trade_halt.svg'
+            tooltip={'marketQuotes.tH'}
+          />
+        )}
+      </>
+    ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.name, b.name, order),
   },
-  {
-    key: 'token',
-    sortable: true,
-    render: (item: IMarketQuote) => <TextCell text={item.symbol} />,
-    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.symbol, b.symbol, order),
-  },
+  // {
+  //   key: 'token',
+  //   sortable: true,
+  //   render: (item: IMarketQuote) => <TextCell text={item.symbol} />,
+  //   sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
+  //     advancedSort(a.symbol, b.symbol, order),
+  // },
   {
     key: 'price',
     sortable: true,
@@ -205,17 +266,72 @@ const MarketQuotesList = [
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),
   },
   {
-    key: 'dailyHigh',
+    key: 'weekChange',
     sortable: true,
-    render: (item: IMarketQuote) => (
-      <TextCell text={item.dailyHigh ? textPrefix(toFixed(item.dailyHigh), '$') : '--'} />
-    ),
+    render: (item: IMarketQuote) => {
+      const change = strOrNumToSign(item.weekUp ?? 0)
+      return (
+        <TextCellWithColor
+          text={
+            item.weekUp
+              ? textPrefix(textSuffix(item.weekUp, '%', 0), change === 1 ? '+' : '')
+              : '--'
+          }
+          change={change}
+          withIcon={false}
+        />
+      )
+    },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.dailyHigh, b.dailyHigh, order),
+      advancedSort(a.weekUp, b.weekUp, order),
   },
   {
-    key: 'quickBuy',
-    sortable: false,
-    render: (item: IMarketQuote) => <RwaStateButton rwa={item} className='text-base/[19px]' />,
+    key: 'marketCap',
+    sortable: true,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.marketCap ? formatLargeNumber(item.marketCap) : '--'}
+      />
+    ),
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
+      advancedSort(a.marketCap, b.marketCap, order),
   },
+  {
+    key: 'floatCap',
+    sortable: true,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.floatCap ? formatLargeNumber(item.floatCap) : '--'}
+      />
+    ),
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
+      advancedSort(a.floatCap, b.floatCap, order),
+  },
+  {
+    key: 'dailyHigh',
+    sortable: false,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.dailyHigh ? textPrefix(toFixed(item.dailyHigh), '$') : '--'}
+      />
+    ),
+  },
+  {
+    key: 'dailyLow',
+    sortable: false,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.dailyLow ? textPrefix(toFixed(item.dailyLow), '$') : '--'}
+      />
+    ),
+  },
+  // {
+  //   key: 'quickBuy',
+  //   sortable: false,
+  //   render: (item: IMarketQuote) => <RwaStateButton rwa={item} className='text-base/[19px]' />,
+  // },
 ]

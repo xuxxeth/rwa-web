@@ -21,19 +21,17 @@ export default function SignatureVerify(props: {
   return (
     <div className={cn('flex flex-col items-center justify-center', className)}>
       <div>
-        <LazyImage className='w-[50px] h-[60px]' src='/images/icons/assets/security.png' alt='' />
+        <LazyImage className='w-[65px]' src='/images/v2/portfolio/security.png' alt='' />
       </div>
-      <div className='text-sm mt-4 text-[24px] font-semibold text-white'>
-        {t('signatureVerify')}
-      </div>
-      <div className=' mt-4 text-60 text-base font-normal text-center'>
+      <div className='text-sm mt-2 font-medium text-white'>{t('signatureVerify')}</div>
+      <div className=' mt-2 text-xs text-base text-gray-400 font-normal text-center'>
         <div className='w-[450px] m-auto'>{t(desc)}</div>
         {subDesc && <div className='w-[350px] m-auto'>{t(subDesc)}</div>}
       </div>
       <button
         disabled={signing}
         onClick={handleSignatureVerify}
-        className='w-[314px] cursor-pointer bg-white rounded-[16px] text-base/6 py-4 mt-9  font-semibold text-black'
+        className='cursor-pointer bg-white rounded-[8px] text-sm/4.5 py-2 px-6 mt-2  font-semibold text-black'
       >
         {t('gotoSignature')}
       </button>

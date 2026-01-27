@@ -101,7 +101,7 @@ export function getDataFeed({
         "session": "0400-2000",
         "timezone": "America/New_York",
         minmov: 1,
-        pricescale: 10000,
+        pricescale: 100,  // 小数点后2位精度
         exchange: "RWA",
         has_intraday: true,
         visible_plots_set: 'ohlc',

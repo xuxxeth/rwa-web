@@ -13,7 +13,7 @@ const ConnectButtonText = memo(
     const setShowConnect = useBaseStore(state => state.setShowConnect)
     return (
       <Button className={cn(
-        "bg-white text-black w-full",
+        "bg-[#9CFF3A] text-black w-full h-[40px] text-[14px]",
         className
       )}
         onClick={async () => {

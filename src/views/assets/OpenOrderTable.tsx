@@ -1,5 +1,5 @@
 import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
-import { useEffect, useMemo, useState, useRef } from 'react'
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { type IRwa } from '@/service/base/types'
 import { openOrderOptions, infiniteOpenOrderOptions } from '@/queries'
@@ -25,12 +25,14 @@ import { useSignatureValidStatus } from '@/hooks/useSignature'
 import SignatureVerify from '@/components/signature-verify'
 import { useTradeUtils } from '@/hooks/useTrading'
 import { type OrderChanged } from './Shared'
+import { useTxToast } from '@/hooks/useTxToast'
+import { useTradeStore } from '@/stores/tradeStore'
 
 export default function OpenOrderTable(props: {
   chainId: number
   account: string
-  rwaTokens: IRwa[]
-  orderChanged: OrderChanged
+  rwaTokens: IRwa[] 
+  orderChanged: OrderChanged | null
 }) {
   const { chainId, account, rwaTokens, orderChanged } = props
 
@@ -261,30 +263,55 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
   const { disabled } = props
   const { t } = useTranslation()
   const { orderId } = props
-  const { cancelOrder } = useTradeUtils()
-  const { toastSuccess, toastError } = useToast()
+  const { cancelOrder, txStep } = useTradeUtils()
+  const setTxError = useTradeStore(state => state.setTxError)
+  const setTxSuccess = useTradeStore(state => state.setTxSuccess)
   const [isCanceling, setIsCanceling] = useState(false)
+
+  const { toastTxSteps, dismissTxToast } = useTxToast()
+  const setTxStep = useTradeStore(state => state.setTxStep)
+  const stepStartRef = useRef(false)
+
+  useEffect(() => {
+    if (stepStartRef.current) {
+      setTxStep(txStep)
+    }
+  }, [txStep])
+  const handleStartStep = useCallback(() => {
+    stepStartRef.current = true
+    dismissTxToast()
+    setTxError('')
+    setTxSuccess('', '', '')
+    setTxStep(1)
+  }, [setTxStep])
+  // 结束后重置step和状态
+  // type: 成功 or 失败
+  const handleEndStep = useCallback(
+    () => {
+      dismissTxToast()
+      setTxError('')
+      setTxSuccess('', '', '')
+      setTimeout(() => {
+        stepStartRef.current = false
+        setTxStep(1)
+      }, 500)
+    },
+    [setTxStep]
+  )
 
   const handleCancelOrder = async () => {
     try {
       setIsCanceling(true)
+      handleStartStep()
+      toastTxSteps({ action: 'cancel', approveed: true, onClick: handleEndStep })
+
       const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
-        toastSuccess({
-          title: t('assets.order.cancelOrderSuccess'),
-        })
+        
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message
-        if (errorMessage) {
-          toastError({
-            title: t(`appErr.${errorMessage}`),
-          })
-        } else {
-          toastError({
-            title: t('assets.order.cancelOrderFailed'),
-          })
-        }
+        setTxError(errorMessage ? t(`appErr.${errorMessage}`) : t('assets.order.cancelOrderFailed'))
       }
     } catch (error) {
       console.log('cancel order error', error)

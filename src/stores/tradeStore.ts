@@ -12,8 +12,11 @@ export const useTradeStore = create<TradeStore>()(
       limitPrice: '',
       inputSize: '',
       expires: 7,
-      activeConvertTab: 'buy',
+      activeConvertTab: 'buy' as const,
       isSignatureValid: false,
+      txStep: 0,
+      txError: '',
+      txSuccess: {type: '', msg: '', tx: ''},
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})
       },
@@ -34,6 +37,16 @@ export const useTradeStore = create<TradeStore>()(
       },
       setIsSignatureValid: (valid: boolean) => {
         set({isSignatureValid: valid})
+      },
+      setTxStep: (step: number) => {
+        set({txStep: step})
+      },
+      setTxError: (str: string) => {
+        set({txError: str})
+      },
+      setTxSuccess: (type: string, msg: string, tx: string) => {
+
+        set({txSuccess: { type, msg, tx }})
       }
     }),
     {

@@ -13,8 +13,10 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { useBaseStore } from "@/stores/baseStore";
 import { symbolToLower } from "@/utils";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
+import { PriceChangeTab } from "../markets/PriceChangeTab";
 
 type CurrencyInputPanelProps = {
+  action?: string; // buy | sell
   mode?: string; // in | out
   from?: string
   label?: string
@@ -26,10 +28,11 @@ type CurrencyInputPanelProps = {
   orderValue?: string
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
+  handleChangePrice?: (priceType: number) => void
 }
 
 const CurrencyInputPanel = memo(
-  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, quantityValue, orderValue, onUserInput }: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, onUserInput, handleChangePrice }: CurrencyInputPanelProps) => {
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
@@ -69,13 +72,12 @@ const CurrencyInputPanel = memo(
 
     return (
       <div className={cn(
-        "bg-[#06070A] p-4 rounded-[16px] border border-[#06070A]",
-        mode === "out" ? "border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0)]" : "",
-        inputFocus ? "border-[#FFFFFF]" : ""
+        "p-3 rounded-[8px] border border-[rgba(255,255,255,0.00005)] bg-[#1A1B1E]",
+        mode === "out" ? "border-[#232427] bg-[#131416]" : "",
+        inputFocus ? "border-[rgba(156,255,58,0.8)]" : ""
       )}>
         <div className={cn(
-          "text-[#6C86AD] font-normal",
-          from === 'markets' ? 'text-[14px]' : 'text-[14px]'
+          "text-[#9CA3AD] font-normal text-[12px] mb-2",
         )}>{label || ''}</div>
         <CurrencyInput 
           isInsufficient={isInsufficient}
@@ -93,39 +95,12 @@ const CurrencyInputPanel = memo(
           }}
         />
         {
-          mode === 'in' && 
-            <div className={cn(
-              " mt-1 py-[6px] font-nomarl text-[#6C86AD] text-[14px] flex items-center justify-between",
-              from === "markets" ? "text-[12px]" : ""
-            )}>
-              <div title={formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)} className={cn(
-                "truncate whitespace-nowrap text-ellipsis",
-                from === "markets" ? "w-[120px] overflow-hidden" : ""
-              )}>≈ ${formatTokenAmountWithCommas(quantityValue || '0', outputToken?.precision)}</div>
-              <div>{t('avbl')}: <span className={cn(
-                "",
-                isInsufficient ? "text-[#F6465D]" : ""
-              )}>{formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')} {inputToken?.symbol || ' '}</span></div>
-            </div>
+          mode === 'price' && <PriceChangeTab from="lite-trade" onChange={(priceType) => handleChangePrice && handleChangePrice(priceType)} />
         }
-        {
-          mode === 'out' && 
-            <div className={cn(
-              " mt-1 py-[6px] font-nomarl text-[#6C86AD] text-[14px] flex items-center justify-between",
-              from === "markets" ? "text-[12px]" : ""
-            )}>
-              <div title={formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)} className={cn(
-                "truncate whitespace-nowrap text-ellipsis",
-                from === "markets" ? "w-[120px] overflow-hidden" : ""
-              )}>≈ ${formatTokenAmountWithCommas(orderValue || '0', outputToken?.precision)}</div>
-              <div>{t('avbl')}: <span className={cn(
-                "",
-                isInsufficient ? "text-[#F6465D]" : ""
-              )}>{formatTokenAmountWithCommas(outputTokenBalance?.balance || '0')} {outputToken?.symbol || ' '}</span></div>
-            </div>
-        }
+        
         <DialogController
-          className="pr-2"
+          className="pr-1 pl-0"
+          headerClassName="px-4"
           topFixed
           title={t("Select a token")}
           open={tokenDialog.open}
@@ -141,21 +116,7 @@ const CurrencyInputPanel = memo(
             />
           </div>
         </DialogController>
-        <DialogController
-          topFixed
-          title={t("Select a token")}
-          open={cTokenDialog.open}
-          openChange={cTokenDialog.setOpen}
-        > 
-          <div>
-            <TokenList
-              onClick={(token) => {
-                cTokenDialog.hide()
-                updateOutputToken(token)
-              }}
-            />
-          </div>
-        </DialogController>
+        
       </div>
     )
   }

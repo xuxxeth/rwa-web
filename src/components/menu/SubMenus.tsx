@@ -21,8 +21,7 @@ export function SubMenuItem({
     <div 
       onClick={() => onClick && onClick()}
       className={cn(
-      "flex items-center justify-between py-3 cursor-pointer font-medium",
-      selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
+      "flex items-center justify-between py-3 cursor-pointer font-medium hover:bg-[#191B1E] px-5",
     )}>
       <span className="text-[14px]">{title}</span>
       {
@@ -60,8 +59,8 @@ export function SubMenus({
     >
       <HoverCardTrigger asChild>
         <div className={cn(
-          "text-base font-normal text-[rgba(255,255,255,0.6)] cursor-pointer h-10 flex items-center leading-[40px]",
-          isPro || isLite ? " font-semibold text-white" : ""
+          "text-[14px] font-medium text-[#9DA3AF] cursor-pointer h-[36px] flex items-center leading-[36px]",
+          isPro || isLite ? "text-white" : ""
         )}
           onClick={e => {
             e.stopPropagation()
@@ -77,11 +76,11 @@ export function SubMenus({
           className="bg-[rgba(0,0,0,0)] w-[190px] border-none pt-0 -mr-[16px]"
        >
         <div 
-          className="bg-[#131823] rounded-[8px] text-white py-2 relative"
+          className="bg-[#131416] border border-[#232427] rounded-[8px] text-white py-2 relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
           <div className="h-[50px] w-[60px] absolute right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
-          <div className=" px-4">
+          <div className="">
             <SubMenuItem title={t('proTrade')}
               onClick={() => {
                 router.push('/markets/trading')

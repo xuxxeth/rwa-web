@@ -8,8 +8,8 @@ type BetweenTextProps = {
 const BetweenText = memo(
   ({left, right}: BetweenTextProps) => {
     return (
-      <div className="flex items-center justify-between text-[14px]">
-        <div className=" text-[#6C86AD]">{left}</div>
+      <div className="flex items-center justify-between text-[12px] font-normal">
+        <div className=" text-[#9DA3AF]">{left}</div>
         <div>
           {right}
         </div>

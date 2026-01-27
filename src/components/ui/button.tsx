@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { LazyImage } from "../image/LazyImage"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[8px] text-[16px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#1D1D1D] disabled:bg-[#1D1D1D] disabled:text-[#5B5B5B] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-[8px] text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:border-[#1A1B1E] disabled:bg-[#1A1B1E] disabled:text-[#737A87] disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -17,7 +17,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-[44px] px-4 py-2",
+        default: "h-[40px] px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-[56px] rounded-md px-8",
         icon: "h-9 w-9",
@@ -60,7 +60,7 @@ const buttonVariants = cva(
       },
       {
         outline: true,
-        className: "disabled:border-[#324054] disabled:text-[#6C86AD] disabled:bg-[#CA3F64]",
+        className: "disabled:border-[#1A1B1E] disabled:text-[#737A87] disabled:bg-[#1A1B1E]",
       },
     ],
     defaultVariants: {

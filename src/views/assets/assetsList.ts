@@ -1,10 +1,42 @@
 import type { IToken, IRwa } from '@/service/base/types'
-import { multiply, sum, symbolToLower, toFixed } from '@/utils/index'
+import { multiply, sum, symbolToLower, toFixed, advancedSort, formatAmount } from '@/utils/index'
 import { useTokens, useRwaTokens } from '@/hooks/useTokens'
 import { useBaseStore } from '@/stores/baseStore'
 import { useEffect, useState } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
+import { useRegulateAssets } from 'ca-common-web'
+
+function useDiamondContract(chainId: number) {
+  const chainList = useBaseStore(state => state.chainList)
+  const chain = chainList.find(chain => chain.id === chainId)
+  return chain?.contract
+}
+
+export function useRiskControlAssets(chainId: number, account: string) {
+  const rwaList = useRwaTokens(false)
+  const tokenList = useTokens()
+  const diamondContract = useDiamondContract(chainId)
+
+  const { assets, isLoading, error, refetch } = useRegulateAssets(
+    diamondContract,
+    account,
+    [...rwaList, ...tokenList].map(rwa => rwa.address)
+  )
+
+  if (!assets) return []
+
+  const allTokens = [...rwaList, ...tokenList]
+
+  return Object.entries(assets.filter(item => item.amount !== 0n))
+    .map(([_, { token, amount }]) => {
+      const tokenInfo = allTokens.find(t => t.address === token)
+      const decimals = tokenInfo?.decimals || 18
+      const quantity = formatAmount(amount, decimals)
+      return { token, amount, quantity, symbol: tokenInfo?.symbol || '' }
+    })
+    .sort((a, b) => advancedSort(a.quantity, b.quantity, 'desc'))
+}
 
 export function useAssetsList(chainId: number, account: string) {
   const tokenList = useTokens()
@@ -32,7 +64,13 @@ export function useAssetsList(chainId: number, account: string) {
     return token
   })
 
-  const estimatedBalance = sum(...assetsList.map(item => item.value ?? 0))
+  const estimatedRwaTotalValue = sum(
+    ...assetsList.filter(item => item.rwaId).map(item => item.value ?? 0)
+  )
+  const estimatedStableTokenTotalValue = sum(
+    ...assetsList.filter(item => !item.rwaId).map(item => item.value ?? 0)
+  )
+  const estimatedBalance = sum(estimatedRwaTotalValue, estimatedStableTokenTotalValue)
 
   useEffect(() => {
     const listener = (data: IAggregateData) => {
@@ -53,7 +91,7 @@ export function useAssetsList(chainId: number, account: string) {
     }
   }, [])
 
-  return { assetsList, estimatedBalance }
+  return { assetsList, estimatedBalance, estimatedRwaTotalValue, estimatedStableTokenTotalValue }
 }
 
 function getAssetItemFromToken(token: IToken): IAssetItem {
@@ -78,7 +116,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     icon: rwa.icon,
     rwaState: rwa.state,
     weight: rwa.weight,
-    precision: rwa.precision
+    precision: rwa.precision,
   }
 }
 

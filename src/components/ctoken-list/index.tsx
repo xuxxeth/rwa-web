@@ -1,4 +1,4 @@
-import { memo, useId, useMemo, useState } from "react"
+import { memo, useId, useMemo, useState, useTransition } from "react"
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
@@ -13,6 +13,9 @@ import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
 import { ScrollBox } from "../scroll-box";
 import { NoData } from "../markets/NoData";
+import { Input } from "../ui/input";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { WalletNotConnectedSmallVersion } from "../wallet-not-connected";
 
 export type CTokenProps = {
   stock: string,
@@ -29,9 +32,9 @@ export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
   const tokenPrice = useRwaPrice(symbol);
   const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
   return (
-    <div className="">
-      <span className="text-[16px] font-medium">${tokenPrice?.price ?? '--'}</span>
-      <div className="flex items-center gap-x-[4px]">
+    <div className="text-[12px]">
+      <span className=" font-medium">${tokenPrice?.price ?? '--'}</span>
+      <div className=" font-normal flex items-center gap-x-[4px]">
         {/* {
           up !== 0 &&
             <img
@@ -61,11 +64,11 @@ export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string;
   const total = multiply(tokenBalance, tokenPrice);
 
   return (
-    <div className="text-right">
-      <div className="text-[16px] font-medium leading-[24px]">
+    <div className="text-right text-[12px]">
+      <div className=" font-medium leading-[24px]">
         {formatTokenAmountWithCommas(tokenBalance)}
       </div>
-      <div className="text-[12px] text-[rgba(255,255,255,0.6)]">
+      <div className=" font-normal text-[#9DA3AF]">
         ≈ ${formatTokenAmountWithCommas(total, pricePrecision)}
       </div>
     </div>
@@ -74,7 +77,7 @@ export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string;
 
 const CTokenItem = memo(
 
-  ({ token, onClick }: {token: IRwa, onClick?: (token: IRwa) => void}) => {
+  ({ token, onClick, account }: {token: IRwa, onClick?: (token: IRwa) => void, account?: string}) => {
     const { t } = useTranslation()
     const marketInfo = useMemo(() => {
       const state = token.state
@@ -107,34 +110,39 @@ const CTokenItem = memo(
     }, [token])
     
     return (
-      <div className="h-[64px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[rgba(16,20,28,1)] rounded-[8px] px-2"
+      <div className="h-[48px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[#232427] px-4 pr-2 relative group"
         onClick={() => {
           onClick && onClick(token)
         }}
       >
-        <div className="flex items-center gap-x-2 w-1/3 shrink-0">
-          <div className="w-10 h-10 shrink-0">
-            <LazyImage src={token.icon} className="w-10 h-10 rounded-full" />
+        <div className="flex items-center gap-x-2 w-4/8 shrink-0">
+          <div>
+            <LazyImage src="/images/v2/icons/collect.png" className="w-4 h-4 rounded-full" />
+          </div>
+          <div className="w-8 h-8 shrink-0">
+            <LazyImage src={token.icon} className="w-8 h-8 rounded-full" />
           </div>
           <div>
-            <div className=" text-[16px] font-semibold leading-[24px]">{token.symbol}</div>
-            <div className=" text-[12px] font-normal leading-[24px] text-[rgba(255,255,255,0.6)]">{token.name}</div>
+            <div className=" text-[12px] font-medium ">{token.symbol}</div>
+            <div className=" text-[12px] font-normal text-[#9DA3AF]">{token.name}</div>
           </div>
-        </div>
-        <div className="w-1/3 flex items-center gap-x-2">
-          <CTokenPrice symbol={token.symbol} />
           {
             token.state === 1 && 
-              <div className="h-[15px] shrink-0 bg-[rgba(255,255,255,0.1)] rounded-[3px] inline-flex items-center px-[3px] gap-x-[3px] mt-1">
-                <LazyImage src={marketInfo.icon} className="w-[12px]" />
-                <span className="text-[9px] font-medium">{marketInfo.info}</span>
-              </div>
+              <LazyImage src="/images/v2/icons/trade_halt.svg" className="w-[24px]" />
           }
-
         </div>
-        <div className="w-1/3 text-right">
-          <CTokenBalance symbol={token.symbol} pricePrecision={token.precision} />
+        <div className={cn(
+          "w-4/8 flex items-center justify-end",
+          account ? "w-2/8 justify-start" : ""
+        )}>
+          <CTokenPrice symbol={token.symbol} />
         </div>
+        {
+          account && <div className="w-2/8 text-right">
+            <CTokenBalance symbol={token.symbol} pricePrecision={token.precision} />
+          </div>
+        }
+        
       </div>
     )
   }
@@ -142,9 +150,59 @@ const CTokenItem = memo(
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
+type TabItemProps = {
+  id: string;
+  label: string;
+  key: string;
+}
+
+const FilterTabItem = memo(({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => {
+  return (
+    <div  className={cn(
+      "px-[10px] h-[23px] flex items-center rounded-[2px] text-[12px] font-normal text-[#9DA3AF] cursor-pointer",
+      active ? "bg-[#383A40] text-[#FFFFFF]" : ""
+    )}
+      onClick={onClick}
+    >
+      {label}
+    </div>
+  )
+})
+
+const FilterTabs = memo(({ onTabChange }: { onTabChange?: (tab: TabItemProps) => void }) => {  
+
+  const { t } = useTranslation()
+  const filteredTabs = useMemo(() => {
+    return [
+      {id: '1', label: t('v2.tx.t37'), key: 'all'},
+      {id: '2', label: t('v2.tx.t38'), key: 'stared'},
+    ]
+  }, [t])
+  const [currentTab, setCurrentTab] = useState<string>(filteredTabs[0].key)
+
+  return (
+    <div className="flex items-center gap-x-2 px-4 my-2">
+      {
+        filteredTabs.map((tab, index) => (
+          <FilterTabItem 
+            key={index}
+            label={tab.label}
+            active={currentTab === tab.key}
+            onClick={() => {
+              setCurrentTab(tab.key)
+              onTabChange && onTabChange(tab)
+            }}
+          />
+        ))
+      }
+    </div>
+  )
+})
+
 const CTokenList = memo(
   ({ from, onClick }: { from?: string, onClick?: (token: IRwa) => void}) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3()
     const { sort, onSortChange } = useTableSort<SortableField>()
     
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
@@ -162,10 +220,33 @@ const CTokenList = memo(
       })
     }, [rwaList, tokenWithBalance, tokenWithPrice])
 
+    const [searchTerm, setSearchTerm] = useState("")
+    
     const [filterHolding, setFilterHolding] = useState(false)
+    const [selectTab, setSelectTab] = useState('all')
+    const [startedList, setStaredList] = useState([])
+    
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value
+      setSearchTerm(value)
+    }
+
     const filterTokens = useMemo(() => {
-      return filterHolding ? sortByBalanceAndPrice(rwaListWithBalance.filter(token => Number(token.balance) > 0)) : rwaListWithBalance
-    }, [rwaListWithBalance, filterHolding])
+      let tokens = selectTab === 'stared' 
+        ? startedList
+        : rwaListWithBalance
+      if (selectTab === 'stared' && !account) return []
+      // 添加搜索过滤
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase().trim()
+        tokens = tokens.filter(token => 
+          token.name.toLowerCase().includes(term) ||
+          token.symbol.toLowerCase().includes(term)
+        )
+      }
+      
+      return tokens
+    }, [rwaListWithBalance, searchTerm, startedList, selectTab, account])
 
     const sortTokens = useMemo(() => {
       if (sort?.order) {
@@ -179,35 +260,60 @@ const CTokenList = memo(
     }, [sort, filterTokens])
 
     return (
-      <div className="min-w-[443px]">
-        <div className=" flex items-center">
+      <div className="min-w-[443px] border-t border-[#232427] relative">
+        <div className=" absolute w-2 top-0 -right-1 h-[1px] bg-[#232427]"></div>
+        {/* <div className=" flex items-center">
           <CheckBox onChange={setFilterHolding} checked={filterHolding} />
           <span onClick={() => {
             setFilterHolding(!filterHolding)
           }} className=" text-[12px] font-normal ml-1 cursor-pointer">{t("Holdings Only")}</span>
+        </div> */}
+        <div className=" px-4 mt-4">
+          <div className="bg-[#1A1B1E] rounded-[4px] overflow-hidden flex items-center px-2 h-[31px]">
+            <LazyImage src="/images/v2/icons/search.png" className="w-[12px] h-[12px]" />
+            <Input className="pl-1 h-[18px] placeholder:text-[#737A87] text-[12px] font-normal " placeholder={t('v2.tx.t36')}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal pr-4">
-            <div className="w-1/3">{t("Name")}</div>
-            <div className="flex items-center w-1/3 cursor-pointer"
+          <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2">
+            <div className="w-4/8">{t("Name")}</div>
+            <div className={cn(
+              "flex items-center w-4/8 justify-end cursor-pointer",
+              account ? "w-2/8 justify-start" : ""
+            )}
               onClick={() => {
                 onSortChange('price')
               }}
               >{t("Change")}
               <div className="text-[rgba(255,255,255,0.6)]"><SortButton order={sort?.order} /></div>
             </div>
-            <div className="w-1/3 text-right">{t("Holdings")}</div>
+            {
+              account && <div className="w-2/8 text-right">{t("Holdings")}</div>
+            }
+            
           </div>
+          <FilterTabs 
+            onTabChange={tab => {
+              setSelectTab(tab.key)
+            }}
+          />
           <div className={cn(
-            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-4",
+            "scroll-box h-[65vh] overflow-y-auto mt-2 pr-0",
             from === "StockSelect" ? "h-[50vh]" : ""
           )}>
             {
-              sortTokens.map((token, index) => <CTokenItem key={`${_id}-${index}`} token={token} onClick={onClick} />)
+              sortTokens.map((token, index) => <CTokenItem account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
             }
             {
-              sortTokens.length <= 0 && <div className="py-[100px]"><NoData /></div>
+              sortTokens.length <= 0 && (selectTab === 'all' || (selectTab === 'stared' && account)) && <div className="py-[100px]"><NoData /></div>
             }
+            {
+              selectTab === 'stared' && !account && <WalletNotConnectedSmallVersion />
+            }
+            
           </div>
           
         </div>

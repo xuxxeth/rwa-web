@@ -1,10 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { subDays, format } from 'date-fns'
+import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
-import { type CaptionLabelProps, type DateRange } from 'react-day-picker'
+import { type DateRange } from 'react-day-picker'
+
 import VectorSVG from '../pagination/vector.svg?react'
+import ChevronSVG from './chevron.svg?react'
 import ArrowSVG from './arrow.svg?react'
 
 import { cn } from '@/lib/utils'
@@ -13,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { DayPicker, getDefaultClassNames } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
-import './custom.css'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export const FormatStr = 'yyyy-MM-dd'
 
@@ -39,6 +41,7 @@ export function DatePickerWithRange({
   }
   onUserSelectedDataRangeChanged: (dateRange: { startTime?: number; endTime?: number }) => void
 }) {
+  const { t } = useTranslation()
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: userSelectedDateRange.from ? new Date(userSelectedDateRange.from * 1000) : new Date(),
     to: userSelectedDateRange.end ? new Date(userSelectedDateRange.end * 1000) : new Date(),
@@ -66,29 +69,35 @@ export function DatePickerWithRange({
           <Button
             id='date'
             className={cn(
-              'w-[265px] h-10 rounded-sm border border-white/10 text-white bg-transparent justify-start text-left font-normal',
+              'w-[211px] h-8 rounded-sm border border-gray-850 text-gray-400 bg-transparent justify-start text-left font-normal text-xs/4 font-normal',
               isOpen ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
           >
-            <CalendarIcon />
+            <CalendarIcon className={cn('w-3 h-4.5', date?.from || date?.to ? 'text-white' : '')} />
             {date?.from ? (
               date.to ? (
                 <>
-                  <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
+                  <span className='text-white'>{format(date.from, FormatStr)}</span>
                   <span className='w-4 h-4 py-1 px-[2.5px]'>
-                    <ArrowSVG style={{ width: '11.7px', height: 8 }} />
+                    <ArrowSVG className='text-white' style={{ width: '11.7px', height: 8 }} />
                   </span>
-                  <span className='text-sm/5.5 font-medium'>{format(date.to, FormatStr)}</span>
+                  <span className='text-white'>{format(date.to, FormatStr)}</span>
                 </>
               ) : (
-                <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
+                <span className='text-white'>{format(date.from, FormatStr)}</span>
               )
             ) : (
-              <span className='text-sm/5.5 font-medium'>Pick a date</span>
+              <>
+                <span>{t('portfolio.start')}</span>
+                <span className='w-4 h-4 py-1 px-[2.5px]'>
+                  <ArrowSVG style={{ width: '11.7px', height: 8 }} />
+                </span>
+                <span>{t('portfolio.end')}</span>
+              </>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='start'>
+        <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='end'>
           <DayPicker
             numberOfMonths={2}
             captionLayout={'label'}
@@ -104,31 +113,50 @@ export function DatePickerWithRange({
             components={{
               Chevron: ({ className, orientation, ...props }) => {
                 if (orientation === 'left') {
-                  return <VectorSVG className='rotate-180' />
+                  return <ChevronSVG />
                 }
                 if (orientation === 'right') {
-                  return <VectorSVG />
+                  return <ChevronSVG className='rotate-180' />
                 }
-                return <VectorSVG className={cn('size-4', className)} {...props} />
+                return <ChevronSVG className={cn('size-4', className)} {...props} />
               },
             }}
+            style={
+              {
+                '--rdp-range_middle-background-color': 'rgba(0,157,255,0.2)',
+                '--rdp-day-width': '36px',
+                '--rdp-day-height': '36px',
+                '--rdp-day_button-width': '36px',
+                '--rdp-day_button-height': '36px',
+                '--rdp-range_end-date-background-color': 'rgba(0,157,255,1)',
+                '--rdp-range_start-date-background-color': 'rgba(0,157,255,1)',
+                '--rdp-selected-border': 'none',
+                '--rdp-day_button-border-radius': '0px',
+                '--rdp-months-gap': '0px',
+              } as React.CSSProperties
+            }
             classNames={{
               root: cn(
                 defaultClassNames.root,
-                'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4 date-range'
+                'px-4 py-3 bg-gray-900 text-white !border !border-gray-850 !rounded-[6px] font-normal'
               ),
               nav: cn(
                 defaultClassNames.nav,
-                'absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1'
+                'w-full !h-5 flex flex-row items-center justify-between cursor-pointer'
               ),
               month_caption: cn(
                 defaultClassNames.month_caption,
-                'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]'
+                'flex w-full items-center justify-center !h-5'
               ),
-              button_previous: cn(
-                defaultClassNames.button_previous,
-                'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50'
+              months: cn(
+                defaultClassNames.months,
+                '[&_.rdp-month:last-child]:pl-4 [&_.rdp-month:last-child]:border-l [&_.rdp-month:last-child]:border-l-gray-850 [&_.rdp-month:last-child]:ml-4'
               ),
+              caption_label: cn(defaultClassNames['caption_label'], 'text-xs/[15px]'),
+              day_button: cn(defaultClassNames.day_button, '!text-xs/[15px]'),
+              weekday: cn(defaultClassNames.weekday, '!py-1 text-xs/[15px] text-gray-500'),
+              range_start: cn(defaultClassNames.range_start, '[&_button]:!rounded-l-[4px]'),
+              range_end: cn(defaultClassNames.range_end, '[&_button]:!rounded-r-[4px]'),
             }}
           />
           {/* <Calendar  原生的 Calendar 有奇怪的样式问题，暂时不使用
@@ -143,6 +171,7 @@ export function DatePickerWithRange({
     </div>
   )
 }
+
 export function DatePicker({
   userSelectedDate,
   onUserSelectedDateChanged,
@@ -151,18 +180,18 @@ export function DatePicker({
   activeColor,
   captionLayout,
   minDate,
-  maxDate
+  maxDate,
 }: {
   userSelectedDate: number
   onUserSelectedDateChanged: (date?: number) => void
   placeholder?: string
   className?: string
   activeColor?: string
-  captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years"
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
   minDate?: number
   maxDate?: number
 }) {
-  const [selected, setSelected] = React.useState<Date>();
+  const [selected, setSelected] = React.useState<Date>()
   const [isOpen, setIsOpen] = React.useState(false)
 
   const defaultClassNames = getDefaultClassNames()
@@ -186,10 +215,16 @@ export function DatePicker({
               className,
               isOpen ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
-            style={{borderColor: isOpen ? activeColor ? activeColor : '' : ''}}
+            style={{ borderColor: isOpen ? (activeColor ? activeColor : '') : '' }}
           >
             <div className='text-[16px] font-normal'>
-              { selected ? format(selected?.getTime(), FormatStr) : userSelectedDate ? format(userSelectedDate, FormatStr) : <span className='text-[rgba(255,255,255,0.3)]'>{placeholder ?? ''}</span> }
+              {selected ? (
+                format(selected?.getTime(), FormatStr)
+              ) : userSelectedDate ? (
+                format(userSelectedDate, FormatStr)
+              ) : (
+                <span className='text-[rgba(255,255,255,0.3)]'>{placeholder ?? ''}</span>
+              )}
             </div>
             <CalendarIcon />
             {/* {date?.from ? (
@@ -217,7 +252,7 @@ export function DatePicker({
             selected={selected}
             onSelect={setSelected}
             mode='single'
-            endMonth={maxDate ? new Date(maxDate) : undefined} 
+            endMonth={maxDate ? new Date(maxDate) : undefined}
             startMonth={minDate ? new Date(minDate) : undefined}
             components={{
               Chevron: ({ className, orientation, ...props }) => {

@@ -19,8 +19,7 @@ export function LanguageItem({
     <div 
       onClick={() => onClick && onClick()}
       className={cn(
-      "flex items-center justify-between py-3 cursor-pointer font-medium",
-      selected ? "text-[#FFFFFF] " : "text-[#6C86AD]"
+      "flex items-center justify-between py-3 cursor-pointer font-medium text-white",
     )}>
       <span className="text-[14px]">{title}</span>
       {
@@ -50,25 +49,28 @@ export function LngSubMenus({
     >
       <HoverCardTrigger asChild>
         <div className=" flex items-center shrink-0">
-          <button className="cursor-pointer">
-            <img src="/images/icons/language.png" className={cn(
-              "w-[30px] h-[30px] lg:w-10 lg:h-10",
+          <button className={cn(
+            "cursor-pointer bg-[#191B1E] rounded-[8px] p-[6px] w-[36px] h-[36px] flex justify-center",
+            open ? "bg-[#383A40]" : ""
+          )}>
+            <img src="/images/v2/icons/language.png" className={cn(
+              "w-[24px] h-[24px] lg:w-6 lg:h-6",
               from === 'home' ? ' rounded-full' : ''
             )} alt="" />
           </button>
         </div>
       </HoverCardTrigger>
        <HoverCardContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[220px] border-none pt-2 -mr-[16px]"
+          className="bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]"
        >
         <div 
-          className="bg-[#131823] rounded-[8px] text-white relative"
+          className="bg-[#131416] border border-[#232427] rounded-[8px] text-white relative"
           style={{boxShadow: '0px 5px 15px 0px rgba(0,0,0,0.25)'}}
         >
           <div className="h-[50px] w-[50px] absolute right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           {
             currentSub === 0 && 
-            <div className=" px-4">
+            <div className=" px-5">
               <div className="flex items-center justify-between py-4 cursor-pointer"
                 onClick={() => setCurrentSub(1)}
               >
@@ -88,7 +90,7 @@ export function LngSubMenus({
                   <img src="/images/icons/back.png" className="w-6" alt="" />
                   <span className="text-sm font-medium ml-2">{t('Back')}</span>
                 </div> */}
-                <div className=" px-4 py-2">
+                <div className=" px-5 py-2">
                   <LanguageItem title="English"  
                     onClick={() => {
                       changeLanguage('en')

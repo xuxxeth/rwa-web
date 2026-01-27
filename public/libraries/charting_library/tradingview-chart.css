@@ -22,3 +22,27 @@
 .dateRangeWrapper-BXXUwft2 {
   display: none;
 }
+
+:root {
+    --tv-color-pane-background: #131416;
+    --tv-color-platform-background: #1A1B1E;
+    --tv-color-toolbar-button-text: #9DA3AF;
+    --tv-color-toolbar-button-text-active: rgb(71, 208, 165);
+    --tv-color-toolbar-button-text-active: #ffffff;
+    --tv-color-toolbar-button-text-active-hover: #ffffff;
+    --tv-color-toolbar-toggle-button-background-active-hover: #383A40;
+    --tv-color-toolbar-toggle-button-background-active: #383A40;
+}
+.item-BXXUwft2 {
+  --ui-lib-typography-font-size: 12px;
+}
+
+.titleWrapper-l31H9iuA .title-l31H9iuA,
+.toolbar-qqNP9X6e,
+.value-gwXludjS {
+  font-size: 12px !important;
+}
+
+.series-l31H9iuA .valuesWrapper-l31H9iuA {
+  font-size: 12px !important;
+}

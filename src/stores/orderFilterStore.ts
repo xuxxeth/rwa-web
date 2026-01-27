@@ -54,6 +54,8 @@ export interface IOpenOrderFilter {
   stockIds?: string
   side?: string
   after?: string
+  before?: string
+  limit?: number
 }
 
 export function generateOpenOrderFilterObj(filters: OrderFilterStore['openOrderFilters']) {
@@ -67,7 +69,7 @@ export function generateOpenOrderFilterObj(filters: OrderFilterStore['openOrderF
   return filterObj
 }
 
-export interface IOpenOrderHistoryFilter {
+export interface IOrderHistoryFilter {
   stockIds?: string
   side?: string
   states?: string
@@ -78,7 +80,7 @@ export interface IOpenOrderHistoryFilter {
 }
 
 export function generateOrderHistoryFilterObj(filters: OrderFilterStore['orderHistoryFilters']) {
-  const filterObj: IOpenOrderHistoryFilter = {}
+  const filterObj: IOrderHistoryFilter = {}
   if (!filters.side.includes('all') && filters.side.length > 0 && filters.side.length < 2) {
     filterObj.side = filters.side.join(',')
   }

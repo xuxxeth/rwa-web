@@ -1,8 +1,10 @@
 import { memo, useEffect, useMemo, useState } from "react"
-import { NumberInput } from "./NumberInput"
+import { NumberInput } from "../v2/input/NumberInput"
 import { LazyImage } from "../image/LazyImage"
 import { cn } from "@/lib/utils"
 import type { IRwa, IToken } from "@/service/base/types"
+import { USDTSelect } from "../usdt-select"
+import { useTranslation } from "@/hooks/useTranslation"
 
 type CurrencyInputProps = {
   disabled?: boolean
@@ -32,16 +34,17 @@ const CurrencyInput = memo(
     onUserInput,
     onFocus
   }: CurrencyInputProps) => {
+    const { t } = useTranslation()
     const [inputValue, setInputValue] = useState('')
     useEffect(() => {
       setInputValue(value || '')
     }, [value])
+
     return (
       <div className="flex items-center justify-between w-full">
         <NumberInput 
           className={cn(
-            "flex-1 min-w-0",
-            from === 'markets' ? ' placeholder:text-[16px] text-[24px] flex-1' : '',
+            "flex-1 min-w-0 placeholder:text-[16px] text-[18px] font-medium disabled:text-[#9DA3AF]",
             isInsufficient ? "text-[#F6465D]" : ""
           )}
           placeholder={placeholder}
@@ -58,31 +61,39 @@ const CurrencyInput = memo(
         {
           mode === 'price' &&
           <div className={cn(
-            "bg-[#131823] rounded-[8px] h-[29px] flex items-center justify-center px-[8px] text-[#6C86AD] text-[14px] font-normal",
-            from === 'markets' ? 'h-[25px] text-[14px]' : ''
+            "pl-[8px] text-[#FFFFFF] text-[12px] font-normal",
           )}>
             USD
           </div>
         }
         {
-          (mode === 'in' || mode === 'out') && 
-            <div className="flex items-center cursor-pointer shrink-0 ml-2"
+          mode === 'in' && 
+            <div className="flex items-center cursor-pointer shrink-0 ml-2 border border-[#232427] bg-[#1A1B1E] px-[3px] rounded-full h-[21px]"
               onClick={() => {
                 onCurrencyClick && onCurrencyClick()
               }}
             >
               {
                 selectedToken?.icon && <LazyImage src={selectedToken?.icon} className={cn(
-                  "w-[24px] h-[24px] rounded-full",
-                  from === 'markets' ? 'w-[18px] h-[18px]' : ''
+                  "w-[14px] h-[14px] rounded-full",
                 )} />
               }
               {/* @ts-ignore */}
-              <div className={cn(" text-[16px] font-medium ml-2 mr-1", from === 'markets' ? 'text-[16px]' : '')}>{selectedToken?.symbol || selectedToken?.rwa}</div>
+              <div className={cn(" text-[12px] font-normal mx-[2px]")}>{selectedToken?.symbol || selectedToken?.rwa}</div>
               
-              <LazyImage src="/images/convert/arrow-down.png" className="w-[24px] h-[24px]" />
+              <LazyImage src="/images/v2/icons/arrow-down-active.png" className="w-[12px] h-[12px] rotate-180 " />
               
             </div>
+        }
+        {
+          mode === 'out' && (
+            <USDTSelect 
+              from="lite-trade"
+              label={t('Order Value')}
+              orderValue={'0'}
+            />
+          )
+          
         }
         
       </div>

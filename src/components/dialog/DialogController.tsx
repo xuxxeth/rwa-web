@@ -34,6 +34,10 @@ export function DialogController({
   open,
   className,
   headerClassName,
+  overlayClassName,
+  titleClassName,
+  closeClassName,
+  closeIconClassName,
   openChange
 }: {
   children?: React.ReactNode;
@@ -43,6 +47,10 @@ export function DialogController({
   open: boolean
   className?: string
   headerClassName?: string
+  overlayClassName?: string
+  closeClassName?: string
+  titleClassName?: string
+  closeIconClassName?: string
   openChange: (open: boolean) => void
 }) {
   
@@ -50,8 +58,12 @@ export function DialogController({
 
   return (
     <Dialog open={open} onOpenChange={openChange}>
-      <DialogContent className={cn(
-        'rounded-[16px]',
+      <DialogContent 
+        overlayClassName={overlayClassName}
+        closeClassName={closeClassName}
+        closeIconClassName={closeIconClassName}
+        className={cn(
+        'rounded-[8px]',
         topFixed ? 'top-[4vh] translate-y-[0]' : '',
         className
       )}
@@ -60,7 +72,7 @@ export function DialogController({
           "",
           headerClassName
         )}>
-          <DialogTitle>{title || ''}</DialogTitle>
+          <DialogTitle className={titleClassName}>{title || ''}</DialogTitle>
         </DialogHeader>
         
         {children}

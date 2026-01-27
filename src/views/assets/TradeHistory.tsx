@@ -30,7 +30,7 @@ function TradeHistory(props: {
   chainId: number
   account: string
   rwaTokens: IRwa[]
-  orderChanged: OrderChanged
+  orderChanged: OrderChanged | null
 }) {
   const { chainId, account, rwaTokens, orderChanged } = props
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()

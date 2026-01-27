@@ -10,7 +10,7 @@ function OrderHistory(props: {
   chainId: number;
   account: string;
   rwaTokens: IRwa[];
-  orderChanged: OrderChanged
+  orderChanged: OrderChanged | null
 }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"openOrders" | "orderHistory">(

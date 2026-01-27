@@ -77,7 +77,10 @@ export interface IRwa {
   "precision": number,
   "state": IRwaState,
   "weight": number,
-
+  "stockStatistics": {
+    "totalShare": number,
+    "circShare": number
+  }
 }
 
 export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice
@@ -89,14 +92,14 @@ export interface IMarket {
   "preMarketMinutes": number,
   "afterMarketMinutes": number,
   "actions": number,
-  "commissionRate": string,
-  "maxCommissionRate": string,
-  "minCommissionPerOrder": string,
-  "actionFeeRate": string,
-  "minActionFeePerOrder": string,
-  "maxActionFeePerOrder": string,
-  "networkFeeInNative": string,
-  "networkFeeInStable": string
+  "commissionRate": string, // 交易费率
+  "maxCommissionRate": string, // 最大交易费率
+  "minCommissionPerOrder": string, // 每笔订单最小交易费
+  "actionFeeRate": string, // 活动费率
+  "minActionFeePerOrder": string, // 每笔订单最小活动费
+  "maxActionFeePerOrder": string, // 每笔订单最大活动费
+  "networkFeeInNative": string, // 原生代币网络费
+  "networkFeeInStable": string // 稳定币网络费
   "timeInForce": number,
   "validDate": number
 }

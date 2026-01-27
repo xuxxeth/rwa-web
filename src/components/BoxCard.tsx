@@ -8,7 +8,7 @@ export type BoxCardProps = {
 export function BoxCard({ children, className }: BoxCardProps) {
   return (
     <div className={cn(
-      "bg-second rounded-[8px] p-6",
+      "bg-[rgba(243,161,63,0.2)] p-6",
       className
     )}>
       { children }
