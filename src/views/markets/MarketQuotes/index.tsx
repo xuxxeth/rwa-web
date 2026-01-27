@@ -41,6 +41,8 @@ export default function MarketQuotes() {
 
   const rwaList = useRwaTokens(false)
 
+  const [isFavorites, setIsFavorites] = useState(false)
+
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const [searchText, setSearchText] = useState('')
@@ -108,8 +110,6 @@ export default function MarketQuotes() {
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesList, marketQuotes, sort)
 
-  const [isAll, setIsAll] = useState(true)
-
   return (
     <MainLayout>
       <ConentLayout>
@@ -118,8 +118,8 @@ export default function MarketQuotes() {
           <SearchFilter
             searchText={searchText}
             onSearchChange={setSearchText}
-            isAll={isAll}
-            onFilterChange={setIsAll}
+            isFavorites={isFavorites}
+            onFavoriteChange={setIsFavorites}
           />
           <TableHeader<SortableField, IMarketQuote, unknown>
             lngPrefix='marketQuotes'
@@ -130,19 +130,17 @@ export default function MarketQuotes() {
             thClassName={'text-xs/[15px] text-gray-400 font-normal'}
           />
           {paginatedData.length === 0 && <NoRecord />}
-          <div>
-            <TableBody<IMarketQuote, unknown>
-              data={paginatedData}
-              config={MarketQuotesList}
-              extra={{} as unknown}
-              getKey={(item: IMarketQuote) => item.symbol}
-              className='px-6 cursor-pointer hover:bg-white/4'
-              onClick={(item: IMarketQuote) => {
-                updateInputToken(item)
-                router.push('/markets/trading/' + symbolToLower(item.symbol))
-              }}
-            />
-          </div>
+          <TableBody<IMarketQuote, unknown>
+            data={paginatedData}
+            config={MarketQuotesList}
+            extra={{} as unknown}
+            getKey={(item: IMarketQuote) => item.symbol}
+            className='px-6 cursor-pointer hover:bg-white/4'
+            onClick={(item: IMarketQuote) => {
+              updateInputToken(item)
+              router.push('/markets/trading/' + symbolToLower(item.symbol))
+            }}
+          />
           {paginatedData.length > 0 && (
             <div className='px-6 py-2 mt-2 mb-4 text-sm/4.5 font-normal text-gray-400'>
               {t('marketQuotes.quoteInfo')}

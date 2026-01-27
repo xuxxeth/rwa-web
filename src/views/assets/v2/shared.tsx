@@ -261,7 +261,7 @@ function WithTableHeader<T extends { orderId: string }>({
         lngPrefix='portfolio.orderTable'
         config={tableConfig}
         sort={null}
-        className='border-none h-7 px-4 flex-0'
+        className='border-none h-7 px-4'
         thClassName='text-gray-400 text-xs/[15px] font-normal'
         onSortChange={noop}
       />

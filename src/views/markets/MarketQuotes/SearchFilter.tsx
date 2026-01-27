@@ -3,15 +3,15 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { cn } from '@/utils'
 
 function SearchFilter({
-  isAll,
-  onFilterChange,
+  isFavorites,
+  onFavoriteChange,
   searchText,
   onSearchChange,
 }: {
-  isAll: boolean
+  isFavorites: boolean
   searchText: string
   onSearchChange: (text: string) => void
-  onFilterChange: (isAll: boolean) => void
+  onFavoriteChange: (isFavorites: boolean) => void
 }) {
   const { t } = useTranslation()
   return (
@@ -22,26 +22,25 @@ function SearchFilter({
         )}
       >
         <div
-          onClick={() => onFilterChange(true)}
-          className={cn('px-3 py-1.5 rounded-[6px]', isAll ? 'text-white bg-gray-750 ' : '')}
+          onClick={() => onFavoriteChange(false)}
+          className={cn('px-3 py-1.5 rounded-[6px]', !isFavorites ? 'text-white bg-gray-750 ' : '')}
         >
           {t('marketQuotes.all')}
         </div>
         <div
-          onClick={() => onFilterChange(false)}
+          onClick={() => onFavoriteChange(true)}
           className={cn(
             'px-3 py-1.5 rounded-[6px] flex flex-row gap-1 items-center',
-            isAll ? 'text-gray-400' : 'bg-gray-750 text-white'
+            !isFavorites ? 'text-gray-400' : 'bg-gray-750 text-white'
           )}
         >
           <LazyImage
-            src={isAll ? '/images/v2/icons/collect.png' : '/images/v2/icons/collected.png'}
+            src={!isFavorites ? '/images/v2/icons/collect.png' : '/images/v2/icons/collected.png'}
             className='w-4 h-4'
           />
           {t('marketQuotes.cl')}
         </div>
       </div>
-      <div></div>
       <div className='relative'>
         <LazyImage
           src='/images/v2/icons/search.png'
