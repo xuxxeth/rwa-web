@@ -13,7 +13,7 @@ export let heroAnimatedOnce = false
 
 export default function Page() {
   return (
-    <div className=" font-normal">
+    <div className=" font-normal bg-[#06070A]">
 
       <Section1 />
       <Section2 />

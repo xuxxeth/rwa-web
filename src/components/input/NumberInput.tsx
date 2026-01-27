@@ -3,10 +3,6 @@ import { Input } from "../ui/input"
 import { escapeRegExp } from "@/utils"
 import { cn } from "@/lib/utils"
 
-// const inputRegex = RegExp("^\\d*$");
-
-// const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,2}$`)
-
 type NumberInputProps = {
   disabled?: boolean
   value: string | number
@@ -23,13 +19,13 @@ const NumberInput = memo(
     value,
     disabled,
     placeholder,
-    regex = `^\\d*(?:\\\\[.])?\\d{0,2}$`,
+    regex = '^(?:\\d+|\\d+\\.\\d{0,2})$',
     onInput,
     onFocus
   }: NumberInputProps) => {
   const inputRegex = RegExp(regex)
   const enforcer = (nextUserInput: string) => {
-    if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
+    if (nextUserInput === '' || inputRegex.test(nextUserInput)) {
       onInput(nextUserInput)
     }
   }    

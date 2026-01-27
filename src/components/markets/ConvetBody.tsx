@@ -200,12 +200,7 @@ export function ConverBody({
       price: parseAmount(truncateUP(limitPrice, 2)),   // 1 usdt
       size: parseAmount(inputSize)    // 10
     }
-    // const orderType = params.tradeType !== TradeType.MARKET ? t('limit') : t('market')
-    // const message = t('v2.tx.s', { orderType })
-     
 
-    // console.log('new order info', message)
-    // return
     setBuying(true)
     handleStartStep()
     toastTxSteps({action: 'place', approveed: approvalState === 3, onClick: handleEndStep})
