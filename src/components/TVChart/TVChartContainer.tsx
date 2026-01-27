@@ -53,7 +53,7 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.0",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.1",
           timezone:"Asia/Hong_Kong",
           overrides: chartOverrides,
           interval: "15" as ResolutionString,
@@ -172,7 +172,7 @@ export const TVChartContainer = memo(
 
     return (
       <div className={cn(
-        " relative text-white px-4",
+        " relative text-white pr-4",
         from === 'market' ? "h-[500px]" : "h-[300px]"
       )}>
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
