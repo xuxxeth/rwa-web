@@ -129,7 +129,7 @@ export function TokenCell(props: {
   nameClassName?: string
 }) {
   return (
-    <div className={'flex flex-row gap-2'}>
+    <div className={'flex flex-row gap-2 font-normal'}>
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
@@ -264,7 +264,7 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='w-[211px] bg-[rgba(19,24,35,1)] border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='w-[211px] bg-gray-900 border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
             <div>
@@ -350,8 +350,9 @@ export function ScrollLoadMore<TData>(props: {
           <div>{t('assets.loading')}...</div>
         ) : hasNextPage ? (
           <div>{t('assets.scrollToLoadMore')}</div>
-        ) : data.length > 0 ? // <div>{t('assets.noMoreData')}</div>
-        null : null}
+        ) : data.length >
+          0 ? null : null // <div>{t('assets.noMoreData')}</div>
+        }
       </div>
       {/* {isLoading && data.length === 0 && (
         <div className='py-1 text-center text-gray-400'>{t('assets.loading')}...</div>
