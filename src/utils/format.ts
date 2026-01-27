@@ -10,14 +10,24 @@ export function textSuffix(text: string, suffix: string, spaceCount: number = 1)
   return `${text}${spaces}${suffix}`
 }
 
+/**
+ * 使用 BigNumber 进行四舍五入，解决 JS 浮点数精度问题
+ * 例如：1.335.toFixed(2) 在 JS 中是 '1.33'，使用 BigNumber 后为 '1.34'
+ * @param value 数值
+ * @param precision 小数位数，默认 2
+ */
 export function toFixed(value: number | string, precision = 2): string {
-  const num = typeof value === 'string' ? parseFloat(value) : value
-
-  if (isNaN(num)) {
-    return `${(0).toFixed(precision)}`
+  if (value === null || value === undefined || value === '') {
+    return new BigNumber(0).toFixed(precision)
   }
 
-  return num.toFixed(precision)
+  const num = new BigNumber(value)
+
+  if (num.isNaN()) {
+    return new BigNumber(0).toFixed(precision)
+  }
+
+  return num.toFixed(precision, BigNumber.ROUND_HALF_UP)
 }
 
 // 格式化百分比，保留两位小数
@@ -74,7 +84,6 @@ export function formatLargeNumber(val: string | number, precision: number = 2): 
 
   return `${sign}${formatter.format(convertedValue)}${matchedUnit.unit}`
 }
-
 
 export type Change = 0 | 1 | -1
 // 将一个字符串或者数字转换为 1, -1, 0
@@ -158,17 +167,14 @@ export function formatWithCommas(value: number | string, decimals?: number): str
 export function formatTokenAmountWithCommas(value: number | string, decimals?: number): string {
   return formatWithCommas(formatTokenAmount(value), decimals)
 }
-export function formatNumberWithCommas(
-  value: number | string,
-  decimal = 2
-): string {
-  const num = Number(value);
-  if (isNaN(num)) return String(value);
+export function formatNumberWithCommas(value: number | string, decimal = 2): string {
+  const num = Number(value)
+  if (isNaN(num)) return String(value)
 
   return num
-    .toFixed(decimal)                  // 先保留 decimal 位
-    .replace(/\.?0+$/, '')             // 去掉末尾多余的 0 和小数点
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 千分位
+    .toFixed(decimal) // 先保留 decimal 位
+    .replace(/\.?0+$/, '') // 去掉末尾多余的 0 和小数点
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') // 千分位
 }
 
 export function formatTimestamp(seconds: number): string {
@@ -262,7 +268,10 @@ export function isGreaterOrEqual(
 }
 
 /** 是否小于 */
-export function isLess(a: string | number | BigNumber | bigint, b: string | number | BigNumber | bigint): boolean {
+export function isLess(
+  a: string | number | BigNumber | bigint,
+  b: string | number | BigNumber | bigint
+): boolean {
   return toBN(a).isLessThan(toBN(b))
 }
 
@@ -279,31 +288,43 @@ export async function sleep(ms: number) {
 }
 
 export function formatDateToShortEN(dateStr: string): string {
-  if (!dateStr) return '';
+  if (!dateStr) return ''
 
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return '';
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return ''
 
-  const day = date.getDate();
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const month = monthNames[date.getMonth()];
-  const year = date.getFullYear();
+  const day = date.getDate()
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ]
+  const month = monthNames[date.getMonth()]
+  const year = date.getFullYear()
 
-  return `${day} ${month}, ${year}`;
+  return `${day} ${month}, ${year}`
 }
 
 export function formatSecondsToDateTime(sec: string | number) {
   const seconds = Number(sec)
-  if (!seconds && seconds !== 0) return '';
-  
-  const date = new Date(seconds * 1000); // 将秒转换为毫秒
-  
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
+  if (!seconds && seconds !== 0) return ''
+
+  const date = new Date(seconds * 1000) // 将秒转换为毫秒
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从0开始
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
