@@ -26,7 +26,7 @@ export function XFooter({
               </div>
             </a>
             <div className=' text-base text-80'>
-              @ 2025 Cyber Alpha. {t('footer.text1')}
+              @ 2025 Tiko. {t('footer.text1')}
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ export function XFooter({
             </div>
           </a>
           <div className=' text-base text-80'>
-            @ 2025 Cyber Alpha. {t('footer.text1')}
+            @ 2025 Tiko. {t('footer.text1')}
           </div>
         </div>
       </div>
