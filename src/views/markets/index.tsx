@@ -5,7 +5,7 @@ function Markets() {
   return (
     <>
       <Outlet />
-      <XFooter />
+      {/* <XFooter /> */}
     </>
   );
 }

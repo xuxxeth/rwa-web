@@ -1,13 +1,12 @@
 
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { memo, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { kycApi } from "@/service/kyc/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import type { ISupportedCountry } from "@/service/kyc/types";
-import { LazyImage } from "../image/LazyImage";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export type ICountryCode = {
@@ -63,7 +62,9 @@ const CountrySelect = memo(
       kycApi.getSupportedCountries()
         .then(res => {
           if (res.code === RESPONSE_CODE.SUCCESS) {
-            const _list = res.data || []
+            const _list = (res.data || []).sort((a, b) => {
+              return b.value.localeCompare(a.value, undefined, { sensitivity: 'base' });
+            });
             setCountryList(_list)
             if (_list[0]) {
               setCurrentCode(_list[0].key)

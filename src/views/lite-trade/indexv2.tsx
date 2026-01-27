@@ -10,6 +10,7 @@ import IconOrder from "@/components/icons/order";
 import { LiteTradeInfo } from "@/components/markets/LiteTradeInfo";
 import { PositionRwa } from "./components/PositionRwa";
 import { useRouter } from "@/hooks/useRouter";
+import { openUrl } from "@/utils/scan";
 
 function LiteTrade() {
   const router = useRouter()
@@ -78,10 +79,10 @@ function LiteTrade() {
                   const res = await signature()
                   if (res?.signature) {
                     refreshIsSignatureValid(true)
-                    router.push("/order")
+                    openUrl('/order')
                   }
                 } else {
-                  router.push("/order")
+                  openUrl('/order')
                 }
               }}
             >

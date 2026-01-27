@@ -11,3 +11,7 @@ export function openScanUrl(url: string, type: string = 'tx', ) {
 
   window.open(_url, '_blank', 'noopener,noreferrer')
 }
+
+export function openUrl(url: string) {
+  window.open(url, '_blank', 'noopener,noreferrer')
+}

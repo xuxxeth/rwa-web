@@ -40,6 +40,7 @@ const OrderConfirm = memo(
     const limitPrice = useTradeStore(state => state.limitPrice)
     const inputSize = useTradeStore(state => state.inputSize)
     const setShowConfirm = useSettingStore(state => state.setShowConfirm)
+    const [innerShow, setInnerShow] = useState(false)
     const feeSymbol = outputToken?.symbol || 'USDT'
     const allFee = `${(orderValue && estimatedFee) ? (parseFloat(orderValue) + parseFloat(estimatedFee)).toFixed(2) : '0.00'} ${outputToken?.symbol || 'USDT'}`
 
@@ -146,13 +147,14 @@ const OrderConfirm = memo(
         />
         <Button className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]"
           onClick={() => {
+            setShowConfirm(!innerShow)
             onClick ? onClick() : null
           }}
         >{t('Confirm')}</Button>
         <div className="mt-3 flex items-center gap-1">
           <CheckBox 
             onChange={e => {
-              setShowConfirm(!e)
+              setInnerShow(e)
             }}
           />
           <span className=" text-[#9DA3AF] text-[14px] font-normal relative top-[1px]">{t('v2.tx.t35')}</span>

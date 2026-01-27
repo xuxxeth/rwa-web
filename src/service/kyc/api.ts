@@ -24,26 +24,30 @@ export const kycApi = {
     client.get<ApiResponse<boolean>>('/v1/kyc/api/liveness/is-expired', { bizNo: bizNo }),
   getSupportedCountries: () =>
     client.get<ApiResponse<ISupportedCountry[]>>('/v1/kyc/public/support-countries'),
-  getKycStatus: () => !isTiko ? client.get<ApiResponse<IKycStatus>>('/v1/kyc/api/status') : ({
-      code: RESPONSE_CODE.SUCCESS,
-      data: {
-        status: KYC_OVERALL_STATUS.VERIFIED,
-        expiresTime: Date.now() + 30 * 24 * 60 * 60 * 1000,
-        pendingSteps: [],
-      },
-      message: null,
-    }),
+  getKycStatus: () => client.get<ApiResponse<IKycStatus>>('/v1/kyc/api/status') 
+  // : ({
+  //     code: RESPONSE_CODE.SUCCESS,
+  //     data: {
+  //       status: KYC_OVERALL_STATUS.VERIFIED,
+  //       expiresTime: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  //       pendingSteps: [],
+  //     },
+  //     message: null,
+  //   })
+  ,
   
-  getKycDetail: () => !isTiko ? client.get<ApiResponse<IKycDetail>>('/v1/kyc/api/detail-result') : ({
-      code: RESPONSE_CODE.SUCCESS,
-      data: {
-        overallStatus: KYC_OVERALL_STATUS.VERIFIED,
-        applyStatus: KYC_OVERALL_STATUS.VERIFIED,
-        status: KYC_STATUS.VERIFIED,
-        expiresTime: Date.now() + 30 * 24 * 60 * 60 * 1000,
-      },
-      message: null,
-    }),
+  getKycDetail: () => client.get<ApiResponse<IKycDetail>>('/v1/kyc/api/detail-result') 
+  // : ({
+  //     code: RESPONSE_CODE.SUCCESS,
+  //     data: {
+  //       overallStatus: KYC_OVERALL_STATUS.VERIFIED,
+  //       applyStatus: KYC_OVERALL_STATUS.VERIFIED,
+  //       status: KYC_STATUS.VERIFIED,
+  //       expiresTime: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  //     },
+  //     message: null,
+  //   })
+  ,
   getKycStepDetail: (step: number) =>
     client.post<ApiResponse<IKycDetail[]>>('/v1/kyc/api/detail-pending-steps', { steps: [step] }),
   submitKyc: (data: IKycSubmitData) => client.post<ApiResponse<null>>('/v1/kyc/api/submit', data),

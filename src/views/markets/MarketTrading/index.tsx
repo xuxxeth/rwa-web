@@ -109,7 +109,6 @@ function Markets() {
       >
         <OrderList show={orderDialog.open} />
       </DialogController>
-      {/* <XFooter /> */}
     </>
   )
 }
