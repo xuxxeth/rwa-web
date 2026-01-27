@@ -33,6 +33,7 @@
     --tv-color-toolbar-toggle-button-background-active-hover: #383A40;
     --tv-color-toolbar-toggle-button-background-active: #383A40;
     --tv-color-popup-element-background-active:#383A40;
+    --tv-color-popup-background: #1A1B1E;
 }
 .item-BXXUwft2 {
   --ui-lib-typography-font-size: 12px;
@@ -67,4 +68,28 @@ html.theme-dark .button-KTgbfaP5,
 }
 .content-Z4M3tWHb {
   align-items: center;
+}
+html.theme-dark .dialog-aRAWUDhF {
+  background-color: #1A1B1E;
+}
+.title-BZKENkhT {
+  font-size: 16px !important;
+}
+.icon-znwuaSC1 svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+html.theme-dark .nav-button-znwuaSC1 {
+  padding-right: 0;
+}
+.item-jFqVJoPk,
+.label-GJX1EXhk {
+  font-size: 12px !important;
+}
+.icon-jFqVJoPk svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.icon-GJX1EXhk.checkmark-GJX1EXhk svg {
+  width: 12px !important;
 }
