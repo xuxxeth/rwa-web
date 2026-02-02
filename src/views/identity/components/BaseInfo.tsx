@@ -624,11 +624,11 @@ const BaseInfo = memo(
                       {...register('residentAddress', {
                         required: t('kyc.t4'),
                         maxLength: {
-                          value: 40,
-                          message: t('kyc.t54', { num: 40 }),
+                          value: 60,
+                          message: t('kyc.t54', { num: 60 }),
                         },
                         pattern: {
-                          value: /^[\u4e00-\u9fa5a-zA-Z0-9]{1,40}$/,
+                          value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,60}$/,
                           message: t('kyc.t64'),
                         },
                         onChange: e => {
@@ -714,11 +714,11 @@ const BaseInfo = memo(
                           required: t('kyc.t4'),
                           maxLength: {
                             value: 30,
-                            message: t('kyc.t54', { num: 40 }),
+                            message: t('kyc.t54', { num: 60 }),
                           },
                           pattern: {
-                            value: /^[\u4e00-\u9fa5a-zA-Z0-9\s,，]{1,40}$/,
-                            message: '只支持中文、英文字母和数字',
+                            value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,60}$/,
+                            message: t('kyc.t64'),
                           },
                           onChange: e => {
                             // 实时限制输入长度

@@ -604,7 +604,7 @@
     "t61": "Please upload proof of address",
     "t62": "Enter your full name (First Name + Last Name)",
     "t63": "Supports Chinese, English, and numeric input, with a maximum of 200 characters.",
-    "t64": "Only Chinese and English letters are supported.",
+    "t64": "Only Chinese characters, English letters, numbers, spaces, and commas are supported.",
     "t65": "At least one of the document photo and description must be submitted.",
     "t66": "Only numeric and alphabetic characters are supported.",
     "t67": "Incorrect Date of Birth"
