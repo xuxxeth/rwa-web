@@ -1,21 +1,31 @@
 import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
+import storage from '@/utils/storage'
+import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 const langPrefix = 'identity.face'
 
 export default function LivenessComplete() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [searchParams] = useSearchParams()
   const success = searchParams.get('success') === 'true'
   const failReason = parseInt(searchParams.get('failReason') || '0')
+
+  const lang = searchParams.get('language') || storage.getItem('CA_LANGUAGE') || i18n.language
+
+  useEffect(() => {
+    if (!lang) return
+    if (lang === storage.getItem('CA_LANGUAGE')) return
+    storage.setItem('CA_LANGUAGE', lang)
+  }, [lang, i18n])
 
   const { icon, title, subTitle } = getIconAndText(success, failReason)
 
   return (
     <div>
       <div className='px-4 h-[56px] flex flex-row items-center justify-left gap-2'>
-        <LazyImage src="/images/logo_dark_v2.svg" />
+        <LazyImage src='/images/logo_dark_v2.svg' />
         {/* <LazyImage className='w-[145px] h-6' src='/images/logo_white_text.png' /> */}
       </div>
       <div className='p-8'>
