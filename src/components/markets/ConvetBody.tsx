@@ -92,7 +92,7 @@ export function ConverBody({
     }
   }, [inputToken, rwaPrice])
 
-  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee } = useCalcFee(orderValue, inputSize, action === 'buy')
+  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee } = useCalcFee(orderValue, inputSize, action === 'buy', inputToken?.feeRate)
 
   const approveAmount = useMemo(() => {
     return action === 'buy' ?
@@ -475,7 +475,7 @@ export function ConverBody({
       <DialogController
         className="p-0"
         headerClassName="px-4 pt-4"
-        
+        overlayClassName='z-[49]'
         title={t('v2.tx.t29')}
         open={orderDialog.open}
         openChange={orderDialog.setOpen}
@@ -487,6 +487,7 @@ export function ConverBody({
           brokerageFee={brokerageFee}
           tradingActivityFee={tradingActivityFee}
           estimatedFee={estimatedFee}
+          feeRate={inputToken?.feeRate ?? ''}
           networkFeeInNative={marketInfo.networkFeeInNative}
           onClick={() => {
             orderDialog.hide()

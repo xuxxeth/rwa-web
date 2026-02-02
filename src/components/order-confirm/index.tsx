@@ -8,6 +8,7 @@ import { useTradeStore } from "@/stores/tradeStore"
 import { useTranslation } from "@/hooks/useTranslation"
 import { useSettingStore } from "@/stores/settingStore"
 import IconWithTooltip, { TooltipWithBorder } from "../icon-tooltip"
+import { useBaseStore } from "@/stores/baseStore"
 
 
 
@@ -19,6 +20,7 @@ type OrderConfirmProps = {
   tradingActivityFee: string,
   estimatedFee: string,
   action: string
+  feeRate: string
   onClick?: () => void
 }
 
@@ -31,9 +33,11 @@ const OrderConfirm = memo(
     tradingActivityFee, 
     estimatedFee,
     networkFeeInNative,
+    feeRate,
     onClick
   }: OrderConfirmProps) => {
     const { t } = useTranslation()
+    const marketInfo = useBaseStore(state => state.marketInfo)
     const [showDetails, setShowDetails] = useState(false);
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
@@ -43,6 +47,15 @@ const OrderConfirm = memo(
     const [innerShow, setInnerShow] = useState(false)
     const feeSymbol = outputToken?.symbol || 'USDT'
     const allFee = `${(orderValue && estimatedFee) ? (parseFloat(orderValue) + parseFloat(estimatedFee)).toFixed(2) : '0.00'} ${outputToken?.symbol || 'USDT'}`
+
+    const commissionRate = marketInfo?.commissionRate || '0.0004'
+    const commissionRatePercent = `${(Number(commissionRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
+    const minCommissionPerOrder = marketInfo?.minCommissionPerOrder || '0.35'
+    const actionFeeRate = marketInfo?.actionFeeRate || '0.000166'
+    const minActionFeePerOrder = marketInfo?.minActionFeePerOrder || '0.01'
+    const maxActionFeePerOrder = marketInfo?.maxActionFeePerOrder || '8.3'
+
+    const feeRatePercent = `${(Number(feeRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
 
     return (
       <div className="w-[420px] border-t border-[#232427] px-6 py-4 min-h-[426px]">
@@ -114,23 +127,27 @@ const OrderConfirm = memo(
               <div className="pl-2 bg-[#1A1B1E] pr-2 py-[6px] rounded-[4px] space-y-1">
                 <BetweenText 
                   left={
-                    <TooltipWithBorder tooltip={t('v2.tx.t321')}>
+                    <TooltipWithBorder tooltip={t('v2.tx.t321', {r1: commissionRatePercent, r2: minCommissionPerOrder})}>
                       {t('v2.tx.t32')}
                     </TooltipWithBorder>
                   }
                   right={`${brokerageFee} ${feeSymbol}`}
                 />
+                {
+                  action === 'sell' &&  
+                    <BetweenText 
+                      left={
+                        <TooltipWithBorder tooltip={t('v2.tx.t331', {r1: actionFeeRate, r2: minActionFeePerOrder, r3: maxActionFeePerOrder})}>
+                          {t('v2.tx.t33')}
+                        </TooltipWithBorder>
+                      }
+                      right={`${tradingActivityFee} ${feeSymbol}`}
+                    />
+                }
+                
                 <BetweenText 
                   left={
-                    <TooltipWithBorder tooltip={t('v2.tx.t331')}>
-                      {t('v2.tx.t33')}
-                    </TooltipWithBorder>
-                  }
-                  right={`${tradingActivityFee} ${feeSymbol}`}
-                />
-                <BetweenText 
-                  left={
-                    <TooltipWithBorder tooltip={t('v2.tx.t341')}>
+                    <TooltipWithBorder tooltip={t('v2.tx.t341', {r1: feeRatePercent})}>
                       {t('v2.tx.t34')}
                     </TooltipWithBorder>
                   }

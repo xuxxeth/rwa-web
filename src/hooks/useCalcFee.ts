@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js'
     - 四舍五入至小数点后两位
  */
 
-export function calculatePlatformFee(amount: number | string, feeRate: number | string = 0.0004): string {
+export function calculatePlatformFee(amount: number | string, feeRate: number | string = 0.004): string {
   const fee = new BigNumber(amount)
     .multipliedBy(feeRate)
     .decimalPlaces(2, BigNumber.ROUND_HALF_UP) // 四舍五入至小数点后两位
@@ -106,7 +106,8 @@ export function calculateEstimatedFee(
 export function useCalcFee(
   amount: number | string = '0',
   quantity: number | string = '0',
-  isBuy: boolean = true
+  isBuy: boolean = true,
+  feeRate?: string
 ) {
   const marketInfo = useBaseStore(state => state.marketInfo)
   
@@ -117,7 +118,7 @@ export function useCalcFee(
   const minActionFeePerOrder = marketInfo?.minActionFeePerOrder || '0.01'
   const maxActionFeePerOrder = marketInfo?.maxActionFeePerOrder || '8.3'
   
-  const platformFee = calculatePlatformFee(amount, commissionRate)
+  const platformFee = calculatePlatformFee(amount, feeRate)
   const brokerageFee = calculateBrokerageFee(quantity, commissionRate, minCommissionPerOrder)
   const tradingActivityFee = isBuy ? '0' : calculateTradingActivityFee(quantity, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
   
