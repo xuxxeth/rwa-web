@@ -84,7 +84,7 @@ export function calculateEstimatedFee(
   amount: number | string, 
   quantity: number | string, 
   isBuy: boolean,
-  platformFeeRate: number | string = 0.0004,
+  platformFeeRate: number | string = 0.004,
   brokerageFeePerShare: number | string = '0.0035',
   brokerageMinFee: number | string = '0.35',
   tradingActivityFeePerShare: number | string = '0.000166',
@@ -122,7 +122,7 @@ export function useCalcFee(
   const brokerageFee = calculateBrokerageFee(quantity, commissionRate, minCommissionPerOrder)
   const tradingActivityFee = isBuy ? '0' : calculateTradingActivityFee(quantity, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
   
-  const estimatedFee = !quantity || Number(quantity) === 0 ? '0.00' : calculateEstimatedFee(amount, quantity, isBuy, commissionRate, commissionRate, minCommissionPerOrder, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
+  const estimatedFee = !quantity || Number(quantity) === 0 ? '0.00' : calculateEstimatedFee(amount, quantity, isBuy, feeRate, commissionRate, minCommissionPerOrder, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
 
   return {
     platformFee,
