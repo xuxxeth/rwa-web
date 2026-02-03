@@ -10,6 +10,7 @@ import CopyButton from "../button/copyButton";
 import { DialogController, useShowDialog } from "../dialog/DialogController";
 import { CTokenList } from "../ctoken-list";
 import { useTranslation } from "@/hooks/useTranslation";
+import useFavorites from "@/hooks/useFavorites";
 
 
 export const StockInfo = memo(
@@ -51,6 +52,8 @@ export function StockDialog({
 
   useBodyScrollLock(open)
 
+  const { isFavorite, toggleFavorite, toggleEnable } = useFavorites()
+
   if (from !== 'pro-trading') return <StockInfo inputToken={inputToken || undefined} />
 
   return (
@@ -60,7 +63,7 @@ export function StockDialog({
       )}
         
       >
-        <LazyImage src="/images/v2/icons/collect.png" className="w-4 h-4 mr-2" /> 
+        <LazyImage onClick={() => {if(inputToken && toggleEnable) { toggleFavorite(inputToken.stockId) }}} src={inputToken && isFavorite(inputToken.stockId) ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 mr-2",  !toggleEnable ? "cursor-not-allowed": '' )} />
         <div className="flex items-center"
           onClick={() => {
             tokenDialog.show()

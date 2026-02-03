@@ -59,16 +59,14 @@ function useFavorites() {
 
   useEffect(() => {
     if (!account || !chainId) {
+      setFavorites([])
       return
     }
     if (!isSignatureValid) {
+      setFavorites([])
       return
     }
     fetchFavorites()
-
-    return () => {
-      setFavorites([])
-    }
   }, [account, chainId, isSignatureValid, fetchFavorites])
 
   const favoritesSet = useMemo(() => new Set(favorites), [favorites])
@@ -104,6 +102,7 @@ function useFavorites() {
     isSignatureValid,
     refreshIsSignatureValid,
     toggleFavorite: debouncedToggleFavorite,
+    toggleEnable: !!(account && chainId && isSignatureValid)
   }
 }
 

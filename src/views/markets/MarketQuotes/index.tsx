@@ -61,7 +61,7 @@ export default function MarketQuotes() {
       ...item,
       isFavorite: isFavorite(item.stockId),
     }))
-  }, [rwaList, isFavorites, favoritesSet, isFavorite])
+  }, [rwaList, isFavorites, favoritesSet, isFavorite, favoritesRest.toggleEnable])
 
   const marketQuotes: IMarketQuote[] = rwaListWithFavorite
     .filter(
@@ -140,7 +140,7 @@ export default function MarketQuotes() {
           <TableHeader<
             SortableField,
             IMarketQuote,
-            { toggleFavorite: (stockId: number) => Promise<boolean> }
+            { toggleFavorite: (stockId: number) => Promise<boolean>; toggleEnable: boolean }
           >
             lngPrefix='marketQuotes'
             config={MarketQuotesListConfig}
@@ -152,11 +152,15 @@ export default function MarketQuotes() {
           {paginatedData.length === 0 && (
             <NoDataReason isFavorites={isFavorites} {...favoritesRest} />
           )}
-          <TableBody<IMarketQuote, { toggleFavorite: (stockId: number) => void }>
+          <TableBody<
+            IMarketQuote,
+            { toggleFavorite: (stockId: number) => void; toggleEnable: boolean }
+          >
             data={paginatedData}
             config={MarketQuotesListConfig}
             extra={{
               toggleFavorite: favoritesRest.toggleFavorite,
+              toggleEnable: favoritesRest.toggleEnable,
             }}
             getKey={(item: IMarketQuote) => item.symbol}
             className='px-6 cursor-pointer hover:bg-white/4'
@@ -213,6 +217,7 @@ function NoDataReason(props: {
 
 function QuoteName(props: {
   isFavorite: boolean
+  toggleEnable: boolean
   toggleFavorite: (stockId: number) => void
   logo: string
   symbol: string
@@ -222,12 +227,13 @@ function QuoteName(props: {
   return (
     <>
       <LazyImage
-        onClick={async ev => {
+        onClick={ev => {
           ev.stopPropagation()
-          await props.toggleFavorite(props.stockId)
+          if (!props.toggleEnable) return
+          props.toggleFavorite(props.stockId)
         }}
         src={props.isFavorite ? '/images/v2/icons/collected.png' : '/images/v2/icons/collect.png'}
-        className='w-4 h-4 mr-3'
+        className={cn('w-4 h-4 mr-3', props.toggleEnable ? 'cursor-pointer' : 'cursor-not-allowed')}
       />
       <LazyImage src={props.logo} className='w-12 h-12 mr-2 rounded-[50%]' />
       <div className='flex flex-col'>
@@ -276,10 +282,14 @@ const MarketQuotesListConfig = [
     key: 'name',
     sortable: true,
     width: 246,
-    render: (item: IMarketQuote, extra: { toggleFavorite: (stockId: number) => void }) => (
+    render: (
+      item: IMarketQuote,
+      extra: { toggleFavorite: (stockId: number) => void; toggleEnable: boolean }
+    ) => (
       <>
         <QuoteName
           isFavorite={item.isFavorite}
+          toggleEnable={extra.toggleEnable}
           toggleFavorite={extra.toggleFavorite}
           logo={item.icon || ''}
           stockId={item.stockId}

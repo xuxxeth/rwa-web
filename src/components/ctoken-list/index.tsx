@@ -16,6 +16,8 @@ import { NoData } from "../markets/NoData";
 import { Input } from "../ui/input";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { WalletNotConnectedSmallVersion } from "../wallet-not-connected";
+import useFavorites from "@/hooks/useFavorites";
+import SignatureVerify from '@/components/signature-verify'
 
 export type CTokenProps = {
   stock: string,
@@ -77,7 +79,7 @@ export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string;
 
 const CTokenItem = memo(
 
-  ({ token, onClick, account }: {token: IRwa, onClick?: (token: IRwa) => void, account?: string}) => {
+  ({ token, onClick, toggleEnable, toggleFavorite, isFavorite, account }: {token: IRwa, toggleEnable: boolean, toggleFavorite: (stockId: number) => void, isFavorite: boolean, onClick?: (token: IRwa) => void, account?: string}) => {  
     const { t } = useTranslation()
     const marketInfo = useMemo(() => {
       const state = token.state
@@ -117,7 +119,11 @@ const CTokenItem = memo(
       >
         <div className="flex items-center gap-x-2 w-4/8 shrink-0">
           <div>
-            <LazyImage src="/images/v2/icons/collect.png" className="w-4 h-4 rounded-full" />
+            <LazyImage onClick={(ev) => {
+              ev.stopPropagation()
+              if(!toggleEnable) return
+              toggleFavorite(token.stockId)
+            }} src={isFavorite ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 rounded-full", !toggleEnable ? 'cursor-not-allowed' : 'cursor-pointer')} />
           </div>
           <div className="w-8 h-8 shrink-0">
             <LazyImage src={token.icon} className="w-8 h-8 rounded-full" />
@@ -224,7 +230,8 @@ const CTokenList = memo(
     
     const [filterHolding, setFilterHolding] = useState(false)
     const [selectTab, setSelectTab] = useState('all')
-    const [startedList, setStaredList] = useState([])
+
+    const { isFavorite, toggleFavorite, toggleEnable, ...favoritesRest } = useFavorites()
     
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
@@ -233,7 +240,7 @@ const CTokenList = memo(
 
     const filterTokens = useMemo(() => {
       let tokens = selectTab === 'stared' 
-        ? startedList
+        ? rwaListWithBalance.filter(token => isFavorite(token.stockId))
         : rwaListWithBalance
       if (selectTab === 'stared' && !account) return []
       // 添加搜索过滤
@@ -246,7 +253,7 @@ const CTokenList = memo(
       }
       
       return tokens
-    }, [rwaListWithBalance, searchTerm, startedList, selectTab, account])
+    }, [rwaListWithBalance, searchTerm, isFavorite, selectTab, account])
 
     const sortTokens = useMemo(() => {
       if (!sort?.field || !sort?.order) {
@@ -362,14 +369,19 @@ const CTokenList = memo(
             from === "StockSelect" ? "h-[50vh]" : ""
           )}>
             {
-              sortTokens.map((token, index) => <CTokenItem account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
+              sortTokens.map((token, index) => <CTokenItem toggleEnable={toggleEnable} toggleFavorite={toggleFavorite} isFavorite={isFavorite(token.stockId)} account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
             }
-            {
-              sortTokens.length <= 0 && (selectTab === 'all' || (selectTab === 'stared' && account)) && <div className="py-[100px]"><NoData /></div>
+           
+            {sortTokens.length <= 0 && <NoDataReason
+              isFavorites={selectTab === 'stared'}
+              {...favoritesRest}
+            />}
+            {/* {
+              sortTokens.length <= 0 && (selectTab === 'all' || (selectTab === 'stared' && account && isSignatureValid)) && <div className="py-[100px]"><NoData /></div>
             }
             {
               selectTab === 'stared' && !account && <WalletNotConnectedSmallVersion />
-            }
+            } */}
             
           </div>
           
@@ -386,5 +398,30 @@ const CTokenList = memo(
     )
   }
 )
+
+function NoDataReason(props: {
+  isFavorites: boolean
+  account?: string
+  chainId: number | null
+  isSignatureValid: boolean
+  isWalletConnecting: boolean
+  refreshIsSignatureValid: () => void
+}) {
+  if (!props.isFavorites) {
+    return <NoData />
+  }
+  if (!props.account && props.isWalletConnecting) return null
+  if (!props.account) return <WalletNotConnectedSmallVersion />
+  if (!props.isSignatureValid)
+    return (
+      <SignatureVerify
+        desc='signatureVerifyDescTop'
+        subDesc='signatureVerifyDescBottom'
+        className='mt-9'
+        refreshIsSignatureValid={props.refreshIsSignatureValid}
+      />
+    )
+  return <NoData />
+}
 
 export { CTokenList }
