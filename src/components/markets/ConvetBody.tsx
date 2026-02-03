@@ -270,17 +270,18 @@ export function ConverBody({
           (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || 
           isMinOrMax.min || isMinOrMax.max || 
           inputToken?.state === 1 ||
-          riskStatus !== RISK_STATUS.VERIFIED ||
-          kycStatus !== KYC_OVERALL_STATUS.VERIFIED ||
-          pendingStep.step === PENDING_STEPS.RISK3
+          riskStatus !== RISK_STATUS.VERIFIED 
+          // ||
+          // kycStatus !== KYC_OVERALL_STATUS.VERIFIED ||
+          // pendingStep.step === PENDING_STEPS.RISK3
           
           , 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, kycStatus, action, pendingStep.step]
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action, pendingStep.step]
   )
 
   const buttonText = useMemo(() => {
     if (expired) return t('kyc.t51')
-    if (kycStatus === KYC_OVERALL_STATUS.NOTVERIFIED || kycStatus === KYC_OVERALL_STATUS.VERIFYING) return t('identity.verifyID')
+    if (riskStatus !== RISK_STATUS.VERIFIED) return t('identity.verifyID')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
@@ -293,7 +294,7 @@ export function ConverBody({
     // if (approvalState !== 3) return t("approve")
     return (actionText + ` ${inputToken?.symbol}`)
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, kycStatus, pendingStep.step, expired, i18n.language])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, pendingStep.step, expired, i18n.language, riskStatus])
 
   const handleChangePrice = useCallback((value: number) => {
     // 所有的价格变化都以inputTokenPrice?.price为基础

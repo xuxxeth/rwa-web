@@ -17,6 +17,7 @@ import IconWithTooltip from "../icon-tooltip"
 import wsService from "@/service/webSocket/service"
 import { truncate } from "@/utils/format"
 import type { ISummaryDataItem } from "@/service/webSocket/types"
+import { useBaseStore } from "@/stores/baseStore"
 
 export const LabelWrap = memo(
   ({ children, tooltip }: { children: React.ReactNode, tooltip?: string }) => {
@@ -98,6 +99,23 @@ export const StockInfo = memo(
         })
       }
     }, [inputToken])
+
+    const getMarket = useBaseStore(state => state.getMarket)
+
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          getMarket()
+        }
+      }
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
+    }, [])
+
+
+
 
     return (
       <div className="flex justify-between text-white pl-4">

@@ -59,7 +59,7 @@ export function StockDialog({
   return (
     <>
       <div className={cn(
-        "flex items-center cursor-pointer py-[9px]",
+        "flex items-center cursor-pointer py-[9px] shrink-0",
       )}
         
       >

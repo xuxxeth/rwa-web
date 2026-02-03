@@ -333,7 +333,7 @@ const CTokenList = memo(
               </div>
             </div>
             <div className={cn(
-              "flex items-center w-4/8 justify-end cursor-pointer cursor-pointer",
+              "flex items-center w-4/8 justify-end cursor-pointer",
               account ? "w-2/8 justify-start" : ""
             )}
               onClick={() => {
