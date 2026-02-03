@@ -47,12 +47,15 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL,
 })
 
+const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api']
+
 axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   const url = req.url || ''
   req.signal = controller.signal
   abortControllerMap.set(url, controller)
-  const needAuth = url.includes('/scan/api/') || url.includes('/kyc/api/') // ✅ 判断 URL 是否需要授权
+  // const needAuth = url.includes('/scan/api/') || url.includes('/kyc/api/') // ✅ 判断 URL 是否需要授权
+  const needAuth = AUTH_URL_PREFIX.some(prefix => url.includes(prefix))
   const account = storage.getItem(CONNECT_ACCOUNT)
   const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
   // ✅ 如果存在 account 但没有签名信息，则中止请求
@@ -70,7 +73,8 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
     req.headers.set('Authorization', auth)
   }
-  const chainId = localStorage.getItem('CA-Chain-Id') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id) 
+  const chainId =
+    localStorage.getItem('CA-Chain-Id') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id)
   const lng = storage.getItem('CA_LANGUAGE') || 'en'
 
   req.headers.set('CA-Chain-Id', chainId)
@@ -167,6 +171,19 @@ const client = {
       return await client.request<T>({
         url,
         method: 'PUT',
+        data,
+        ...config,
+      })
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  },
+  delete: async <T = any>(url: string, data?: any, config?: RequestConfig) => {
+    try {
+      return await client.request<T>({
+        url,
+        method: 'DELETE',
         data,
         ...config,
       })

@@ -10,5 +10,7 @@ export interface IQuote {
   floatCap?: string
 }
 
-export type IMarketQuote = IQuote & IRwa
-  
+export type IMarketQuote = IQuote &
+  IRwa & {
+    isFavorite: boolean
+  }
