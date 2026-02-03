@@ -249,15 +249,51 @@ const CTokenList = memo(
     }, [rwaListWithBalance, searchTerm, startedList, selectTab, account])
 
     const sortTokens = useMemo(() => {
-      if (sort?.order) {
-        return filterTokens.sort((token1, token2) => {
-          const up1 = Math.abs(Number(token1.up))
-          const up2 = Math.abs(Number(token2.up))
-          return sort.order === 'asc' ? up1 - up2 : up2 - up1
-        })
+      if (!sort?.field || !sort?.order) {
+        return filterTokens
       }
-      return filterTokens
-    }, [sort, filterTokens])
+
+      const list = [...filterTokens]
+
+      return list.sort((a, b) => {
+        switch (sort.field) {
+          case 'name': {
+            const nameA = a.symbol?.toLowerCase() || ''
+            const nameB = b.symbol?.toLowerCase() || ''
+            return sort.order === 'asc'
+              ? nameA.localeCompare(nameB)
+              : nameB.localeCompare(nameA)
+          }
+
+          case 'change': {
+            const upA = Number(a.up) || 0
+            const upB = Number(b.up) || 0
+            return sort.order === 'asc'
+              ? upA - upB
+              : upB - upA
+          }
+
+          case 'marketCap': {
+            const balanceA = a.balance ?? '0'
+            const balanceB = b.balance ?? '0'
+            const priceA = a.price ?? '0'
+            const priceB = b.price ?? '0'
+
+            const totalA = Number(multiply(balanceA, priceA)) || 0
+            const totalB = Number(multiply(balanceB, priceB)) || 0
+
+            return sort.order === 'asc'
+              ? totalA - totalB
+              : totalB - totalA
+          }
+
+          default:
+            return 0
+        }
+      })
+    }, [filterTokens, sort])
+
+
 
     return (
       <div className="min-w-[443px] border-t border-[#232427] relative">
@@ -279,19 +315,40 @@ const CTokenList = memo(
         </div>
         <div className="mt-2">
           <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2">
-            <div className="w-4/8">{t("Name")}</div>
+            <div className="w-4/8 flex items-center cursor-pointer"
+              onClick={() => {
+                onSortChange('name')
+              }}
+            >
+              {t("Name")}
+              <div className="text-[rgba(255,255,255,0.6)]">
+                <SortButton order={sort?.field === 'name' ? sort?.order : undefined} />
+              </div>
+            </div>
             <div className={cn(
-              "flex items-center w-4/8 justify-end cursor-pointer",
+              "flex items-center w-4/8 justify-end cursor-pointer cursor-pointer",
               account ? "w-2/8 justify-start" : ""
             )}
               onClick={() => {
-                onSortChange('price')
+                onSortChange('change')
               }}
               >{t("Change")}
-              <div className="text-[rgba(255,255,255,0.6)]"><SortButton order={sort?.order} /></div>
+              <div className="text-[rgba(255,255,255,0.6)]">
+                <SortButton order={sort?.field === 'change' ? sort?.order : undefined} />
+              </div>
             </div>
             {
-              account && <div className="w-2/8 text-right">{t("Holdings")}</div>
+              account && 
+                <div className="w-2/8 text-right flex items-center justify-end cursor-pointer"
+                  onClick={() => {
+                    onSortChange('marketCap')
+                  }}
+                >
+                  {t("Holdings")}
+                  <div className="text-[rgba(255,255,255,0.6)]">
+                    <SortButton order={sort?.field === 'marketCap' ? sort?.order : undefined} />
+                  </div>
+                </div>
             }
             
           </div>

@@ -1,4 +1,5 @@
 import { memo, useState } from "react"
+import BigNumber from 'bignumber.js'
 import { BetweenText } from "../between-text"
 import { LazyImage } from "../image/LazyImage"
 import { Button } from "../ui/button"
@@ -46,7 +47,17 @@ const OrderConfirm = memo(
     const setShowConfirm = useSettingStore(state => state.setShowConfirm)
     const [innerShow, setInnerShow] = useState(false)
     const feeSymbol = outputToken?.symbol || 'USDT'
-    const allFee = `${(orderValue && estimatedFee) ? (parseFloat(orderValue) + parseFloat(estimatedFee)).toFixed(2) : '0.00'} ${outputToken?.symbol || 'USDT'}`
+
+    const symbol = outputToken?.symbol || 'USDT';
+
+    const value = new BigNumber(orderValue || 0);
+    const fee = new BigNumber(estimatedFee || 0);
+
+    const total = action === 'buy'
+      ? value.plus(fee)
+      : value.minus(fee);
+
+    const allFee = `${total.toFixed(2)} ${symbol}`;
 
     const commissionRate = marketInfo?.commissionRate || '0.0004'
     const commissionRatePercent = `${(Number(commissionRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
