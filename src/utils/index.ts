@@ -115,6 +115,11 @@ export function symbolToLower(symbol: string) {
   return symbol.toLowerCase()
 }
 
+export function fuzzySearch(text: string, searchText: string) {
+  if (!text || !searchText) return false
+  return text.toLowerCase().includes(searchText.toLowerCase())
+}
+
 export function getEasternSecondsSinceMidnight() {
   const now = new Date()
   const estString = now.toLocaleString('en-US', { timeZone: 'America/New_York' })

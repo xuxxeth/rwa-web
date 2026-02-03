@@ -15,6 +15,7 @@ import {
   symbolToLower,
   multiply,
   formatLargeNumber,
+  fuzzySearch,
 } from '@/utils'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
@@ -65,7 +66,7 @@ export default function MarketQuotes() {
 
   const marketQuotes: IMarketQuote[] = rwaListWithFavorite
     .filter(
-      rwa => !searchText || rwa.symbol.toLowerCase().includes(searchText.trim().toLowerCase())
+      rwa => !searchText || fuzzySearch(rwa.symbol, searchText) || fuzzySearch(rwa.name, searchText)
     )
     .map(rwa => {
       const quote = tokenWithQuote[symbolToLower(rwa.symbol)]

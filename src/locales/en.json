@@ -119,7 +119,7 @@
     "tH": "Trade Halt",
     "all": "All",
     "cl": "Favorites",
-    "search": "Search for token names",
+    "search": "Search for token or company name",
     "quoteInfo": "* Tiko stock tokens are not equity or securities and currently confer no dividends or voting rights.",
     "networkError": {
       "title": "Network Disconnected",

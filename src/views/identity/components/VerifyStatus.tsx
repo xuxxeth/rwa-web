@@ -174,18 +174,27 @@ function TradePrepare() {
   const { t } = useTranslation()
   return (
     <div className='flex flex-col gap-4 text-base text-[#1A85FF]'>
-      <a href='https://tiko.gitbook.io/tiko-docs/faq/how-to-prepare-for-trading-on-tiko' target='_blank' className='flex flex-row items-center gap-1.5'>
+      <a
+        href='https://tiko.gitbook.io/tiko-docs/faq/how-to-prepare-for-trading-on-tiko'
+        target='_blank'
+        className='flex flex-row items-center gap-1.5'
+      >
         {t(`${langPrefix}.pre1`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
       </a>
-      <a href='https://tiko.gitbook.io/tiko-docs/faq/how-to-buy-my-first-u.s.-stock-on-tiko-step-by-step' target='_blank' className='flex flex-row items-center gap-1.5'>
+      <a
+        href='https://tiko.gitbook.io/tiko-docs/faq/how-to-buy-my-first-u.s.-stock-on-tiko-step-by-step'
+        target='_blank'
+        className='flex flex-row items-center gap-1.5'
+      >
         {t(`${langPrefix}.pre2`)} <LazyImage src='/images/icons/identity/arrow-narrow.svg' />
       </a>
     </div>
   )
 }
 
-const HotRwsSymbolList = ['AAPLc', 'COINc', 'HOODc', 'TSLAc', 'NVDAc', 'GOOGLc'].map(item =>
-  item.toLowerCase()
+// 热门列表 Symbol 前缀集合
+const HotRwsSymbolSet = new Set(
+  ['AAPL', 'COIN', 'HOOD', 'TSLA', 'NVDA', 'GOOGL'].map(item => item.toLowerCase())
 )
 
 function HotRwas() {
@@ -196,7 +205,15 @@ function HotRwas() {
   const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   const displayList = useMemo(() => {
-    const list = rwaList.filter(rwa => HotRwsSymbolList.includes(rwa.symbol.toLowerCase()))
+    const list = rwaList.filter(rwa => {
+      const lowerSymbol = rwa.symbol.toLowerCase()
+      for (const prefix of HotRwsSymbolSet) {
+        if (lowerSymbol.startsWith(prefix)) {
+          return true
+        }
+      }
+      return false
+    })
     return list
   }, [rwaList])
 

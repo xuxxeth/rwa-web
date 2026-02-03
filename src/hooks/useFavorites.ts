@@ -1,9 +1,8 @@
 import { useChainId, useAccount } from 'ca-common-web'
 import { useAppStore } from '@/stores/appStore'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ucApi } from '@/service/uc/api'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
-import useDebounce from '@/hooks/useDebounce'
 
 function useFavorites() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -29,33 +28,45 @@ function useFavorites() {
     }
   }, [])
 
-  const addFavorite = useCallback(async (stockId: number) => {
-    try {
-      const res = await ucApi.addFavorite(stockId)
-      if (res.code === 9200) {
-        await fetchFavorites()
-        return true
-      }
-      return false
-    } catch (err) {
-      console.error(err)
-      return false
-    }
-  }, [])
+  const addFavorite = useCallback(
+    async (stockId: number) => {
+      try {
+        const res = await ucApi.addFavorite(stockId)
+        if (res.code === 9200) {
+          // 为了更快的更新 UI，先更新本地状态，等服务器返回成功再刷新
+          setFavorites([...favorites, stockId])
 
-  const removeFavorite = useCallback(async (stockId: number) => {
-    try {
-      const res = await ucApi.removeFavorite(stockId)
-      if (res.code === 9200) {
-        await fetchFavorites()
-        return true
+          await fetchFavorites()
+          return true
+        }
+        return false
+      } catch (err) {
+        console.error(err)
+        return false
       }
-      return false
-    } catch (err) {
-      console.error(err)
-      return false
-    }
-  }, [])
+    },
+    [favorites]
+  )
+
+  const removeFavorite = useCallback(
+    async (stockId: number) => {
+      try {
+        const res = await ucApi.removeFavorite(stockId)
+        if (res.code === 9200) {
+          // 为了更快的更新 UI，先更新本地状态，等服务器返回成功再刷新
+          setFavorites(favorites.filter(id => id !== stockId))
+
+          await fetchFavorites()
+          return true
+        }
+        return false
+      } catch (err) {
+        console.error(err)
+        return false
+      }
+    },
+    [favorites]
+  )
 
   useEffect(() => {
     if (!account || !chainId) {
@@ -67,7 +78,7 @@ function useFavorites() {
       return
     }
     fetchFavorites()
-  }, [account, chainId, isSignatureValid, fetchFavorites])
+  }, [account, chainId, isSignatureValid])
 
   const favoritesSet = useMemo(() => new Set(favorites), [favorites])
 
@@ -78,18 +89,25 @@ function useFavorites() {
     [favoritesSet]
   )
 
+  const lockRef = useRef(false)
+
   const toggleFavorite = useCallback(
     async (stockId: number) => {
-      if (isFavorite(stockId)) {
-        return await removeFavorite(stockId)
-      } else {
-        return await addFavorite(stockId)
+      if (lockRef.current) return false
+      lockRef.current = true
+
+      try {
+        if (isFavorite(stockId)) {
+          return await removeFavorite(stockId)
+        } else {
+          return await addFavorite(stockId)
+        }
+      } finally {
+        lockRef.current = false
       }
     },
     [isFavorite]
   )
-
-  const debouncedToggleFavorite = useDebounce(toggleFavorite, 200)
 
   return {
     isWalletConnecting,
@@ -101,8 +119,8 @@ function useFavorites() {
     fetchFavorites,
     isSignatureValid,
     refreshIsSignatureValid,
-    toggleFavorite: debouncedToggleFavorite,
-    toggleEnable: !!(account && chainId && isSignatureValid)
+    toggleFavorite,
+    toggleEnable: !!(account && chainId && isSignatureValid),
   }
 }
 
