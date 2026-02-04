@@ -61,7 +61,7 @@ function LiteTrade() {
           <LiteTradeInfo />
           <div className="flex gap-x-[14px]">
             <div className="w-[420px]">
-              <BoxCard className="min-h-[536px] rounded-[16px] bg-[#131416] relative">
+              <BoxCard className="rounded-[16px] bg-[#131416] relative">
                 <ConverBody from="lite-trade" />
               </BoxCard>
 

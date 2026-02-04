@@ -117,7 +117,10 @@ const CTokenItem = memo(
           onClick && onClick(token)
         }}
       >
-        <div className="flex items-center gap-x-2 w-4/8 shrink-0">
+        <div className={cn(
+          "flex items-center gap-x-2 w-5/8 shrink-0",
+          account ? "w-4/8" : ""
+        )}>
           <div>
             <LazyImage onClick={(ev) => {
               ev.stopPropagation()
@@ -138,7 +141,7 @@ const CTokenItem = memo(
           }
         </div>
         <div className={cn(
-          "w-4/8 flex items-center justify-end",
+          "w-3/8 flex items-center ",
           account ? "w-2/8 justify-start" : ""
         )}>
           <CTokenPrice symbol={token.symbol} />
@@ -321,8 +324,11 @@ const CTokenList = memo(
           </div>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2">
-            <div className="w-4/8 flex items-center cursor-pointer"
+          <div className=" flex items-center justify-between text-[12px] font-normal px-4">
+            <div className={cn(
+              "w-5/8 flex items-center cursor-pointer",
+              account ? "w-4/8" : ""
+            )}
               onClick={() => {
                 onSortChange('name')
               }}
@@ -333,7 +339,7 @@ const CTokenList = memo(
               </div>
             </div>
             <div className={cn(
-              "flex items-center w-4/8 justify-end cursor-pointer",
+              "flex items-center w-3/8 cursor-pointer",
               account ? "w-2/8 justify-start" : ""
             )}
               onClick={() => {

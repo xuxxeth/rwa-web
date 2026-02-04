@@ -8,6 +8,7 @@ import { kycApi } from "@/service/kyc/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import type { ISupportedCountry } from "@/service/kyc/types";
 import { useTranslation } from "@/hooks/useTranslation";
+import { LazyImage } from "../image/LazyImage";
 
 export type ICountryCode = {
   code: string,
@@ -115,14 +116,18 @@ const CountrySelect = memo(
           </div>
         </SelectTrigger>
         <SelectContent className="border-none p-0">
-          <div className="sticky top-0 z-50 p-2 border-b border-[rgba(255,255,255,0.1)]">
-            <input 
-              type="text"
-              placeholder={t('kyc.t4')}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="text-[14px] w-full px-3 py-2 rounded-[6px] bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.2)] text-white placeholder-[#9DA3AF] focus:outline-none focus:border-white"
-            />
+          <div className="sticky top-0 z-50 p-2 ">
+            <div className=" relative">
+              <LazyImage src="/images/v2/icons/search.png" className="w-3 h-3 absolute left-2 top-[13px]" />
+              <input 
+                type="text"
+                placeholder={t('kyc.t4')}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="text-[14px] w-full px-3 pl-6 py-2 rounded-[6px] bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0)] text-white placeholder-[#9DA3AF] focus:outline-none focus:border-white"
+              />
+            </div>
+            
           </div>
           <div className="max-h-[300px] overflow-y-auto">
             {countryList

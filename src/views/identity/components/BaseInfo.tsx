@@ -25,6 +25,9 @@ import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
 import { parseISO } from 'date-fns'
+import {
+  Text,
+} from './Upload/shared'
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
@@ -754,7 +757,11 @@ const BaseInfo = memo(
           </SectionBox>
           <SectionBox>
             <SectionTitle>{t('kyc.t19')}</SectionTitle>
-            <div className='h-5'></div>
+            
+            <div className="my-5">
+              <Text text='uploadIncome' className=' text-white' />
+              <Text text='extraTips' className='text-sm mt-2' />
+            </div>
             <Upload
               type='extra'
               keys={incomeCertifications}

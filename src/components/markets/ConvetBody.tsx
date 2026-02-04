@@ -398,31 +398,34 @@ export function ConverBody({
           
         </>
       }
-      <div>
-        <div className={cn(
-          " flex items-center justify-between text-[12px] mt-3 text-[#9DA3AF] px-3",
-        )}>
-          <div>{t('avbl')}: </div>
-          <div>
-            <span className={cn(
-              "text-[#FFFFFF]",
-              isInsufficient ? "text-[#CA3F64]" : ""
-            )}> 
-              {
-                action === 'buy' ?
-                formatTokenAmountWithCommas(outputTokenBalance?.balance || '0') :
-                formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')
-              }
-              <span className="ml-1">
+      {
+        account && 
+        <div>
+          <div className={cn(
+            " flex items-center justify-between text-[12px] mt-3 text-[#9DA3AF] px-3",
+          )}>
+            <div>{t('avbl')}: </div>
+            <div>
+              <span className={cn(
+                "text-[#FFFFFF]",
+                isInsufficient ? "text-[#CA3F64]" : ""
+              )}> 
                 {
-                  action === 'buy' ? outputToken?.symbol : inputToken?.symbol
+                  action === 'buy' ?
+                  formatTokenAmountWithCommas(outputTokenBalance?.balance || '0') :
+                  formatTokenAmountWithCommas(inputTokenBalance?.balance || '0')
                 }
+                <span className="ml-1">
+                  {
+                    action === 'buy' ? outputToken?.symbol : inputToken?.symbol
+                  }
+                </span>
+                
               </span>
-              
-            </span>
+            </div>
           </div>
         </div>
-      </div>
+      }
       
       {
         !account ? 
