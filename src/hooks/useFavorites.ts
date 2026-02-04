@@ -113,7 +113,7 @@ function useFavorites() {
     isWalletConnecting,
     chainId,
     account,
-    favoritesSet,
+    favorites,
     isLoading,
     isFavorite,
     fetchFavorites,

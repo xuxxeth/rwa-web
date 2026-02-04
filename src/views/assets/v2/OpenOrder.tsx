@@ -201,14 +201,24 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'action',
     sortable: false,
     render: (item: IOpenOrder, { refetch }) => (
-      <CancelOrderButton refetch={refetch} orderId={item.orderId} disabled={item.state === 8} />
+      <CancelOrderButton
+        refetch={refetch}
+        className='max-w-[50px] text-ellipsis overflow-hidden'
+        orderId={item.orderId}
+        disabled={item.state === 8}
+      />
     ),
-    width: 58,
+    width: 65,
   },
 ]
 
-function CancelOrderButton(props: { orderId: string; refetch: () => void; disabled: boolean }) {
-  const { disabled } = props
+function CancelOrderButton(props: {
+  className?: string
+  orderId: string
+  refetch: () => void
+  disabled: boolean
+}) {
+  const { className, disabled } = props
   const { t } = useTranslation()
   const { orderId } = props
   const { cancelOrder, txStep } = useTradeUtils()
@@ -245,8 +255,20 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
     }, 500)
   }, [setTxStep])
 
+  const [isOnCooldown, setIsOnCooldown] = useState(false)
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearTimeout(cooldownTimerRef.current)
+      }
+    }
+  }, [])
+
   const handleCancelOrder = async () => {
-    if (isCanceling) return
+    if (isCanceling || isOnCooldown) return
+
     try {
       setIsCanceling(true)
       handleStartStep()
@@ -254,6 +276,10 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
 
       const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
+        setIsOnCooldown(true)
+        cooldownTimerRef.current = setTimeout(() => {
+          setIsOnCooldown(false)
+        }, 10 * 1000)
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message
@@ -270,11 +296,13 @@ function CancelOrderButton(props: { orderId: string; refetch: () => void; disabl
 
   return (
     <button
-      disabled={isCanceling || disabled}
+      disabled={isCanceling || disabled || isOnCooldown}
       onClick={debouncedCancelOrder}
       className={cn(
-        'cursor-pointer text-xs/4 font-normal rounded-[4px] group-hover:text-green-100 group-hover:bg-[rgba(37,167,80,0.2)] px-1 py-[2px]',
-        (isCanceling || disabled) && 'opacity-50 cursor-not-allowed'
+        'cursor-pointer text-xs/4 text-left font-normal rounded-[4px] group-hover:text-green-100 group-hover:bg-[rgba(37,167,80,0.2)] px-1 py-[2px]',
+        className,
+        (isCanceling || disabled || isOnCooldown) &&
+          'opacity-50 cursor-not-allowed pointer-events-none'
       )}
     >
       {isCanceling ? t('assets.order.cancelOrdering') : t('assets.order.cancelOrder')}

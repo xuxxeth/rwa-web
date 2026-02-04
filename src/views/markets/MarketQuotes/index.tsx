@@ -47,24 +47,25 @@ export default function MarketQuotes() {
 
   const [isFavorites, setIsFavorites] = useState(false)
 
-  const { favoritesSet, isFavorite, ...favoritesRest } = useFavorites()
+  const { favorites, isFavorite, ...favoritesRest } = useFavorites()
 
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const [searchText, setSearchText] = useState('')
 
-  const rwaListWithFavorite = useMemo(() => {
+  const rwaMap = useMemo(() => new Map(rwaList.map(rwa => [rwa.stockId, rwa])), [rwaList])
+
+  const newRwaList = useMemo(() => {
     let rwaListFiltered = rwaList
     if (isFavorites) {
-      rwaListFiltered = rwaList.filter(rwa => favoritesSet.has(rwa.stockId))
+      rwaListFiltered = favorites
+        .map(stockId => rwaMap.get(stockId))
+        .filter(rwa => rwa !== undefined)
     }
-    return rwaListFiltered.map(item => ({
-      ...item,
-      isFavorite: isFavorite(item.stockId),
-    }))
-  }, [rwaList, isFavorites, favoritesSet, isFavorite, favoritesRest.toggleEnable])
+    return rwaListFiltered
+  }, [rwaList, isFavorites, favorites, isFavorite])
 
-  const marketQuotes: IMarketQuote[] = rwaListWithFavorite
+  const marketQuotes: IMarketQuote[] = newRwaList
     .filter(
       rwa => !searchText || fuzzySearch(rwa.symbol, searchText) || fuzzySearch(rwa.name, searchText)
     )
@@ -141,7 +142,11 @@ export default function MarketQuotes() {
           <TableHeader<
             SortableField,
             IMarketQuote,
-            { toggleFavorite: (stockId: number) => Promise<boolean>; toggleEnable: boolean }
+            {
+              toggleFavorite: (stockId: number) => Promise<boolean>
+              toggleEnable: boolean
+              isFavorite: (stockId: number) => boolean
+            }
           >
             lngPrefix='marketQuotes'
             config={MarketQuotesListConfig}
@@ -155,13 +160,18 @@ export default function MarketQuotes() {
           )}
           <TableBody<
             IMarketQuote,
-            { toggleFavorite: (stockId: number) => void; toggleEnable: boolean }
+            {
+              toggleFavorite: (stockId: number) => void
+              toggleEnable: boolean
+              isFavorite: (stockId: number) => boolean
+            }
           >
             data={paginatedData}
             config={MarketQuotesListConfig}
             extra={{
               toggleFavorite: favoritesRest.toggleFavorite,
               toggleEnable: favoritesRest.toggleEnable,
+              isFavorite,
             }}
             getKey={(item: IMarketQuote) => item.symbol}
             className='px-6 cursor-pointer hover:bg-white/4'
@@ -285,11 +295,15 @@ const MarketQuotesListConfig = [
     width: 246,
     render: (
       item: IMarketQuote,
-      extra: { toggleFavorite: (stockId: number) => void; toggleEnable: boolean }
+      extra: {
+        toggleFavorite: (stockId: number) => void
+        toggleEnable: boolean
+        isFavorite: (stockId: number) => boolean
+      }
     ) => (
       <>
         <QuoteName
-          isFavorite={item.isFavorite}
+          isFavorite={extra.isFavorite(item.stockId)}
           toggleEnable={extra.toggleEnable}
           toggleFavorite={extra.toggleFavorite}
           logo={item.icon || ''}

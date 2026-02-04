@@ -217,24 +217,37 @@ const CTokenList = memo(
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
 
+    const [selectTab, setSelectTab] = useState('all')
+
+    const { isFavorite, favorites, toggleFavorite, toggleEnable, ...favoritesRest } = useFavorites()
+
     const _id = useId()
     const rwaList = useRwas()
+
+    const rwaMap = useMemo(() => {
+      return new Map(rwaList.map(rwa => [rwa.stockId, rwa]))
+    }, [rwaList])
+
+    const newRwaList = useMemo(() => {
+      if(selectTab === 'all') return rwaList
+
+      return favorites.map(favorite => rwaMap.get(favorite)).filter(rwa => rwa !== undefined)
+    }, [rwaList, favorites, selectTab])
+
+
     const rwaListWithBalance = useMemo(() => {
-      return rwaList.filter(rwa => rwa.state < 2).map(rwa => {
+      return newRwaList.filter(rwa => rwa.state < 2).map(rwa => {
         return {
           ...rwa,
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
           ...tokenWithPrice[symbolToLower(rwa.symbol)]
         }
       })
-    }, [rwaList, tokenWithBalance, tokenWithPrice])
+    }, [newRwaList, tokenWithBalance, tokenWithPrice])
 
     const [searchTerm, setSearchTerm] = useState("")
     
     const [filterHolding, setFilterHolding] = useState(false)
-    const [selectTab, setSelectTab] = useState('all')
-
-    const { isFavorite, toggleFavorite, toggleEnable, ...favoritesRest } = useFavorites()
     
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
@@ -242,10 +255,12 @@ const CTokenList = memo(
     }
 
     const filterTokens = useMemo(() => {
-      let tokens = selectTab === 'stared' 
-        ? rwaListWithBalance.filter(token => isFavorite(token.stockId))
-        : rwaListWithBalance
-      if (selectTab === 'stared' && !account) return []
+      let tokens = rwaListWithBalance
+      // let tokens = selectTab === 'stared' 
+      //   ? rwaListWithBalance.filter(token => isFavorite(token.stockId))
+      //   : rwaListWithBalance
+
+      // if (selectTab === 'stared' && !account) return []
       // 添加搜索过滤
       if (searchTerm.trim()) {
         const term = searchTerm.toLowerCase().trim()
@@ -256,7 +271,7 @@ const CTokenList = memo(
       }
       
       return tokens
-    }, [rwaListWithBalance, searchTerm, isFavorite, selectTab, account])
+    }, [rwaListWithBalance, searchTerm, selectTab])
 
     const sortTokens = useMemo(() => {
       if (!sort?.field || !sort?.order) {
