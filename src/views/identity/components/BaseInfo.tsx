@@ -567,8 +567,8 @@ const BaseInfo = memo(
                     placeHolder={t('kyc.t28')}
                     defaultValue={issueCountry}
                     onChange={data => {
-                      setValue('issueCountry', data.key)
-                      if (data.key !== 'CHN') {
+                      setValue('issueCountry', data.code)
+                      if (data.code !== 'CHN') {
                         setValue('type', 1) // 非中国只能选护照
                       }
                     }}

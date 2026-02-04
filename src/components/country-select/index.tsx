@@ -35,22 +35,22 @@ const CountrySelect = memo(
     className,
     placeHolder
   }: CountrySelectProps) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const [countryList, setCountryList] = useState<ISupportedCountry[]>([])
     const [currentCode, setCurrentCode] = useState('')
-    const [currentCountry, setCurrentCountry] = useState<ISupportedCountry>({key: '', value: ''})
+    const [currentCountry, setCurrentCountry] = useState<ISupportedCountry>({code: '', zhName: '', enName: ''})
     const [open, setOpen] = useState(false)
     const [searchText, setSearchText] = useState('')
 
     useEffect(() => {
       if (defaultValue && countryList.length > 0) {
         setCurrentCode(defaultValue)
-        const _country = countryList.find(country => country.key === defaultValue) || countryList[0]
+        const _country = countryList.find(country => country.code === defaultValue) || countryList[0]
         if (_country) {
           setCurrentCountry(_country)
           onChange && onChange(_country)
           if (!defaultValue) {
-            setCurrentCode(_country.key)
+            setCurrentCode(_country.code)
           }
         }
       }
@@ -64,16 +64,16 @@ const CountrySelect = memo(
         .then(res => {
           if (res.code === RESPONSE_CODE.SUCCESS) {
             const _list = (res.data || []).sort((a, b) => {
-              return b.value.localeCompare(a.value, undefined, { sensitivity: 'base' });
+              return i18n.language === 'en' ? a.enName.localeCompare(b.enName, undefined, { sensitivity: 'base' }) : a.zhName.localeCompare(b.zhName, undefined, { sensitivity: 'base' });
             });
             setCountryList(_list)
             if (_list[0]) {
-              setCurrentCode(_list[0].key)
+              setCurrentCode(_list[0].code)
               setCurrentCountry(_list[0])
             }
           }
         })
-    }, [])
+    }, [i18n])
 
     return (
       <Select 
@@ -84,7 +84,7 @@ const CountrySelect = memo(
         onValueChange={(en) => {
           if (en) {
             setCurrentCode(en)
-            const _country = countryList.find(country => country.key === en)
+            const _country = countryList.find(country => country.code === en)
             if (_country) {
               setCurrentCountry(_country)
               onChange && onChange(_country)
@@ -108,7 +108,7 @@ const CountrySelect = memo(
                 <div className="w-6 h-6 flex items-center justify-center">
                   <LazyImage src={`/images/country/${currentCountry.key}.${ pngCode.includes(currentCountry.key) ? 'png' : 'svg'}`} className="w-6" />
                 </div> */}
-                <span className=" font-normal md:text-[16px]">{currentCountry.value}</span>
+                <span className=" font-normal md:text-[16px]">{i18n.language === 'en' ? currentCountry.enName : currentCountry.zhName}</span>
               </div>
             ) : (
               <span className="md:text-[1.04vw] text-5">{placeHolder || 'Please select'} </span>
@@ -131,12 +131,11 @@ const CountrySelect = memo(
           </div>
           <div className="max-h-[300px] overflow-y-auto">
             {countryList
-              .filter(code => 
-                code.value.toLowerCase().includes(searchText.toLowerCase()) || 
-                code.key.toLowerCase().includes(searchText.toLowerCase())
+              .filter(ct1 => i18n.language === 'en' ? ct1.enName.toLowerCase().includes(searchText.toLowerCase()) : ct1.zhName.toLowerCase().includes(searchText.toLowerCase())
+                
               )
-              .map(code => (
-            <SelectItem key={code.key} value={code.key}>
+              .map(ct2 => (
+            <SelectItem key={ct2.code} value={ct2.code}>
               <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
                 <div className=" flex items-center gap-x-2">
                   {/* 
@@ -144,11 +143,11 @@ const CountrySelect = memo(
                     <LazyImage src={`/images/country/${code.key}.${ pngCode.includes(code.key) ? 'png' : 'svg'}`} className="w-6" />
                   </div>
                   */}
-                  <span>{code.value}</span>
+                  <span>{i18n.language === 'en' ? ct2.enName : ct2.zhName}</span>
                 </div>
                 <span
                   className="ml-auto data-[state=checked]:block hidden text-[#9CFF3A]"
-                  data-state={code.key === currentCode ? 'checked' : ''}
+                  data-state={ct2.code === currentCode ? 'checked' : ''}
                 >
                   <Check className="h-4 w-4 text-white" />
                 </span>

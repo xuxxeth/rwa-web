@@ -1,6 +1,7 @@
 export interface ISupportedCountry {
-  key: string
-  value: string
+  code: string
+  enName: string
+  zhName: string
 }
 
 // 0 未认证, 1 认证中, 2 已通过, 3 已拒绝
