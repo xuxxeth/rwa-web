@@ -70,7 +70,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
 
   return (
     <div className='bg-gray-900 rounded-[6px] p-3'>
-      <div className='text-xs/[23px] font-normal mb-2'>{t('companyProfile.fundamental')}</div>
+      <div className='text-sm/[23px] font-normal mb-2'>{t('companyProfile.fundamental')}</div>
       <div>
         {[
           {

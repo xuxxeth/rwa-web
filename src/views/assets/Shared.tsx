@@ -74,7 +74,7 @@ export function ValueCell(props: { value: string; currency?: string }) {
 }
 
 export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
-  if (reason === 0) return '--'
+  if (reason === 0) return <div>--</div>
 
   const reasonMap: Record<number, string> = {
     1: '1',
@@ -87,7 +87,7 @@ export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
 
   const key = reasonMap[reason]
 
-  if (!key) return '--'
+  if (!key) return <div>--</div>
 
   return (
     <IconWithTooltip
@@ -193,9 +193,9 @@ export function OrderStatusCell(props: { state: number }) {
   const { t } = useTranslation()
   const config = ORDER_STATUS[props.state]
   return (
-    <button className={cn('text-xs/4 py-1 rounded-sm font-normal', config?.className || '')}>
+    <div className={cn('text-xs/4 py-1 rounded-sm font-normal', config?.className || '')}>
       {config.text && t(`assets.order.state.${config.text}`)}
-    </button>
+    </div>
   )
 }
 
@@ -346,12 +346,12 @@ export function ScrollLoadMore<TData>(props: {
   return (
     <>
       <div ref={loadMoreRef} className='py-1 text-xs/[15px] text-gray-400 text-center'>
-        {isFetchingNextPage ? (
-          <div>{t('assets.loading')}...</div>
-        ) : hasNextPage ? (
-          <div>{t('assets.scrollToLoadMore')}</div>
-        ) : data.length >
-          0 ? null : null // <div>{t('assets.noMoreData')}</div>
+        {
+          isFetchingNextPage ? (
+            <div>{t('assets.loading')}...</div>
+          ) : hasNextPage ? (
+            <div>{t('assets.scrollToLoadMore')}</div>
+          ) : data.length > 0 ? null : null // <div>{t('assets.noMoreData')}</div>
         }
       </div>
       {/* {isLoading && data.length === 0 && (

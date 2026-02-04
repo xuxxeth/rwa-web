@@ -40,7 +40,7 @@ const Profile = memo(({ from }: { from?: string }) => {
   return (
     <>
       <div className='p-3 bg-gray-900 rounded-[4px] mt-2'>
-        <div className='text-xs/5 font-normal mb-2'>{t('companyProfile.profile')}</div>
+        <div className='text-sm/5 font-normal mb-2'>{t('companyProfile.profile')}</div>
         <div className='flex flex-row gap-4'>
           {[
             [

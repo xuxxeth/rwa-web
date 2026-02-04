@@ -6,7 +6,7 @@ export function OrderInTrade() {
   const chainId = useChainId()
 
   return (
-    <div className=' h-[350px] pt-2 flex flex-col'>
+    <div className=' h-[420px] pt-2 flex flex-col'>
       <Order
         chainId={chainId}
         account={account}

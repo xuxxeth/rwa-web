@@ -89,22 +89,27 @@ const FAQ = memo(() => {
 
   return (
     <div className='px-4 text-gray-400 font-medium'>
-      <div className='text-base/5 pt-8 pb-4 border-t border-t-gray-850'>{t('FAQ')}</div>
-      <div className='flex flex-col gap-4 text-xs/[15px]'>
+      <div className='text-base/5 pt-8 border-t border-t-gray-850'>{t('FAQ')}</div>
+      <div className='flex flex-col text-xs/[15px]'>
         {/* {faqList.map(faq => (
           <FAQItem key={faq.q} aq={faq} />
         ))} */}
         {FAQ_CONFIG.map(({ key, path }) => (
-          <div key={key} className='flex flex-row items-start gap-4'>
-            <div className='flex-1'>{(faqList as any)[key]}</div>
-            <a
+          <div
+            key={key}
+            className='flex flex-row hover:text-white cursor-pointer text-sm/4.5 text-gray-400 font-normal items-start py-4 border-b border-b-gray-850'
+          >
+            <a href={faqDomain + path} rel='noopener noreferrer' target='_blank' className='flex-1'>
+              {(faqList as any)[key]}
+            </a>
+            {/* <a
               href={faqDomain + path}
               target='_blank'
               className='basis-3.5 h-3.5'
               rel='noopener noreferrer'
             >
               <LazyImage src='/images/v2/icons/link.svg' className={cn('w-full h-full ')} />
-            </a>
+            </a> */}
           </div>
         ))}
       </div>

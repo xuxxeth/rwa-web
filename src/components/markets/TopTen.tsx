@@ -38,7 +38,7 @@ const TopTen = memo(({ topTen }: { topTen: IToptenshareholder[] }) => {
 
   return (
     <div>
-      <div className='text-xs/5 font-normal mb-2'>{t('companyProfile.top10')}</div>
+      <div className='text-sm/5 font-normal mb-2'>{t('companyProfile.top10')}</div>
       <div className='border border-gray-850'>
         <TopHeader />
         {topTen.map((top, index) => {

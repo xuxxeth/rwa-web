@@ -494,7 +494,15 @@
     "bps": "NAV / Share",
     "ocfps": "Cash Flow",
     "grps": "Revenue",
-    "yoy": "YOY"
+    "yoy": "YOY",
+    "formulas": {
+      "roa": "ROA = net income / average total assets",
+      "roe": "ROE = net income / average shareholders’ equity",
+      "pe": "PE = current price / last fiscal year EPS",
+      "pb": "PB = current price / book value per share",
+      "eps": "EPS = (net income − preferred dividends) / weighted average shares outstanding",
+      "bps": "NAV/share = total equity attributable to common shareholders / shares outstanding"
+    }
   },
   "newHome": {
     "btn1": "Launch App",

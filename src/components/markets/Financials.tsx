@@ -161,6 +161,13 @@ const Financials = memo(() => {
     return annualList.find(item => item.value === current)?.label
   }, [current, annualList])
 
+  const roeFormula = useMemo(() => {
+    if (['ocfps', 'grps'].includes(current)) {
+      return undefined
+    }
+    return t(`financials.formulas.${current}`)
+  }, [current, t])
+
   return (
     <div className='p-4 bg-gray-900 rounded-[4px] mt-2'>
       <div className='text-xs/5 font-normal mb-2'>{t('companyProfile.financial')}</div>
@@ -259,7 +266,7 @@ const Financials = memo(() => {
                 yAxisId='left'
                 dataKey='bar1'
                 name={roeName}
-                barSize={35}
+                barSize={70}
                 radius={[2, 2, 0, 0]}
                 // fill='#578CF9'
                 fill='url(#financials_bar_gradient)'
@@ -308,6 +315,7 @@ const Financials = memo(() => {
             <div className='text-[12px] font-normal'>YOY%</div>
           </div>
         </div>
+        <div className='text-gray-400 text-xs/[15px] h-[15px] font-normal mt-4'>{roeFormula}</div>
       </div>
     </div>
   )

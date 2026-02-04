@@ -147,11 +147,11 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     sortable: false,
     breakOnSpace: false,
     render: (item: IOpenOrder) => (
-      <>
+      <div className='flex flex-row items-center'>
         <AmountCell amount={item.settledSize} />
         <span className='text-sm'>/</span>
         <AmountCell amount={item.size} />
-      </>
+      </div>
     ),
   },
   {
@@ -203,7 +203,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     render: (item: IOpenOrder, { refetch }) => (
       <CancelOrderButton refetch={refetch} orderId={item.orderId} disabled={item.state === 8} />
     ),
-    width: 50,
+    width: 58,
   },
 ]
 

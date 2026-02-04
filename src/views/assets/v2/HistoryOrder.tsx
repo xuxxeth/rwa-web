@@ -176,11 +176,11 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     sortable: false,
     breakOnSpace: false,
     render: (item: IOrder) => (
-      <>
+      <div className='flex flex-row items-center'>
         <AmountCell amount={item.settledSize} />
         <span className='text-sm'>/</span>
         <AmountCell amount={item.size} />
-      </>
+      </div>
     ),
   },
   {

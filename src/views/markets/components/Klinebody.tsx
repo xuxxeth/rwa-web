@@ -52,7 +52,7 @@ const KlineBody = memo(
           <OrderInTrade />
         </div>
 
-        <div hidden={activeTab !== 'com'} className="px-4">
+        <div hidden={activeTab !== 'com'} className="px-4 mb-2">
           <LazyStatistics from={from} />
           <LazyProfile from={from} />
           <LazyFinancials />

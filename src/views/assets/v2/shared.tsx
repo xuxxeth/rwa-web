@@ -198,7 +198,7 @@ export function OrderTable<
 }) {
   if (!chainId || !account) {
     return (
-      <WithTableHeader tableConfig={tableConfig}>
+      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
         <WalletNotConnectedSmallVersion />
       </WithTableHeader>
     )
@@ -208,7 +208,7 @@ export function OrderTable<
 
   if (!isSignatureValid) {
     return (
-      <WithTableHeader tableConfig={tableConfig}>
+      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
         <SignatureVerify
           desc='signatureVerifyDescTop'
           subDesc='signatureVerifyDescBottom'
@@ -220,7 +220,7 @@ export function OrderTable<
   }
 
   return (
-    <WithTableHeader tableConfig={tableConfig}>
+    <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
       {dataMode === 'pagination' && (
         <OrderContentByPagination<T, F>
           chainId={chainId}
@@ -251,9 +251,11 @@ export function OrderTable<
 function WithTableHeader<T extends { orderId: string }>({
   children,
   tableConfig,
+  dataMode,
 }: {
   children: React.ReactNode
   tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  dataMode: 'pagination' | 'scroll'
 }) {
   return (
     <>
@@ -261,8 +263,16 @@ function WithTableHeader<T extends { orderId: string }>({
         lngPrefix='portfolio.orderTable'
         config={tableConfig}
         sort={null}
-        className='border-none h-7 px-4'
-        thClassName='text-gray-400 text-xs/[15px] font-normal'
+        className={cn(
+          'border-none h-7 px-4',
+          dataMode === 'scroll'
+            ? 'bg-gray-900 [&>*:not(:first-child)]:border-l [&>*:not(:first-child)]:border-gray-850 [&>*:not(:first-child)_button]:ml-2'
+            : ''
+        )}
+        thClassName={cn(
+          'text-gray-400 text-xs/[15px] font-normal',
+          dataMode === 'scroll' ? '' : ''
+        )}
         onSortChange={noop}
       />
       {children}
@@ -345,14 +355,16 @@ export function OrderContentByScroll<
   }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
   return (
-    <div className='flex-1 overflow-auto'>
+    <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
       <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void }>
         data={allOrders}
         config={tableConfig}
         extra={{ rwaTokens, refetch }}
         getKey={(item: T) => item.id}
         isLoading={isLoading}
-        className={cn('border-none hover:bg-gray-900 px-4 group')}
+        className={cn(
+          'hover:bg-gray-900 px-4 group [&>*:not(:first-child)]:border-l [&>*:not(:first-child)]:border-gray-850 [&>*:not(:first-child)>div]:pl-2 [&>*:not(:first-child)>button]:ml-2'
+        )}
         tdClassName='h-[56px] text-xs/4'
       />
       <ScrollLoadMore<T>

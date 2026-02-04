@@ -22,7 +22,7 @@ export function TableBody<T, Extra>(props: {
   extra: Extra
   getKey: (item: T) => string | number
   className?: string
-  dynamicClassName?: (item: T) => string
+  dynamicClassName?: (item: T, index: number) => string
   tdClassName?: string
   ExtraComponent?: (props: { item: T }) => ReactNode
   onClick?: (item: T) => void
@@ -31,14 +31,14 @@ export function TableBody<T, Extra>(props: {
 
   return (
     <div className={cn('relative', isLoading ? 'opacity-40 min-h-[150px]' : '')}>
-      {data.map((item: T) => {
+      {data.map((item: T, index: number) => {
         return (
           <div
             key={getKey(item)}
             className={cn(
               'flex flex-row px-3 border-b border-b-gray-850',
               props.className,
-              props.dynamicClassName?.(item) || ''
+              props.dynamicClassName?.(item, index) || ''
             )}
             onClick={() => {
               if (onClick) {

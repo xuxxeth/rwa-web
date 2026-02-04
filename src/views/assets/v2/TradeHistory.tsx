@@ -162,7 +162,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'executionTime',
     sortable: false,
-    breakOnSpace: true,
+    breakOnSpace: false,
     render: (item: ITrade) => <TextCell className='w-[80px]' text={formatTimestamp(item.txTime)} />,
   },
   {
