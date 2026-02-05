@@ -75,6 +75,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     chainId,
     handleConnect: rwaHandleConnect,
     handleDisConnect,
+    handleSwitchChain,
     initialized,
   } = useActiveWeb3()
 
@@ -153,19 +154,34 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         break
 
       case WalletStatus.WRONG_NETWORK:
-        toastError({
-          title: t('switchNetwork', { network: networkText }),
-        })
-        handleDisConnect()
-        break
-
-      case WalletStatus.IDLE:
-        if (hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
+        
+        if (chains[0]) {
+          handleSwitchChain(chains[0].id)
+            .then(res => {
+              if (res) {
+                // window.location.reload()
+              } else {
+                toastError({
+                  title: t('switchNetwork', { network: networkText }),
+                })
+              }
+            })
+        } else {
           toastError({
-            title: t('walletDisconnect'),
+            title: t('switchNetwork', { network: networkText }),
           })
         }
+        
+        // handleDisConnect()
         break
+
+      // case WalletStatus.IDLE:
+      //   if (!isRestoringRef.current && hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
+      //     toastError({
+      //       title: t('walletDisconnect'),
+      //     })
+      //   }
+      //   break
     }
 
     prevStatusRef.current = status
@@ -349,6 +365,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 className=' flex items-center justify-center py-3 cursor-pointer'
                 onClick={async () => {
                   await handleDisConnect()
+                  toastError({
+                    title: t('walletDisconnect'),
+                  })
                 }}
               >
                 <img src='/images/icons/disconnect.png' className='w-[14px] h-[14px]' alt='' />

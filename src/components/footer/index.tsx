@@ -3,6 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { MainLayout } from '@/layouts/main'
 import { openUrlInNewWindow } from '@/utils/index'
 import { LazyImage } from '../image/LazyImage'
+import { PRIVACY_SERVICE } from '@/config/privacyService'
 
 export function XFooter({
   from
@@ -58,7 +59,7 @@ export function XFooter({
             <div className='flex items-center mt-4'>
               <div
                 className='text-80 cursor-pointer'
-                onClick={() => openUrlInNewWindow('/documents/cyberalpha-privacy-policy.pdf')}
+                onClick={() => openUrlInNewWindow(PRIVACY_SERVICE.privacy.url)}
               >
                 {t('footer.text2')}
               </div>
@@ -66,7 +67,7 @@ export function XFooter({
             <div className='flex items-center mt-4'>
               <div
                 className='text-80 cursor-pointer'
-                onClick={() => openUrlInNewWindow('/documents/cyberalpha-terms-of-service.pdf')}
+                onClick={() => openUrlInNewWindow(PRIVACY_SERVICE.userService.url)}
               >
                 {t('footer.text3')}
               </div>

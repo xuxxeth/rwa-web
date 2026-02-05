@@ -11,6 +11,7 @@ import { DialogController, useShowDialog } from "../dialog/DialogController";
 import { CTokenList } from "../ctoken-list";
 import { useTranslation } from "@/hooks/useTranslation";
 import useFavorites from "@/hooks/useFavorites";
+import IconWithTooltip from "../icon-tooltip";
 
 
 export const StockInfo = memo(
@@ -71,6 +72,14 @@ export function StockDialog({
         >
           <StockInfo inputToken={inputToken || undefined} />
           <IconArrowDown open={open} />
+          {
+            inputToken?.state === 1 && 
+              <IconWithTooltip
+                triggerClassName='ml-2 mr-5'
+                icon='/images/v2/icons/trade_halt.svg'
+                tooltip='portfolio.tH'
+              />
+          }
         </div>
         
       </div>

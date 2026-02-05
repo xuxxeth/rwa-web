@@ -1,4 +1,4 @@
-import { useAccount, useChainId, useConnect, useDisconnect, useWallets, useInitialized } from '@/hooks/useCaCommon'
+import { useAccount, useChainId, useConnect, useDisconnect, useWallets, useInitialized, useSwitchChain } from '@/hooks/useCaCommon'
 
 import { useCallback } from 'react'
 import type { ConnectorType, WalletConfig } from '@/hooks/useCaCommon'
@@ -12,6 +12,7 @@ export function useActiveWeb3() {
   const account = useAccount() as unknown as string | undefined
   const chainId = useChainId()
   const initialized = useInitialized()
+  const switchChain = useSwitchChain()
 
   const handleConnect = useCallback(
     async (connectorType: ConnectorType, wallet: WalletConfig) => {
@@ -38,6 +39,16 @@ export function useActiveWeb3() {
     await disConnect()
   }, [disConnect])
 
+  const handleSwitchChain = useCallback(async (chainId: number) => {
+    try {
+      await switchChain(chainId)
+      return true
+    } catch(error) {
+      await disConnect()
+      return false
+    }
+  }, [switchChain, disConnect])
+
   return {
     initialized,
     wallets,
@@ -45,5 +56,6 @@ export function useActiveWeb3() {
     chainId,
     handleConnect,
     handleDisConnect,
+    handleSwitchChain
   }
 }

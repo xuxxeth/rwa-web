@@ -46,7 +46,7 @@ const RwaItemPrice = memo(
 
     return (
       <div className={cn(
-        " ",
+        " min-w-[60px]",
         up === 0 ? 'text-[#A1A1A1]' : up > 0
               ? "text-[#25A750] text-[12px]"
               : "text-[#CA3F64] text-[12px]",

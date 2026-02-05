@@ -18,6 +18,7 @@ import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { WalletNotConnectedSmallVersion } from "../wallet-not-connected";
 import useFavorites from "@/hooks/useFavorites";
 import SignatureVerify from '@/components/signature-verify'
+import IconWithTooltip from "../icon-tooltip";
 
 export type CTokenProps = {
   stock: string,
@@ -137,7 +138,12 @@ const CTokenItem = memo(
           </div>
           {
             token.state === 1 && 
-              <LazyImage src="/images/v2/icons/trade_halt.svg" className="w-[24px]" />
+              // <LazyImage src="/images/v2/icons/trade_halt.svg" className="w-[24px]" />
+              <IconWithTooltip
+                triggerClassName=''
+                icon='/images/v2/icons/trade_halt.svg'
+                tooltip='portfolio.tH'
+              />
           }
         </div>
         <div className={cn(

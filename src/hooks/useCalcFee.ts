@@ -6,13 +6,13 @@ import BigNumber from 'bignumber.js'
     计算规则：
     - 平台服务费 = 委托金额*配置百分比
     精度规则：
-    - 四舍五入至小数点后两位
+    - 向上取整至小数点后两位
  */
 
 export function calculatePlatformFee(amount: number | string, feeRate: number | string = 0.004): string {
   const fee = new BigNumber(amount)
     .multipliedBy(feeRate)
-    .decimalPlaces(2, BigNumber.ROUND_HALF_UP) // 四舍五入至小数点后两位
+    .decimalPlaces(2, BigNumber.ROUND_UP) // 向上取整至小数点后两位
   return fee.toFixed(2)
 }
 
@@ -22,7 +22,7 @@ export function calculatePlatformFee(amount: number | string, feeRate: number | 
   计算规则：
   - 交易活动费 = min(max(minFee, 委托数量 * feePerShare), maxFee)
   精度规则：
-  - 四舍五入至小数点后两位
+  - 向上取整至小数点后两位
 */
 export function calculateTradingActivityFee(
   quantity: number | string,
@@ -42,7 +42,7 @@ export function calculateTradingActivityFee(
     fee = maxFeeBN
   }
 
-  return fee.decimalPlaces(2, BigNumber.ROUND_HALF_UP).toFixed(2) // 四舍五入至小数点后两位
+  return fee.decimalPlaces(2, BigNumber.ROUND_UP).toFixed(2) // 向上取整至小数点后两位
 }
 
 /**
@@ -52,7 +52,7 @@ export function calculateTradingActivityFee(
   计算规则：
   - 券商手续费=max(minFee, 委托数量 * feePerShare)
   精度规则：
-  - 四舍五入至小数点后两位
+  - 向上取整至小数点后两位
  */
 export function calculateBrokerageFee(
   quantity: number | string,
@@ -68,7 +68,7 @@ export function calculateBrokerageFee(
     fee = minFeeBN
   }
 
-  return fee.decimalPlaces(2, BigNumber.ROUND_HALF_UP).toFixed(2) // 四舍五入至小数点后两位
+  return fee.decimalPlaces(2, BigNumber.ROUND_UP).toFixed(2) // 向上取整至小数点后两位
 } 
 
 /**
@@ -77,7 +77,7 @@ export function calculateBrokerageFee(
   - 买入时：预估交易费用=券商手续费+平台服务费
   - 卖出时：预估交易费用=券商手续费+交易活动费+平台服务费
   精度规则：
-  - 四舍五入至小数点后两位
+  - 向上取整至小数点后两位
  */
 
 export function calculateEstimatedFee(
@@ -100,11 +100,11 @@ export function calculateEstimatedFee(
     totalFee = totalFee.plus(tradingActivityFee)
   }
 
-  return totalFee.decimalPlaces(2, BigNumber.ROUND_HALF_UP).toFixed(2) // 四舍五入至小数点后两位
+  return totalFee.decimalPlaces(2, BigNumber.ROUND_UP).toFixed(2) // 向上取整至小数点后两位
 }
 
 export function useCalcFee(
-  amount: number | string = '0',
+  orderValue: number | string = '0',
   quantity: number | string = '0',
   isBuy: boolean = true,
   feeRate?: string
@@ -118,16 +118,21 @@ export function useCalcFee(
   const minActionFeePerOrder = marketInfo?.minActionFeePerOrder || '0.01'
   const maxActionFeePerOrder = marketInfo?.maxActionFeePerOrder || '8.3'
   
-  const platformFee = calculatePlatformFee(amount, feeRate)
+  const platformFee = calculatePlatformFee(orderValue, feeRate)
   const brokerageFee = calculateBrokerageFee(quantity, commissionRate, minCommissionPerOrder)
   const tradingActivityFee = isBuy ? '0' : calculateTradingActivityFee(quantity, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
   
-  const estimatedFee = !quantity || Number(quantity) === 0 ? '0.00' : calculateEstimatedFee(amount, quantity, isBuy, feeRate, commissionRate, minCommissionPerOrder, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
+  const estimatedFee = !quantity || Number(quantity) === 0 ? '0.00' : calculateEstimatedFee(orderValue, quantity, isBuy, feeRate, commissionRate, minCommissionPerOrder, actionFeeRate, minActionFeePerOrder, maxActionFeePerOrder)
+  
+  const value = new BigNumber(orderValue || 0);
+  const fee = new BigNumber(estimatedFee || 0);
 
+  const allOrderValue = isBuy ? value.plus(fee) : value.minus(fee);
   return {
     platformFee,
     brokerageFee,
     tradingActivityFee,
-    estimatedFee
+    estimatedFee,
+    allOrderValue: allOrderValue.toString()
   }
 }

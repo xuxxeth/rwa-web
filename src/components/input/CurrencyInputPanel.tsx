@@ -24,8 +24,6 @@ type CurrencyInputPanelProps = {
   value?: string
   regex?: string
   isInsufficient?: boolean
-  quantityValue?: string
-  orderValue?: string
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
   handleChangePrice?: (priceType: number) => void

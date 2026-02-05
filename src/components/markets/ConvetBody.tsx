@@ -22,7 +22,6 @@ import { RISK_STATUS } from "@/config/constants";
 import { useTrading } from "@/hooks/useTrading";
 import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
-import { KYC_OVERALL_STATUS, PENDING_STEPS } from "@/service/kyc/types";
 import { useKycExpired, useKycStatus } from "@/hooks/useKycStatus";
 import type { IRwa, ITokenWithPrice } from "@/service/base/types";
 import { useTxToast } from "@/hooks/useTxToast";
@@ -92,7 +91,7 @@ export function ConverBody({
     }
   }, [inputToken, rwaPrice])
 
-  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee } = useCalcFee(orderValue, inputSize, action === 'buy', inputToken?.feeRate)
+  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee, allOrderValue } = useCalcFee(orderValue, inputSize, action === 'buy', inputToken?.feeRate)
 
   const approveAmount = useMemo(() => {
     return action === 'buy' ?
@@ -344,12 +343,11 @@ export function ConverBody({
             placeholder={'0'}
             onUserInput={hanleInputQuantity}
             isInsufficient={isSellInsufficient}
-            quantityValue={orderValue}
           />
           <div className="h-3"></div>
           <USDTSelect 
             label={action === 'buy' ? t('v2.tx.t26') : t('v2.tx.t27')}
-            orderValue={orderValue}
+            orderValue={allOrderValue}
           />
           
         </>
@@ -379,7 +377,6 @@ export function ConverBody({
               placeholder={t('Enter an amount')}
               onUserInput={hanleInputQuantity}
               isInsufficient={isSellInsufficient}
-              quantityValue={orderValue}
               action={action}
             />
             <div className="h-1 relative">
@@ -389,9 +386,8 @@ export function ConverBody({
               from={from}
               mode="out"
               label={action === 'buy' ? t('v2.tx.t26') : t('v2.tx.t27')}
-              value={orderValue}
+              value={allOrderValue}
               isInsufficient={isInsufficient}
-              orderValue={orderValue}
               action={action}
             />
           </div>
