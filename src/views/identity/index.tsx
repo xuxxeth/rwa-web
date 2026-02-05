@@ -64,7 +64,7 @@ function IdentityEntry() {
 
 function Identity({ account }: { account: string }) {
   const { i18n } = useTranslation()
-  
+
   const [kycDetail, setKycDetail] = useState<IKycDetail | undefined>(undefined)
   const expireStatus = useKycExpired()
   const [searchParams] = useSearchParams()
@@ -108,7 +108,6 @@ function Identity({ account }: { account: string }) {
         message: null,
       }
     }
-    
   }
 
   useEffect(() => {
@@ -140,7 +139,6 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
-      
       // 已过期/即将过期
       {
         match: () =>
@@ -170,10 +168,9 @@ function Identity({ account }: { account: string }) {
             userInfo={kycDetail.userInfo}
             rejectReason={kycDetail.rejectReason}
           />
-          
         ),
       },
-      
+
       // 认证失败
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
@@ -191,7 +188,12 @@ function Identity({ account }: { account: string }) {
           (status === KYC_STATUS.VERIFYING ||
             status === KYC_STATUS.EXPIRED ||
             status === KYC_STATUS.DECLINED),
-        render: () => <Risk3Info refresh={refresh} reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser} />,
+        render: () => (
+          <Risk3Info
+            refresh={refresh}
+            reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser}
+          />
+        ),
       },
       // 认证中 - OCR Verifying
       {
@@ -234,6 +236,22 @@ function Identity({ account }: { account: string }) {
           />
         ),
       },
+      // 认证中 - Liveness Verifying and retry OCR
+      // 认证中 - 活体认证达最大次数之后，如果要重试的话，重新进入 BaseInfo 组件
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.LIVENESS &&
+          status === KYC_STATUS.VERIFYING &&
+          isRetry,
+        render: () => (
+          <BaseInfo
+            refresh={refresh}
+            userInfo={kycDetail.userInfo}
+            rejectReason={kycDetail.rejectReason}
+          />
+        ),
+      },
       // 认证中 - Liveness Verifying or Retry
       {
         match: () =>
@@ -241,7 +259,14 @@ function Identity({ account }: { account: string }) {
           verifyType === KYC_VERIFY_TYPE.LIVENESS &&
           (status === KYC_STATUS.VERIFYING || (status === KYC_STATUS.REJECTED && isRetry)),
         render: () => (
-          <FaceRecognition status={status} refresh={refresh} onResetRetry={resetRetry} />
+          <FaceRecognition
+            retry={() => {
+              setIsRetry(true)
+            }}
+            status={status}
+            refresh={refresh}
+            onResetRetry={resetRetry}
+          />
         ),
       },
       // 认证中 - Liveness Verify Failed/Rejected

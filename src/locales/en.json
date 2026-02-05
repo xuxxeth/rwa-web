@@ -367,6 +367,8 @@
     "face": {
       "rg": "Facial Verification",
       "title": "Scan the QR code with your phone to complete facial verification.",
+      "reCheckInfo": "Face recognition failed. Please check or modify your personal information before trying again.",
+      "reCheck": "Check Personal Information",
       "tip": "For a smooth process, ensure good lighting and keep your face clearly visible.",
       "btn": "View Verification Result",
       "fresh": "Refresh",
