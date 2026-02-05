@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import { type DateRange } from 'react-day-picker'
+import { format, addYears, addMonths } from 'date-fns'
+import { Calendar as CalendarIcon, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { DayPicker, getDefaultClassNames, useDayPicker, type DateRange } from 'react-day-picker'
 
 import VectorSVG from '../pagination/vector.svg?react'
 import ChevronSVG from './chevron.svg?react'
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 // import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { DayPicker, getDefaultClassNames } from 'react-day-picker'
+
 import 'react-day-picker/dist/style.css'
 import { useTranslation } from '@/hooks/useTranslation'
 
@@ -29,6 +29,83 @@ export function setEndOfDay(date: Date): Date {
   const newDate = new Date(date)
   newDate.setHours(23, 59, 59, 999)
   return newDate
+}
+
+function CustomNav({
+  className,
+  onPreviousClick,
+  onNextClick,
+  previousMonth,
+  nextMonth,
+}: {
+  className?: string
+  onPreviousClick?: React.MouseEventHandler<HTMLButtonElement>
+  onNextClick?: React.MouseEventHandler<HTMLButtonElement>
+  previousMonth?: Date
+  nextMonth?: Date
+}) {
+  const { goToMonth, months } = useDayPicker()
+  const currentMonth = months?.[0]?.date
+
+  const onPrevYearClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (currentMonth) {
+      goToMonth(addYears(currentMonth, -1))
+    }
+  }
+
+  const onNextYearClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (currentMonth) {
+      goToMonth(addYears(currentMonth, 1))
+    }
+  }
+
+  return (
+    <nav className={cn(className, 'flex items-center justify-between')}>
+      <div className='flex items-center'>
+        <button
+          type='button'
+          onClick={onPrevYearClick}
+          className='p-1 pr-0 cursor-pointer text-gray-500 hover:text-white transition-colors'
+        >
+          <ChevronsLeft className='size-4' />
+        </button>
+        <button
+          type='button'
+          onClick={onPreviousClick}
+          disabled={!previousMonth}
+          className={cn(
+            'p-1 pl-0 text-gray-500 cursor-pointer hover:text-white transition-colors',
+            !previousMonth && 'opacity-50 pointer-events-none'
+          )}
+        >
+          <ChevronSVG className='text-gray-500 hover:text-white' />
+        </button>
+      </div>
+
+      <div className='flex items-center'>
+        <button
+          type='button'
+          onClick={onNextClick}
+          disabled={!nextMonth}
+          className={cn(
+            'p-1 pr-0 cursor-pointer text-gray-500 hover:text-white transition-colors',
+            !nextMonth && 'opacity-50 pointer-events-none'
+          )}
+        >
+          <ChevronSVG className='rotate-180 text-gray-500 hover:text-white' />
+        </button>
+        <button
+          type='button'
+          onClick={onNextYearClick}
+          className='p-1 pl-0 cursor-pointer text-gray-500 hover:text-white transition-colors'
+        >
+          <ChevronsRight className='size-4' />
+        </button>
+      </div>
+    </nav>
+  )
 }
 
 export function DatePickerWithRange({
@@ -100,6 +177,7 @@ export function DatePickerWithRange({
         <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='end'>
           <DayPicker
             numberOfMonths={2}
+            defaultMonth={date?.to ? addMonths(date.to, -1) : date?.from || new Date()}
             captionLayout={'label'}
             showOutsideDays={false}
             selected={date}
@@ -111,15 +189,16 @@ export function DatePickerWithRange({
             }}
             mode='range'
             components={{
-              Chevron: ({ className, orientation, ...props }) => {
-                if (orientation === 'left') {
-                  return <ChevronSVG />
-                }
-                if (orientation === 'right') {
-                  return <ChevronSVG className='rotate-180' />
-                }
-                return <ChevronSVG className={cn('size-4', className)} {...props} />
-              },
+              Nav: CustomNav,
+              // Chevron: ({ className, orientation, ...props }) => {
+              //   if (orientation === 'left') {
+              //     return <ChevronSVG />
+              //   }
+              //   if (orientation === 'right') {
+              //     return <ChevronSVG className='rotate-180' />
+              //   }
+              //   return <ChevronSVG className={cn('size-4', className)} {...props} />
+              // },
             }}
             style={
               {
