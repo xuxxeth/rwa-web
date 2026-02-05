@@ -9,6 +9,7 @@ import Order from './Order'
 
 import AssetsSVG from '@/assets/portfolio/assets.svg?react'
 import OrderSVG from '@/assets/portfolio/order.svg?react'
+import { useEffect, useRef } from 'react'
 
 function Portfolio() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -16,9 +17,15 @@ function Portfolio() {
   const account = useAccount()
   const chainId = useChainId()
 
+  const isInitialMount = useRef(true)
+
   const walltedConnected = account && chainId
 
-  if (isWalletConnecting) {
+  useEffect(() => {
+    isInitialMount.current = false
+  }, [])
+
+  if (isWalletConnecting && isInitialMount.current) {
     return null
   }
 

@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { format, addYears, addMonths } from 'date-fns'
+import { enUS, zhTW } from 'date-fns/locale'
 import { Calendar as CalendarIcon, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { DayPicker, getDefaultClassNames, useDayPicker, type DateRange } from 'react-day-picker'
 
@@ -118,7 +119,8 @@ export function DatePickerWithRange({
   }
   onUserSelectedDataRangeChanged: (dateRange: { startTime?: number; endTime?: number }) => void
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const locale = i18n.language === 'zh' ? zhTW : enUS
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: userSelectedDateRange.from ? new Date(userSelectedDateRange.from * 1000) : new Date(),
     to: userSelectedDateRange.end ? new Date(userSelectedDateRange.end * 1000) : new Date(),
@@ -176,6 +178,7 @@ export function DatePickerWithRange({
         </PopoverTrigger>
         <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='end'>
           <DayPicker
+            locale={locale}
             numberOfMonths={2}
             defaultMonth={date?.to ? addMonths(date.to, -1) : date?.from || new Date()}
             captionLayout={'label'}
@@ -270,6 +273,8 @@ export function DatePicker({
   minDate?: number
   maxDate?: number
 }) {
+  const { i18n } = useTranslation()
+  const locale = i18n.language === 'zh' ? zhTW : enUS
   const [selected, setSelected] = React.useState<Date | undefined>()
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -310,6 +315,7 @@ export function DatePicker({
         </PopoverTrigger>
         <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='start'>
           <DayPicker
+            locale={locale}
             numberOfMonths={1}
             // captionLayout={captionLayout || 'label'}
             captionLayout='label'
