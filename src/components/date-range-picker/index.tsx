@@ -67,7 +67,7 @@ function CustomNav({
         <button
           type='button'
           onClick={onPrevYearClick}
-          className='p-1 pr-0 cursor-pointer text-gray-500 hover:text-white transition-colors'
+          className='p-1 pr-0 cursor-pointer focus:outline-none text-gray-500 hover:text-white transition-colors'
         >
           <ChevronsLeft className='size-4' />
         </button>
@@ -76,7 +76,7 @@ function CustomNav({
           onClick={onPreviousClick}
           disabled={!previousMonth}
           className={cn(
-            'p-1 pl-0 text-gray-500 cursor-pointer hover:text-white transition-colors',
+            'p-1 pl-0 text-gray-500 focus:outline-none cursor-pointer hover:text-white transition-colors',
             !previousMonth && 'opacity-50 pointer-events-none'
           )}
         >
@@ -90,7 +90,7 @@ function CustomNav({
           onClick={onNextClick}
           disabled={!nextMonth}
           className={cn(
-            'p-1 pr-0 cursor-pointer text-gray-500 hover:text-white transition-colors',
+            'p-1 pr-0 cursor-pointer text-gray-500 focus:outline-none hover:text-white transition-colors',
             !nextMonth && 'opacity-50 pointer-events-none'
           )}
         >
@@ -99,7 +99,7 @@ function CustomNav({
         <button
           type='button'
           onClick={onNextYearClick}
-          className='p-1 pl-0 cursor-pointer text-gray-500 hover:text-white transition-colors'
+          className='p-1 pl-0 cursor-pointer focus:outline-none text-gray-500 hover:text-white transition-colors'
         >
           <ChevronsRight className='size-4' />
         </button>
@@ -225,7 +225,7 @@ export function DatePickerWithRange({
               ),
               month_caption: cn(
                 defaultClassNames.month_caption,
-                'flex w-full items-center justify-center !h-5'
+                'flex w-full items-center justify-center !h-5 !mb-1'
               ),
               months: cn(
                 defaultClassNames.months,
@@ -270,7 +270,7 @@ export function DatePicker({
   minDate?: number
   maxDate?: number
 }) {
-  const [selected, setSelected] = React.useState<Date>()
+  const [selected, setSelected] = React.useState<Date | undefined>()
   const [isOpen, setIsOpen] = React.useState(false)
 
   const defaultClassNames = getDefaultClassNames()
@@ -306,60 +306,81 @@ export function DatePicker({
               )}
             </div>
             <CalendarIcon />
-            {/* {date?.from ? (
-              date.to ? (
-                <>
-                  <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
-                  <span className='w-4 h-4 py-1 px-[2.5px]'>
-                    <ArrowSVG style={{ width: '11.7px', height: 8 }} />
-                  </span>
-                  <span className='text-sm/5.5 font-medium'>{format(date.to, FormatStr)}</span>
-                </>
-              ) : (
-                <span className='text-sm/5.5 font-medium'>{format(date.from, FormatStr)}</span>
-              )
-            ) : (
-              <span className='text-sm/5.5 font-medium'>Pick a date</span>
-            )} */}
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-auto p-0' style={{ border: 'none' }} align='start'>
           <DayPicker
             numberOfMonths={1}
-            captionLayout={captionLayout || 'label'}
+            // captionLayout={captionLayout || 'label'}
+            captionLayout='label'
             showOutsideDays={false}
-            selected={selected}
+            selected={selected || (userSelectedDate ? new Date(userSelectedDate) : undefined)}
+            defaultMonth={selected ?? (userSelectedDate ? new Date(userSelectedDate) : undefined)}
             onSelect={setSelected}
             mode='single'
             endMonth={maxDate ? new Date(maxDate) : undefined}
             startMonth={minDate ? new Date(minDate) : undefined}
             components={{
-              Chevron: ({ className, orientation, ...props }) => {
-                if (orientation === 'left') {
-                  return <VectorSVG className='rotate-180' />
-                }
-                if (orientation === 'right') {
-                  return <VectorSVG />
-                }
-                return <VectorSVG className={cn('size-4', className)} {...props} />
-              },
+              Nav: CustomNav,
+              // Chevron: ({ className, orientation, ...props }) => {
+              //   if (orientation === 'left') {
+              //     return <VectorSVG className='rotate-180' />
+              //   }
+              //   if (orientation === 'right') {
+              //     return <VectorSVG />
+              //   }
+              //   return <VectorSVG className={cn('size-4', className)} {...props} />
+              // },
             }}
+            style={
+              {
+                '--rdp-range_middle-background-color': 'rgba(0,157,255,0.2)',
+                '--rdp-day-width': '36px',
+                '--rdp-day-height': '36px',
+                '--rdp-day_button-width': '36px',
+                '--rdp-day_button-height': '36px',
+                '--rdp-range_end-date-background-color': 'rgba(0,157,255,1)',
+                '--rdp-range_start-date-background-color': 'rgba(0,157,255,1)',
+                '--rdp-selected-border': 'none',
+                '--rdp-day_button-border-radius': '0px',
+                '--rdp-months-gap': '0px',
+              } as React.CSSProperties
+            }
             classNames={{
+              // root: cn(
+              //   defaultClassNames.root,
+              //   'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4 [--cell-size:36px]'
+              // ),
+              // nav: cn(
+              //   defaultClassNames.nav,
+              //   'absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1'
+              // ),
+              // month_caption: cn(
+              //   defaultClassNames.month_caption,
+              //   'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]'
+              // ),
+              // button_previous: cn(
+              //   defaultClassNames.button_previous,
+              //   'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50'
+              // ),
               root: cn(
                 defaultClassNames.root,
-                'w-fit bg-[rgba(19,24,35,1)] text-white rounded-sm p-4 [--cell-size:36px]'
+                'px-4 py-3 bg-gray-900 text-white !border !border-gray-850 !rounded-[6px] font-normal'
               ),
               nav: cn(
                 defaultClassNames.nav,
-                'absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1'
+                'w-full !h-5 flex flex-row items-center justify-between cursor-pointer'
               ),
               month_caption: cn(
                 defaultClassNames.month_caption,
-                'flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]'
+                'flex w-full items-center justify-center !h-5 !mb-1'
               ),
-              button_previous: cn(
-                defaultClassNames.button_previous,
-                'h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50'
+              caption_label: cn(defaultClassNames['caption_label'], 'text-xs/[15px]'),
+              day_button: cn(defaultClassNames.day_button, '!text-xs/[15px]'),
+              weekday: cn(defaultClassNames.weekday, '!py-1 text-xs/[15px] text-gray-500'),
+              selected: cn(
+                defaultClassNames.selected,
+                '!bg-[rgba(0,157,255,1)] !text-white hover:!bg-[rgba(0,157,255,1)] hover:!text-white focus:!bg-[rgba(0,157,255,1)] focus:!text-white !rounded-[4px]'
               ),
             }}
           />
