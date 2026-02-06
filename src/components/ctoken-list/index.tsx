@@ -1,4 +1,4 @@
-import { memo, useId, useMemo, useState, useTransition } from "react"
+import { memo, useEffect, useId, useMemo, useState, useTransition } from "react"
 import { useTranslation } from "@/hooks/useTranslation";
 import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
@@ -324,7 +324,9 @@ const CTokenList = memo(
       })
     }, [filterTokens, sort])
 
-
+    useEffect(() => {
+      onSortChange('marketCap')
+    }, [])
 
     return (
       <div className="min-w-[443px] border-t border-[#232427] relative">
