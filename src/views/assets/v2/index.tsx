@@ -19,13 +19,13 @@ function Portfolio() {
 
   const isInitialMount = useRef(true)
 
-  const walltedConnected = account && chainId
-
   useEffect(() => {
     isInitialMount.current = false
   }, [])
 
-  if (isWalletConnecting && isInitialMount.current) {
+  const walltedConnected = account && chainId
+
+  if (!walltedConnected && isWalletConnecting && isInitialMount.current) {
     return null
   }
 
