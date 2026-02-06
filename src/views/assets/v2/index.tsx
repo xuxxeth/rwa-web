@@ -17,15 +17,17 @@ function Portfolio() {
   const account = useAccount()
   const chainId = useChainId()
 
-  const isInitialMount = useRef(true)
-
-  useEffect(() => {
-    isInitialMount.current = false
-  }, [])
-
   const walltedConnected = account && chainId
 
-  if (!walltedConnected && isWalletConnecting && isInitialMount.current) {
+  const initialConnectingFinished = useRef(false)
+
+  useEffect(() => {
+    if (!isWalletConnecting) {
+      initialConnectingFinished.current = true
+    }
+  }, [isWalletConnecting])
+
+  if (!walltedConnected && isWalletConnecting && !initialConnectingFinished.current) {
     return null
   }
 

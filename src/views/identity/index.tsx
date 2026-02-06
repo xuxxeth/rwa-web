@@ -40,18 +40,19 @@ function IdentityEntry() {
   const account = useAccount()
   const chainId = useChainId()
 
-  const isInitialMount = useRef(true)
-
   const walltedConnected = account && chainId
 
-  useEffect(() => {
-    isInitialMount.current = false
-  }, [])
+  const initialConnectingFinished = useRef(false)
 
-  if (!walltedConnected && isWalletConnecting && isInitialMount.current) {
+  useEffect(() => {
+    if (!isWalletConnecting) {
+      initialConnectingFinished.current = true
+    }
+  }, [isWalletConnecting])
+
+  if (!walltedConnected && isWalletConnecting && !initialConnectingFinished.current) {
     return null
   }
-
   if (!walltedConnected) {
     return <WalletNotConnected desc='identity.cwdesc' />
   }
