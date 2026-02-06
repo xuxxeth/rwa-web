@@ -11,7 +11,6 @@ import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
-import { ScrollBox } from "../scroll-box";
 import { NoData } from "../markets/NoData";
 import { Input } from "../ui/input";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
@@ -248,7 +247,7 @@ const CTokenList = memo(
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
           ...tokenWithPrice[symbolToLower(rwa.symbol)]
         }
-      })
+      }).sort((a, b) => Number(b.balance ?? '0') - Number(a.balance ?? '0'))
     }, [newRwaList, tokenWithBalance, tokenWithPrice])
 
     const [searchTerm, setSearchTerm] = useState("")
@@ -307,11 +306,11 @@ const CTokenList = memo(
           case 'marketCap': {
             const balanceA = a.balance ?? '0'
             const balanceB = b.balance ?? '0'
-            const priceA = a.price ?? '0'
-            const priceB = b.price ?? '0'
+            // const priceA = a.price ?? '0'
+            // const priceB = b.price ?? '0'
 
-            const totalA = Number(multiply(balanceA, priceA)) || 0
-            const totalB = Number(multiply(balanceB, priceB)) || 0
+            const totalA = Number(balanceA) || 0
+            const totalB = Number(balanceB) || 0
 
             return sort.order === 'asc'
               ? totalA - totalB
@@ -324,9 +323,9 @@ const CTokenList = memo(
       })
     }, [filterTokens, sort])
 
-    useEffect(() => {
-      onSortChange('marketCap')
-    }, [])
+    // useEffect(() => {
+    //   onSortChange('marketCap')
+    // }, [])
 
     return (
       <div className="min-w-[443px] border-t border-[#232427] relative">
