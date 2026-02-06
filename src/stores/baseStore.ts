@@ -11,6 +11,7 @@ import type {
   ITokenWithBalance,
   ITokenWithPrice,
   IStockWithPrice,
+  IChain,
 } from '@/service/base/types'
 import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight } from '@/utils'
 
@@ -24,6 +25,7 @@ export const useBaseStore = create<BaseStore>()(
       connectInit: false,
       showConnect: false,
       currentWallet: null,
+      currentChain: null,
       lastChainId: null,
       lastInitTime: 0,
       chainList: [],
@@ -44,6 +46,9 @@ export const useBaseStore = create<BaseStore>()(
       },
       setCurrentWallet: (wallt: any) => {
         set({ currentWallet: wallt })
+      },
+      setCurrentChain: (chain: IChain | null) => {
+        set({ currentChain: chain })
       },
       setTokenWithBalance: (tokenWithBalance: Record<string, ITokenWithBalance>) => {
         set({ tokenWithBalance: tokenWithBalance })

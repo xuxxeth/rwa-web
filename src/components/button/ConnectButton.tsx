@@ -77,6 +77,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     handleDisConnect,
     handleSwitchChain,
     initialized,
+    isSameChain
   } = useActiveWeb3()
 
   const chains = useBaseStore(s => s.chainList)
@@ -258,7 +259,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   return (
     <>
-      {!account ? (
+      {(!account || !isSameChain) ? (
         <div
           className={cn(
             'h-[36px] flex items-center px-6 bg-[#9CFF3A] text-sm font-medium rounded-[8px] cursor-pointer',

@@ -54,12 +54,13 @@ export function SwitchButton() {
   const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
 
-  const [selected, setSelected] = useState<typeof chains[0] | null>(null)
+  const currentChain = useBaseStore(state => state.currentChain)
+  const setCurrentChain = useBaseStore(state => state.setCurrentChain)
 
   useEffect(() => {
     if (chains[0]) {
       const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
-      setSelected(chains.find(chain => chain.id === _chainId) || chains[0])
+      setCurrentChain(chains.find(chain => chain.id === _chainId) || chains[0])
     }
     
   }, [chains])
@@ -74,15 +75,15 @@ export function SwitchButton() {
       <HoverCardTrigger asChild
       >
         {
-          selected ? 
+          currentChain ? 
           <div className={cn(
             "h-[36px] flex items-center p-2 bg-[#191B1E] text-sm font-medium rounded-[8px] cursor-pointer text-white",
             open ? "bg-[#383A40]" : ""
           )}
             
           >
-            <img src={getChainIconById(String(selected.id))} className="w-6 mr-1 rounded-full" alt="" />
-            <span >{selected.displayName}</span>
+            <img src={getChainIconById(String(currentChain.id))} className="w-6 mr-1 rounded-full" alt="" />
+            <span >{currentChain.displayName}</span>
             <img src="/images/icons/down.png" className={cn(
               "w-3 ml-4 mr-2 transition-all",
               open ? ' rotate-180' : ''
@@ -119,11 +120,11 @@ export function SwitchButton() {
                     title={chain.displayName} 
                     icon={chain.icon}
                     disabled={chain.state === 0}
-                    selected={selected?.id === chain.id} 
+                    selected={currentChain?.id === chain.id} 
                     onClick={() => {
                       if (chain.state !== 0) {
                         setOpen(false)
-                        setSelected(chain)
+                        setCurrentChain(chain)
                       }
                       
                     }}

@@ -60,11 +60,10 @@ export function ConverBody({
   const showConfirm = useSettingStore(state => state.showConfirm)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
-  const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
   const { expired } = useKycExpired()
   const action = useTradeStore(state => state.activeConvertTab)
-  const { account } = useActiveWeb3()
+  const { account, isSameChain } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const orderDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
@@ -424,7 +423,7 @@ export function ConverBody({
       }
       
       {
-        !account ? 
+        (!account || !isSameChain) ? 
           <div className="mt-3"><ConnectButtonText /></div> :
           !isSignatureValid ?
           <SignButton className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]" refreshIsSignatureValid={() => {

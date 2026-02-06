@@ -1,11 +1,13 @@
 import { useAccount, useChainId, useConnect, useDisconnect, useWallets, useInitialized, useSwitchChain } from '@/hooks/useCaCommon'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { ConnectorType, WalletConfig } from '@/hooks/useCaCommon'
 import storage from '@/utils/storage'
 import { CONNECTOR_TYPE, LATEST_WALLET_UUID, WALLET_UUID } from '@/config/constants'
+import { useBaseStore } from '@/stores/baseStore'
 
 export function useActiveWeb3() {
+  const currentChain = useBaseStore(state => state.currentChain)
   const wallets = useWallets()
   const connect = useConnect()
   const disConnect = useDisconnect()
@@ -49,6 +51,10 @@ export function useActiveWeb3() {
     }
   }, [switchChain, disConnect])
 
+  const isSameChain = useMemo(() => {
+    return currentChain?.id === chainId
+  }, [chainId, currentChain])
+
   return {
     initialized,
     wallets,
@@ -56,6 +62,7 @@ export function useActiveWeb3() {
     chainId,
     handleConnect,
     handleDisConnect,
-    handleSwitchChain
+    handleSwitchChain,
+    isSameChain
   }
 }

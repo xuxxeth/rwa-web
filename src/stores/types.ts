@@ -20,6 +20,7 @@ export interface BaseStore {
   connectInit: boolean,
   showConnect: boolean,
   currentWallet: any,
+  currentChain: IChain | null;
   lastChainId: number | null;
   lastInitTime: number;
   chainList: IChain[];
@@ -57,6 +58,7 @@ export interface BaseStore {
   updateRwasPrice: (priceList: IRwaPrice[]) => void;
   updateStocksPrice: (priceList: IRwaPrice[]) => void;
   freshTokenBalances: () => void;
+  setCurrentChain: (chain: IChain | null) => void;
 }
 
 export interface TradeStore {
