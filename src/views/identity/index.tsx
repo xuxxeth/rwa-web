@@ -53,7 +53,7 @@ function IdentityEntry() {
       <SignatureVerify
         desc='identity.signd'
         subDesc='identity.signSubd'
-        className='mt-9'
+        className='mt-18'
         refreshIsSignatureValid={refreshIsSignatureValid}
       />
     )
@@ -236,22 +236,23 @@ function Identity({ account }: { account: string }) {
           />
         ),
       },
+      // TODO: 暂时不做
       // 认证中 - Liveness Verifying and retry OCR
       // 认证中 - 活体认证达最大次数之后，如果要重试的话，重新进入 BaseInfo 组件
-      {
-        match: () =>
-          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
-          verifyType === KYC_VERIFY_TYPE.LIVENESS &&
-          status === KYC_STATUS.VERIFYING &&
-          isRetry,
-        render: () => (
-          <BaseInfo
-            refresh={refresh}
-            userInfo={kycDetail.userInfo}
-            rejectReason={kycDetail.rejectReason}
-          />
-        ),
-      },
+      // {
+      //   match: () =>
+      //     overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+      //     verifyType === KYC_VERIFY_TYPE.LIVENESS &&
+      //     status === KYC_STATUS.VERIFYING &&
+      //     isRetry,
+      //   render: () => (
+      //     <BaseInfo
+      //       refresh={refresh}
+      //       userInfo={kycDetail.userInfo}
+      //       rejectReason={kycDetail.rejectReason}
+      //     />
+      //   ),
+      // },
       // 认证中 - Liveness Verifying or Retry
       {
         match: () =>
@@ -259,14 +260,7 @@ function Identity({ account }: { account: string }) {
           verifyType === KYC_VERIFY_TYPE.LIVENESS &&
           (status === KYC_STATUS.VERIFYING || (status === KYC_STATUS.REJECTED && isRetry)),
         render: () => (
-          <FaceRecognition
-            retry={() => {
-              setIsRetry(true)
-            }}
-            status={status}
-            refresh={refresh}
-            onResetRetry={resetRetry}
-          />
+          <FaceRecognition status={status} refresh={refresh} onResetRetry={resetRetry} />
         ),
       },
       // 认证中 - Liveness Verify Failed/Rejected

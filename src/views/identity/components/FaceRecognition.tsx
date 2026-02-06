@@ -9,12 +9,10 @@ import type { ApiResponse } from '@/service/client'
 import { usePendingStep } from '@/hooks/usePendingStep'
 import { CircleLoading } from '@/components/loading'
 import { useToast } from '@/hooks/useToast'
-import { useRouter } from '@/hooks/useRouter'
 
 const faceLangPrefix = 'identity.face'
 
 export default function FaceRecognition({
-  retry,
   refresh: refreshKycDetail,
   onResetRetry,
   status,
@@ -22,7 +20,6 @@ export default function FaceRecognition({
   refresh: () => Promise<ApiResponse<IKycDetail>>
   onResetRetry: () => void
   status?: number
-  retry: () => void
 }) {
   const { toastSuccess } = useToast()
 
@@ -37,8 +34,6 @@ export default function FaceRecognition({
   const [isMaxTimesReached, setIsMaxTimesReached] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const pendingStep = usePendingStep()
-
-  const router = useRouter()
 
   const clickLockRef = useRef(false)
 
@@ -173,12 +168,7 @@ export default function FaceRecognition({
 
       <div className='text-base text-60 px-5 py-3 rounded-sm bg-[#361604] flex items-center'>
         <LazyImage src='/images/kyc/warning.png' className='w-5 h-5 mr-1' />
-        {errorMsg
-          ? isMaxTimesReached
-            ? t(`${faceLangPrefix}.reCheckInfo`)
-            : errorMsg
-          : t(`${faceLangPrefix}.tip`)}
-        {/* {errorMsg ? isMaxTimesReached ? t(`${faceLangPrefix}.reCheckInfo`) : errorMsg : t(`${faceLangPrefix}.${isMaxTimesReached ? 'reCheckInfo' : 'tip'}`) : ''} */}
+        {errorMsg ? errorMsg : t(`${faceLangPrefix}.${isMaxTimesReached ? 'times' : 'tip'}`)}
       </div>
       {urlInfo === undefined && (
         <button
@@ -188,15 +178,7 @@ export default function FaceRecognition({
           disabled={isLoading}
           className='w-[402px] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none px-6 py-2 text-white m-auto border border-white rounded-lg cursor-pointer'
         >
-          {isMaxTimesReached ? t(`${faceLangPrefix}.reCheck`) : t(`${faceLangPrefix}.getQr`)}
-        </button>
-      )}
-      {urlInfo === null && isMaxTimesReached && (
-        <button
-          onClick={retry}
-          className='w-[402px] disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none px-6 py-2 text-white m-auto border border-white rounded-lg cursor-pointer'
-        >
-          {t(`${faceLangPrefix}.reCheck`)}
+          {t(`${faceLangPrefix}.getQr`)}
         </button>
       )}
     </div>
