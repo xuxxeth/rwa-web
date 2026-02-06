@@ -62,6 +62,7 @@ export interface BaseStore {
 }
 
 export interface TradeStore {
+  realtimeRwaData: ISummaryDataItem | null;
   inputToken: IRwa | null;
   outputToken: IToken | null;
   limitPrice: string;
@@ -82,6 +83,7 @@ export interface TradeStore {
   setTxStep: (step: number) => void
   setTxError: (msg: string) => void
   setTxSuccess: (type: string, msg: string, tx: string) => void
+  setRealtimeRwaData: (data: ISummaryDataItem | null) => void
 }
 
 export interface WssStore {

@@ -10,11 +10,9 @@ import type { IRwa } from "@/service/base/types"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/useRouter"
 import { StockDialog } from "./StockDialog"
-import { useRwaSummary } from "@/hooks/useRwaSummary"
 import { useStockStore } from "@/stores/stockStore"
 import { PreMarketOpen } from "./PreMarketOpen"
 import IconWithTooltip from "../icon-tooltip"
-import wsService from "@/service/webSocket/service"
 import { truncate } from "@/utils/format"
 import type { ISummaryDataItem } from "@/service/webSocket/types"
 import { useBaseStore } from "@/stores/baseStore"
@@ -39,10 +37,13 @@ export const LabelWrap = memo(
 const RwaItemPrice = memo(
   ({ data, from }: { data: IRwa, from?: string}) => {
     const rwaPrice = useRwaPrice(data.symbol)
-    const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
+    const realtimeData = useTradeStore(state => state.realtimeRwaData)
+
+    // const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
+    const up = useMemo(() => realtimeData ? Number(truncate((realtimeData?.pc && realtimeData?.p ? realtimeData.p / realtimeData.pc - 1 : 0) * 100, 2)) : 0 ,[realtimeData?.p])
     const isPro = from === 'pro-trading'
 
-    if (!rwaPrice) return null
+    if (!realtimeData) return null
 
     return (
       <div className={cn(
@@ -52,12 +53,12 @@ const RwaItemPrice = memo(
               : "text-[#CA3F64] text-[12px]",
       )}>
         <div className={cn(
-          "text-[20px] font-semibold leading-[100%]",
+          "text-[20px] leading-[100%] font-mono-semibold",
           isPro ? " text-[18px] " : ""
-        )}>${rwaPrice.price || '--'}</div>
+        )}>${realtimeData.p || '--'}</div>
         <span
           className={cn(
-            "leading-[100%] font-normal",
+            "leading-[100%] font-normal font-mono",
             isPro ? " text-[14px] " : ""
           )
             
@@ -65,7 +66,7 @@ const RwaItemPrice = memo(
           }
         >
           {up !== 0 && (up > 0 ? '+' : '-')}
-          {Math.abs(Number(rwaPrice?.up || "0"))}%
+          {Math.abs(Number(up || "0"))}%
         </span>
       </div>
     )
@@ -77,28 +78,8 @@ export const StockInfo = memo(
     const { t } = useTranslation()
     const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
-    const [realtimeData, setRealtimeData] = useState<ISummaryDataItem | null>()
-
     const stockData = useStockStore(state => state.stockData)
-
-    useEffect(() => {
-      if (inputToken?.symbol) {
-        // @ts-ignore
-        wsService.on(`realtime.${inputToken.symbol}`, (rwa: ISummaryDataItem) => {
-          const precision = inputToken?.precision
-          const _data = {
-            ...rwa,
-            p: truncate(rwa.p || 0, precision), // 最新价
-            o: truncate(rwa.o || 0, precision), // 今开价
-            l: truncate(rwa.l || 0, precision), // 最低价
-            h: truncate(rwa.h || 0, precision), // 最高价
-            c: truncate(rwa.c || 0, precision), // 当日收盘价
-            pc: truncate(rwa.pc || 0, precision), // 昨日收盘价
-          } as any
-          setRealtimeData(_data)
-        })
-      }
-    }, [inputToken])
+    const realtimeData = useTradeStore(state => state.realtimeRwaData)
 
     const getMarket = useBaseStore(state => state.getMarket)
 

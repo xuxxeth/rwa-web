@@ -1,26 +1,19 @@
 import { useTranslation } from '@/hooks/useTranslation'
-import { cn } from '@/lib/utils'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import { StatisticsItem } from './StatisticsItem'
 import { useTradeStore } from '@/stores/tradeStore'
 import { divide, formatLargeNumber, multiply, shortenAddress } from '@/utils'
-import CopyButton from '../button/copyButton'
 import { useChainById } from '@/hooks/useChain'
-import { LazyImage } from '../image/LazyImage'
 import { baseApi } from '@/service/base/api'
 import type { IStatistic } from '@/service/base/types'
-import { NumberText } from '../number-text'
-import { ProfileTitle } from './ProfileTitle'
-import { useRwaPrice } from '@/hooks/useTokenBalances'
+
 import { useStockStore } from '@/stores/stockStore'
 import IconWithTooltip from '@/components/icon-tooltip'
 
 const Statistics = memo(({ from }: { from?: string }) => {
   const { t } = useTranslation()
-  const itemClass = from === 'market' ? 'text-[16px] py-4' : ''
   const inputToken = useTradeStore(state => state.inputToken)
   const setStockData = useStockStore(state => state.setStockData)
-  const rwaPrice = useRwaPrice(inputToken?.symbol || '')
+  const rwaPrice = useTradeStore(state => state.realtimeRwaData)
 
   const chain = useChainById(inputToken?.chainId)
   const initRef = useRef(false)
@@ -34,26 +27,26 @@ const Statistics = memo(({ from }: { from?: string }) => {
       peStatic: '--',
       pb: '--',
     }
-    if (statisticData?.totalShare && rwaPrice?.price) {
+    if (statisticData?.totalShare && rwaPrice?.p) {
       // 总市值 = 当前股价 * 总股本
-      _data.marketCap = formatLargeNumber(multiply(statisticData.totalShare, rwaPrice.price))
+      _data.marketCap = formatLargeNumber(multiply(statisticData.totalShare, rwaPrice.p))
       // 流通市值 = 当前股价 * 流通股本
-      _data.circCap = formatLargeNumber(multiply(statisticData.circShare, rwaPrice.price))
+      _data.circCap = formatLargeNumber(multiply(statisticData.circShare, rwaPrice.p))
       _data.peTtm = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netIncomeLtm)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netIncomeLtm)
       )
       // pe(static) = 总市值/ 上一个完整财年的净利润
       _data.peStatic = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netIncomeLastYear)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netIncomeLastYear)
       )
       // pb = 总市值/净资产
       _data.pb = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.price), statisticData.netAsset)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netAsset)
       )
     }
 
     return _data
-  }, [statisticData, rwaPrice?.price])
+  }, [statisticData, rwaPrice?.p])
 
   useEffect(() => {
     setStockData(capData)

@@ -13,25 +13,25 @@ import { useRouter } from "@/hooks/useRouter";
 import { openUrl } from "@/utils/scan";
 
 function LiteTrade() {
-  const router = useRouter()
+  // const router = useRouter()
   const { account } = useActiveWeb3()
   const setShowConnect = useBaseStore(state => state.setShowConnect)
-  const setTokenWithPriceByWebSocketData = useBaseStore(
-    state => state.setTokenWithPriceByWebSocketData
-  )
-  const setStockWithPriceByWebSocketData = useBaseStore(
-    (state) => state.setStockWithPriceByWebSocketData
-  );
-  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+  // const setTokenWithPriceByWebSocketData = useBaseStore(
+  //   state => state.setTokenWithPriceByWebSocketData
+  // )
+  // const setStockWithPriceByWebSocketData = useBaseStore(
+  //   (state) => state.setStockWithPriceByWebSocketData
+  // );
+  // const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
   const [ _, refreshIsSignatureValid] = useSignatureValidStatus()
 
   const { signing, signature, validSignature } = useRequestSignature()
 
-  useWssOn('summary', (data: any) => {
-    setTokenWithPriceByWebSocketData(data || [])
-    setStockWithPriceByWebSocketData(data || [])
-    stableTokenWithPrice(data || [])
-  })
+  // useWssOn('summary', (data: any) => {
+  //   setTokenWithPriceByWebSocketData(data || [])
+  //   setStockWithPriceByWebSocketData(data || [])
+  //   stableTokenWithPrice(data || [])
+  // })
 
   return (
     <>

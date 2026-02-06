@@ -3,10 +3,12 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { TradeStore } from './types'
 
 import type { IRwa, IToken } from '@/service/base/types'
+import type { ISummaryDataItem } from '@/service/webSocket/types';
 
 export const useTradeStore = create<TradeStore>()(
   persist(
     (set, get) => ({
+      realtimeRwaData: null,
       inputToken: null,
       outputToken: null,
       limitPrice: '',
@@ -47,6 +49,9 @@ export const useTradeStore = create<TradeStore>()(
       setTxSuccess: (type: string, msg: string, tx: string) => {
 
         set({txSuccess: { type, msg, tx }})
+      },
+      setRealtimeRwaData: (data: ISummaryDataItem | null) => {
+        set({realtimeRwaData: data})
       }
     }),
     {

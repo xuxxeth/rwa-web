@@ -25,10 +25,11 @@ const Section4 = memo(
     );
     const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
     
-    useWssOn('summary', (data: any) => {
-      setTokenWithPriceByWebSocketData(data || [])
-      setStockWithPriceByWebSocketData(data || [])
-      stableTokenWithPrice(data || [])
+    useWssOn('aggregate', (data: any) => {
+      const _data = data?.items || []
+      setTokenWithPriceByWebSocketData(_data)
+      setStockWithPriceByWebSocketData(_data)
+      stableTokenWithPrice(_data)
     })
 
     const handleClick = useCallback((rwa: IRwa) => {

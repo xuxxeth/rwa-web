@@ -38,7 +38,7 @@ const DoctypeSelect = memo(
       ] : [
         { code: '1', label: t('identity.passport'), icon: '/images/icons/identity/passport.png' },
       ]
-    }, [t]) 
+    }, [t, countryCode]) 
     
     const [currentCode, setCurrentCode] = useState(idList[0].code)
     const [currentDoctype, setCurrentDoctype] = useState(idList[0])

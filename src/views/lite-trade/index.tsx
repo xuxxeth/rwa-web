@@ -25,24 +25,24 @@ function LiteTrade() {
   const { t } = useTranslation()
   const orderDialog = useShowDialog()
   const setShowConnect = useBaseStore(state => state.setShowConnect)
-  const setTokenWithPriceByWebSocketData = useBaseStore(
-    state => state.setTokenWithPriceByWebSocketData
-  )
-  const setStockWithPriceByWebSocketData = useBaseStore(
-    (state) => state.setStockWithPriceByWebSocketData
-  );
-  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+  // const setTokenWithPriceByWebSocketData = useBaseStore(
+  //   state => state.setTokenWithPriceByWebSocketData
+  // )
+  // const setStockWithPriceByWebSocketData = useBaseStore(
+  //   (state) => state.setStockWithPriceByWebSocketData
+  // );
+  // const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
   const [ isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const [action, setAction] = useState('buy')
   const [showKline, setShowKline] = useState(false)
 
   const { signing, signature, validSignature } = useRequestSignature()
 
-  useWssOn('summary', (data: any) => {
-    setTokenWithPriceByWebSocketData(data || [])
-    setStockWithPriceByWebSocketData(data || [])
-    stableTokenWithPrice(data || [])
-  })
+  // useWssOn('summary', (data: any) => {
+  //   setTokenWithPriceByWebSocketData(data || [])
+  //   setStockWithPriceByWebSocketData(data || [])
+  //   stableTokenWithPrice(data || [])
+  // })
 
   return (
     <>

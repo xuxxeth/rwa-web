@@ -17,21 +17,6 @@ function Markets() {
   const [action, setAction] = useState('buy')
   const orderDialog = useShowDialog()
 
-  const setTokenWithPriceByWebSocketData = useBaseStore(
-    state => state.setTokenWithPriceByWebSocketData
-  )
-  const setStockWithPriceByWebSocketData = useBaseStore(
-    state => state.setStockWithPriceByWebSocketData
-  )
-  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
-  const updateOriginSummary = useWssStore(state => state.updateOriginSummary)
-
-  useWssOn('summary', (data: any) => {
-    setTokenWithPriceByWebSocketData(data || [])
-    setStockWithPriceByWebSocketData(data || [])
-    stableTokenWithPrice(data || [])
-    updateOriginSummary(data || [])
-  })
 
   return (
     <>

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { ConnectButtonText } from "@/components/button/ConnectButtonText";
 import BigNumber from "bignumber.js";
-import { formatTokenAmountWithCommas, isGreater, isLess, parseAmount, truncateUP } from "@/utils";
+import { formatTokenAmountWithCommas, isGreater, isLess, parseAmount, truncate, truncateUP } from "@/utils";
 import { useShowDialog, DialogController } from '@/components/dialog/DialogController'
 import { ExpiresSetting } from "../expires-setting";
 import { useTradeStore } from "@/stores/tradeStore";
@@ -33,6 +33,8 @@ import { OrderConfirm } from "../order-confirm";
 import { useSettingStore } from "@/stores/settingStore";
 import { ConvertAction } from "./ConvertAction";
 import { useKycStore } from "@/stores/kycStore";
+import type { ISummaryDataItem } from "@/service/webSocket/types";
+import wsService from "@/service/webSocket/service"
 
 type ConverBodyProps = {
   action?: string
@@ -70,25 +72,26 @@ export function ConverBody({
 
   const paymentToken = useMemo(() => action === 'buy' ? outputToken?.address : inputToken?.address, [action, inputToken?.address, outputToken?.address])
 
-  const rwaPrice = useRwaPrice(inputToken?.symbol || '')
+  const rwaPrice = useTokenBalance(inputToken?.symbol || '')
+  const realtimeData = useTradeStore(state => state.realtimeRwaData)
   const initPrice = useRef(false)
   // const inputTokenPrice = useStableRwaPrice(inputToken?.symbol || '')
   const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
 
   useEffect(() => {
-    if (rwaPrice && !initPrice.current) {
+    
+    if (rwaPrice && realtimeData && !initPrice.current) {
       initPrice.current = true
-      setInputTokenPrice(rwaPrice)
+      setInputTokenPrice({...rwaPrice, price: String(realtimeData.p)})
     }
-  }, [rwaPrice])
+  }, [rwaPrice, realtimeData])
   const preToken = useRef<IRwa | null>(null)
   useEffect(() => {
-
-    if (inputToken && preToken.current?.symbol !== inputToken?.symbol) {
+    if (inputToken && realtimeData && preToken.current?.symbol !== inputToken?.symbol) {
       preToken.current = inputToken
-      setInputTokenPrice(rwaPrice)
+      setInputTokenPrice({...rwaPrice, price: String(realtimeData.p)})
     }
-  }, [inputToken, rwaPrice])
+  }, [inputToken, rwaPrice, realtimeData])
 
   const { estimatedFee, platformFee, brokerageFee, tradingActivityFee, allOrderValue } = useCalcFee(orderValue, inputSize, action === 'buy', inputToken?.feeRate)
 
@@ -315,7 +318,37 @@ export function ConverBody({
     }
   }, [inputTokenPrice, updateLimitPrice])
 
+  const setRealtimeData = useTradeStore(state => state.setRealtimeRwaData)
+  
+  useEffect(() => {
+    let onKey = ''
+    let listener = null
+    if (inputToken?.symbol) {
+      onKey = `realtime.${inputToken.symbol}`
+      listener = (rwa: ISummaryDataItem) => {
+        const precision = inputToken?.precision
+        const _data = {
+          ...rwa,
+          p: truncate(rwa.p || 0, precision), // 最新价
+          o: truncate(rwa.o || 0, precision), // 今开价
+          l: truncate(rwa.l || 0, precision), // 最低价
+          h: truncate(rwa.h || 0, precision), // 最高价
+          c: truncate(rwa.c || 0, precision), // 当日收盘价
+          pc: truncate(rwa.pc || 0, precision), // 昨日收盘价
+        } as any
+        setRealtimeData(_data)
+      }
+      // @ts-ignore
+      wsService.on(onKey, listener)
+    }
 
+    return () => {
+      if (onKey && listener) {
+        // @ts-ignore
+        wsService.off(onKey, listener)
+      }
+    }
+  }, [inputToken])
 
   return (
     <div className={cn(

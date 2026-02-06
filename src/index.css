@@ -43,9 +43,21 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Source Code Pro 600';
+  src: url('/fonts/sourceCodePro/SourceCodePro-SemiBold.ttf');
+  font-weight: 600;
+  font-style: normal;
+}
+
 .font-mono {
   font-family: 'Source Code Pro', monospace !important;
   font-weight: 400;
+}
+
+.font-mono-semibold {
+  font-family: 'Source Code Pro 600', monospace !important;
+  font-weight: 600;
 }
 
 

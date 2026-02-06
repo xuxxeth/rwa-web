@@ -1,11 +1,10 @@
-import { memo, useEffect, useId, useMemo, useState, useTransition } from "react"
+import { memo, useId, useMemo, useState } from "react"
 import { useTranslation } from "@/hooks/useTranslation";
-import { CheckBox } from "../check-box"
 import { LazyImage } from "../image/LazyImage"
 import { useRwas } from "@/hooks/useRwaBalances";
 import type { IRwa } from "@/service/base/types";
 import { formatTokenAmountWithCommas } from "@/utils/format";
-import { multiply, sortByBalanceAndPrice, symbolToLower } from "@/utils";
+import { multiply, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
 import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
@@ -18,6 +17,8 @@ import { WalletNotConnectedSmallVersion } from "../wallet-not-connected";
 import useFavorites from "@/hooks/useFavorites";
 import SignatureVerify from '@/components/signature-verify'
 import IconWithTooltip from "../icon-tooltip";
+import { useWssStore } from "@/stores/wssStore";
+import { useWssOn } from "@/hooks/useWssOn";
 
 export type CTokenProps = {
   stock: string,
@@ -326,6 +327,24 @@ const CTokenList = memo(
     // useEffect(() => {
     //   onSortChange('marketCap')
     // }, [])
+
+
+    const setTokenWithPriceByWebSocketData = useBaseStore(
+      state => state.setTokenWithPriceByWebSocketData
+    )
+    const setStockWithPriceByWebSocketData = useBaseStore(
+      state => state.setStockWithPriceByWebSocketData
+    )
+    const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+    const updateOriginSummary = useWssStore(state => state.updateOriginSummary)
+
+    useWssOn('aggregate', (data: any) => {
+      const _data = data?.items || []
+      setTokenWithPriceByWebSocketData(_data)
+      setStockWithPriceByWebSocketData(_data)
+      stableTokenWithPrice(_data)
+      updateOriginSummary(_data)
+    })
 
     return (
       <div className="min-w-[443px] border-t border-[#232427] relative">
