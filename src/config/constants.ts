@@ -46,7 +46,8 @@ export const RISK_STATUS = {
 export type Address = `0x${string}`
 
 // 签名过期时间15天
-export const SIGNATURE_EXPIRES = 15 * 24 * 60 * 60;
+// export const SIGNATURE_EXPIRES = 15 * 24 * 60 * 60;
+export const SIGNATURE_EXPIRES = 1 * 60 * 60;
 export const ID_EXPIRES = 30 * 24 * 60 * 60;
 
 const RED = '#FF6767'
