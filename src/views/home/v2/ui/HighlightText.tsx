@@ -1,18 +1,29 @@
 import React from 'react'
+import { cn } from '@/utils'
 
 interface HighlightProps {
   isVisible: boolean
   delay: string
   children?: React.ReactNode
   className?: string
+  svgClassName?: string
 }
 
-export const HighlightText: React.FC<HighlightProps> = ({ isVisible, delay, children, className }) => {
+export const HighlightText: React.FC<HighlightProps> = ({
+  isVisible,
+  delay,
+  children,
+  className,
+  svgClassName,
+}) => {
   return (
     <span className={`relative inline-block text-[#9CFF3A] ${className || 'mx-1'}`}>
       {children}
       <svg
-        className={`absolute -bottom-2 left-0 w-full h-[12px] pointer-events-none transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        className={cn(
+          `absolute -bottom-1 left-0 w-full h-[12px] pointer-events-none transition-opacity duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`,
+          svgClassName
+        )}
         viewBox='0 0 100 15'
         preserveAspectRatio='none'
       >

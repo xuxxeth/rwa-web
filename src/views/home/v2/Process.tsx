@@ -72,6 +72,7 @@ export const Process: React.FC = () => {
                       isVisible={isVisible}
                       delay='delay-500'
                       className={language === 'en' ? 'mr-4 md:mr-6' : 'mx-1'}
+                      svgClassName='-bottom-0'
                     />
                   ),
                 }}
