@@ -1,0 +1,141 @@
+{
+  "nav": {
+    "compliance": "合規",
+    "process": "交易流程",
+    "whyUs": "優勢",
+    "trust": "信任",
+    "launchApp": "啟動APP"
+  },
+  "hero": {
+    "title_prefix": "構建代幣化世界\n讓全球資產",
+    "title_highlight": "觸手可及",
+    "title_suffix": "",
+    "subtitle": "讓所有真實資產都能安全、自由、合規地流通\n通过 Crypto 投资全球顶级股票",
+    "cta": "開始交易"
+  },
+  "compliance": {
+    "title": "以<1>監管</1>為底層\n<2>透明</2>驅動全球鏈上金融",
+    "subtitle": "將合規、透明、可驗證的金融基礎設施，直接鏈接全球股票市場",
+    "items": [
+      {
+        "title": "FSC 雙牌照監管",
+        "description": "持有毛里求斯 FSC 頒發 Investment Dealer 與 VASP 雙牌照，雙重監管框架下合規運行"
+      },
+      {
+        "title": "AML & CFT 原生合規",
+        "description": "合規機制原生嵌入系統，全面落實 AML / CFT 要求，符合 FSC 與 FATF 國際標準"
+      },
+      {
+        "title": "KYC & KYT 风控",
+        "description": "融合鏈下身份驗證與鏈上交易監控，實現身份可信與資金可追溯"
+      },
+      {
+        "title": "鏈上 × 鏈下雙審計",
+        "description": "股票資產由持牌券商托管，1:1 鏈上映射，審計可驗證、資產可追蹤"
+      }
+    ]
+  },
+  "process": {
+    "title": "快速交易股票\n<1>直連</1> 真實市場",
+    "subtitle": "",
+    "items": [
+      {
+        "id": 1,
+        "title": "鏈上快速下單",
+        "description": "用戶透過 Web3 錢包，以加密資產直接提交交易指令"
+      },
+      {
+        "id": 2,
+        "title": "訂單撮合執行",
+        "description": "平台系統處理後，直達持牌券商，完成真實股票市場成交"
+      },
+      {
+        "id": 3,
+        "title": "鏈上發行與交割",
+        "description": "智能合約自動鑄造或銷毀股票代幣，成交信息全程鏈上可查"
+      },
+      {
+        "id": 4,
+        "title": "資產回傳用戶錢包",
+        "description": "用戶獲得股票代幣或 USDT，全流程自動執行，無人工干預"
+      }
+    ]
+  },
+  "whyUs": {
+    "title": "<1>为什么</1> 选择Tiko",
+    "items": [
+      {
+        "subLabel": "SPEED",
+        "value": "6S",
+        "title": "即時的交易體驗",
+        "description": "鏈上確認與券商執行協同，最快約 6 秒完成成交與鏈上交割"
+      },
+      {
+        "subLabel": "FEE MODEL",
+        "value": "0.2%",
+        "title": "透明的费用模型",
+        "description": "費用透明、鏈上可驗證，無滑點博弈，「成本即規則」。"
+      },
+      {
+        "subLabel": "LIQUIDITY",
+        "value": "$1M+",
+        "title": "百万級交易深度",
+        "description": "流動性直連美股市場，單筆交易最高支持 100 萬美元"
+      }
+    ]
+  },
+  "trust": {
+    "title": "嚴格的<1>安全</1>與<2>信任</2>",
+    "description": "資產安全是我們的首要任務，通過多重驗證與透明機制，確保您的每一分投資都安全無虞。",
+    "items": [
+      {
+        "title": "可驗證資產儲備",
+        "description": "定期披露資產證明，鏈上智能合約透明，儲備金持續大於流通資產"
+      },
+      {
+        "title": "券商合規託管",
+        "description": "股票資產由<1>盈立證券</1>（<1>uSMART</1>）託管，多司法牌照，資產隔離、監管清晰"
+      },
+      {
+        "title": "協議全面審計",
+        "description": "核心智能合約與安全架構均通過 <1>SlowMist</1> 完整審計，無權限留存"
+      },
+      {
+        "title": "真正去中心化执行",
+        "description": "平台不持前置頭寸、不干預成交，用戶直鏈交易與結算"
+      }
+    ]
+  },
+  "innovation": {
+    "title": "鏈上創新與<1>資產</1>潛能",
+    "footer": "Tiko 在链上重建一个合规、透明、可验证的全球新金融系统",
+    "items": [
+      {
+        "title": "全球資產直通",
+        "description": "以加密資產參與美國、香港等主要股票市場，免法幣兌換，降低跨境摩擦"
+      },
+      {
+        "title": "股息創新分配",
+        "description": "股票分紅遵循市場規則，自動通過鏈上合約分配，權益與現實完全一致"
+      },
+      {
+        "title": "創新金融應用",
+        "description": "代幣化股票可接入鏈上抵押、理財、組合策略，提升資產流動性，釋放 Web3 世界的長期價值。"
+      }
+    ]
+  },
+  "partners": {
+    "roles": [
+      "持牌經紀合作夥伴",
+      "安全審計合作夥伴",
+      "預言機供應商",
+      "OCR 與身份驗證合作夥伴",
+      "鏈上KYT&合規合作夥伴"
+    ]
+  },
+  "footer": {
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "docs": "文档"
+  }
+}

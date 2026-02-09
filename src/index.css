@@ -1,7 +1,7 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -60,7 +60,6 @@
   font-weight: 600;
 }
 
-
 .font-light {
   font-family: 'Google Sans Flex 300';
   font-weight: 300;
@@ -104,7 +103,7 @@ body {
   min-width: 356px !important;
   width: 500px !important;
 }
-[data-sonner-toaster][data-y-position=top] {
+[data-sonner-toaster][data-y-position='top'] {
   top: 80px !important;
 }
 [data-sonner-toast] {
@@ -120,7 +119,6 @@ body {
   }
 }
 @layer utilities {
-
   .text-80 {
     color: rgba(255, 255, 255, 0.8);
   }
@@ -130,7 +128,7 @@ body {
   }
 
   .stock-rise {
-    color: rgba(80, 227, 194, 1)
+    color: rgba(80, 227, 194, 1);
   }
 
   .stock-fall {
@@ -142,32 +140,19 @@ body {
   }
 
   .shadow-1 {
-    background:
-    linear-gradient(
-      267.03deg,
-      #00F0FF 4.01%,
-      #5200FF 57.55%,
-      #FF2DF7 114.97%
-    );
-  box-shadow: 0 0 40px rgba(156, 255, 58, 0.5),
-              0 0 80px rgba(82, 0, 255, 0.4),
-              0 0 120px rgba(255, 45, 247, 0.3);
-  border-radius: 624px;
+    background: linear-gradient(267.03deg, #00f0ff 4.01%, #5200ff 57.55%, #ff2df7 114.97%);
+    box-shadow:
+      0 0 40px rgba(156, 255, 58, 0.5),
+      0 0 80px rgba(82, 0, 255, 0.4),
+      0 0 120px rgba(255, 45, 247, 0.3);
+    border-radius: 624px;
     backdrop-filter: blur(624px);
   }
   .circle-bg {
     border-radius: 50%;
-    background: radial-gradient(
-        circle at center,
-        #9CFF3A 0%,
-        transparent 40%
-      ),
-      linear-gradient(
-        267.03deg,
-        #00F0FF 4.01%,
-        #5200FF 57.55%,
-        #FF2DF7 114.97%
-      );
+    background:
+      radial-gradient(circle at center, #9cff3a 0%, transparent 40%),
+      linear-gradient(267.03deg, #00f0ff 4.01%, #5200ff 57.55%, #ff2df7 114.97%);
     filter: blur(624px);
     position: absolute;
     top: 50%;
@@ -178,21 +163,17 @@ body {
     width: 895px;
     height: 895px;
     border-radius: 50%;
-    background: radial-gradient(
-      50% 50% at 50% 50%, 
-      #1B255E 0%,       
-      rgba(27, 37, 94, 0) 100% 
-    );
-    backdrop-filter: blur(200px); 
+    background: radial-gradient(50% 50% at 50% 50%, #1b255e 0%, rgba(27, 37, 94, 0) 100%);
+    backdrop-filter: blur(200px);
   }
   .new-circle-bg4 {
     border-radius: 50%;
     background: radial-gradient(
-      50% 50% at 50% 50%, 
-      rgba(106, 252, 223, 0.25) 0%,       
-      rgba(106, 252, 223, 0) 100% 
+      50% 50% at 50% 50%,
+      rgba(106, 252, 223, 0.25) 0%,
+      rgba(106, 252, 223, 0) 100%
     );
-    backdrop-filter: blur(1000px); 
+    backdrop-filter: blur(1000px);
   }
 
   .scale-quarter {
@@ -258,20 +239,45 @@ body {
 /* 这里是根据 ui 给出的颜色定义写的*/
 @theme {
   --color-gray-950: #131416;
-  --color-gray-900: #1A1B1E;
+  --color-gray-900: #1a1b1e;
   --color-gray-850: #232427;
-  --color-gray-800: #282A2F;
-  --color-gray-750: #383A40;
-  --color-gray-700: #41464F;
-  --color-gray-500: #737A87;
-  --color-gray-400: #9DA3AF;
+  --color-gray-800: #282a2f;
+  --color-gray-750: #383a40;
+  --color-gray-700: #41464f;
+  --color-gray-500: #737a87;
+  --color-gray-400: #9da3af;
 
-  --color-yellow-50: #FFB219;
-  --color-blue-50: #009DFF;
-  --color-green-50: #25A750;
-  --color-green-100: #2EE4A7;
-  --color-red-50: #CA3F64;
-  --color-red-100: #F63C6B;
+  --color-yellow-50: #ffb219;
+  --color-blue-50: #009dff;
+  --color-green-50: #25a750;
+  --color-green-100: #2ee4a7;
+  --color-red-50: #ca3f64;
+  --color-red-100: #f63c6b;
+
+  /* Brand Colors */
+  --color-brand: #9cff3a;
+  --color-brand-hover: #8ae630;
+  --color-brand-light: #e2ffc2;
+
+  /* Dark Colors */
+  --color-dark: #111111;
+  --color-dark-surface: #1a1a1a;
+
+  /* Shadows */
+  --shadow-glow: 0 0 20px rgba(156, 255, 58, 0.3);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+
+  /* Animations */
+  --animate-loop-scroll: loop-scroll 60s linear infinite;
+
+  @keyframes loop-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 @theme inline {
@@ -391,12 +397,12 @@ body {
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* 全局滾動條樣式 */
@@ -410,7 +416,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #383A40; /* 滾動條顏色 */
+  background-color: #383a40; /* 滾動條顏色 */
   border-radius: 69px; /* 圓角 */
 }
 
@@ -424,7 +430,7 @@ body {
   outline: none !important;
 }
 .title-primary {
-  background: linear-gradient(90deg, #BEFF6E 0.55%, #6AFCDF 50%);
+  background: linear-gradient(90deg, #beff6e 0.55%, #6afcdf 50%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text; /* for some browsers */
@@ -440,33 +446,23 @@ body {
   backdrop-filter: blur(20px);
   mix-blend-mode: normal;
   border-radius: 6px;
-  clip-path: polygon(
-    0 0,
-    171px 0,
-    100% 66px,
-    100% 100%,
-    0 100%
-  );
+  clip-path: polygon(0 0, 171px 0, 100% 66px, 100% 100%, 0 100%);
 }
 
 .glass {
   inset: 0;
   border-radius: 8px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.0),
-    rgba(255,255,255,0.05)
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.05));
   backdrop-filter: blur(10px) saturate(50%);
   -webkit-backdrop-filter: blur(10px) saturate(50%);
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
   box-shadow:
-    inset 0 0.5px 0 rgba(255,255,255,0.01),
-    0 1px 0 rgba(0,0,0,0.1),
-    0 10px 10px rgba(0,0,0,0.1),
-    inset 0 1px 1px rgba(255,255,255,0.05);
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.01),
+    0 1px 0 rgba(0, 0, 0, 0.1),
+    0 10px 10px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 /* .glass {
   position: relative;
@@ -494,6 +490,3 @@ body {
   mask-composite: exclude;
   pointer-events: none;
 } */
-  
-
-

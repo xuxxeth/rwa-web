@@ -16,6 +16,7 @@ import {
   multiply,
   formatLargeNumber,
   fuzzySearch,
+  formatUp,
 } from '@/utils'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
@@ -34,42 +35,15 @@ import NoRecord from '@/components/no-record'
 import useFavorites from '@/hooks/useFavorites'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
 import SignatureVerify from '@/components/signature-verify'
+import type { IRwa } from '@/service/base/types'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
-export default function MarketQuotes() {
-  const { t } = useTranslation()
-  const { sort, onSortChange } = useTableSort<SortableField>()
-  const router = useRouter()
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
-
-  const rwaList = useRwaTokens(false)
-
-  const [isFavorites, setIsFavorites] = useState(false)
-
-  const { favorites, isFavorite, ...favoritesRest } = useFavorites()
-
+export function useRwaListWithQuote(rwaList: IRwa[]) {
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
-  const [searchText, setSearchText] = useState('')
-
-  const rwaMap = useMemo(() => new Map(rwaList.map(rwa => [rwa.stockId, rwa])), [rwaList])
-
-  const newRwaList = useMemo(() => {
-    let rwaListFiltered = rwaList
-    if (isFavorites) {
-      rwaListFiltered = favorites
-        .map(stockId => rwaMap.get(stockId))
-        .filter(rwa => rwa !== undefined)
-    }
-    return rwaListFiltered
-  }, [rwaList, isFavorites, favorites, isFavorite])
-
-  const marketQuotes: IMarketQuote[] = newRwaList
-    .filter(
-      rwa => !searchText || fuzzySearch(rwa.symbol, searchText) || fuzzySearch(rwa.name, searchText)
-    )
-    .map(rwa => {
+  const rwaListWithQuote = useMemo(() => {
+    return rwaList.map(rwa => {
       const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
 
       return {
@@ -87,6 +61,7 @@ export default function MarketQuotes() {
           : undefined,
       }
     })
+  }, [rwaList, tokenWithQuote])
 
   useEffect(() => {
     const listener = (data: ISummaryData) => {
@@ -124,6 +99,97 @@ export default function MarketQuotes() {
       wsService.off('summary', listener)
     }
   }, [])
+
+  return rwaListWithQuote
+}
+
+export default function MarketQuotes() {
+  const { t } = useTranslation()
+  const { sort, onSortChange } = useTableSort<SortableField>()
+  const router = useRouter()
+  const updateInputToken = useTradeStore(state => state.updateInputToken)
+
+  const rwaList = useRwaTokens(false)
+
+  const [isFavorites, setIsFavorites] = useState(false)
+
+  const { favorites, isFavorite, ...favoritesRest } = useFavorites()
+
+  // const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
+
+  const [searchText, setSearchText] = useState('')
+
+  const rwaMap = useMemo(() => new Map(rwaList.map(rwa => [rwa.stockId, rwa])), [rwaList])
+
+  const newRwaList = useMemo(() => {
+    let rwaListFiltered = rwaList
+    if (isFavorites) {
+      rwaListFiltered = favorites
+        .map(stockId => rwaMap.get(stockId))
+        .filter(rwa => rwa !== undefined)
+    }
+    return rwaListFiltered.filter(
+      rwa => !searchText || fuzzySearch(rwa.symbol, searchText) || fuzzySearch(rwa.name, searchText)
+    )
+  }, [rwaList, isFavorites, favorites, isFavorite, searchText])
+
+  const marketQuotes = useRwaListWithQuote(newRwaList)
+
+  // const marketQuotesFiltered: IMarketQuote[] = newRwaList.map(rwa => {
+  //   const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+
+  //   return {
+  //     ...rwa,
+  //     price: quote?.price,
+  //     up: quote?.up,
+  //     dailyHigh: quote?.dailyHigh,
+  //     dailyLow: quote?.dailyLow,
+  //     weekUp: quote?.weekUp,
+  //     marketCap: quote?.price
+  //       ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
+  //       : undefined,
+  //     floatCap: quote?.price
+  //       ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
+  //       : undefined,
+  //   }
+  // })
+
+  // useEffect(() => {
+  //   const listener = (data: ISummaryData) => {
+  //     const obj = data.reduce(
+  //       (acc, item) => {
+  //         acc[symbolToLower(item.S)] = {
+  //           price: truncate(item.p, 2),
+  //           // item.p 最新价 itme.pc 昨日收盘价
+  //           // up = (最新价 - 昨日收盘价) - 1
+  //           up:
+  //             item.p && item.pc
+  //               ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
+  //               : '0',
+  //           dailyHigh: item.h ? truncate(item.h, 2) : '0',
+  //           dailyLow: item.l ? truncate(item.l, 2) : '0',
+  //           // 周涨跌幅
+  //           // weekUp = (item.p 最新价 - item.wc 上周收盘价) - 1
+  //           weekUp:
+  //             item.p && item.wc
+  //               ? truncate(multiply(subtract(divide(item.p, item.wc), 1), 100), 2)
+  //               : '0',
+  //         }
+  //         return acc
+  //       },
+  //       {} as Record<string, IQuote>
+  //     )
+  //     if (data.length > 10) {
+  //       setTokenWithQuote(obj)
+  //     }
+  //   }
+
+  //   wsService.on('summary', listener)
+
+  //   return () => {
+  //     wsService.off('summary', listener)
+  //   }
+  // }, [])
 
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
@@ -264,7 +330,7 @@ function TextCell(props: { text: string; className?: string; icon?: string }) {
   )
 }
 
-function getColorAndIcon(change: Change) {
+export function getColorAndIcon(change: Change) {
   switch (change) {
     case 0:
       return { color: 'text-gray-400', icon: '' }
@@ -350,7 +416,7 @@ const MarketQuotesListConfig = [
       const change = strOrNumToSign(item.up ?? 0)
       return (
         <TextCellWithColor
-          text={item.up ? textPrefix(textSuffix(item.up, '%', 0), change === 1 ? '+' : '') : '--'}
+          text={item.up ? formatUp(item.up) : '--'}
           change={change}
           withIcon={false}
         />

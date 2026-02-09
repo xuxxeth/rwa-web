@@ -3,7 +3,10 @@ import { lazy } from 'react'
 import { Navigate, type RouteObject } from 'react-router-dom'
 
 // 懒加载页面
-const Home = lazy(() => import('../views/home'))
+// const Home = lazy(() => import('../views/home'))
+
+const Home = lazy(() => import('../views/home/v2'))
+
 const LiteTrade = lazy(() => import('../views/lite-trade/indexv2'))
 const Markets = lazy(() => import('../views/markets'))
 const About = lazy(() => import('../views/about'))

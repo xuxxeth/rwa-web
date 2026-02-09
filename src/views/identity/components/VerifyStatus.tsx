@@ -5,22 +5,12 @@ import { useRouter } from '@/hooks/useRouter'
 import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
 import { useEffect, useState, type ReactNode } from 'react'
-import { isLess, parseAmount, textPrefix, toFixed } from '@/utils'
+import { formatUp, isLess, parseAmount, textPrefix, toFixed } from '@/utils'
 import type { ApiResponse } from '@/service/client'
 import type { IKycDetail } from '@/service/kyc/types'
-import wsService from '@/service/webSocket/service'
-import { type ISummaryData } from '@/service/webSocket/types'
-import {
-  truncate,
-  textSuffix,
-  strOrNumToSign,
-  symbolToLower,
-  divide,
-  subtract,
-  multiply,
-  cn,
-} from '@/utils'
-import { type IRwa } from '@/service/base/types'
+
+import { symbolToLower, cn, getUpColor } from '@/utils'
+import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
 import { useTradeStore } from '@/stores/tradeStore'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
@@ -217,75 +207,35 @@ function HotRwas() {
     return list
   }, [rwaList])
 
-  const [tokenMap, setTokenMap] = useState<Record<string, { price: string; up: string }>>({})
-
-  useEffect(() => {
-    const listener = (data: ISummaryData) => {
-      const obj = data.reduce(
-        (acc, item) => {
-          acc[symbolToLower(item.S)] = {
-            price: truncate(item.p, 5),
-            // item.p 最新价 itme.pc 昨日收盘价
-            // up = (最新价 - 昨日收盘价) - 1
-            up:
-              item.p && item.pc
-                ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
-                : '0',
-          }
-          return acc
-        },
-        {} as Record<string, { price: string; up: string }>
-      )
-      setTokenMap(obj)
-    }
-
-    wsService.on('summary', listener)
-
-    return () => {
-      wsService.off('summary', listener)
-    }
-  }, [])
-
-  const getRwaPrice = (rwa: IRwa) => {
-    const price = tokenMap[rwa.symbol.toLowerCase()]?.price
-    return price ? textPrefix(toFixed(price, rwa.precision), '$') : '--'
-  }
-
-  const getRwaUp = (rwa: IRwa) => {
-    const up = tokenMap[rwa.symbol.toLowerCase()]?.up
-    return up ? textPrefix(textSuffix(up, '%', 0), strOrNumToSign(up) === 1 ? '+' : '') : '--'
-  }
-
-  const getRwaColor = (rwa: IRwa) => {
-    const up = tokenMap[rwa.symbol.toLowerCase()]?.up
-    const change = strOrNumToSign(up ?? 0)
-    if (change === 0) return 'stock-even'
-    return change === 1 ? 'stock-rise' : 'stock-fall'
-  }
+  const rwaWithPriceAndUp = useRwaWithPriceAndUp(displayList)
 
   return (
     <>
       <div className='text-2xl mt-5'>{t(`${langPrefix}.hot`)}</div>
-      <div className='grid grid-cols-3 gap-5 cursor-pointer font-medium'>
-        {displayList.map(rwa => {
+      <div className='grid grid-cols-3 gap-4 cursor-pointer font-medium'>
+        {rwaWithPriceAndUp.map(rwa => {
           return (
             <div
               key={rwa.symbol}
-              className='flex flex-row items-center justify-center gap-4 p-4 bg-[#1C1C1C] rounded-lg'
+              className='flex flex-row items-center p-3 bg-[#1C1C1C] rounded-lg'
               onClick={() => {
                 updateInputToken(rwa)
                 router.push('/markets/trading/' + symbolToLower(rwa.symbol))
               }}
             >
-              <LazyImage src={rwa.icon} className='w-[42px] h-[42px] rounded-lg' />
-              <div className='flex flex-col gap-1'>
+              <LazyImage src={rwa.icon} className='w-[42px] h-[42px] mr-3 rounded-lg' />
+              <div className='flex flex-col gap-1 mr-3 w-[68px]'>
                 <div className='text-base'>{rwa.symbol}</div>
                 <div className='text-sm text-60 whitespace-nowrap'>{rwa.name}</div>
               </div>
-              <div className='flex flex-col gap-1'>
-                <div className='text-base'>{getRwaPrice(rwa)}</div>
-                <div className={cn('text-sm text-[#1A85FF]', getRwaColor(rwa))}>
-                  <button className='bg-white/10 px-2 py-[2px] rounded-sm'>{getRwaUp(rwa)}</button>
+              <div className='flex flex-col gap-1 mr-3'>
+                <div className='text-base'>
+                  {rwa.price ? textPrefix(toFixed(rwa.price, rwa.precision), '$') : '--'}
+                </div>
+                <div className={cn('text-sm text-[#1A85FF]', getUpColor(rwa.change))}>
+                  <button className='bg-white/10 px-2 py-[2px] rounded-sm'>
+                    {formatUp(rwa.up)}
+                  </button>
                 </div>
               </div>
               <LazyImage src='/images/icons/identity/arrow.png' className='w-4 h-[9px]' />

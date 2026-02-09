@@ -76,8 +76,11 @@ function App() {
     <>
       <GoogleAnalytics />
       <ScrollToTop />
-      {
+      {/* {
         !isNoMenus && (isHomeMenus ? <HomeMenus /> : <Menus />)
+      } */}
+      {
+        !isNoMenus && !isHomeMenus && <Menus />
       }
       <RoutesWrapper />
       {createPortal(

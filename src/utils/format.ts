@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import prettyMs from 'pretty-ms'
+import { multiply, subtract, divide } from './index'
 
 export function textPrefix(text: string, prefix: string) {
   return `${prefix}${text}`
@@ -127,6 +128,33 @@ export function truncateUP(value: number | string, decimals: number): string {
  */
 export function formatStockPrice(value: number | string): string {
   return truncate(value, 3)
+}
+
+export function formatUp(up: string | undefined) {
+  const change = strOrNumToSign(up || 0)
+  if (up === undefined) return ''
+  return `${textPrefix(textSuffix(up, '%'), change === 1 ? '+' : '')}`
+}
+
+export function calculateUp(price: number, pc: number) {
+  return truncate(multiply(subtract(divide(price, pc), 1), 100), 2)
+}
+
+export function getUpColor(change: Change) {
+  switch (change) {
+    case 0: {
+      return 'text-gray-400'
+    }
+    case 1: {
+      return 'text-green-50'
+    }
+    case -1: {
+      return 'text-red-50'
+    }
+    default: {
+      return 'text-gray-400'
+    }
+  }
 }
 
 /**

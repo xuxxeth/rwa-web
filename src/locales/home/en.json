@@ -1,0 +1,141 @@
+{
+  "nav": {
+    "compliance": "Compliance",
+    "process": "Process",
+    "whyUs": "Why Us",
+    "trust": "Trust",
+    "launchApp": "Launch App"
+  },
+  "hero": {
+    "title_prefix": "Building a",
+    "title_highlight": "Tokenized Reality",
+    "title_suffix": "\nfor Everyone",
+    "subtitle": "A world where every real asset can move freely, securely, and compliantly.\nInvest in global top-tier stocks via Crypto.",
+    "cta": "Start Trading"
+  },
+  "compliance": {
+    "title": "<1>Regulatory</1>-Driven\n<2>Transparency</2>-Led Global Finance",
+    "subtitle": "Linking compliant, transparent, and verifiable financial infrastructure directly to global stock markets.",
+    "items": [
+      {
+        "title": "Dual FSC Licensing",
+        "description": "Holds Mauritius FSC \"Investment Dealer\" and \"VASP\" licenses; operating under a robust dual-regulatory framework."
+      },
+      {
+        "title": "Native AML & CFT Compliance",
+        "description": "Regulatory mechanisms are embedded at the protocol level, fully meeting FSC and FATF international standards."
+      },
+      {
+        "title": "KYC & KYT Risk Management",
+        "description": "Integrates off-chain identity verification with on-chain transaction monitoring for total identity trust and asset traceability."
+      },
+      {
+        "title": "On-Chain & Off-Chain Dual Audit",
+        "description": "Stock assets are held by licensed custodians with 1:1 on-chain mapping for real-time verification and tracking."
+      }
+    ]
+  },
+  "process": {
+    "title": "Trade Equities Instantly\n<1>Connect</1> to Real Markets",
+    "subtitle": "",
+    "items": [
+      {
+        "id": 1,
+        "title": "Instant On-Chain Ordering",
+        "description": "Submit trade instructions directly via Web3 wallets using crypto assets."
+      },
+      {
+        "id": 2,
+        "title": "Order Execution",
+        "description": "Orders are routed to licensed brokers for real-time execution in the actual stock market."
+      },
+      {
+        "id": 3,
+        "title": "Issuance & Settlement",
+        "description": "Smart contracts automatically mint/burn stock tokens; all transaction data is verifiable on-chain."
+      },
+      {
+        "id": 4,
+        "title": "Automated Asset Delivery",
+        "description": "Stock tokens or USDT are delivered to the user’s wallet via automated, intervention-free execution."
+      }
+    ]
+  },
+  "whyUs": {
+    "title": "<1>Why</1> Choose Tiko",
+    "items": [
+      {
+        "subLabel": "SPEED",
+        "value": "6S",
+        "title": "Instant Trading Experience",
+        "description": "6-second settlement with synchronized on-chain and broker execution"
+      },
+      {
+        "subLabel": "FEE MODEL",
+        "value": "0.2%",
+        "title": "Transparent Fee Model",
+        "description": "Fully verifiable on-chain fees with zero slippage gaming. \"The code is the rule.\""
+      },
+      {
+        "subLabel": "LIQUIDITY",
+        "value": "$1M+",
+        "title": "Institutional-Grade Liquidity",
+        "description": "Direct access to US equity markets, supporting single trades up to $1 million."
+      }
+    ]
+  },
+  "trust": {
+    "title": "<1>Security</1> & <2>Trust</2>",
+    "description": "Asset security is our top priority. Through multi-layered verification and transparency mechanisms, we ensure your investment is safe.",
+    "items": [
+      {
+        "title": "Verifiable Proof of Reserves",
+        "description": "Regular asset disclosures and transparent smart contracts ensure reserves always exceed circulating assets."
+      },
+      {
+        "title": "Licensed Broker Custody",
+        "description": "Assets are held by <1>uSMART</1> (licensed in multiple jurisdictions) with strict asset segregation."
+      },
+      {
+        "title": "Comprehensive Protocol Audit",
+        "description": "Core smart contracts and security architecture are fully audited by <1>SlowMist</1>."
+      },
+      {
+        "title": "True Decentralized Execution",
+        "description": "No house positions or manual intervention; direct user-to-market trading and settlement."
+      }
+    ]
+  },
+  "innovation": {
+    "title": "Innovation & Asset <1>Potential</1>",
+    "footer": "Tiko Reconstructing Global Finance: Compliant, Transparent, and Verifiable.",
+    "items": [
+      {
+        "title": "Seamless Access to\nGlobal Assets",
+        "description": "Access US and HK stock markets directly via crypto; eliminate FX friction and cross-border hurdles."
+      },
+      {
+        "title": "Innovative Dividend Distribution",
+        "description": "Dividends follow market rules and are automatically distributed via smart contracts, mirroring real-world rights."
+      },
+      {
+        "title": "Web3 Financial Composability",
+        "description": "Tokenized stocks can be integrated into on-chain lending, staking, and yield strategies to unlock long-term value."
+      }
+    ]
+  },
+  "partners": {
+    "roles": [
+      "Licensed Brokerage Partner",
+      "Security Audit Partner",
+      "Oracle Provider",
+      "OCR & Identity Verification Partner",
+      "On-Chain KYT & Compliance Partner"
+    ]
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "docs": "Docs"
+  }
+}
