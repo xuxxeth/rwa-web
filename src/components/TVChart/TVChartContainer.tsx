@@ -178,7 +178,7 @@ export const TVChartContainer = memo(
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
         <div className=" absolute w-4 h-1 -right-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
         <div
-          className="h-full"
+          className="h-full pl-4"
           ref={chartContainerRef}
         >
 

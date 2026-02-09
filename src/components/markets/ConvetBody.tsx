@@ -79,7 +79,6 @@ export function ConverBody({
   const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
 
   useEffect(() => {
-    
     if (rwaPrice && realtimeData && !initPrice.current) {
       initPrice.current = true
       setInputTokenPrice({...rwaPrice, price: String(realtimeData.p)})
@@ -321,9 +320,20 @@ export function ConverBody({
   const setRealtimeData = useTradeStore(state => state.setRealtimeRwaData)
   
   useEffect(() => {
+    if (inputToken?.symbol) {
+      if (initPrice.current) {
+        initPrice.current = false
+      }
+    }
+  }, [inputToken])
+  useEffect(() => {
     let onKey = ''
     let listener = null
     if (inputToken?.symbol) {
+      if (onKey && listener) {
+        // @ts-ignore
+        wsService.off(onKey, listener)
+      }
       onKey = `realtime.${inputToken.symbol}`
       listener = (rwa: ISummaryDataItem) => {
         const precision = inputToken?.precision
