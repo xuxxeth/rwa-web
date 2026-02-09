@@ -52,6 +52,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
 
   useEffect(() => {
     if (inputToken?.stockId ) {
+      setStatisticData(undefined)
       baseApi.getStatistic(inputToken.stockId).then(res => {
         setStatisticData(res?.data || {})
       })
@@ -65,12 +66,12 @@ const Statistics = memo(({ from }: { from?: string }) => {
         {[
           {
             title: 'tso',
-            value: formatLargeNumber(statisticData?.totalShare || ''),
+            value: statisticData?.totalShare ? formatLargeNumber(statisticData?.totalShare || '') : '--',
             tooltip: 'tsoH',
           },
           {
             title: 'float',
-            value: formatLargeNumber(statisticData?.circShare || ''),
+            value: statisticData?.circShare ? formatLargeNumber(statisticData?.circShare || '') : '--',
             tooltip: 'floatH',
           },
           {
