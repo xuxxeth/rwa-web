@@ -15,8 +15,6 @@ const Statistics = memo(({ from }: { from?: string }) => {
   const setStockData = useStockStore(state => state.setStockData)
   const rwaPrice = useTradeStore(state => state.realtimeRwaData)
 
-  const chain = useChainById(inputToken?.chainId)
-  const initRef = useRef(false)
   const [statisticData, setStatisticData] = useState<IStatistic>()
 
   const capData = useMemo(() => {
@@ -53,8 +51,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
   }, [capData])
 
   useEffect(() => {
-    if (inputToken?.stockId && !initRef.current) {
-      initRef.current = true
+    if (inputToken?.stockId ) {
       baseApi.getStatistic(inputToken.stockId).then(res => {
         setStatisticData(res?.data || {})
       })
