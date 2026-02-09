@@ -198,6 +198,9 @@ export function getDataFeed({
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
         _resolution = resolution.toLowerCase()
       }
+      if (_resolution === '60m') {
+        _resolution = '1h'
+      }
       const key = `candle.${symbolInfo.name}_${_resolution}`
       const listener = (data: any) => { 
         if (data.c > 0) {
