@@ -69,7 +69,7 @@ export const Footer: React.FC = () => {
 
             {/* Telegram - New Pure Plane Icon */}
             <a
-              href='https://t.me/TikoRWA'
+              href='https://t.me/TIKO_RWA'
               target='_blank'
               rel='noopener noreferrer'
               className='w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#9CFF3A] hover:text-black transition-all duration-300'
