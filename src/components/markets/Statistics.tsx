@@ -16,7 +16,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
   const rwaPrice = useTradeStore(state => state.realtimeRwaData)
 
   const [statisticData, setStatisticData] = useState<IStatistic>()
-
+  const unit = '1000000'
   const capData = useMemo(() => {
     let _data = {
       marketCap: '--',
@@ -31,15 +31,15 @@ const Statistics = memo(({ from }: { from?: string }) => {
       // 流通市值 = 当前股价 * 流通股本
       _data.circCap = formatLargeNumber(multiply(statisticData.circShare, rwaPrice.p))
       _data.peTtm = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netIncomeLtm)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLtm, unit))
       )
       // pe(static) = 总市值/ 上一个完整财年的净利润
       _data.peStatic = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netIncomeLastYear)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLastYear, unit))
       )
       // pb = 总市值/净资产
       _data.pb = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.p), statisticData.netAsset)
+        divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netAsset, unit))
       )
     }
 
