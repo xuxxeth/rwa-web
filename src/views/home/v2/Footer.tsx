@@ -5,13 +5,13 @@ export const Footer: React.FC = () => {
   const { t } = useTranslation('home')
 
   return (
-    <footer className='relative bg-[#131416] border-t border-white/10 pt-16 pb-12 text-white overflow-hidden'>
+    <footer className='relative bg-[#131416] border-t border-white/10 pt-12 pb-8 text-white overflow-hidden'>
       {/* Ambient Glow */}
       <div className='absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#9CFF3A] opacity-[0.03] blur-[150px] rounded-full pointer-events-none -translate-y-1/2 z-0' />
 
       <div className='max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col'>
         {/* Top Section: Brand/Email & Socials */}
-        <div className='flex flex-col md:flex-row justify-between items-start md:items-end gap-10 mb-16'>
+        <div className='flex flex-col md:flex-row justify-between items-start md:items-start gap-10 mb-8'>
           {/* Left: Logo & Email */}
           <div className='flex flex-col items-start gap-6'>
             <svg
@@ -69,7 +69,7 @@ export const Footer: React.FC = () => {
 
             {/* Telegram - New Pure Plane Icon */}
             <a
-              href='https://t.me/+SI2ZHu3_QDdlY2Zl'
+              href='https://t.me/TikoRWA'
               target='_blank'
               rel='noopener noreferrer'
               className='w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#9CFF3A] hover:text-black transition-all duration-300'

@@ -1,3 +1,5 @@
+import { cn } from '@/utils'
+
 export const GlobalIcon = () => (
   <svg viewBox='0 0 24 24' fill='none' className='w-full h-full stroke-current' strokeWidth='1.2'>
     <circle cx='12' cy='12' r='9' />
@@ -30,14 +32,14 @@ export const ComposabilityIcon = () => (
   </svg>
 )
 
-export const TikoLogo = () => (
+export const TikoLogo = (props: { className?: string }) => (
   <svg
     width='56'
     height='21'
     viewBox='0 0 56 21'
     fill='none'
     xmlns='http://www.w3.org/2000/svg'
-    className='h-5 md:h-6 w-auto'
+    className={cn('h-5 md:h-6 w-auto', props.className)}
   >
     <path
       d='M47.8124 3.375C51.851 3.375 55.1249 6.64893 55.1249 10.6875C55.1249 14.7261 51.851 18 47.8124 18C43.7738 18 40.4999 14.7261 40.4999 10.6875C40.4999 6.64894 43.7738 3.37501 47.8124 3.375ZM47.8124 7.875C46.2591 7.875 44.9999 9.1342 44.9999 10.6875C44.9999 12.2408 46.2591 13.5 47.8124 13.5C49.3656 13.4999 50.6249 12.2407 50.6249 10.6875C50.6249 9.13425 49.3656 7.87508 47.8124 7.875Z'

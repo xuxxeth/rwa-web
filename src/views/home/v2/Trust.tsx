@@ -5,6 +5,8 @@ import { HighlightText } from './ui/HighlightText'
 
 interface TrustItem {
   title: string
+  topTag: string
+  bottomTag: string
   description: string
 }
 
@@ -103,7 +105,7 @@ export const Trust: React.FC = () => {
                 <div className='absolute top-8 right-8 flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity duration-300'>
                   <div className='w-1.5 h-1.5 rounded-full bg-[#9CFF3A] animate-pulse' />
                   <span className='text-[10px] text-[#9CFF3A] font-mono tracking-wider uppercase'>
-                    Verified
+                    {item.topTag}
                   </span>
                 </div>
 
@@ -133,7 +135,9 @@ export const Trust: React.FC = () => {
 
                 {/* Bottom Decoration */}
                 <div className='mt-8 pt-6 border-t border-white/5 flex items-center justify-between opacity-50 group-hover:opacity-100 transition-opacity duration-500'>
-                  <span className='text-[10px] text-gray-500 font-mono tracking-wider'>SECURE</span>
+                  <span className='text-[10px] text-gray-500 font-mono tracking-wider'>
+                    {item.bottomTag}
+                  </span>
                   <CheckCircle2 size={14} className='text-[#9CFF3A]' />
                 </div>
               </div>

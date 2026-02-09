@@ -263,16 +263,8 @@ function WithTableHeader<T extends { orderId: string }>({
         lngPrefix='portfolio.orderTable'
         config={tableConfig}
         sort={null}
-        className={cn(
-          'border-none h-7 px-4',
-          dataMode === 'scroll'
-            ? 'bg-gray-900 [&>*:not(:first-child)]:border-l [&>*:not(:first-child)]:border-gray-850 [&>*:not(:first-child)_button]:ml-2'
-            : ''
-        )}
-        thClassName={cn(
-          'text-gray-400 text-xs/[15px] font-normal',
-          dataMode === 'scroll' ? '' : ''
-        )}
+        className={cn('border-none h-7 px-4', 'bg-gray-900')}
+        thClassName={cn('text-gray-400 text-xs/[15px] font-normal')}
         onSortChange={noop}
       />
       {children}
@@ -362,10 +354,8 @@ export function OrderContentByScroll<
         extra={{ rwaTokens, refetch }}
         getKey={(item: T) => item.id}
         isLoading={isLoading}
-        className={cn(
-          'hover:bg-gray-900 px-4 group [&>*:not(:first-child)]:border-l [&>*:not(:first-child)]:border-gray-850 [&>*:not(:first-child)>div]:pl-2 [&>*:not(:first-child)>button]:ml-2'
-        )}
-        tdClassName='h-[56px] text-xs/4'
+        className={cn('hover:bg-opacity-01 px-4 group')}
+        tdClassName='h-[46px] text-xs/4'
       />
       <ScrollLoadMore<T>
         isFetchingNextPage={isFetchingNextPage}
@@ -432,7 +422,7 @@ export function OrderContentByPagination<
         config={tableConfig}
         extra={{ rwaTokens, refetch: fetchFirstPage }}
         getKey={(item: T) => item.orderId}
-        className={cn('border-none hover:bg-gray-900 px-4 group')}
+        className={cn('hover:bg-opacity-01 px-4 group')}
         tdClassName='h-[56px] text-xs/4'
       />
       {(data.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled) && (

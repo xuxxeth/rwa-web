@@ -90,18 +90,26 @@
     "items": [
       {
         "title": "可驗證資產儲備",
+        "topTag": "VERIFIED",
+        "bottomTag": "TRUST",
         "description": "定期披露資產證明，鏈上智能合約透明，儲備金持續大於流通資產"
       },
       {
         "title": "券商合規託管",
+        "topTag": "CUSTODY",
+        "bottomTag": "SECURE",
         "description": "股票資產由<1>盈立證券</1>（<1>uSMART</1>）託管，多司法牌照，資產隔離、監管清晰"
       },
       {
         "title": "協議全面審計",
+        "topTag": "AUDIT",
+        "bottomTag": "COMPREHENSIVE",
         "description": "核心智能合約與安全架構均通過 <1>SlowMist</1> 完整審計，無權限留存"
       },
       {
         "title": "真正去中心化执行",
+        "topTag": "DECENTRALIZED",
+        "bottomTag": "ON-CHAIN",
         "description": "平台不持前置頭寸、不干預成交，用戶直鏈交易與結算"
       }
     ]
@@ -120,7 +128,7 @@
       },
       {
         "title": "創新金融應用",
-        "description": "代幣化股票可接入鏈上抵押、理財、組合策略，提升資產流動性，釋放 Web3 世界的長期價值。"
+        "description": "股票代幣化賦能鏈上質押與理財，盤活資產流動性，釋放 Web3 價值"
       }
     ]
   },

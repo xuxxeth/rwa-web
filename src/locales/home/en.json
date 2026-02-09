@@ -90,18 +90,26 @@
     "items": [
       {
         "title": "Verifiable Proof of Reserves",
+        "topTag": "VERIFIED",
+        "bottomTag": "TRUST",
         "description": "Regular asset disclosures and transparent smart contracts ensure reserves always exceed circulating assets."
       },
       {
         "title": "Licensed Broker Custody",
+        "topTag": "CUSTODY",
+        "bottomTag": "SECURE",
         "description": "Assets are held by <1>uSMART</1> (licensed in multiple jurisdictions) with strict asset segregation."
       },
       {
         "title": "Comprehensive Protocol Audit",
+        "topTag": "AUDIT",
+        "bottomTag": "COMPREHENSIVE",
         "description": "Core smart contracts and security architecture are fully audited by <1>SlowMist</1>."
       },
       {
         "title": "True Decentralized Execution",
+        "topTag": "DECENTRALIZED",
+        "bottomTag": "ON-CHAIN",
         "description": "No house positions or manual intervention; direct user-to-market trading and settlement."
       }
     ]

@@ -254,6 +254,17 @@ body {
   --color-red-50: #ca3f64;
   --color-red-100: #f63c6b;
 
+  --color-opacity-01: #FFFFFF03;
+  --color-opacity-02: #FFFFFF05;
+  --color-opacity-03: #FFFFFF08;
+  --color-opacity-04: #FFFFFF0A;
+  --color-opacity-08: #FFFFFF14;
+  --color-opacity-12: #FFFFFF1F;
+  --color-opacity-20: #FFFFFF33;
+  --color-opacity-40: #FFFFFF66;
+  --color-opacity-60: #FFFFFF99;
+  --color-opacity-80: #FFFFFFCC;
+
   /* Brand Colors */
   --color-brand: #9cff3a;
   --color-brand-hover: #8ae630;

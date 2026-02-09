@@ -70,7 +70,7 @@ const HeroTitle: React.FC<{ t: any }> = ({ t }) => {
   return (
     <h1
       ref={titleRef}
-      className='text-4xl md:text-[60px] font-bold tracking-tight text-gray-900 leading-tight md:leading-[1.15] mb-6 whitespace-pre-line relative z-[130]'
+      className='text-4xl md:text-[56px] font-bold tracking-tight text-gray-900 leading-tight md:leading-[1.15] mb-6 whitespace-pre-line relative z-[130]'
     >
       {t('hero.title_prefix')}
       <HighlightText isVisible={isTitleVisible} delay='delay-500' className='mx-2 md:mx-3'>
@@ -188,7 +188,7 @@ export const Hero: React.FC = () => {
   )
 
   return (
-    <div className='relative z-20 pt-24 pb-10 md:pt-32 md:pb-10 px-6 !overflow-visible'>
+    <div className='relative z-20 pt-24 pb-10 md:pt-42 md:pb-10 px-6 !overflow-visible'>
       <div className='max-w-7xl mx-auto flex flex-col items-center text-center'>
         <HeroTitle t={t} />
 

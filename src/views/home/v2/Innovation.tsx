@@ -142,15 +142,17 @@ export const Innovation: React.FC = () => {
           - Updated Padding: py-12 md:py-16 to match the visual weight of the Partners section as requested.
           - This removes the excessive bottom space and creates a balanced text band.
       */}
-      <div className='w-full mt-12 md:mt-20 bg-gradient-to-b from-transparent to-white'>
-        <div className='py-12 md:py-16 px-6 md:px-12'>
+      <div className='w-full mt-12 md:mt-5 md:pb-10 bg-gradient-to-b from-transparent to-white'>
+        <div className='py-12 md:py-10 px-6 md:px-12'>
           <div className='max-w-6xl mx-auto'>
             {/* Horizontal Layout: Logo + Text */}
             <div className='flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3'>
               {hasTiko && (
                 <span className='inline-flex items-center shrink-0'>
                   {/* Updated: Logo Colors for White Background (fill="black") */}
-                  <TikoLogo />
+
+                  {/* height: 33px*/}
+                  <TikoLogo className='h-[33px] md:h-[33px]' />
                 </span>
               )}
 
