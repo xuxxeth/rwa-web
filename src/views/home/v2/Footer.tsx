@@ -57,7 +57,7 @@ export const Footer: React.FC = () => {
           <div className='flex items-center gap-3'>
             {/* X (Twitter) */}
             <a
-              href='https://x.com/CyberAlpha_x'
+              href='https://x.com/TIKO_RWA'
               target='_blank'
               rel='noopener noreferrer'
               className='w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#9CFF3A] hover:text-black transition-all duration-300'

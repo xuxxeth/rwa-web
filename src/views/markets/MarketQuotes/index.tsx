@@ -70,7 +70,7 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
           acc[symbolToLower(item.S)] = {
             price: truncate(item.p, 2),
             // item.p 最新价 itme.pc 昨日收盘价
-            // up = (最新价 - 昨日收盘价) - 1
+            // up = (item.p 最新价/item.pc 昨日收盘价) - 1
             up:
               item.p && item.pc
                 ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
@@ -78,7 +78,7 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
             dailyHigh: item.h ? truncate(item.h, 2) : '0',
             dailyLow: item.l ? truncate(item.l, 2) : '0',
             // 周涨跌幅
-            // weekUp = (item.p 最新价 - item.wc 上周收盘价) - 1
+            // weekUp = (item.p 最新价/item.wc 上周收盘价) - 1
             weekUp:
               item.p && item.wc
                 ? truncate(multiply(subtract(divide(item.p, item.wc), 1), 100), 2)
