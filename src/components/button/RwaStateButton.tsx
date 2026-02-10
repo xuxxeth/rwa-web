@@ -22,7 +22,7 @@ export function BuyButton({ rwa, className }: { rwa: IRwa; className?: string })
     <button
       onClick={() => {
         updateInputToken(rwa)
-        router.push('/markets/trading/' + symbolToLower(rwa.symbol))
+        router.push('/trade/' + rwa.symbol)
       }}
       className={cn(
         'text-sm/4.5 flex flex-row hover:bg-green-50 text-green-50 hover:text-white items-center font-medium px-3 py-2  bg-[rgba(37,167,80,0.1)] rounded-[5px] cursor-pointer',

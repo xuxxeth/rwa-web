@@ -140,7 +140,7 @@ export const StockInfo = memo(
           {
             from !== 'pro-trading' && 
               <SmallButton onClick={() => {
-                router.push('/markets/trading')
+                router.push('/trade')
               }} >{t('Enter Pro Trading')}</SmallButton>
           }
         </div>

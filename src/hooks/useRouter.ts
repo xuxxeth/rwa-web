@@ -1,10 +1,11 @@
 
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 
 export function useRouter() {
 
   const navigate = useNavigate()
   const location = useLocation()
+  const params = useParams<Record<string, string | undefined>>()
   
   const push = (path: string) => {  
     navigate(path)
@@ -19,6 +20,7 @@ export function useRouter() {
     push,
     replace,
     back,
-    location
+    location,
+    params
   }
 }

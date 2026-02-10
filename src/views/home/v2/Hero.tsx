@@ -168,8 +168,6 @@ export const Hero: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
-
   const stockData = useStockData()
 
   useEffect(() => {
@@ -181,10 +179,9 @@ export const Hero: React.FC = () => {
 
   const handleClick = useCallback(
     (rwa: IRwa) => {
-      updateInputToken(rwa)
-      router.push('/markets/trading')
+      router.push('/trade')
     },
-    [updateInputToken]
+    []
   )
 
   return (
@@ -197,7 +194,7 @@ export const Hero: React.FC = () => {
         </p>
 
         <div className='flex flex-col sm:flex-row items-center gap-6 relative z-[130]'>
-          <a onClick={() => router.push('/markets/trading')} className='w-full sm:w-auto'>
+          <a onClick={() => router.push('/trade')} className='w-full sm:w-auto'>
             <Button size='lg' className='w-full px-12 group shadow-xl shadow-brand/20'>
               {t('hero.cta')}
             </Button>

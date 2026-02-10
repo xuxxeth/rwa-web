@@ -32,28 +32,32 @@ const routes: RouteObject[] = [
   },
   {
     path: '/markets',
-    element: <Markets />,
-    children: [
-      {
-        index: true,
-        element: <Navigate to='quotes' replace />,
-      },
-      {
-        path: 'quotes',
-        element: <MarketQuotes />,
-      },
-      {
-        path: 'trading',
-        element: <MarketTrading />,
-      },
-      {
-        path: 'trading/:symbol',
-        element: <MarketTrading />,
-      },
-    ],
+    element: <MarketQuotes />,
+    // children: [
+    //   {
+    //     index: true,
+    //     element: <Navigate to='quotes' replace />,
+    //   },
+    //   {
+    //     path: 'quotes',
+    //     element: <MarketQuotes />,
+    //   },
+    //   {
+    //     path: 'trading',
+    //     element: <MarketTrading />,
+    //   },
+    //   {
+    //     path: 'trading/:symbol',
+    //     element: <MarketTrading />,
+    //   },
+    // ],
   },
   {
-    path: '/lite-trade',
+    path: '/trade/:symbol?',
+    element: <MarketTrading />,
+  },
+  {
+    path: '/lite-trade/:symbol?',
     element: <LiteTrade />,
   },
   {

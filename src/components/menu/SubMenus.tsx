@@ -47,7 +47,7 @@ export function SubMenus({
 
   const router = useRouter();
   
-  const isPro = useMemo(() => router.location.pathname === "/markets/trading", [router])
+  const isPro = useMemo(() => router.location.pathname === "/trade", [router])
   const isLite = useMemo(() => router.location.pathname === "/lite-trade", [router])
 
   return (
@@ -59,8 +59,8 @@ export function SubMenus({
     >
       <HoverCardTrigger asChild>
         <div className={cn(
-          "text-[14px] font-medium text-[#9DA3AF] cursor-pointer h-[36px] flex items-center leading-[36px]",
-          isPro || isLite ? "text-white" : ""
+          "text-[14px] font-medium text-[#9DA3AF] cursor-pointer h-[36px] flex items-center leading-[36px] ",
+          isPro || isLite ? "" : ""
         )}
           onClick={e => {
             e.stopPropagation()
@@ -83,7 +83,7 @@ export function SubMenus({
           <div className="">
             <SubMenuItem title={t('proTrade')}
               onClick={() => {
-                router.push('/markets/trading')
+                router.push('/trade')
                 setOpen(false)
               }}
               selected={isPro}

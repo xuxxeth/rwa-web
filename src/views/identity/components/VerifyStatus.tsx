@@ -192,8 +192,6 @@ function HotRwas() {
   const rwaList = useRwaTokens()
   const router = useRouter()
 
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
-
   const displayList = useMemo(() => {
     const list = rwaList.filter(rwa => {
       const lowerSymbol = rwa.symbol.toLowerCase()
@@ -219,8 +217,8 @@ function HotRwas() {
               key={rwa.symbol}
               className='flex flex-row items-center p-3 bg-[#1C1C1C] rounded-lg'
               onClick={() => {
-                updateInputToken(rwa)
-                router.push('/markets/trading/' + symbolToLower(rwa.symbol))
+               
+                router.push('/trade/' + rwa.symbol)
               }}
             >
               <LazyImage src={rwa.icon} className='w-[42px] h-[42px] mr-3 rounded-lg' />
