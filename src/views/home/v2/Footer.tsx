@@ -105,7 +105,7 @@ export const Footer: React.FC = () => {
 
           <div className='flex gap-6 font-normal'>
             <a
-              href='https://www.tiko.cc/documents/cyberalpha-privacy-policy.pdf'
+              href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Privacy+Policy%EF%BC%88TIKO%EF%BC%89.pdf'
               target='_blank'
               rel='noopener noreferrer'
               className='text-gray-400 hover:text-[#9CFF3A] transition-colors text-xs md:text-sm'
@@ -113,7 +113,7 @@ export const Footer: React.FC = () => {
               {t('footer.privacy')}
             </a>
             <a
-              href='https://www.tiko.cc/documents/cyberalpha-terms-of-service.pdf'
+              href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Terms+of+Service(TIKO).pdf'
               target='_blank'
               rel='noopener noreferrer'
               className='text-gray-400 hover:text-[#9CFF3A] transition-colors text-xs md:text-sm'
