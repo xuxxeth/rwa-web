@@ -405,7 +405,8 @@
       "rs": "Retry Submit",
       "rv": "Retry Verify",
       "t67": "Identity verification is temporarily unavailable. Please try again later.",
-      "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc"
+      "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc",
+      "verifyingWait": "Submitting information, please do not leave this page."
     },
     "firstName": "First Name",
     "lastName": "Last Name",

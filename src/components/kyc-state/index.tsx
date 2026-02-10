@@ -77,7 +77,7 @@ const KycState = () => {
       return
     }
 
-    if ((pendingStep.expired)) {
+    if (pendingStep.expired) {
       setContent({
         title: t('kyc.t45'),
         content: t('kyc.t46', { expire: desc }),
@@ -88,16 +88,16 @@ const KycState = () => {
       return
     }
 
-    // if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED || kycDetail?.status === KYC_STATUS.VERIFYING) && !show) {
-    //   setContent({
-    //     title: t('kyc.t25'),
-    //     content: t('kyc.t32'),
-    //     btnText: t('kyc.t33'),
-    //     btn: 'upload'
-    //   })
-    //   setShow(true)
-    //   return
-    // }
+    if (pendingStep.risk3) {
+      setContent({
+        title: t('kyc.t25'),
+        content: t('kyc.t32'),
+        btnText: t('kyc.t33'),
+        btn: 'upload'
+      })
+      setShow(true)
+      return
+    }
     if (!kycDetail && !pendingStep.step) {
       setShow(false)
       setContent(defaultContent)
@@ -172,7 +172,7 @@ const KycState = () => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      {show && !isNotShow && content.title  && (
+      {show && !isNotShow && content.title && (
         <motion.div
           initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}

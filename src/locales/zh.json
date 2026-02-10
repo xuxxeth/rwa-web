@@ -406,7 +406,8 @@
       "rs": "重新提交資料",
       "rv": "重新驗證",
       "t67": "系統目前無法完成身分識別，請稍後再試。",
-      "issue": "如帳戶出現異常需要申訴，請發送電子郵件至📧 contact@tiko.cc"
+      "issue": "如帳戶出現異常需要申訴，請發送電子郵件至📧 contact@tiko.cc",
+      "verifyingWait": "資料提交中，請勿離開。"
     },
     "firstName": "名字",
     "lastName": "姓氏",

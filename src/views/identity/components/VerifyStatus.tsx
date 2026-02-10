@@ -12,6 +12,7 @@ import type { IKycDetail } from '@/service/kyc/types'
 import { symbolToLower, cn, getUpColor } from '@/utils'
 import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
 import { useTradeStore } from '@/stores/tradeStore'
+import { useKycStore } from '@/stores/kycStore'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
 
@@ -80,13 +81,12 @@ function VerifyStatus(props: {
   retryComponent?: ReactNode
 }) {
   const { t } = useTranslation()
-
   return (
     <VerifyStatusWrapper>
       <LazyImage src={getIconFromType(props.type)} className='w-[120px] h-[90px] pt-5' />
       <div>
         <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.${props.title}`)}</div>
-        <div className='text-base text-[#909090]'>{t(`${langPrefix}.${props.detail}`)}</div>
+        <div className='text-base text-[#909090] text-center'>{t(`${langPrefix}.${props.detail}`)}</div>
       </div>
       <Button
         onClick={() => {
@@ -247,12 +247,12 @@ function HotRwas() {
 
 export function Verifying(props: { refresh: () => Promise<ApiResponse<IKycDetail>> }) {
   const router = useRouter()
-
+  const retryCount = useKycStore(state => state.retryCount)
   return (
     <VerifyStatus
       type='verifying'
       title='verifying'
-      detail='verifyingTip'
+      detail= {retryCount < 3 ? 'verifyingWait' : 'verifyingTip'} 
       btnText='m'
       btnOnClick={() => router.push('/markets/quotes')}
     />

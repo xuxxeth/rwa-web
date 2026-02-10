@@ -179,7 +179,7 @@ export const Hero: React.FC = () => {
 
   const handleClick = useCallback(
     (rwa: IRwa) => {
-      router.push('/trade')
+      router.push('/trade/' + rwa.symbol)
     },
     []
   )

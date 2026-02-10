@@ -17,6 +17,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
 
   const [statisticData, setStatisticData] = useState<IStatistic>()
   const unit = '1000000'
+
   const capData = useMemo(() => {
     let _data = {
       marketCap: '--',

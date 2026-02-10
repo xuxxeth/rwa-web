@@ -18,7 +18,6 @@ import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { useSignatureValidStatus } from "@/hooks/useSignature";
 import SignButton from "../button/SignButton";
 import { useRiskStatus } from "@/hooks/useRiskStatus";
-import { RISK_STATUS } from "@/config/constants";
 import { useTrading } from "@/hooks/useTrading";
 import { SessionType, SideType, TifType, TradeType } from "@/hooks/useCaCommon";
 import { usePendingStep } from "@/hooks/usePendingStep";
@@ -33,8 +32,11 @@ import { OrderConfirm } from "../order-confirm";
 import { useSettingStore } from "@/stores/settingStore";
 import { ConvertAction } from "./ConvertAction";
 import { useKycStore } from "@/stores/kycStore";
-import type { ISummaryDataItem } from "@/service/webSocket/types";
-import wsService from "@/service/webSocket/service"
+import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
+import { useRealtimeRwa } from "@/hooks/useRealtimeRwa";
+import { RISK_STATUS } from "@/config/constants";
+import { useRouter } from "@/hooks/useRouter";
+import { useTradePageReady } from "@/hooks/useTradePageReady";
 
 type ConverBodyProps = {
   action?: string
@@ -44,6 +46,7 @@ type ConverBodyProps = {
 export function ConverBody({
   from
 }: ConverBodyProps) {
+  const router = useRouter()
   const { t, i18n } = useTranslation()
   const { toastError } = useToast()
   const marketInfo = useBaseStore(state => state.marketInfo)
@@ -178,12 +181,12 @@ export function ConverBody({
       return
     }
     // 禁止卖
-    if (riskUserConfig?.actions === 1) {
+    if (riskUserConfig?.actions === 1 && action === 'sell') {
       toastError({title: t('v2.tx.t41')})
       return
     }
     // 禁止买
-    if (riskUserConfig?.actions === 2) {
+    if (riskUserConfig?.actions === 2 && action === 'buy') {
       toastError({title: t('v2.tx.t40')})
       return
     }
@@ -269,19 +272,26 @@ export function ConverBody({
     () => Number(orderValue) <= 0 || 
           (action === 'buy' ? !!isInsufficient : !!isSellInsufficient) || 
           isMinOrMax.min || isMinOrMax.max || 
-          inputToken?.state === 1 ||
-          riskStatus !== RISK_STATUS.VERIFIED 
+          inputToken?.state === 1 
+          // || riskStatus !== RISK_STATUS.VERIFIED 
           // ||
           // kycStatus !== KYC_OVERALL_STATUS.VERIFIED ||
           // pendingStep.step === PENDING_STEPS.RISK3
           
           , 
-    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, riskStatus, action, pendingStep.step]
+    [orderValue, isInsufficient, isSellInsufficient, isMinOrMax, inputToken, action, pendingStep.step]
   )
-
+  
+  const kycButtonText = useMemo(() => {
+    let text = ''
+    if (riskStatus !== RISK_STATUS.VERIFIED && riskStatus !== RISK_STATUS.DEFAULT) {
+      text = t('identity.verifyID')
+    }
+    return text
+    
+  }, [t, riskStatus])
   const buttonText = useMemo(() => {
-    if (expired) return t('kyc.t51')
-    if (riskStatus !== RISK_STATUS.VERIFIED) return t('identity.verifyID')
+    // if (expired) return t('kyc.t51')
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     // 先判断当前资产是否可交易
@@ -292,9 +302,9 @@ export function ConverBody({
     if (isInsufficient) return i18n.language === 'zh' ? outputToken?.symbol + ' ' + t("Insufficient") : t("Insufficient") + ' ' + outputToken?.symbol
     if (isSellInsufficient) return i18n.language === 'zh' ? inputToken?.symbol + ' ' + t("Insufficient") :  t("Insufficient") + ' ' + inputToken?.symbol
     // if (approvalState !== 3) return t("approve")
-    return (actionText + ` ${inputToken?.symbol}`)
+    return (actionText + ` ${inputToken?.symbol}`) 
 
-  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, pendingStep.step, expired, i18n.language, riskStatus])
+  }, [t, limitPrice, actionText, buying, disabled, inputToken, outputToken, orderValue, isInsufficient, isSellInsufficient, approvalState, isMinOrMax, pendingStep.step, i18n.language])
 
   const handleChangePrice = useCallback((value: number) => {
     // 所有的价格变化都以inputTokenPrice?.price为基础
@@ -317,7 +327,7 @@ export function ConverBody({
     }
   }, [inputTokenPrice, updateLimitPrice])
 
-  const setRealtimeData = useTradeStore(state => state.setRealtimeRwaData)
+  useRealtimeRwa(inputToken)
   
   useEffect(() => {
     if (inputToken?.symbol) {
@@ -326,39 +336,53 @@ export function ConverBody({
       }
     }
   }, [inputToken])
-  useEffect(() => {
-    let onKey = ''
-    let listener = null
-    if (inputToken?.symbol) {
-      if (onKey && listener) {
-        // @ts-ignore
-        wsService.off(onKey, listener)
-      }
-      onKey = `realtime.${inputToken.symbol}`
-      listener = (rwa: ISummaryDataItem) => {
-        const precision = inputToken?.precision
-        const _data = {
-          ...rwa,
-          p: truncateUP(rwa.p || 0, precision), // 最新价
-          o: truncateUP(rwa.o || 0, precision), // 今开价
-          l: truncateUP(rwa.l || 0, precision), // 最低价
-          h: truncateUP(rwa.h || 0, precision), // 最高价
-          c: truncateUP(rwa.c || 0, precision), // 当日收盘价
-          pc: truncateUP(rwa.pc || 0, precision), // 昨日收盘价
-        } as any
-        setRealtimeData(_data)
-      }
-      // @ts-ignore
-      wsService.on(onKey, listener)
-    }
+  
+  // useEffect(() => {
+  //   let onKey = ''
+  //   let listener = null
+  //   if (inputToken?.symbol) {
+  //     if (onKey && listener) {
+  //       // @ts-ignore
+  //       wsService.off(onKey, listener)
+  //     }
+  //     onKey = `realtime.${inputToken.symbol}`
+  //     listener = (rwa: ISummaryDataItem) => {
+  //       const precision = inputToken?.precision
+  //       const _data = {
+  //         ...rwa,
+  //         p: truncateUP(rwa.p || 0, precision), // 最新价
+  //         o: truncateUP(rwa.o || 0, precision), // 今开价
+  //         l: truncateUP(rwa.l || 0, precision), // 最低价
+  //         h: truncateUP(rwa.h || 0, precision), // 最高价
+  //         c: truncateUP(rwa.c || 0, precision), // 当日收盘价
+  //         pc: truncateUP(rwa.pc || 0, precision), // 昨日收盘价
+  //       } as any
+  //       setRealtimeData(_data)
+  //     }
+  //     // @ts-ignore
+  //     wsService.on(onKey, listener)
+  //   }
 
-    return () => {
-      if (onKey && listener) {
-        // @ts-ignore
-        wsService.off(onKey, listener)
-      }
-    }
-  }, [inputToken])
+  //   return () => {
+  //     if (onKey && listener) {
+  //       // @ts-ignore
+  //       wsService.off(onKey, listener)
+  //     }
+  //   }
+  // }, [inputToken])
+
+  const isPageReady = useTradePageReady({
+    account,
+    isSameChain,
+    inputToken,
+    outputToken,
+    inputTokenBalance,
+    outputTokenBalance,
+    approvalState,
+    riskStatus,
+    isSignatureValid
+  })
+
 
   return (
     <div className={cn(
@@ -464,34 +488,47 @@ export function ConverBody({
           </div>
         </div>
       }
+      <div className={cn(
+        " opacity-0",
+        isPageReady ? " opacity-100" : ""
+      )}>
+        {
+          (!account || !isSameChain) ? 
+            <div className="mt-3"><ConnectButtonText /></div> :
+            !isSignatureValid ?
+            <SignButton className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]" refreshIsSignatureValid={() => {
+              refreshIsSignatureValid()
+            }} /> :
+            kycButtonText ? 
+            <Button
+              className="h-[40px] w-full mt-3"
+              onClick={() => {
+                router.push('/identity')
+              }}
+            >{kycButtonText}
+            </Button> : 
+            <Button variant={buttonVariant} 
+              loading={buying}
+              className={cn(
+                "w-full mt-3 ",
+                from === 'markets' ? 'h-[40px]' : '',
+                action === 'buy' ? 'bg-[rgba(37,167,80,0.2)] text-[#2EE4A7]' : 'bg-[rgba(202,63,100,0.2)] text-[#F63C6B]'
+              )}
+              disabled={disabled || buying}
+              onClick={() => {
+                if (showConfirm) {
+                  orderDialog.setOpen(true)
+                  return
+                }
+                handlePlaceOrder()
+              }}
+            >
+              { buttonText }
+              
+            </Button>
+        }
+      </div>
       
-      {
-        (!account || !isSameChain) ? 
-          <div className="mt-3"><ConnectButtonText /></div> :
-          !isSignatureValid ?
-          <SignButton className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]" refreshIsSignatureValid={() => {
-            refreshIsSignatureValid()
-          }} /> :
-          <Button variant={buttonVariant} 
-            loading={buying}
-            className={cn(
-              "w-full mt-3 ",
-              from === 'markets' ? 'h-[40px]' : '',
-              action === 'buy' ? 'bg-[rgba(37,167,80,0.2)] text-[#2EE4A7]' : 'bg-[rgba(202,63,100,0.2)] text-[#F63C6B]'
-            )}
-            disabled={disabled || buying}
-            onClick={() => {
-              if (showConfirm) {
-                orderDialog.setOpen(true)
-                return
-              }
-              handlePlaceOrder()
-            }}
-          >
-            { buttonText }
-            
-          </Button>
-      }
       {
         Number(orderValue) > 0 && 
           <EstimatedInfo

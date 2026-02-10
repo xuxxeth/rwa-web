@@ -82,13 +82,18 @@ function Identity({ account }: { account: string }) {
   const pendingStep = usePendingStep()
   const pendingStepRef = useRef(0)
   const kycDetailInit = useRef(false)
+  const retryCount = useRef(0)
+  const updateRetryCount = useKycStore(state => state.updateRetryCount)
 
   const resetRetry = () => {
     setIsRetry(prev => (prev === true ? false : prev))
   }
 
-  const refresh = async () => {
+  const refresh = async (init?: boolean) => {
     try {
+      if (init) {
+        retryCount.current = 1
+      } 
       const res = await kycApi.getKycDetail()
       if (res?.data) {
         if (pendingStepRef.current) {
@@ -105,6 +110,10 @@ function Identity({ account }: { account: string }) {
       }
       kycDetailInit.current = true
       setKycDetail(res?.data || {})
+      if (!init) {
+        retryCount.current = retryCount.current + 1
+        updateRetryCount(retryCount.current)
+      }
       return res
     } catch (error) {
       kycDetailInit.current = true
@@ -123,13 +132,13 @@ function Identity({ account }: { account: string }) {
     if (pendingStep.step) {
       pendingStepRef.current = pendingStep.step
     }
-    refresh()
+    refresh(true)
   }, [account, pendingStep.step])
 
   // 切换语言， 重新拉取认证详情
   useEffect(() => {
     if (kycDetailInit.current) {
-      refresh()
+      refresh(true)
     }
   }, [i18n.language])
 
@@ -148,6 +157,10 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
+      // {
+      //   match: () => true,
+      //   render: () => <Verifying refresh={refresh} />,
+      // },
       // 已过期/即将过期
       {
         match: () =>
