@@ -1,23 +1,12 @@
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
-import BigNumber from "bignumber.js";
-import { parseAmount, truncateUP } from "@/utils";
-import { useTradeStore } from "@/stores/tradeStore";
-import { useBaseStore } from "@/stores/baseStore";
+import { parseAmount } from "@/utils";
 import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
-import { useSignatureValidStatus } from "@/hooks/useSignature";
-import { useRiskStatus } from "@/hooks/useRiskStatus";
 import { useTrading } from "@/hooks/useTrading";
-import type { IRwa, ITokenWithPrice } from "@/service/base/types";
 import { useTxToast } from "@/hooks/useTxToast";
 import { useCalcFee } from "@/hooks/useCalcFee";
-import { useSettingStore } from "@/stores/settingStore";
-import { useKycStore } from "@/stores/kycStore";
-import { useRealtimeRwa } from "@/hooks/useRealtimeRwa";
-import { RISK_STATUS } from "@/config/constants";
-import { useTradePageReady } from "@/hooks/useTradePageReady";
 import { cn } from "@/lib/utils";
 import { TradeFormUI } from "./TradeFormUI";
 import { TradeButtonUI } from "./TradeButtonUI";
@@ -26,6 +15,11 @@ import { useOrderBase } from "./useOrderBase";
 import { useApproveAmount } from "./useApproveAmount";
 import { useLimitOrderUIState } from "./useLimitOrderUIState";
 import { useLimitOrder } from "./useLimitOrder";
+import { useTradeStoreBindings } from "./useTradeStoreBindings";
+import { useRealtimePriceSync } from "./useRealtimePriceSync";
+import { useTxStepLifecycle } from "./useTxStepLifecycle";
+import { useTradeGateState } from "./useTradeGateState";
+import { useTradeCallbacks } from "./useTradeCallbacks";
 
 type ConverBodyProps = {
   action?: string
@@ -37,25 +31,25 @@ export function ConverBody({
 }: ConverBodyProps) {
   const { t, i18n } = useTranslation()
   const { toastError } = useToast()
-  const marketInfo = useBaseStore(state => state.marketInfo)
-  const riskUserConfig = useKycStore(state => state.riskUserConfig)
-  const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
-  const updateLimitPrice = useTradeStore(state => state.updateLimitPrice)
-  const updateInputSize = useTradeStore(state => state.updateInputSize)
-  const updateExpires = useTradeStore(state => state.updateExpires)
-  const setTxError = useTradeStore(state => state.setTxError)
-  const setTxSuccess = useTradeStore(state => state.setTxSuccess)
-  const setTxStep = useTradeStore(state => state.setTxStep)
-  const limitPrice = useTradeStore(state => state.limitPrice)
-  const inputSize = useTradeStore(state => state.inputSize)
-  const expires = useTradeStore(state => state.expires)
-  const inputToken = useTradeStore(state => state.inputToken)
-  const outputToken = useTradeStore(state => state.outputToken)
-  const showConfirm = useSettingStore(state => state.showConfirm)
-
-  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
-  const { riskStatus } = useRiskStatus()
-  const action = useTradeStore(state => state.activeConvertTab) as "buy" | "sell"
+  const {
+    marketInfo,
+    freshTokenBalances,
+    riskUserConfig,
+    showConfirm,
+    updateLimitPrice,
+    updateInputSize,
+    updateExpires,
+    setTxError,
+    setTxSuccess,
+    setTxStep,
+    limitPrice,
+    inputSize,
+    expires,
+    inputToken,
+    outputToken,
+    action,
+    realtimeData,
+  } = useTradeStoreBindings()
   const { account, isSameChain } = useActiveWeb3()
 
   const paymentToken = useMemo(
@@ -65,41 +59,17 @@ export function ConverBody({
 
   const inputTokenBalance = useTokenBalance(inputToken?.symbol || '')
   const outputTokenBalance = useTokenBalance(outputToken?.symbol || '')
-
-  const rwaPrice = inputTokenBalance
-  const realtimeData = useTradeStore(state => state.realtimeRwaData)
-  const initPrice = useRef(false)
-  const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
-  const safeUpdateLimitPrice = useCallback((nextPrice: string) => {
-    if (nextPrice !== limitPrice) {
-      updateLimitPrice(nextPrice)
-    }
-  }, [limitPrice, updateLimitPrice])
-
-  useEffect(() => {
-    if (rwaPrice && realtimeData && !initPrice.current) {
-      initPrice.current = true
-      setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p) })
-    }
-  }, [rwaPrice, realtimeData])
-
-  const preToken = useRef<IRwa | null>(null)
-  useEffect(() => {
-    if (inputToken && realtimeData && preToken.current?.symbol !== inputToken?.symbol) {
-      preToken.current = inputToken
-      setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p) })
-    }
-  }, [inputToken, rwaPrice, realtimeData])
+  const { handlePriceInput, handleChangePrice } = useRealtimePriceSync({
+    inputToken,
+    rwaPrice: inputTokenBalance,
+    realtimeData,
+    limitPrice,
+    updateLimitPrice,
+  })
 
   useEffect(() => {
     updateInputSize('')
   }, [action, updateInputSize])
-
-  useEffect(() => {
-    if (inputTokenPrice) {
-      safeUpdateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
-    }
-  }, [inputTokenPrice, safeUpdateLimitPrice])
 
   const orderValue = useOrderBase(limitPrice, inputSize)
 
@@ -127,33 +97,16 @@ export function ConverBody({
   )
 
   const { toastTxSteps, dismissTxToast } = useTxToast()
-  const stepStartRef = useRef(false)
-
-  useEffect(() => {
-    if (stepStartRef.current) {
-      setTxStep(txStep)
-    }
-  }, [txStep, setTxStep])
-
-  const handleEndStep = useCallback(() => {
-    dismissTxToast()
-    setTxError('')
-    setTxSuccess('', '', '')
-    setTimeout(() => {
-      stepStartRef.current = false
-      setTxStep(approvalState === 3 ? 1 : 0)
-      refetchAllowance()
-    }, 500)
-  }, [dismissTxToast, setTxError, setTxSuccess, setTxStep, approvalState, refetchAllowance])
-
-  const handleStartStep = useCallback(() => {
-    stepStartRef.current = true
-    dismissTxToast()
-    setTxError('')
-    setTxSuccess('', '', '')
-    setTxStep(approvalState === 3 ? 1 : 0)
-    toastTxSteps({ action: 'place', approveed: approvalState === 3, onClick: handleEndStep })
-  }, [dismissTxToast, setTxError, setTxSuccess, setTxStep, approvalState, toastTxSteps, handleEndStep])
+  const { handleStartStep } = useTxStepLifecycle({
+    txStep,
+    approvalState,
+    setTxStep,
+    setTxError,
+    setTxSuccess,
+    dismissTxToast,
+    toastTxSteps,
+    refetchAllowance,
+  })
 
   const order = useLimitOrder({
     placeOrder,
@@ -191,49 +144,17 @@ export function ConverBody({
   })
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
-
-  const handlePriceChange = useCallback((value: string) => {
-    safeUpdateLimitPrice(value)
-  }, [safeUpdateLimitPrice])
-
-  const handleSizeChange = useCallback((value: string) => {
-    updateInputSize(value)
-  }, [updateInputSize])
-
-  const handleChangePrice = useCallback((value: number) => {
-    const basePrice = inputTokenPrice?.price ?? '0'
-    if (Number(basePrice) && value !== 0) {
-      const changeValue = new BigNumber(basePrice)
-        .multipliedBy(Math.abs(value))
-        .dividedBy(100)
-        .decimalPlaces(2, BigNumber.ROUND_UP)
-      const newPrice = value > 0
-        ? new BigNumber(basePrice).plus(changeValue).toFixed(2)
-        : new BigNumber(basePrice).minus(changeValue).isLessThan(0)
-          ? '0'
-          : new BigNumber(basePrice).minus(changeValue).toFixed(2)
-      safeUpdateLimitPrice(newPrice)
-    } else if (value === 0 && inputTokenPrice) {
-      safeUpdateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
-    }
-  }, [inputTokenPrice, safeUpdateLimitPrice])
-
-  useRealtimeRwa(inputToken)
-
-  useEffect(() => {
-    if (inputToken?.symbol && initPrice.current) {
-      initPrice.current = false
-    }
-  }, [inputToken])
-
-  const kycButtonText = useMemo(() => {
-    if (riskStatus !== RISK_STATUS.VERIFIED && riskStatus !== RISK_STATUS.DEFAULT) {
-      return t('identity.verifyID')
-    }
-    return ''
-  }, [t, riskStatus])
-
-  const isPageReady = useTradePageReady({
+  const { handlePriceChange, handleSizeChange, handleExpiresChange } = useTradeCallbacks({
+    onPriceInput: handlePriceInput,
+    updateInputSize,
+    updateExpires,
+  })
+  const {
+    isSignatureValid,
+    refreshIsSignatureValid,
+    kycButtonText,
+    isPageReady,
+  } = useTradeGateState({
     account,
     isSameChain,
     inputToken,
@@ -241,8 +162,7 @@ export function ConverBody({
     inputTokenBalance,
     outputTokenBalance,
     approvalState,
-    riskStatus,
-    isSignatureValid
+    t,
   })
 
   return (
@@ -270,9 +190,7 @@ export function ConverBody({
         onPriceChange={handlePriceChange}
         onSizeChange={handleSizeChange}
         onChangePriceType={handleChangePrice}
-        onExpiresChange={(value) => {
-          updateExpires(value)
-        }}
+        onExpiresChange={handleExpiresChange}
       />
 
       <TradeButtonUI
