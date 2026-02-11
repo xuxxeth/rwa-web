@@ -1,7 +1,7 @@
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
 import { useTranslation } from "@/hooks/useTranslation";
-import { ConverBody } from "../../components/markets/TradeBox";
+import { TradeBox } from "../../components/markets/TradeBox";
 import { InvestBody } from "../../components/markets/InvestBody";
 import { XFooter } from "@/components/footer";
 import { lazy, useEffect, useState } from "react";
@@ -90,7 +90,7 @@ function LiteTrade() {
                     <KlineSwitch onChange={show => setShowKline(show)} />
                   </div>
                 </div>
-                <ConverBody action={action} />
+                <TradeBox action={action} />
               </BoxCard>
               <FAQ />
 

@@ -1,37 +1,19 @@
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
-import { ConverBody } from "../../components/markets/TradeBox";
+import { TradeBox } from "../../components/markets/TradeBox";
 import { useRequestSignature, useSignatureValidStatus } from "@/hooks/useSignature";
-import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
-import { useWssStore } from "@/stores/wssStore";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import IconOrder from "@/components/icons/order";
 import { LiteTradeInfo } from "@/components/markets/LiteTradeInfo";
 import { PositionRwa } from "./components/PositionRwa";
-import { useRouter } from "@/hooks/useRouter";
 import { openUrl } from "@/utils/scan";
 
 function LiteTrade() {
-  // const router = useRouter()
   const { account } = useActiveWeb3()
   const setShowConnect = useBaseStore(state => state.setShowConnect)
-  // const setTokenWithPriceByWebSocketData = useBaseStore(
-  //   state => state.setTokenWithPriceByWebSocketData
-  // )
-  // const setStockWithPriceByWebSocketData = useBaseStore(
-  //   (state) => state.setStockWithPriceByWebSocketData
-  // );
-  // const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
   const [ _, refreshIsSignatureValid] = useSignatureValidStatus()
-
   const { signing, signature, validSignature } = useRequestSignature()
-
-  // useWssOn('summary', (data: any) => {
-  //   setTokenWithPriceByWebSocketData(data || [])
-  //   setStockWithPriceByWebSocketData(data || [])
-  //   stableTokenWithPrice(data || [])
-  // })
 
   return (
     <>
@@ -62,7 +44,7 @@ function LiteTrade() {
           <div className="flex gap-x-[14px]">
             <div className="w-[420px]">
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
-                <ConverBody from="lite-trade" />
+                <TradeBox from="lite-trade" />
               </BoxCard>
 
             </div>

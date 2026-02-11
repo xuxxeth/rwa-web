@@ -3,12 +3,9 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useState } from 'react'
 import { MarketTrading } from '@/components/market-trading'
 import { ConvertTabs } from '@/components/markets/ConvertTabs'
-import { ConverBody } from '@/components/markets/TradeBox'
+import { TradeBox } from '@/components/markets/TradeBox'
 import { FAQ } from '@/components/markets/FAQ'
 import { KlineBody } from '../components/Klinebody'
-import { useWssOn } from '@/hooks/useWssOn'
-import { useBaseStore } from '@/stores/baseStore'
-import { useWssStore } from '@/stores/wssStore'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { OrderList } from '@/components/markets/OrderList'
 
@@ -75,7 +72,7 @@ function Markets() {
                       </button>
                     </div> */}
                   </div>
-                  <ConverBody from='markets' action={action} />
+                  <TradeBox from='markets' action={action} />
                 </BoxCard>
                 <FAQ />
               </div>

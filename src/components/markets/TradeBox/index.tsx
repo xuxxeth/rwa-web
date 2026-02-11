@@ -21,14 +21,14 @@ import { useTxStepLifecycle } from "./useTxStepLifecycle";
 import { useTradeGateState } from "./useTradeGateState";
 import { useTradeCallbacks } from "./useTradeCallbacks";
 
-type ConverBodyProps = {
+type TradeBoxProps = {
   action?: string
   from?: string
 }
 
-export function ConverBody({
+export function TradeBox({
   from
-}: ConverBodyProps) {
+}: TradeBoxProps) {
   const { t, i18n } = useTranslation()
   const { toastError } = useToast()
   const {
