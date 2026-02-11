@@ -66,10 +66,15 @@ export function ConverBody({
   const inputTokenBalance = useTokenBalance(inputToken?.symbol || '')
   const outputTokenBalance = useTokenBalance(outputToken?.symbol || '')
 
-  const rwaPrice = useTokenBalance(inputToken?.symbol || '')
+  const rwaPrice = inputTokenBalance
   const realtimeData = useTradeStore(state => state.realtimeRwaData)
   const initPrice = useRef(false)
   const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
+  const safeUpdateLimitPrice = useCallback((nextPrice: string) => {
+    if (nextPrice !== limitPrice) {
+      updateLimitPrice(nextPrice)
+    }
+  }, [limitPrice, updateLimitPrice])
 
   useEffect(() => {
     if (rwaPrice && realtimeData && !initPrice.current) {
@@ -92,9 +97,9 @@ export function ConverBody({
 
   useEffect(() => {
     if (inputTokenPrice) {
-      updateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
+      safeUpdateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
     }
-  }, [inputToken, inputTokenPrice, updateLimitPrice])
+  }, [inputTokenPrice, safeUpdateLimitPrice])
 
   const orderValue = useOrderBase(limitPrice, inputSize)
 
@@ -188,8 +193,8 @@ export function ConverBody({
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
 
   const handlePriceChange = useCallback((value: string) => {
-    updateLimitPrice(value)
-  }, [updateLimitPrice])
+    safeUpdateLimitPrice(value)
+  }, [safeUpdateLimitPrice])
 
   const handleSizeChange = useCallback((value: string) => {
     updateInputSize(value)
@@ -207,11 +212,11 @@ export function ConverBody({
         : new BigNumber(basePrice).minus(changeValue).isLessThan(0)
           ? '0'
           : new BigNumber(basePrice).minus(changeValue).toFixed(2)
-      updateLimitPrice(newPrice)
+      safeUpdateLimitPrice(newPrice)
     } else if (value === 0 && inputTokenPrice) {
-      updateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
+      safeUpdateLimitPrice(truncateUP(inputTokenPrice?.price ?? '0', 2))
     }
-  }, [inputTokenPrice, updateLimitPrice])
+  }, [inputTokenPrice, safeUpdateLimitPrice])
 
   useRealtimeRwa(inputToken)
 

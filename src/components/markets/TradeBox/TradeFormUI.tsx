@@ -7,7 +7,6 @@ import { PriceChangeTab } from "../PriceChangeTab"
 import { USDTSelect } from "../../usdt-select"
 import { ConvertAction } from "../ConvertAction"
 import { EstimatedInfo } from "../../../views/lite-trade/components/EstimatedInfo"
-import { MarketCloseTip } from "../MarketCloseTip"
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { ExpiresSetting } from "../../expires-setting"
 
