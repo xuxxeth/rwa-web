@@ -193,7 +193,7 @@ export function getDataFeed({
       subscriberUID,
       onResetCacheNeededCallback,
     ) => {
-
+      wsService.init({})
       console.log('symbolInfo: ', symbolInfo, resolution)
       const sub = wsListeners.get(subscriberUID)
       if (sub) {
@@ -201,7 +201,7 @@ export function getDataFeed({
         wsListeners.delete(subscriberUID)
       }
 
-      let _resolution = `${resolution}m`
+      let _resolution = `${String(resolution)}m`
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
         _resolution = resolution.toLowerCase()
       }
@@ -210,7 +210,7 @@ export function getDataFeed({
       }
       const key = `candle.${symbolInfo.name}_${_resolution}`
       const listener = (data: any) => { 
-        if (data.c > 0) {
+        if (data?.c > 0) {
           onRealtimeCallback({
             "time": data.E,
             "open": data.o,
