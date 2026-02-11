@@ -10,7 +10,7 @@ export function useMarketState() {
   useEffect(() => {
     const getMarketStateInterval = () => {
       getMarketState()
-        .then(() => {
+        .finally(() => {
           if (!marketTimer.current) {
             marketTimer.current = setTimeout(() => {
               marketTimer.current && clearTimeout(marketTimer.current)

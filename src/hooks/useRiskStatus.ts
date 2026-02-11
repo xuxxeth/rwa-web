@@ -1,20 +1,48 @@
 import { RISK_STATUS } from "@/config/constants";
 import { useKycStore } from "@/stores/kycStore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { riskApi } from "@/service/risk/api";
 import { useTradeStore } from "@/stores/tradeStore";
 
 export function useRiskUserConfig() {
-  const { chainId, account } = useActiveWeb3()  
+  const { chainId, account } = useActiveWeb3()
   const getUserConfig = useKycStore(state => state.getUserConfig)
   const isSignatureValid = useTradeStore(state => state.isSignatureValid)
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
-    if (chainId && account || isSignatureValid) {
+    const shouldFetch = !!(chainId && account) || isSignatureValid
+
+    if (!shouldFetch) return
+
+    const fetchUserConfig = () => {
       getUserConfig()
+        .finally(() => {
+          if (!timerRef.current) {
+            timerRef.current = setTimeout(() => {
+              if (timerRef.current) {
+                clearTimeout(timerRef.current)
+                timerRef.current = null
+              }
+              fetchUserConfig()
+            }, 30000)
+          }
+        })
     }
-  }, [chainId, account, isSignatureValid])
+
+    fetchUserConfig()
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [chainId, account, isSignatureValid, getUserConfig])
 }
+
 
 export function useRiskStatus() {
   const riskUserConfig = useKycStore(state => state.riskUserConfig)

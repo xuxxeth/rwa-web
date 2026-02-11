@@ -102,6 +102,9 @@ function Identity({ account }: { account: string }) {
       if (init) {
         retryCount.current = 1
       } 
+      if (!init) {
+        updateRetryCount(retryCount.current)
+      }
       const res = await kycApi.getKycDetail()
       if (res?.data) {
         if (pendingStepRef.current) {
