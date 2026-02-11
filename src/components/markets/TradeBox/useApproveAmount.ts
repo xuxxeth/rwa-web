@@ -1,5 +1,6 @@
 import type { IRwa, IToken } from "@/service/base/types"
 import { useMemo } from "react"
+import BigNumber from "bignumber.js"
 
 export type TradeAction = "buy" | "sell"
 
@@ -28,21 +29,22 @@ export function useApproveAmount({
   return useMemo(() => {
     if (!paymentToken) return 0n
     if (!inputToken || !outputToken) return 0n
-    if (!orderValue) return 0n
 
     try {
       if (action === "buy") {
-        const total =
-          Number(orderValue) +
-          Number(estimatedFee || 0)
+        if (!orderValue) return 0n
+        const total = new BigNumber(orderValue).plus(
+          new BigNumber(estimatedFee || 0)
+        )
 
         return BigInt(
-          parseAmount(total.toString(), outputToken.decimals)
+          parseAmount(total.toFixed(), outputToken.decimals)
         )
       }
 
+      if (!inputSize) return 0n
       return BigInt(
-        parseAmount(inputSize || "0", inputToken.decimals)
+        parseAmount(inputSize, inputToken.decimals)
       )
     } catch {
       return 0n

@@ -6,6 +6,26 @@ import {
   isGreater,
   isLess,
 } from "@/utils"
+import type { IRwa, IToken } from "@/service/base/types"
+import type { TFunction } from "i18next"
+
+type TokenBalance = {
+  balance?: string
+}
+
+interface UseLimitOrderFormParams {
+  limitPrice: string
+  inputSize: string
+  inputToken?: IRwa | null
+  outputToken?: IToken | null
+  action: "buy" | "sell"
+  inputTokenBalance?: TokenBalance | null
+  outputTokenBalance?: TokenBalance | null
+  t: TFunction
+  i18n: {
+    language: string
+  }
+}
 
 export function useLimitOrderForm({
   limitPrice,
@@ -15,10 +35,9 @@ export function useLimitOrderForm({
   action,
   inputTokenBalance,
   outputTokenBalance,
-  estimatedFee,
   t,
   i18n
-}: any) {
+}: UseLimitOrderFormParams) {
 
   const orderValue = useMemo(() => {
     if (!Number(limitPrice) || !Number(inputSize)) return ''
@@ -64,8 +83,8 @@ export function useLimitOrderForm({
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     if (inputToken?.state === 1) return t('tradingHalt')
-    if (isMinOrMax.min) return t('amountMin')
-    if (isMinOrMax.max) return t('amountMax')
+    if (isMinOrMax.min) return t('amountMin', { amount: inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol })
+    if (isMinOrMax.max) return t('amountMax', { amount: inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol })
     if (isBuyInsufficient)
       return i18n.language === 'zh'
         ? `${outputToken?.symbol} ${t("Insufficient")}`
