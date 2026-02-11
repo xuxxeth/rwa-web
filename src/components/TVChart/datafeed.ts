@@ -201,13 +201,19 @@ export function getDataFeed({
         wsListeners.delete(subscriberUID)
       }
 
-      let _resolution = `${String(resolution)}m`
+      let _resolution = `${resolution}`
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
-        _resolution = resolution.toLowerCase()
+        if (!resolution.includes('M')) {
+          _resolution = resolution.toLowerCase()
+        }
+      } else {
+        _resolution = _resolution + 'm'
+        if (_resolution === '60m') {
+          _resolution = '1h'
+        }
       }
-      if (_resolution === '60m') {
-        _resolution = '1h'
-      }
+      
+      
       const key = `candle.${symbolInfo.name}_${_resolution}`
       const listener = (data: any) => { 
         if (data?.c > 0) {
