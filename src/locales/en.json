@@ -196,6 +196,9 @@
       "details": "Details",
       "status": "Status",
       "action": "Action",
+      "tf": "Trading Fees",
+      "bf": "Brokerage Fee",
+      "pf": "Platform Service Fee",
       "reason": {
         "1": "System Initiated",
         "2": "Market Close Cancelled",

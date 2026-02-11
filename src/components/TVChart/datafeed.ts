@@ -20,7 +20,8 @@ export function keyToMinutes(key: string): number {
     "60": 60,
     "1D": 24 * 60,        // 1 day = 1440 minutes
     "1W": 7 * 24 * 60,    // 1 week = 10080 minutes
-    "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
+    // "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
+    "1M": 40320,   // 后端接口配置
   };
 
   return map[key.toUpperCase()] ?? 15; // 未匹配返回 0
@@ -98,7 +99,7 @@ export function getDataFeed({
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
-        "session": "0400-2000",
+        session: "0930-1600",
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 100,  // 小数点后2位精度
@@ -194,6 +195,12 @@ export function getDataFeed({
     ) => {
 
       console.log('symbolInfo: ', symbolInfo, resolution)
+      const sub = wsListeners.get(subscriberUID)
+      if (sub) {
+        wsService.off(sub.key, sub.listener)
+        wsListeners.delete(subscriberUID)
+      }
+
       let _resolution = `${resolution}m`
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
         _resolution = resolution.toLowerCase()
