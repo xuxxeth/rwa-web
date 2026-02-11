@@ -114,7 +114,7 @@ export const StockInfo = memo(
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
-            <div className="mt-1">{stockData?.peTtm || '--'}</div>
+            <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
           </div>
           {/* <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>

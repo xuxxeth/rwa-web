@@ -728,7 +728,8 @@
       "com": "Introduction",
       "t39": "Account status abnormal. Trading is disabled.",
       "t40": "Account status abnormal. Buying is disabled.",
-      "t41": "Account status abnormal. Selling is disabled."
+      "t41": "Account status abnormal. Selling is disabled.",
+      "t42": "Loss"
     },
     "hd": {
       "h1": "Orders",
