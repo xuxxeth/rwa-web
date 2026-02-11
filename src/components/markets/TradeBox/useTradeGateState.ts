@@ -18,6 +18,10 @@ interface UseTradeGateStateParams {
   inputTokenBalance?: TokenBalance | null
   outputTokenBalance?: TokenBalance | null
   approvalState: number
+  action: "buy" | "sell"
+  riskUserConfig?: {
+    actions?: number
+  } | null
   t: TFunction
 }
 
@@ -29,6 +33,8 @@ export function useTradeGateState({
   inputTokenBalance,
   outputTokenBalance,
   approvalState,
+  action,
+  riskUserConfig,
   t,
 }: UseTradeGateStateParams) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
@@ -38,8 +44,18 @@ export function useTradeGateState({
     if (riskStatus !== RISK_STATUS.VERIFIED && riskStatus !== RISK_STATUS.DEFAULT) {
       return t('identity.verifyID')
     }
+    if (riskUserConfig?.actions === 0) {
+      return t('identity.verifyID')
+    }
+    if (riskUserConfig?.actions === 1 && action === 'sell') {
+      return '更新资料'
+    }
+    if (riskUserConfig?.actions === 2 && action === 'buy') {
+      return '更新资料'
+    }
+    
     return ''
-  }, [riskStatus, t])
+  }, [riskUserConfig, action, riskStatus, t])
 
   const isPageReady = useTradePageReady({
     account,

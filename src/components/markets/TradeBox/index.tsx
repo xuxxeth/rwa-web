@@ -162,6 +162,8 @@ export function TradeBox({
     inputTokenBalance,
     outputTokenBalance,
     approvalState,
+    action,
+    riskUserConfig,
     t,
   })
 
