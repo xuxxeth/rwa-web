@@ -48,10 +48,10 @@ export function useTradeGateState({
       return t('identity.verifyID')
     }
     if (riskUserConfig?.actions === 1 && action === 'sell') {
-      return '更新资料'
+      return t('kyc.t51')
     }
     if (riskUserConfig?.actions === 2 && action === 'buy') {
-      return '更新资料'
+      return t('kyc.t51')
     }
     
     return ''
