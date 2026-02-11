@@ -1,7 +1,7 @@
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
 import { useTranslation } from "@/hooks/useTranslation";
-import { ConverBody } from "../../components/markets/ConvetBody";
+import { ConverBody } from "../../components/markets/TradeBox";
 import { InvestBody } from "../../components/markets/InvestBody";
 import { XFooter } from "@/components/footer";
 import { lazy, useEffect, useState } from "react";

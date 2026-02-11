@@ -1,6 +1,6 @@
 import { MainLayout } from "@/layouts/main";
 import { BoxCard } from "../../components/BoxCard";
-import { ConverBody } from "../../components/markets/ConvetBody";
+import { ConverBody } from "../../components/markets/TradeBox";
 import { useRequestSignature, useSignatureValidStatus } from "@/hooks/useSignature";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";
