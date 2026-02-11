@@ -10,10 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
-import { textSuffix, toFixed } from '@/utils'
+import { textSuffix, toFixed, sum } from '@/utils'
 import type { IOrder, OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
-import { NoData } from '@/components/markets/NoData'
 import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord from '@/components/no-record'
 
@@ -37,6 +36,40 @@ export function checkOrderChangedEqual(a: OrderChanged | null, b: OrderChanged |
 
 export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-xs/4 font-normal', props.className)}>{props.text}</div>
+}
+
+export function TradingFees(props: { currency: string; commission: string; fee: string }) {
+  let { currency, commission, fee } = props
+  commission = toFixed(commission)
+  fee = toFixed(fee)
+
+  const sumFees = sum(commission, fee)
+  const { t } = useTranslation()
+  const tooltip = (
+    <div className='flex flex-col gap-1'>
+      <div className='text-xs/[15px] text-gray-300'>
+        {t('portfolio.orderTable.bf')}{' '}
+        <span className='ml-9'>
+          {commission} {currency}
+        </span>
+      </div>
+      <div className='text-xs/[15px] text-gray-300'>
+        {t('portfolio.orderTable.pf')}{' '}
+        <span className='ml-9'>
+          {fee} {currency}
+        </span>
+      </div>
+    </div>
+  )
+  return (
+    <div>
+      <IconWithTooltip
+        iconOrTextClassName='text-xs/[15px] font-normal border-b border-dashed'
+        text={`${sumFees} ${currency}`}
+        tooltip={tooltip}
+      />
+    </div>
+  )
 }
 
 export function TextCellWithTranslation(props: { text: string; className?: string }) {

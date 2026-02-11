@@ -5,6 +5,7 @@ import {
   ValueCell,
   AmountCell,
   TextCell,
+  TradingFees,
   OrderTypeCell,
   DropDownFilter,
   filledStatus,
@@ -195,6 +196,14 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     breakOnSpace: false,
     render: (item: IOrder) => (
       <TextCell text={textPrefix(toFixed(divide(item.settledAmount, item.settledSize)), '$')} />
+    ),
+  },
+  {
+    key: 'tf',
+    sortable: false,
+    breakOnSpace: false,
+    render: (item: IOrder) => (
+      <TradingFees currency={item.currency} commission={item.commission} fee={item.fee} />
     ),
   },
   {

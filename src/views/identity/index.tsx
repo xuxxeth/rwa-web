@@ -32,13 +32,16 @@ import { useSearchParams } from 'react-router-dom'
 import { ReviewInfo } from './components/ReviewInfo'
 import { useKycStore } from '@/stores/kycStore'
 import { usePendingStep } from '@/hooks/usePendingStep'
-import { useTranslation } from '@/hooks/useTranslation'
+import { useTranslation, useI18nLanguage } from '@/hooks/useTranslation'
 
 function IdentityEntry() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+  const { i18n } = useTranslation()
   const account = useAccount()
   const chainId = useChainId()
+
+  const lang = useI18nLanguage(i18n)
 
   const walltedConnected = account && chainId
 
@@ -60,9 +63,14 @@ function IdentityEntry() {
   if (!isSignatureValid) {
     return (
       <SignatureVerify
+        isTitleSameLine={lang === 'zh'}
+        buttonClassName='mt-4 text-base'
+        titleClassName='text-2xl'
+        descClassName='w-[550px] text-lg'
         desc='identity.signd'
+        subDescClassName='w-[750px] text-lg'
         subDesc='identity.signSubd'
-        className='mt-18'
+        className='mt-24'
         refreshIsSignatureValid={refreshIsSignatureValid}
       />
     )

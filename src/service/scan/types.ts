@@ -59,6 +59,8 @@ export interface IOrder {
   tradeTime: number
   txHash: string
   currency: string
+  commission: string
+  fee: string
 }
 
 export interface ITrade {
