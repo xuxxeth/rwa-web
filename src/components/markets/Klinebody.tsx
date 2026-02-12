@@ -136,7 +136,6 @@ export const StockInfo = memo(
             <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t21')}</LabelWrap>
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
-          <PreMarketOpen />
           {
             from !== 'pro-trading' && 
               <SmallButton onClick={() => {

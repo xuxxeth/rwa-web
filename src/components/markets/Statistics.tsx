@@ -82,7 +82,8 @@ const Statistics = memo(({ from }: { from?: string }) => {
           },
           {
             title: 'pe',
-            value: capData?.peStatic || '',
+            // value: capData?.peStatic || '',
+            value: capData?.peTtm ? parseFloat(capData.peTtm) < 0 ? t('v2.tx.t42') : capData?.peTtm : '--',
             tooltip: 'peH',
           },
           {

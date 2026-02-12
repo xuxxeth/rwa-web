@@ -20,6 +20,8 @@ import { useRealtimePriceSync } from "./useRealtimePriceSync";
 import { useTxStepLifecycle } from "./useTxStepLifecycle";
 import { useTradeGateState } from "./useTradeGateState";
 import { useTradeCallbacks } from "./useTradeCallbacks";
+import { EstimatedInfo } from "@/views/lite-trade/components/EstimatedInfo";
+import { PreMarketOpen } from "../PreMarketOpen";
 
 type TradeBoxProps = {
   action?: string
@@ -218,7 +220,18 @@ export function TradeBox({
         feeRate={inputToken?.feeRate ?? ''}
         networkFeeInNative={marketInfo.networkFeeInNative}
       />
-      <MarketCloseTip />
+
+      {Number(orderValue) > 0 && (
+        <EstimatedInfo
+          estimatedFee={estimatedFee}
+          networkFeeInNative={marketInfo.networkFeeInNative}
+          expires={expires}
+          onEdit={() => {
+            // expiresDialog.show()
+          }}
+        />
+      )}
+      {/* <MarketCloseTip /> */}
     </div>
   )
 }

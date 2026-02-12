@@ -150,16 +150,6 @@ export function TradeFormUI({
         </div>
       )}
 
-      {Number(orderValue) > 0 && (
-        <EstimatedInfo
-          estimatedFee={estimatedFee}
-          networkFeeInNative={networkFeeInNative}
-          expires={expires}
-          onEdit={() => {
-            expiresDialog.show()
-          }}
-        />
-      )}
 
       
 

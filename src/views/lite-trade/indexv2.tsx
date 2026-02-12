@@ -8,6 +8,7 @@ import IconOrder from "@/components/icons/order";
 import { LiteTradeInfo } from "@/components/markets/LiteTradeInfo";
 import { PositionRwa } from "./components/PositionRwa";
 import { openUrl } from "@/utils/scan";
+import { PreMarketOpen } from "@/components/markets/PreMarketOpen";
 
 function LiteTrade() {
   const { account } = useActiveWeb3()
@@ -46,6 +47,9 @@ function LiteTrade() {
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
                 <TradeBox from="lite-trade" />
               </BoxCard>
+              <div className="border border-[#232427] rounded-[16px] px-3 py-2 mt-2">
+                <PreMarketOpen />
+              </div>
 
             </div>
             <button disabled={signing} className=" bg-[#131416] w-9 h-9 rounded-full overflow-hidden cursor-pointer flex items-center justify-center"
@@ -75,7 +79,6 @@ function LiteTrade() {
           
         </div>
         </MainLayout>
-
       </div>
     </>
     
