@@ -13,7 +13,14 @@ function useDiamondContract(chainId: number) {
   return chain?.contract
 }
 
-export function useRiskControlAssets(chainId: number, account: string) {
+export interface IRiskControlAsset {
+  token: string
+  amount: bigint
+  quantity: string
+  symbol: string
+}
+
+export function useRiskControlAssets(chainId: number, account: string): IRiskControlAsset[] {
   const rwaList = useRwaTokens(false)
   const tokenList = useTokens()
   const diamondContract = useDiamondContract(chainId)
@@ -59,7 +66,7 @@ export function useAssetsList(chainId: number, account: string) {
     const calculatePrice = token.tokenPrice ?? token.rwaPrice
 
     if (token.holdings !== undefined && calculatePrice !== undefined) {
-      token.value = toFixed(multiply(token.holdings, calculatePrice), 2)
+      token.value = multiply(token.holdings, calculatePrice)
     }
     return token
   })
