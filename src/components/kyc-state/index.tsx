@@ -11,7 +11,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
 import { usePendingStep } from "@/hooks/usePendingStep";
 
-const NO_SHOW_PATH = ['/identity']
+const NO_SHOW_PATH = ['/identity', '/']
 
 const defaultContent = {title: '', content: '', btnText: '', btn: ''}
 

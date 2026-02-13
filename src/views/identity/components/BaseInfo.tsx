@@ -612,7 +612,7 @@ const BaseInfo = memo(
 
             <div className=' grid grid-cols-1 font-normal'>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t14')} />
+                <FormItemLabel title={t('kyc.t14')} hide />
                 {type === 0 && (
                   <div className='mt-3 flex gap-x-2 items-center mb-3'>
                     <CheckBox

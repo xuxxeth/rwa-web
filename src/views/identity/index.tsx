@@ -168,10 +168,7 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
-      // {
-      //   match: () => true,
-      //   render: () => <Verifying refresh={refresh} />,
-      // },
+      
       // 已过期/即将过期
       {
         match: () =>

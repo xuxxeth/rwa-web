@@ -16,8 +16,9 @@ export function keyToMinutes(key: string): number {
     "1": 1,
     "5": 5,
     "15": 15,
-    // "45",
+    "30": 40,
     "60": 60,
+    "240": 240,
     "1D": 24 * 60,        // 1 day = 1440 minutes
     "1W": 7 * 24 * 60,    // 1 week = 10080 minutes
     // "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
@@ -54,8 +55,9 @@ const configurationData: DatafeedConfiguration = {
     "1",
     "5",
     "15",
-    // "45",
+    "30",
     "60",
+    "4H",
     // "1440",
     '1D', '1W', '1M'
   ] as ResolutionString[],
@@ -99,7 +101,7 @@ export function getDataFeed({
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
-        session: "0930-1600",
+        session: "0930-1601",
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 100,  // 小数点后2位精度
@@ -200,7 +202,6 @@ export function getDataFeed({
         wsService.off(sub.key, sub.listener)
         wsListeners.delete(subscriberUID)
       }
-
       let _resolution = `${resolution}`
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
         if (!resolution.includes('M')) {
@@ -210,6 +211,9 @@ export function getDataFeed({
         _resolution = _resolution + 'm'
         if (_resolution === '60m') {
           _resolution = '1h'
+        }
+        if (_resolution === '240m') {
+          _resolution = '4h'
         }
       }
       

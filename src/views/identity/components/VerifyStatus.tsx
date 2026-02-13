@@ -29,7 +29,7 @@ export function VerifySucceeded() {
       title='ok'
       detail='okTip'
       btnText='m'
-      btnOnClick={() => router.push('/markets/quotes')}
+      btnOnClick={() => router.push('/markets')}
       extra={extra}
     />
   )
@@ -254,7 +254,7 @@ export function Verifying(props: { refresh: () => Promise<ApiResponse<IKycDetail
       title='verifying'
       detail= {retryCount > 0 && retryCount < 3 ? 'verifyingWait' : 'verifyingTip'} 
       btnText='m'
-      btnOnClick={() => router.push('/markets/quotes')}
+      btnOnClick={() => router.push('/markets')}
     />
   )
 }

@@ -41,6 +41,9 @@ export function useTradeGateState({
   const { riskStatus } = useRiskStatus()
 
   const kycButtonText = useMemo(() => {
+    if (riskStatus === RISK_STATUS.ISSUE) {
+      return t('issue')
+    }
     if (riskStatus !== RISK_STATUS.VERIFIED && riskStatus !== RISK_STATUS.DEFAULT) {
       return t('identity.verifyID')
     }
