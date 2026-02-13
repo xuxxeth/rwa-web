@@ -196,7 +196,7 @@ export default function MarketQuotes() {
     <MainLayout>
       <ConentLayout>
         <div>
-          <MarketTrading align='center' />
+          {/* <MarketTrading align='center' /> */}
           <SearchFilter
             searchText={searchText}
             onSearchChange={setSearchText}
