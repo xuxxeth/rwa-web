@@ -48,7 +48,7 @@ function LiteTrade() {
     <>
       
         <div className="  min-h-[100vh] text-white">
-          <MarketTrading/>
+          {/* <MarketTrading/> */}
           <MainLayout>
           <div className="pt-5 flex gap-x-10">
             <div className="w-[580px]">
