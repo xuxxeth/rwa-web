@@ -32,7 +32,7 @@ const Updater = memo(
     const newOrder = useWssStore(state => state.newOrder)
     const setTxSuccess = useTradeStore(state => state.setTxSuccess)
     const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
-    console.log(router.location)
+
     useEffect(() => {
       if (newOrder) {
         console.log('new order info: ', newOrder)

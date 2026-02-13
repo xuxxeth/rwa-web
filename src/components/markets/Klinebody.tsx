@@ -99,10 +99,10 @@ export const StockInfo = memo(
 
 
     return (
-      <div className="flex justify-between text-white pl-4">
+      <div className="flex text-white pl-4">
         <StockDialog from={from} />
         <div className={cn(
-          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4",
+          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4 ml-10",
         )}>
           
           {

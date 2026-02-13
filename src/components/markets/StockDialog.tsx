@@ -76,7 +76,7 @@ export function StockDialog({
           {
             inputToken?.state === 1 && 
               <IconWithTooltip
-                triggerClassName='ml-2 mr-5'
+                triggerClassName='ml-2'
                 icon='/images/v2/icons/trade_halt.svg'
                 tooltip='portfolio.tH'
               />
