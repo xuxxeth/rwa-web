@@ -120,9 +120,9 @@ function AssetsRatio({
       const othersValue = others.reduce((acc, cur) => sum(acc, cur.value), '0')
       const othersHoldings = others.reduce((acc, cur) => sum(acc, cur.holdings), '0')
       const othersItem: ChartData = {
-        name: 'Others',
+        name: t('portfolio.others'),
         value: parseFloat(othersValue),
-        symbol: 'Others',
+        symbol: t('portfolio.others'),
         holdings: othersHoldings,
       }
       top6 = [...top5, othersItem]
