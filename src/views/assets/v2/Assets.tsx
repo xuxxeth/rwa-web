@@ -149,7 +149,7 @@ function AssetsRatio({
     <>
       <div className='text-sm/4.5 absolute top-0 left-4'>{t('portfolio.ratio')}</div>
       <div className='flex flex-row h-full'>
-        <div className='flex-none min-w-[40%] flex flex-col justify-end h-full'>
+        <div className='flex-none min-w-[40%] flex flex-col mt-10 justify-start h-full'>
           <div className='flex flex-row'>
             {chartDataToList.map((list, listIdx) => {
               return (
