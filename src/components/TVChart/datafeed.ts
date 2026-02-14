@@ -16,7 +16,7 @@ export function keyToMinutes(key: string): number {
     "1": 1,
     "5": 5,
     "15": 15,
-    "30": 40,
+    "30": 30,
     "60": 60,
     "240": 240,
     "1D": 24 * 60,        // 1 day = 1440 minutes
