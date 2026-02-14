@@ -24,6 +24,7 @@ import {
   sum,
   truncate,
   textSuffix,
+  isLess,
 } from '@/utils'
 
 function Assets({ chainId, account }: { chainId: number; account: string }) {
@@ -129,10 +130,15 @@ function AssetsRatio({
       top6 = sortedData.slice(0, 6)
     }
 
-    return top6.map(item => ({
-      ...item,
-      ratio: multiply(toFixed(divide(item.value, estimatedBalance), 2), 100),
-    }))
+    return top6.map(item => {
+      const ratio = divide(item.value, estimatedBalance)
+      const isTooSmall = isLess(ratio, '0.01')
+      return {
+        ...item,
+        ratio: multiply(toFixed(divide(item.value, estimatedBalance), 2), 100),
+        isTooSmall,
+      }
+    })
   }, [assetsList, estimatedBalance])
 
   const chartDataToList = Array.from({ length: Math.ceil(chartData.length / 3) }, (_, idx) =>
@@ -143,7 +149,7 @@ function AssetsRatio({
     <>
       <div className='text-sm/4.5 absolute top-0 left-4'>{t('portfolio.ratio')}</div>
       <div className='flex flex-row h-full'>
-        <div className='flex-none flex flex-col justify-end h-full'>
+        <div className='flex-none min-w-[40%] flex flex-col justify-end h-full'>
           <div className='flex flex-row'>
             {chartDataToList.map((list, listIdx) => {
               return (
@@ -179,10 +185,12 @@ function AssetsRatio({
                         <span
                           className={cn(
                             'text-xs/[15px] text-gray-400',
-                            isActive ? 'text-white font-medium' : ''
+                            isActive ? 'text-white' : ''
                           )}
                         >
-                          {item.symbol} {formatLargeNumber(truncate(item.value, 2))} ({item.ratio}%)
+                          {item.symbol}{' '}
+                          {textPrefix(formatLargeNumber(truncate(item.value, 2)), '$')} (
+                          {!item.isTooSmall ? item.ratio : '<1'}%)
                         </span>
                       </div>
                     )
@@ -192,13 +200,13 @@ function AssetsRatio({
             })}
           </div>
         </div>
-        {/* <div className='flex-1'>
+        <div className='flex-1'>
           <div
             className='w-full h-[132px]'
             style={{
               backgroundImage: 'url(/images/v2/portfolio/pie-bg.svg)',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'left 43px top 30px',
+              backgroundPosition: `left 33px top 30px`,
             }}
           >
             <AssetsPieChart
@@ -207,9 +215,9 @@ function AssetsRatio({
               onActiveIndexChange={setActiveIndex}
             />
           </div>
-        </div> */}
+        </div>
       </div>
-      <div className='w-[40%] absolute right-0 top-0'>
+      {/* <div className='w-[40%] absolute right-0 top-0'>
         <div
           className='w-full h-[132px]'
           style={{
@@ -224,7 +232,7 @@ function AssetsRatio({
             onActiveIndexChange={setActiveIndex}
           />
         </div>
-      </div>
+      </div> */}
     </>
   )
 }

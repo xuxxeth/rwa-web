@@ -6,6 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 // 预定义颜色：前个资产的颜色
 export const COLORS = ['#00E096', '#818CF8', '#F473B6', '#FBC024', '#62A7FB', '#94A3B8']
+export const PieChartCx = 70
 
 export interface ChartData {
   name: string
@@ -14,6 +15,7 @@ export interface ChartData {
   [key: string]: any
   ratio?: string
   holdings: string
+  isTooSmall?: boolean
 }
 
 export default function AssetsPieChart({
@@ -60,7 +62,7 @@ export default function AssetsPieChart({
           <foreignObject
             // x={isRight ? dotX + 10 : dotX - 10} // 如果在右侧，起点为圆点右侧 10px；如果在左侧，起点为圆点左侧 10px
             // y={dotY - 12}
-            x={isRight ? dotX - 60 : dotX + 60}
+            x={isRight ? dotX - 70 : dotX + 70}
             y={dotY - 30}
             height={24}
             className='overflow-visible pointer-events-none'
@@ -76,7 +78,7 @@ export default function AssetsPieChart({
                 <div>{textPrefix(formatLargeNumber(truncate(payload.value, 2)), '$')}</div>
               </div>
               <div>
-                {t('portfolio.allc')} {payload.ratio}%
+                {t('portfolio.allc')} {!payload.isTooSmall ? payload.ratio : '<1'}%
               </div>
             </div>
           </foreignObject>
@@ -87,7 +89,7 @@ export default function AssetsPieChart({
 
   const selectedColors = COLORS.slice(0, chartData.length)
 
-  const cx = 80
+  const cx = PieChartCx
   const cy = 67
   const innerRadius = 49
   const outerRadius = 57

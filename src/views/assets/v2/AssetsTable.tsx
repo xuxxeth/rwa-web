@@ -67,7 +67,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
             if (rwa) {
               router.push('/trade/' + item.symbol)
             }
-            
           }
         }}
       />
