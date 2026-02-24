@@ -14,6 +14,7 @@ import { useBaseStore } from "@/stores/baseStore";
 import { symbolToLower } from "@/utils";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { PriceChangeTab } from "../markets/PriceChangeTab";
+import { useRouter } from "@/hooks/useRouter";
 
 type CurrencyInputPanelProps = {
   action?: string; // buy | sell
@@ -31,6 +32,7 @@ type CurrencyInputPanelProps = {
 
 const CurrencyInputPanel = memo(
   ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, onUserInput, handleChangePrice }: CurrencyInputPanelProps) => {
+    const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
@@ -52,15 +54,17 @@ const CurrencyInputPanel = memo(
       }
       
     }, [mode])
-    
-    const inputTokenBalance = useTokenBalance(inputToken?.symbol || '') 
-    const outputTokenBalance = useTokenBalance(outputToken?.symbol || '') 
 
     useEffect(() => {
-      if (rwaList[0] && !inputToken) {
-        updateInputToken(rwaList[0])
+      
+      if (!router.params.symbol) {
+        rwaList[0] && updateInputToken(rwaList[0])
+      } else {
+        // 通过symbol查找对应的token
+        const _rwa = rwaList.find(rwa => rwa.symbol.toLowerCase() === router.params.symbol?.toLowerCase())
+        _rwa && updateInputToken(_rwa)
       }
-    }, [rwaList.length, inputToken])
+    }, [rwaList.length, inputToken, router.params])
 
     useEffect(() => {
       if (tokenList[0]) {
@@ -109,7 +113,8 @@ const CurrencyInputPanel = memo(
             <CTokenList 
               onClick={(token) => {
                 tokenDialog.hide()
-                updateInputToken(token)
+                // updateInputToken(token)
+                router.push('/lite-trade/' + token.symbol)
               }}
             />
           </div>

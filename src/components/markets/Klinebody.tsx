@@ -47,18 +47,18 @@ const RwaItemPrice = memo(
 
     return (
       <div className={cn(
-        " min-w-[60px]",
+        " min-w-[70px]",
         up === 0 ? 'text-[#A1A1A1]' : up > 0
               ? "text-[#25A750] text-[12px]"
               : "text-[#CA3F64] text-[12px]",
       )}>
         <div className={cn(
-          "text-[20px] leading-[100%] font-mono-semibold",
+          "text-[20px] leading-[100%] font-semibold",
           isPro ? " text-[18px] " : ""
         )}>${realtimeData.p || '--'}</div>
         <span
           className={cn(
-            "leading-[100%] font-normal font-mono",
+            "leading-[100%] font-normal font-semibold",
             isPro ? " text-[14px] " : ""
           )
             
@@ -99,10 +99,10 @@ export const StockInfo = memo(
 
 
     return (
-      <div className="flex justify-between text-white pl-4">
+      <div className="flex text-white pl-4">
         <StockDialog from={from} />
         <div className={cn(
-          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4",
+          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4 ml-10",
         )}>
           
           {
@@ -114,7 +114,7 @@ export const StockInfo = memo(
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
-            <div className="mt-1">{stockData?.peTtm || '--'}</div>
+            <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
           </div>
           {/* <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
@@ -136,11 +136,10 @@ export const StockInfo = memo(
             <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t21')}</LabelWrap>
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
-          <PreMarketOpen />
           {
             from !== 'pro-trading' && 
               <SmallButton onClick={() => {
-                router.push('/markets/trading')
+                router.push('/trade')
               }} >{t('Enter Pro Trading')}</SmallButton>
           }
         </div>

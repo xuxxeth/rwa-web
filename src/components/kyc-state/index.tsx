@@ -10,8 +10,9 @@ import { useKycStore } from "@/stores/kycStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
 import { usePendingStep } from "@/hooks/usePendingStep";
+import { formatSecondsToDateTime } from "@/utils/format";
 
-const NO_SHOW_PATH = ['/identity']
+const NO_SHOW_PATH = ['/identity', '/']
 
 const defaultContent = {title: '', content: '', btnText: '', btn: ''}
 
@@ -77,7 +78,7 @@ const KycState = () => {
       return
     }
 
-    if ((pendingStep.expired)) {
+    if (pendingStep.expired) {
       setContent({
         title: t('kyc.t45'),
         content: t('kyc.t46', { expire: desc }),
@@ -88,16 +89,16 @@ const KycState = () => {
       return
     }
 
-    // if (pendingStep.risk3 && (kycDetail?.status === KYC_STATUS.DECLINED || kycDetail?.status === KYC_STATUS.EXPIRED || kycDetail?.status === KYC_STATUS.VERIFYING) && !show) {
-    //   setContent({
-    //     title: t('kyc.t25'),
-    //     content: t('kyc.t32'),
-    //     btnText: t('kyc.t33'),
-    //     btn: 'upload'
-    //   })
-    //   setShow(true)
-    //   return
-    // }
+    if (pendingStep.risk3 && kycDetail?.expireTime) {
+      setContent({
+        title: t('kyc.t25'),
+        content: t('kyc.t32', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
+        btnText: t('kyc.t33'),
+        btn: 'upload'
+      })
+      setShow(true)
+      return
+    }
     if (!kycDetail && !pendingStep.step) {
       setShow(false)
       setContent(defaultContent)
@@ -108,10 +109,10 @@ const KycState = () => {
     } 
 
 
-    if (ocrIncome) {
+    if (ocrIncome && kycDetail?.expireTime) {
       setContent({
         title: t('kyc.t29'),
-        content: t('kyc.t32'),
+        content: t('kyc.t32', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
         btnText: t('kyc.t33'),
         btn: 'upload'
       })
@@ -172,7 +173,7 @@ const KycState = () => {
 
   return ReactDOM.createPortal(
     <AnimatePresence>
-      {show && !isNotShow && content.title  && (
+      {show && !isNotShow && content.title && (
         <motion.div
           initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}
@@ -185,20 +186,20 @@ const KycState = () => {
         >
           <div className="flex justify-between">
             <div className="flex items-center gap-x-2">
-              <LazyImage src="/images/kyc/id.png" className="w-6 h-4" />
-              <div className="text-[#FFB219] text-[18px] font-medium">{content.title}</div>
+              <LazyImage src="/images/v2/icons/id.png" className="w-[21px] h-[14px]" />
+              <div className="text-[#FFB219] text-[14px] font-medium">{content.title}</div>
             </div>
             <button
               onClick={close}
               className="absolute top-4 right-4 rounded hover:bg-[#1e1e1e] transition"
             >
-              <X size={24} className="text-white" />
+              <img src="/images/v2/icons/close_light.png" className="w-3 h-3" />
             </button>
           </div>
-          <div className="text-white text-base font-normal leading-6 text-center my-5">
+          <div className="text-white text-[14px] font-normal leading-6 text-center my-5">
             {content.content}
           </div>
-          <Button className="w-full h-[44px] bg-[#1D1D1D] text-white"
+          <Button className="w-full h-[44px] bg-[#1D1D1D] text-white text-[14px] font-medium"
             onClick={handleGo}
           >{content.btnText}</Button>
         </motion.div>

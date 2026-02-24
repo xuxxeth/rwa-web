@@ -159,7 +159,9 @@
     "total": "Est. Total Asset Value",
     "rwa": "Est. RWA Asset Value",
     "settle": "Est. Settlement Asset Value",
-    "risk": "Est. Risk-Controlled Asset Value",
+    "risk": "Risk-Controlled Asset",
+    "others": "Others",
+    "details": "Details",
     "token": "Token",
     "name": "Name",
     "price": "Last Price",
@@ -171,6 +173,7 @@
     "email": "If you disagree with the risk control outcome, please contact the official email at <0>{{email}}</0> to request a review.",
     "quantity": "Quantity",
     "ratio": "Asset Allocation",
+    "allc": "Allocation",
     "openOrder": "Open Orders",
     "historyOrder": "Order History",
     "tradeHistory": "Trade History",
@@ -185,7 +188,7 @@
       "orderPrice": "Order Price",
       "filledPrice": "Filled Price",
       "filledAmount": "Filled Amount",
-      "filledValue":"Filled Value",
+      "filledValue": "Filled Value",
       "filledAvg": "Filled Avg. Price",
       "avgPrice": "Avg. Price",
       "tradeValue": "Trade Value",
@@ -365,7 +368,7 @@
       "large": "The file is too large, please re-upload.",
       "typeInvalid": "The file type is not supported, please re-upload.",
       "fail": "File upload failed, please try again.",
-      "livenessFail": "The image does not meet the requirements. please re-upload." 
+      "livenessFail": "The image does not meet the requirements. please re-upload."
     },
     "face": {
       "rg": "Facial Verification",
@@ -408,7 +411,8 @@
       "rs": "Retry Submit",
       "rv": "Retry Verify",
       "t67": "Identity verification is temporarily unavailable. Please try again later.",
-      "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc"
+      "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc",
+      "verifyingWait": "Submitting information, please do not leave this page."
     },
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -585,7 +589,7 @@
     "t29": "Verification Incomplete",
     "t30": "Your information does not match your documents. Please resubmit your details.",
     "t31": "Edit",
-    "t32": "Please upload your income proof to continue.",
+    "t32": "Please upload your income proof before {{expire}} to continue.",
     "t33": "Upload",
     "t34": "Additional information is required. Please check the details page and update your info.",
     "t35": "View",
@@ -727,7 +731,10 @@
       "com": "Introduction",
       "t39": "Account status abnormal. Trading is disabled.",
       "t40": "Account status abnormal. Buying is disabled.",
-      "t41": "Account status abnormal. Selling is disabled."
+      "t41": "Account status abnormal. Selling is disabled.",
+      "t42": "Loss",
+      "t43": "Time until opening ",
+      "t44": "Markets Closed — Orders will be queued and executed in the next trading session."
     },
     "hd": {
       "h1": "Orders",

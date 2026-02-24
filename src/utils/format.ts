@@ -187,8 +187,6 @@ export function formatWithCommas(value: number | string, decimals?: number): str
   if (bn.isNaN()) return '0'
   const fixed = decimals != null ? bn.toFixed(decimals) : bn.toString()
   const [intPart, decPart] = fixed.split('.')
-  const test1 = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  const test = decPart ? `.${decPart}` : ''
   return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (decPart ? `.${decPart}` : '')
 }
 

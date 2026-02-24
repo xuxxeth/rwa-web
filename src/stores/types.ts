@@ -108,11 +108,13 @@ export interface KycState {
   kycDetail: IKycDetail | null
   isLoading: boolean
   error: string | null
+  retryCount: number
 }
 
 export interface KycActions {
   fetchKycStatus: () => Promise<void>
   refetchKycStatusAndConfigIfNeed: (kycDetail: IKycDetail) => Promise<void>
+  updateRetryCount: (count: number) => void
 }
 
 export type KycStore = RiskSTore & KycState & KycActions

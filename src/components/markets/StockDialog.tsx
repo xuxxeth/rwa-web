@@ -12,6 +12,7 @@ import { CTokenList } from "../ctoken-list";
 import { useTranslation } from "@/hooks/useTranslation";
 import useFavorites from "@/hooks/useFavorites";
 import IconWithTooltip from "../icon-tooltip";
+import { useRouter } from "@/hooks/useRouter";
 
 
 export const StockInfo = memo(
@@ -45,9 +46,9 @@ type StockSelectProps = {
 export function StockDialog({
   from
 }: StockSelectProps) {
+  const router = useRouter()
   const { t } = useTranslation()
   const inputToken = useTradeStore(state => state.inputToken)
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
   const [open, setOpen] = useState(false)
   const tokenDialog = useShowDialog()
 
@@ -75,7 +76,7 @@ export function StockDialog({
           {
             inputToken?.state === 1 && 
               <IconWithTooltip
-                triggerClassName='ml-2 mr-5'
+                triggerClassName='ml-2'
                 icon='/images/v2/icons/trade_halt.svg'
                 tooltip='portfolio.tH'
               />
@@ -96,7 +97,8 @@ export function StockDialog({
           <CTokenList 
             onClick={(token) => {
               tokenDialog.hide()
-              updateInputToken(token)
+              // updateInputToken(token)
+              router.push('/trade/' + token.symbol)
             }}
           />
         </div>

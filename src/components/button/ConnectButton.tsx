@@ -329,8 +329,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 >
                   <div className={cn(
                     ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
-                    kycStatus === KYC_OVERALL_STATUS.VERIFIED ? 'bg-[#25A750]' :
-                    kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step ? 'bg-[#CA3F64]' : 'bg-[#FFB219]'
+                    kycStatus === KYC_OVERALL_STATUS.VERIFIED && !pendingStep.step ? 'bg-[#25A750]' :
+                    (kycStatus === KYC_OVERALL_STATUS.ISSUE) ? 'bg-[#CA3F64]' : 'bg-[#FFB219]'
                   )}>
                     <img src={
                       kycStatus === KYC_OVERALL_STATUS.VERIFIED ? '/images/v2/icons/verify.png' :

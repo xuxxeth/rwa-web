@@ -31,14 +31,18 @@ import {
 
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
-  maxRetries = 5,
-  interval = 3000
+  maxRetries = 3,
+  interval = 5000
 ): Promise<any> {
   let attempt = 1
   return new Promise(resolve => {
     const query = async () => {
+
       const result = await refresh()
-      if (result.code === RESPONSE_CODE.SUCCESS && result.data?.overallStatus !== 0) {
+      if (result.code === RESPONSE_CODE.SUCCESS && result.data?.rejectReason) {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, behavior: "instant" });
+        });
         return resolve(result)
       }
       if (attempt < maxRetries) {
@@ -47,6 +51,9 @@ export async function retryRefresh(
           query()
         }, interval)
       } else {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, behavior: "instant" });
+        });
         resolve(result)
       }
     }
@@ -306,6 +313,7 @@ const BaseInfo = memo(
         if (refresh) {
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
+          
           if (detailRes.code === RESPONSE_CODE.SUCCESS && detailRes.data?.overallStatus) {
             // toastSuccess({ title: '提交成功' })
             clear()
@@ -604,7 +612,7 @@ const BaseInfo = memo(
 
             <div className=' grid grid-cols-1 font-normal'>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t14')} />
+                <FormItemLabel title={t('kyc.t14')} hide />
                 {type === 0 && (
                   <div className='mt-3 flex gap-x-2 items-center mb-3'>
                     <CheckBox
@@ -770,12 +778,12 @@ const BaseInfo = memo(
                 setValue('incomeCertifications', keys as string[])
               }}
             />
-            <div className='flex items-center text-base text-[#909090] py-3'>
-              <span className='text-[#CA3F64] mr-1 flex items-center'>*</span>
-              {t('kyc.t20')}
-            </div>
+            <div className='h-2'></div>
           </SectionBox>
-
+          <div className='flex items-center text-base text-[#909090] py-3'>
+            <span className='text-[#CA3F64] mr-1 flex items-center'>*</span>
+            {t('kyc.t20')}
+          </div>
           {/* <div className='mt-8 flex gap-x-2 items-start'>
             <div className=' shrink-0 relative top-[2px]'>
               <CheckBox />

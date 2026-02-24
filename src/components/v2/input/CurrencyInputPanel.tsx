@@ -8,6 +8,7 @@ import { useTokens } from "@/hooks/useTokens";
 import { useRwas } from "@/hooks/useRwaBalances";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTradeStore } from "@/stores/tradeStore";
+import { useRouter } from "@/hooks/useRouter";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -24,13 +25,13 @@ type CurrencyInputPanelProps = {
 
 const CurrencyInputPanel = memo(
   ({ mode = 'in', type, label, placeholder, value, from, regex, isInsufficient, onUserInput }: CurrencyInputPanelProps) => {
+    const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
     const updateOutputToken = useTradeStore(state => state.updateOutputToken)
 
     const tokenDialog = useShowDialog()
-    const cTokenDialog = useShowDialog()
     const tokenList = useTokens()
     const rwaList = useRwas()
 
@@ -45,10 +46,15 @@ const CurrencyInputPanel = memo(
     }, [mode])
 
     useEffect(() => {
-      if (rwaList[0] && !inputToken) {
-        updateInputToken(rwaList[0])
+      
+      if (!router.params.symbol) {
+        rwaList[0] && updateInputToken(rwaList[0])
+      } else {
+        // 通过symbol查找对应的token
+        const _rwa = rwaList.find(rwa => rwa.symbol.toLowerCase() === router.params.symbol?.toLowerCase())
+        _rwa && updateInputToken(_rwa)
       }
-    }, [rwaList.length, inputToken])
+    }, [rwaList.length, inputToken, router.params])
 
     useEffect(() => {
       if (tokenList[0]) {
@@ -96,7 +102,8 @@ const CurrencyInputPanel = memo(
             <CTokenList 
               onClick={(token) => {
                 tokenDialog.hide()
-                updateInputToken(token)
+                // updateInputToken(token)
+                router.push('/trade/' + token.symbol)
               }}
             />
           </div>

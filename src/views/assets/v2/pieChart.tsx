@@ -1,80 +1,45 @@
-import { useMemo, useState } from 'react'
-import { PieChart, Pie, Cell, Sector, Tooltip } from 'recharts'
-import { type IAssetItem } from '../assetsList'
-import { advancedSort, cn, textPrefix, toFixed, sum } from '@/utils'
+import { PieChart, Pie, Cell, Sector, ResponsiveContainer, Customized } from 'recharts'
+import { cn, formatLargeNumber, textPrefix, toFixed } from '@/utils'
+import { truncate } from '@/utils'
+import { useState, useRef } from 'react'
+import { useTranslation } from '@/hooks/useTranslation'
 
-// 预定义颜色：前7个资产的颜色
-const COLORS = ['#0F8660', '#0AC083', '#21F69A', '#23FF9F', '#4FFF7C', '#76FE5E']
+// 预定义颜色：前个资产的颜色
+export const COLORS = ['#00E096', '#818CF8', '#F473B6', '#FBC024', '#62A7FB', '#94A3B8']
+export const PieChartCx = 70
 
-interface AssetsPieChartProps {
-  data: IAssetItem[]
-  className?: string
-}
-
-interface ChartData {
+export interface ChartData {
   name: string
   value: number
   symbol: string
   [key: string]: any
+  ratio?: string
+  holdings: string
+  isTooSmall?: boolean
 }
 
-export default function AssetsPieChart({ data, className }: AssetsPieChartProps) {
-  const chartData = useMemo(() => {
-    if (!data || data.length === 0) return []
+export default function AssetsPieChart({
+  chartData,
+  activeIndex,
+  onActiveIndexChange,
+}: {
+  chartData: ChartData[]
+  activeIndex: number
+  onActiveIndexChange: (index: number) => void
+}) {
+  const { t } = useTranslation()
 
-    // 1. 预处理数据：转换 value 为数字并过滤掉 0 值
-    const validData = data.filter(item => item.value !== undefined && item.value !== '0')
-
-    // 2. 按价值降序排序
-    const sortedData = validData
-      .sort((a, b) => advancedSort(a.value, b.value, 'desc'))
-      .map(item => ({
-        name: item.name!,
-        value: parseFloat(item.value!),
-        symbol: item.symbol,
-      }))
-
-    let top6: ChartData[] = []
-
-    if (sortedData.length > 6) {
-      const top5 = sortedData.slice(0, 5)
-      const others = sortedData.slice(5)
-      const othersValue = others.reduce((acc, cur) => sum(acc, cur.value!), '0')
-      const othersItem: ChartData = {
-        name: 'Others',
-        value: parseFloat(othersValue),
-        symbol: 'Others',
-      }
-      top6 = [...top5, othersItem]
-    } else {
-      top6 = sortedData.slice(0, 6)
-    }
-
-    return top6
-  }, [data])
-
-  const renderActiveShape = (props: any) => {
-    const {
-      cx,
-      cy,
-      innerRadius,
-      outerRadius,
-      midAngle,
-      payload,
-      value,
-      startAngle,
-      endAngle,
-      percent,
-      fill,
-    } = props
+  const renderActiveShape = (props: any, showTooltip: boolean = true) => {
+    const { cx, cy, innerRadius, outerRadius, midAngle, payload, startAngle, endAngle, fill } =
+      props
 
     const RADIAN = Math.PI / 180
     const cos = Math.cos(-RADIAN * midAngle)
     const sin = Math.sin(-RADIAN * midAngle)
 
-    const midRadius = (innerRadius + outerRadius) / 2
-    const dotX = cx + midRadius * cos
-    const dotY = cy + midRadius * sin
+    const labelRadius = innerRadius + (outerRadius - innerRadius) * 0.35
+    const dotX = cx + labelRadius * cos
+    const dotY = cy + labelRadius * sin
 
     const isRight = cos >= 0
 
@@ -88,50 +53,130 @@ export default function AssetsPieChart({ data, className }: AssetsPieChartProps)
           startAngle={startAngle}
           endAngle={endAngle}
           fill={fill}
-          cornerRadius={5}
+          cornerRadius={3}
         />
-        <circle cx={dotX} cy={dotY} r={3} fill='#fff' className='pointer-events-none' />
-        <foreignObject
-          x={isRight ? dotX + 10 : dotX - 10} // 如果在右侧，起点为圆点右侧 10px；如果在左侧，起点为圆点左侧 10px
-          y={dotY - 12}
-          height={24}
-          className='overflow-visible pointer-events-none'
-        >
-          <div
-            className={cn(
-              'flex flex-row justify-center gap-1 bg-white/10 py-1 px-2 rounded-sm text-xs w-max',
-              isRight ? '' : '-translate-x-full' // 如果在左侧，通过 transform 向左平移 100% 自身宽度
-            )}
+        {showTooltip && (
+          <circle cx={dotX} cy={dotY} r={3} fill='#fff' className='pointer-events-none' />
+        )}
+        {showTooltip && (
+          <foreignObject
+            // x={isRight ? dotX + 10 : dotX - 10} // 如果在右侧，起点为圆点右侧 10px；如果在左侧，起点为圆点左侧 10px
+            // y={dotY - 12}
+            x={isRight ? dotX - 70 : dotX + 70}
+            y={dotY - 30}
+            height={24}
+            className='overflow-visible pointer-events-none'
           >
-            <span>{payload.symbol}</span>
-            <div>{textPrefix(toFixed(payload.value, 2), '$')}</div>
-          </div>
-        </foreignObject>
+            <div
+              className={cn(
+                'bg-white/10 py-1 px-2 backdrop-blur-[15px] rounded-sm text-xs/[15px] w-max',
+                isRight ? '' : '-translate-x-full' // 如果在左侧，通过 transform 向左平移 100% 自身宽度
+              )}
+            >
+              <div className='flex flex-row justify-center gap-1'>
+                <span>{payload.symbol}</span>
+                <div>{textPrefix(formatLargeNumber(truncate(payload.value, 2)), '$')}</div>
+              </div>
+              <div>
+                {t('portfolio.allc')} {!payload.isTooSmall ? payload.ratio : '<1'}%
+              </div>
+            </div>
+          </foreignObject>
+        )}
       </g>
     )
   }
 
-  const selectedColors = COLORS.slice(COLORS.length - chartData.length)
+  const selectedColors = COLORS.slice(0, chartData.length)
+
+  const cx = PieChartCx
+  const cy = 67
+  const innerRadius = 49
+  const outerRadius = 57
+  const paddingAngle = 3
+
+  const [hoverIndex, setHoverIndex] = useState(-1)
+  const anglesRef = useRef<
+    {
+      startAngle: number
+      endAngle: number
+      midAngle: number
+      cx: number
+      cy: number
+      innerRadius: number
+      outerRadius: number
+    }[]
+  >([])
 
   return (
-    <PieChart style={{ width: '100%', height: '100%' }}>
-      <Pie
-        data={chartData}
-        cx='50%'
-        cy='50%'
-        activeShape={renderActiveShape}
-        innerRadius={49}
-        outerRadius={57}
-        paddingAngle={3}
-        cornerRadius='30%'
-        dataKey='value'
-        stroke='none'
-        animationDuration={710}
-      >
-        {chartData.map((entry, index) => (
-          <Cell key={entry.name} fill={selectedColors[index % selectedColors.length]} />
-        ))}
-      </Pie>
-    </PieChart>
+    <ResponsiveContainer width='100%' height={132}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx={cx}
+          cy={cy}
+          activeShape={hoverIndex !== -1 ? renderActiveShape : false}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
+          paddingAngle={paddingAngle}
+          cornerRadius='30%'
+          startAngle={0}
+          endAngle={360}
+          label={(p: any) => {
+            const { index, cx, cy, innerRadius, outerRadius, startAngle, endAngle } = p
+            anglesRef.current[index] = {
+              startAngle,
+              endAngle,
+              midAngle: (startAngle + endAngle) / 2,
+              cx,
+              cy,
+              innerRadius,
+              outerRadius,
+            }
+            return null
+          }}
+          labelLine={false}
+          dataKey='value'
+          stroke='none'
+          animationDuration={300}
+          onMouseEnter={(data, idx) => {
+            setHoverIndex(idx)
+            onActiveIndexChange(idx)
+          }}
+          onMouseLeave={() => {
+            setHoverIndex(-1)
+            onActiveIndexChange(-1)
+          }}
+        >
+          {chartData.map((entry, index) => (
+            <Cell
+              key={entry.name}
+              fill={selectedColors[index % selectedColors.length]}
+              fillOpacity={activeIndex === -1 ? 1 : index === activeIndex ? 1 : 0.25}
+            />
+          ))}
+          <Customized
+            component={() =>
+              hoverIndex === -1 && activeIndex !== -1 && anglesRef.current[activeIndex]
+                ? renderActiveShape(
+                    {
+                      cx: anglesRef.current[activeIndex].cx ?? cx,
+                      cy: anglesRef.current[activeIndex].cy ?? cy,
+                      innerRadius: anglesRef.current[activeIndex].innerRadius ?? innerRadius,
+                      outerRadius: anglesRef.current[activeIndex].outerRadius ?? outerRadius,
+                      startAngle: anglesRef.current[activeIndex].startAngle,
+                      endAngle: anglesRef.current[activeIndex].endAngle,
+                      midAngle: anglesRef.current[activeIndex].midAngle,
+                      fill: selectedColors[activeIndex % selectedColors.length],
+                      payload: chartData[activeIndex],
+                    },
+                    false
+                  )
+                : null
+            }
+          />
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
   )
 }

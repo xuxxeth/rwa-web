@@ -12,6 +12,7 @@ import type { IKycDetail } from '@/service/kyc/types'
 import { symbolToLower, cn, getUpColor } from '@/utils'
 import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
 import { useTradeStore } from '@/stores/tradeStore'
+import { useKycStore } from '@/stores/kycStore'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
 
@@ -28,7 +29,7 @@ export function VerifySucceeded() {
       title='ok'
       detail='okTip'
       btnText='m'
-      btnOnClick={() => router.push('/markets/quotes')}
+      btnOnClick={() => router.push('/markets')}
       extra={extra}
     />
   )
@@ -80,13 +81,12 @@ function VerifyStatus(props: {
   retryComponent?: ReactNode
 }) {
   const { t } = useTranslation()
-
   return (
     <VerifyStatusWrapper>
       <LazyImage src={getIconFromType(props.type)} className='w-[120px] h-[90px] pt-5' />
       <div>
         <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.${props.title}`)}</div>
-        <div className='text-base text-[#909090]'>{t(`${langPrefix}.${props.detail}`)}</div>
+        <div className='text-base text-[#909090] text-center'>{t(`${langPrefix}.${props.detail}`)}</div>
       </div>
       <Button
         onClick={() => {
@@ -192,8 +192,6 @@ function HotRwas() {
   const rwaList = useRwaTokens()
   const router = useRouter()
 
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
-
   const displayList = useMemo(() => {
     const list = rwaList.filter(rwa => {
       const lowerSymbol = rwa.symbol.toLowerCase()
@@ -219,8 +217,8 @@ function HotRwas() {
               key={rwa.symbol}
               className='flex flex-row items-center p-3 bg-[#1C1C1C] rounded-lg'
               onClick={() => {
-                updateInputToken(rwa)
-                router.push('/markets/trading/' + symbolToLower(rwa.symbol))
+               
+                router.push('/trade/' + rwa.symbol)
               }}
             >
               <LazyImage src={rwa.icon} className='w-[42px] h-[42px] mr-3 rounded-lg' />
@@ -249,14 +247,14 @@ function HotRwas() {
 
 export function Verifying(props: { refresh: () => Promise<ApiResponse<IKycDetail>> }) {
   const router = useRouter()
-
+  const retryCount = useKycStore(state => state.retryCount)
   return (
     <VerifyStatus
       type='verifying'
       title='verifying'
-      detail='verifyingTip'
+      detail= {retryCount > 0 && retryCount < 3 ? 'verifyingWait' : 'verifyingTip'} 
       btnText='m'
-      btnOnClick={() => router.push('/markets/quotes')}
+      btnOnClick={() => router.push('/markets')}
     />
   )
 }

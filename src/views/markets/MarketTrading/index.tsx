@@ -3,14 +3,12 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useState } from 'react'
 import { MarketTrading } from '@/components/market-trading'
 import { ConvertTabs } from '@/components/markets/ConvertTabs'
-import { ConverBody } from '@/components/markets/ConvetBody'
+import { TradeBox } from '@/components/markets/TradeBox'
 import { FAQ } from '@/components/markets/FAQ'
 import { KlineBody } from '../components/Klinebody'
-import { useWssOn } from '@/hooks/useWssOn'
-import { useBaseStore } from '@/stores/baseStore'
-import { useWssStore } from '@/stores/wssStore'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { OrderList } from '@/components/markets/OrderList'
+import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
 
 function Markets() {
   const { t } = useTranslation()
@@ -32,9 +30,10 @@ function Markets() {
             <LazyImage src="/images/convert/arrow-right.png" className="w-[12px] h-[12px] mx-1" />
             <div>{inputToken?.symbol || '--'}</div>
           </div> */}
-          <div className=''>
+          {/* <div className=''>
             <MarketTrading align='left' />
-          </div>
+          </div> */}
+          <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
           <div className='flex '>
             <div className='flex-1'>
               <KlineBody from='market' />
@@ -42,7 +41,9 @@ function Markets() {
             <div className='w-[340px] shrink-0 flex'>
               <div className='w-[4px] bg-[#1A1B1E] h-full shrink-0'>&nbsp;</div>
               <div className='w-full'>
-                <BoxCard className='min-h-[448px] rounded-[4px] p-4 bg-[#131416]'>
+                <PreMarketOpen />
+                <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
+                <BoxCard className='min-h-[370px] rounded-[4px] p-4 bg-[#131416]'>
                   <ConvertTabs from='markets' onChange={tab => setAction(tab.key)} />
                   <div className='flex items-center justify-between mt-3'>
                     <div className='text-[14px] font-medium rounded-[8px] h-[26px] flex items-center px-2 bg-[#383A40]'>
@@ -75,7 +76,7 @@ function Markets() {
                       </button>
                     </div> */}
                   </div>
-                  <ConverBody from='markets' action={action} />
+                  <TradeBox from='markets' action={action} />
                 </BoxCard>
                 <FAQ />
               </div>

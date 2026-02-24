@@ -51,7 +51,7 @@ export const Navbar: React.FC = () => {
           {/* Right Side Actions */}
           <div className='flex items-center gap-4 md:gap-6'>
             <Button
-              onClick={() => router.push('/markets/trading')}
+              onClick={() => router.push('/trade')}
               size='sm'
               variant='primary'
               className='shadow-none py-2 px-6'

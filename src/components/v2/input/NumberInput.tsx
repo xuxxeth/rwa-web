@@ -31,6 +31,7 @@ const NumberInput = memo(
 
     const enforcer = (nextUserInput: string) => {
       const normalized = normalizeInput(nextUserInput)
+
       if (normalized === '' || inputRegex.test(normalized)) {
         onInput(normalized)
       }

@@ -78,7 +78,7 @@ const Risk3Info = memo(
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
         
-        <SectionBox>
+        <SectionBox className="pb-2">
           <SectionTitle>{t('kyc.t19')}</SectionTitle>
           {
             reviewCommentToUser && 

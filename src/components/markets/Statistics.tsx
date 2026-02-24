@@ -17,6 +17,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
 
   const [statisticData, setStatisticData] = useState<IStatistic>()
   const unit = '1000000'
+
   const capData = useMemo(() => {
     let _data = {
       marketCap: '--',
@@ -81,7 +82,8 @@ const Statistics = memo(({ from }: { from?: string }) => {
           },
           {
             title: 'pe',
-            value: capData?.peStatic || '',
+            // value: capData?.peStatic || '',
+            value: capData?.peTtm ? parseFloat(capData.peTtm) < 0 ? t('v2.tx.t42') : capData?.peTtm : '--',
             tooltip: 'peH',
           },
           {
@@ -109,46 +111,6 @@ const Statistics = memo(({ from }: { from?: string }) => {
     </div>
   )
 
-  // return (
-  //   <div>
-  //     <ProfileTitle title={t('Statistics')} className=' my-6' />
-  //     <div
-  //       className={cn(
-  //         ' grid gap-x-4',
-  //         from === 'market' ? ' grid-cols-4' : 'grid-cols-[1fr_1fr_1fr_1.5fr]'
-  //       )}
-  //     >
-  //       <StatisticsItem className={cn('border-t', itemClass)} label={t('Mkt Cap')}>
-  //         <NumberText text={capData?.marketCap} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn('border-t', itemClass)} label={t('Total Share')}>
-  //         <NumberText text={formatLargeNumber(statisticData?.totalShare || '')} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn('border-t', itemClass)} label={t('Circ. Shares')}>
-  //         <NumberText text={formatLargeNumber(statisticData?.circShare || '')} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn('border-t', itemClass)} label={t('Circ. Cap')}>
-  //         <NumberText text={capData?.circCap} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn(itemClass)} label={t('P/E (TTM)')}>
-  //         <NumberText text={capData?.peTtm} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn(itemClass)} label={t('P/E (Static)')}>
-  //         <NumberText text={capData?.peStatic} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn(itemClass)} label={t('P/B')}>
-  //         <NumberText text={capData?.pb} />
-  //       </StatisticsItem>
-  //       <StatisticsItem className={cn(itemClass)} label={t('Onchain Address')}>
-  //         <div className='flex items-center gap-x-2'>
-  //           {chain && <LazyImage src={chain.icon} className='w-[16px] h-[16px]' />}
-  //           {shortenAddress(inputToken?.address || '')}
-  //           <CopyButton copyText={inputToken?.address || ''} />
-  //         </div>
-  //       </StatisticsItem>
-  //     </div>
-  //   </div>
-  // )
 })
 
 export { Statistics }

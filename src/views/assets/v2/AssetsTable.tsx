@@ -12,7 +12,6 @@ import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
 import { symbolToLower } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
-import { useTradeStore } from '@/stores/tradeStore'
 import { useCallback } from 'react'
 import IconWithTooltip from '@/components/icon-tooltip'
 
@@ -23,7 +22,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
 
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
-  const updateInputToken = useTradeStore(state => state.updateInputToken)
 
   const rwaList = useBaseStore(state => state.rwaList)
 
@@ -67,10 +65,8 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
           if (item.rwaId) {
             const rwa = rwaList.find(rwa => rwa.id === item.rwaId)
             if (rwa) {
-              updateInputToken(rwa)
+              router.push('/trade/' + item.symbol)
             }
-            // router.push('/markets/trading/' + symbolToLower(item.symbol))
-            router.push('/markets/trading')
           }
         }}
       />

@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { kycApi } from '@/service/kyc/api'
 import { KYC_STATUS, type IKycDetail } from '@/service/kyc/types'
-import { RISK_STATUS } from '@/config/constants'
 import { type KycStore } from './types'
 import { riskApi } from '@/service/risk/api'
 
@@ -11,6 +10,7 @@ export const useKycStore = create<KycStore>((set, get) => ({
   isLoading: false,
   error: null,
   riskUserConfig: null,
+  retryCount: 0,
   getUserConfig: async () => {
     const res = await riskApi.getUserConfig()
     if (res.code === 9401) {
@@ -63,4 +63,7 @@ export const useKycStore = create<KycStore>((set, get) => ({
       set({ error: error.message, isLoading: false })
     }
   },
+  updateRetryCount: (count: number) => {
+    set({retryCount: count})
+  }
 }))
