@@ -40,7 +40,7 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
   const { t } = useTranslation()
   return (
     <div className='w-full h-full flex flex-col'>
-      <div className='flex flex-row gap-1 border-b border-gray-900 border-b-4 py-4'>
+      <div className='flex flex-row gap-1 border-gray-900 border-b-4 py-4'>
         <div className='flex-[1.2] px-4 flex flex-row gap-1'>
           <div className='w-full flex flex-col'>
             <div className='pb-4'>
@@ -135,7 +135,7 @@ function AssetsRatio({
       const isTooSmall = isLess(ratio, '0.01')
       return {
         ...item,
-        ratio: multiply(toFixed(divide(item.value, estimatedBalance), 2), 100),
+        ratio: multiply(toFixed(divide(item.value, estimatedBalance), 4), 100),
         isTooSmall,
       }
     })
@@ -313,7 +313,7 @@ const RiskControlAssets = memo(
               </div>
             </div>
             <div className='bg-gray-900 p-3 rounded-[4px]'>
-              <div className='flex flex-row justify-between mb-2 text-sm/4.5 mb-2 text-gray-400'>
+              <div className='flex flex-row justify-between text-sm/4.5 mb-2 text-gray-400'>
                 <span>{t('portfolio.name')}</span>
                 <span>{t('portfolio.frozen')}</span>
               </div>

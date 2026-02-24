@@ -1,7 +1,7 @@
 import type { IRwa } from "@/service/base/types"
 import type { ISummaryDataItem } from "@/service/webSocket/types"
 import { useTradeStore } from "@/stores/tradeStore"
-import { truncateUP } from "@/utils/format"
+import { truncate } from "@/utils/format"
 import { useEffect } from "react"
 import wsService from "@/service/webSocket/service"
 
@@ -18,12 +18,12 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
         const precision = inputToken?.precision
         const _data = {
           ...rwa,
-          p: truncateUP(rwa.p || 0, precision), // 最新价
-          o: truncateUP(rwa.o || 0, precision), // 今开价
-          l: truncateUP(rwa.l || 0, precision), // 最低价
-          h: truncateUP(rwa.h || 0, precision), // 最高价
-          c: truncateUP(rwa.c || 0, precision), // 当日收盘价
-          pc: truncateUP(rwa.pc || 0, precision), // 昨日收盘价
+          p: truncate(rwa.p || 0, precision), // 最新价
+          o: truncate(rwa.o || 0, precision), // 今开价
+          l: truncate(rwa.l || 0, precision), // 最低价
+          h: truncate(rwa.h || 0, precision), // 最高价
+          c: truncate(rwa.c || 0, precision), // 当日收盘价
+          pc: truncate(rwa.pc || 0, precision), // 昨日收盘价
         } as any
         setRealtimeData(_data)
       }

@@ -13,7 +13,7 @@ import { StockDialog } from "./StockDialog"
 import { useStockStore } from "@/stores/stockStore"
 import { PreMarketOpen } from "./PreMarketOpen"
 import IconWithTooltip from "../icon-tooltip"
-import { truncate } from "@/utils/format"
+import { toFixed, truncate } from "@/utils/format"
 import type { ISummaryDataItem } from "@/service/webSocket/types"
 import { useBaseStore } from "@/stores/baseStore"
 
@@ -36,11 +36,10 @@ export const LabelWrap = memo(
 
 const RwaItemPrice = memo(
   ({ data, from }: { data: IRwa, from?: string}) => {
-    const rwaPrice = useRwaPrice(data.symbol)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
 
     // const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
-    const up = useMemo(() => realtimeData ? Number(truncate((realtimeData?.pc && realtimeData?.p ? realtimeData.p / realtimeData.pc - 1 : 0) * 100, 2)) : 0 ,[realtimeData?.p])
+    const up = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.pc && realtimeData?.p ? realtimeData.p / realtimeData.pc - 1 : 0) * 100, 2)) : 0 ,[realtimeData?.p])
     const isPro = from === 'pro-trading'
 
     if (!realtimeData) return null
@@ -58,7 +57,7 @@ const RwaItemPrice = memo(
         )}>${realtimeData.p || '--'}</div>
         <span
           className={cn(
-            "leading-[100%] font-normal font-semibold",
+            "leading-[100%] font-normal",
             isPro ? " text-[14px] " : ""
           )
             

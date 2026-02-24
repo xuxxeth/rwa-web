@@ -45,9 +45,9 @@ function MainContent({ chainId, account }: { chainId: number; account: string })
   const activeTab = router.location.pathname.includes('/order') ? 'order' : 'assets'
 
   return (
-    <div className='flex flex-row border-y border-gray-900 border-y-4 text-white min-h-[calc(100vh-64px)] font-normal'>
-      <div className='flex-none px-4 pt-4 border-r border-gray-900 border-r-4 w-[224px]'>
-        <div className='flex flex-row items-center px-3 py-2.5 border gap-2.5 bg-gray-900 rounded-sm border border-gray-850 text-gray-500'>
+    <div className='flex flex-row border-gray-900 border-y-4 text-white min-h-[calc(100vh-64px)] font-normal'>
+      <div className='flex-none px-4 pt-4 border-gray-900 border-r-4 w-[224px]'>
+        <div className='flex flex-row items-center px-3 py-2.5 gap-2.5 bg-gray-900 rounded-sm border border-gray-850 text-gray-500'>
           <LazyImage className='w-4 h-4' src='/images/v2/portfolio/my.svg' />
           <div className='text-base/5'>{t('portfolio.my')}</div>
         </div>

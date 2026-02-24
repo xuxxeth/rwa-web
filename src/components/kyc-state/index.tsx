@@ -182,10 +182,10 @@ const KycState = () => {
             duration: 0.5,
             ease: "easeOut",
           }}
-          className="fixed bottom-4 right-4 z-[99] w-[450px] min-h-[200px] border border-[#333333] bg-[#0E0E0E] rounded-[16px] p-4 flex flex-col justify-between"
+          className="fixed bottom-4 right-4 z-[99] w-[400px] min-h-[164px] border border-[#232427] bg-[#1A1B1E] rounded-[16px] p-4 flex flex-col justify-between"
         >
           <div className="flex justify-between">
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-2 mt-1">
               <LazyImage src="/images/v2/icons/id.png" className="w-[21px] h-[14px]" />
               <div className="text-[#FFB219] text-[14px] font-medium">{content.title}</div>
             </div>
@@ -199,7 +199,7 @@ const KycState = () => {
           <div className="text-white text-[14px] font-normal leading-6 text-center my-5">
             {content.content}
           </div>
-          <Button className="w-full h-[44px] bg-[#1D1D1D] text-white text-[14px] font-medium"
+          <Button className="w-full h-[44px] bg-[#232427] text-white text-[14px] font-medium"
             onClick={handleGo}
           >{content.btnText}</Button>
         </motion.div>

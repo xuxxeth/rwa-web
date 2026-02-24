@@ -150,7 +150,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'tradeValue',
     sortable: false,
-    render: (item: ITrade) => <ValueCell value={item.amount} currency={item.currency} />,
+    render: (item: ITrade) => <ValueCell value={toFixed(item.amount) } currency={item.currency} />,
   },
   {
     key: 'avgPrice',
