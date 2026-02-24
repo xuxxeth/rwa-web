@@ -589,7 +589,7 @@
     "t29": "Verification Incomplete",
     "t30": "Your information does not match your documents. Please resubmit your details.",
     "t31": "Edit",
-    "t32": "Please upload your income proof to continue.",
+    "t32": "Please upload your income proof before {{expire}} to continue.",
     "t33": "Upload",
     "t34": "Additional information is required. Please check the details page and update your info.",
     "t35": "View",

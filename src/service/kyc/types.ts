@@ -124,6 +124,7 @@ export interface IKycDetail {
   status?: KYC_STATUS
   rejectReason?: string
   expiresTime?: number
+  expireTime?: number
 }
 
 export interface IKycSubmitData {

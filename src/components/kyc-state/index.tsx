@@ -10,6 +10,7 @@ import { useKycStore } from "@/stores/kycStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "@/hooks/useRouter";
 import { usePendingStep } from "@/hooks/usePendingStep";
+import { formatSecondsToDateTime } from "@/utils/format";
 
 const NO_SHOW_PATH = ['/identity', '/']
 
@@ -88,10 +89,10 @@ const KycState = () => {
       return
     }
 
-    if (pendingStep.risk3) {
+    if (pendingStep.risk3 && kycDetail?.expireTime) {
       setContent({
         title: t('kyc.t25'),
-        content: t('kyc.t32'),
+        content: t('kyc.t32', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
         btnText: t('kyc.t33'),
         btn: 'upload'
       })
@@ -108,10 +109,10 @@ const KycState = () => {
     } 
 
 
-    if (ocrIncome) {
+    if (ocrIncome && kycDetail?.expireTime) {
       setContent({
         title: t('kyc.t29'),
-        content: t('kyc.t32'),
+        content: t('kyc.t32', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
         btnText: t('kyc.t33'),
         btn: 'upload'
       })
