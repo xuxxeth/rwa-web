@@ -23,10 +23,10 @@ const PreMarketOpen = memo(
         )}>&nbsp;</div>
         {
           !tradingTime?.tradeState &&
-            <div className="text-[12px] font-normal text-[#9DA3AF]">
+            <div className="text-[12px] font-normal text-[#9DA3AF] flex flex-col justify-center">
               <div className=" leading-[14px]">{t('v2.tx.t44')}</div>
               <div className={cn(
-                "flex items-center text-[12px]",
+                "flex items-center text-[12px] leading-[14px]",
                 i18n.language === "zh" ? "mt-[5px]" : ""
               )}>
                 <div className=" text-white mr-2">{t('v2.tx.t43')}</div>

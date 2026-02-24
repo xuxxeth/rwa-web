@@ -778,12 +778,12 @@ const BaseInfo = memo(
                 setValue('incomeCertifications', keys as string[])
               }}
             />
-            <div className='flex items-center text-base text-[#909090] py-3'>
-              <span className='text-[#CA3F64] mr-1 flex items-center'>*</span>
-              {t('kyc.t20')}
-            </div>
+            <div className='h-2'></div>
           </SectionBox>
-
+          <div className='flex items-center text-base text-[#909090] py-3'>
+            <span className='text-[#CA3F64] mr-1 flex items-center'>*</span>
+            {t('kyc.t20')}
+          </div>
           {/* <div className='mt-8 flex gap-x-2 items-start'>
             <div className=' shrink-0 relative top-[2px]'>
               <CheckBox />

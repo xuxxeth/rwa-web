@@ -47,18 +47,18 @@ const RwaItemPrice = memo(
 
     return (
       <div className={cn(
-        " min-w-[60px]",
+        " min-w-[70px]",
         up === 0 ? 'text-[#A1A1A1]' : up > 0
               ? "text-[#25A750] text-[12px]"
               : "text-[#CA3F64] text-[12px]",
       )}>
         <div className={cn(
-          "text-[20px] leading-[100%] font-mono-semibold",
+          "text-[20px] leading-[100%] font-semibold",
           isPro ? " text-[18px] " : ""
         )}>${realtimeData.p || '--'}</div>
         <span
           className={cn(
-            "leading-[100%] font-normal font-mono",
+            "leading-[100%] font-normal font-semibold",
             isPro ? " text-[14px] " : ""
           )
             
