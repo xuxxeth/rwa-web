@@ -222,9 +222,9 @@ export function getDataFeed({
       const key = `candle.${symbolInfo.name}_${_resolution}`
       const listener = (data: any) => { 
         const lastBar = lastBarsCache.get(symbolInfo.name)
-        if (data?.c > 0 && (!lastBar || lastBar.time < data.t)) {
+        if (data?.c > 0 && (!lastBar || lastBar.time <= data.t * 1000)) {
           onRealtimeCallback({
-            "time": data.t,
+            "time": data.t * 1000,
             "open": Number(truncate(data.o, 2)),
             "high": Number(truncate(data.h, 2)),
             "low": Number(truncate(data.l, 2)),
