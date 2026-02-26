@@ -22,7 +22,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { scanApi } from '@/service/scan/api'
 import { TableHeader, type ITableConfig } from '@/components/table-header'
 import { type IOpenOrder } from '@/service/scan/types'
-import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, divide } from '@/utils'
+import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, divide, truncate } from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useTxToast } from '@/hooks/useTxToast'
 import { useTradeStore } from '@/stores/tradeStore'
@@ -140,7 +140,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
+    render: (item: IOpenOrder) => <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />,
   },
   {
     key: 'filledAmount',
@@ -158,7 +158,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'filledValue',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => <ValueCell value={item.settledAmount} currency={item.currency} />,
+    render: (item: IOpenOrder) => <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />,
   },
   {
     key: 'filledAvg',

@@ -10,6 +10,7 @@ import type {
 import { klineApi } from "@/service/kline/api";
 import { RESPONSE_CODE } from "@/config/constants";
 import wsService from "@/service/webSocket/service";
+import { truncate } from "@/utils/format";
 
 export function keyToMinutes(key: string): number {
   const map: Record<string, number> = {
@@ -165,10 +166,10 @@ export function getDataFeed({
         let bars = _data.reverse().map((bar: any) => {
           return {
             "time": bar.t * 1000,
-            "open": bar.o,
-            "high": bar.h,
-            "low": bar.l,
-            "close": bar.c,
+            "open": Number(truncate(bar.o, 2)),
+            "high": Number(truncate(bar.h, 2)),
+            "low": Number(truncate(bar.l, 2)),
+            "close": Number(truncate(bar.c, 2)),
             "volume": bar.volume ?? 0,
           }
         })
@@ -220,13 +221,14 @@ export function getDataFeed({
       
       const key = `candle.${symbolInfo.name}_${_resolution}`
       const listener = (data: any) => { 
-        if (data?.c > 0) {
+        const lastBar = lastBarsCache.get(symbolInfo.name)
+        if (data?.c > 0 && (!lastBar || lastBar.time <= data.t * 1000)) {
           onRealtimeCallback({
-            "time": data.E,
-            "open": data.o,
-            "high": data.h,
-            "low": data.l,
-            "close": data.c,
+            "time": data.t * 1000,
+            "open": Number(truncate(data.o, 2)),
+            "high": Number(truncate(data.h, 2)),
+            "low": Number(truncate(data.l, 2)),
+            "close": Number(truncate(data.c, 2)),
             "volume": 0,
           })
         }

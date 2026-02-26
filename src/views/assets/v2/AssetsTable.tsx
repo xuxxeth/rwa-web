@@ -6,7 +6,7 @@ import Pagination from '@/components/pagination'
 import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
 import { TextCell, TokenCell } from '../Shared'
-import { textPrefix, toFixed, formatWithCommas } from '@/utils/format'
+import { textPrefix, toFixed, formatWithCommas, truncate } from '@/utils/format'
 import type { IRwa } from '@/service/base/types'
 import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
@@ -108,7 +108,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     sortable: true,
     render: (item: IAssetItem) => {
       const price = item.tokenPrice ?? item.rwaPrice
-      return <TextCell text={price ? textPrefix(toFixed(price, item.precision), '$') : '--'} />
+      return <TextCell text={price ? textPrefix(truncate(price, item.precision), '$') : '--'} />
     },
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
       advancedSort(a.tokenPrice ?? a.rwaPrice ?? '0', b.tokenPrice ?? b.rwaPrice ?? '0', order),

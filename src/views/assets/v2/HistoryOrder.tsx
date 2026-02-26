@@ -23,7 +23,7 @@ import { scanApi } from '@/service/scan/api'
 import { type ITableConfig } from '@/components/table-header'
 import { type IOrder } from '@/service/scan/types'
 import { type IOrderHistoryFilter } from '@/stores/orderFilterStore'
-import { textPrefix, toFixed, formatTimestamp, divide } from '@/utils'
+import { textPrefix, toFixed, formatTimestamp, divide, truncate } from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
 import { generateOrderHistoryFilterObj } from '@/stores/orderFilterStore'
 import { DatePickerWithRange } from '@/components/date-range-picker'
@@ -170,7 +170,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOrder) => <TextCell text={textPrefix(toFixed(item.price), '$')} />,
+    render: (item: IOrder) => <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />,
   },
   {
     key: 'filledAmount',
@@ -188,7 +188,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'filledValue',
     breakOnSpace: false,
     sortable: false,
-    render: (item: IOrder) => <ValueCell value={item.settledAmount} currency={item.currency} />,
+    render: (item: IOrder) => <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />,
   },
   {
     key: 'filledAvg',
