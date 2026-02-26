@@ -96,7 +96,7 @@ const CountrySelect = memo(
         <SelectTrigger 
           open={open}
           className={cn(
-            "px-4 py-0 h-[44px] shadow-none flex items-center justify-between rounded-[8px] bg-[rgba(255,255,255,0.08)] border border-solid border-[rgba(255,255,255,0)]",
+            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] bg-[#1A1B1E] border border-solid border-[rgba(255,255,255,0)]",
             className,
             open ? 'border-[#ffffff]' : ''
           )}
@@ -108,10 +108,10 @@ const CountrySelect = memo(
                 <div className="w-6 h-6 flex items-center justify-center">
                   <LazyImage src={`/images/country/${currentCountry.key}.${ pngCode.includes(currentCountry.key) ? 'png' : 'svg'}`} className="w-6" />
                 </div> */}
-                <span className=" font-normal md:text-[16px]">{i18n.language === 'en' ? currentCountry.enName : currentCountry.zhName}</span>
+                <span className=" font-normal md:text-[14px]">{i18n.language === 'en' ? currentCountry.enName : currentCountry.zhName}</span>
               </div>
             ) : (
-              <span className="md:text-[1.04vw] text-5">{placeHolder || 'Please select'} </span>
+              <span className="md:text-[14px] text-5">{placeHolder || 'Please select'} </span>
             )}
           </div>
         </SelectTrigger>

@@ -12,9 +12,9 @@ export function XFooter({
 }) {
   const { t } = useTranslation()
   return (
-    <div className='border-t border-[rgba(255,255,255,0.1)] pt-[40px] pb-[40px] md:mt-[130px] font-normal'>
+    <div className=' pt-[40px] pb-[40px] font-normal text-[#9DA3AF]'>
 
-    <MainLayout>
+    <MainLayout className='bg-[#131416]'>
       <div className='md:flex justify-between px-5 font-normal'>
         <div>
           {/* <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' /> */}
@@ -22,11 +22,11 @@ export function XFooter({
           <div className=' hidden md:block'>
             <a href='mailto:contact@tiko.cc'>
               <div className='flex items-center my-4'>
-                <img src='/images/icons/e_mail.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>contact@tiko.cc</div>
+                <img src='/images/icons/e_mail.png' className='w-[14px]' alt='' />
+                <div className='text-[#9DA3AF] ml-2'>contact@tiko.cc</div>
               </div>
             </a>
-            <div className=' text-base text-80'>
+            <div className=' text-base text-[#9DA3AF]'>
               @ 2025 Tiko. {t('footer.text1')}
             </div>
           </div>
@@ -36,20 +36,20 @@ export function XFooter({
             <div className=' font-semibold'>{t('footer.text5')}</div>
             <a href={X_URL} target='_blank'>
               <div className='flex items-center mt-4'>
-                <img src='/images/icons/x.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>X Official</div>
+                <img src='/images/icons/x.png' className='w-4' alt='' />
+                <div className='text-[#9DA3AF] ml-2 text-[14px]'>X Official</div>
               </div>
             </a>
             <a href={TG_URL} target='_blank'>
               <div className='flex items-center mt-4'>
-                <img src='/images/icons/tg.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>Telegram</div>
+                <img src='/images/icons/tg.png' className='w-4' alt='' />
+                <div className='text-[#9DA3AF] ml-2 text-[14px]'>Telegram</div>
               </div>
             </a>
             <a href={DISCORD_URL} target='_blank'>
               <div className='flex items-center mt-4'>
-                <img src='/images/icons/discord.png' className='w-6' alt='' />
-                <div className='text-80 ml-2'>Discord</div>
+                <img src='/images/icons/discord.png' className='w-4' alt='' />
+                <div className='text-[#9DA3AF] ml-2 text-[14px]'>Discord</div>
               </div>
             </a>
           </div>
@@ -58,7 +58,7 @@ export function XFooter({
             
             <div className='flex items-center mt-4'>
               <div
-                className='text-80 cursor-pointer'
+                className='text-[#9DA3AF] cursor-pointer text-[14px]'
                 onClick={() => openUrlInNewWindow(PRIVACY_SERVICE.privacy.url)}
               >
                 {t('footer.text2')}
@@ -66,15 +66,15 @@ export function XFooter({
             </div>
             <div className='flex items-center mt-4'>
               <div
-                className='text-80 cursor-pointer'
+                className='text-[#9DA3AF] cursor-pointer text-[14px]'
                 onClick={() => openUrlInNewWindow(PRIVACY_SERVICE.userService.url)}
               >
                 {t('footer.text3')}
               </div>
             </div>
             <a href={GITBOOK_URL} target='_blank'>
-              <div className='flex items-center mt-4'>
-                <div className='text-80'>{t('footer.text6')}</div>
+              <div className='flex items-center mt-4 text-[14px]'>
+                <div className='text-[#9DA3AF]'>{t('footer.text6')}</div>
               </div>
             </a>
           </div>
@@ -84,10 +84,10 @@ export function XFooter({
           <a href='mailto:contact@cyberalpha.cc'>
             <div className='flex items-center my-4'>
               <img src='/images/icons/e_mail.png' className='w-6' alt='' />
-              <div className='text-80 ml-2'>contact@cyberalpha.cc</div>
+              <div className='text-[#9DA3AF] ml-2'>contact@cyberalpha.cc</div>
             </div>
           </a>
-          <div className=' text-base text-80'>
+          <div className=' text-base text-[#9DA3AF]'>
             @ 2025 Tiko. {t('footer.text1')}
           </div>
         </div>

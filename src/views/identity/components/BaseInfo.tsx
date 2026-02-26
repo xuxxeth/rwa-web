@@ -62,7 +62,7 @@ export async function retryRefresh(
 }
 
 export const SectionTitle = ({ children }: { children: React.ReactNode }) => {
-  return <div className='text-[18px] font-normal leading-[100%]'>{children}</div>
+  return <div className='text-[16px] font-normal leading-[100%]'>{children}</div>
 }
 
 export const SectionBox = ({
@@ -72,7 +72,7 @@ export const SectionBox = ({
   children: React.ReactNode
   className?: string
 }) => {
-  return <div className={cn('p-5 bg-[#0E0E0E] rounded-[4px] pb-0 mb-2', className)}>{children}</div>
+  return <div className={cn('p-5 bg-[#131416] rounded-[4px] pb-0 mb-2', className)}>{children}</div>
 }
 export const FormItemBox = ({ children }: { children: React.ReactNode }) => {
   return <div className='my-5'>{children}</div>
@@ -87,7 +87,7 @@ export const FormItemLabel = ({
   hide?: boolean
 }) => {
   return (
-    <div className='flex items-center text-[#909090] text-[16px] font-normal'>
+    <div className='flex items-center text-[#9DA3AF] text-[14px] font-normal'>
       {children || title} {hide && <span className='text-[#CA3F64] ml-1 flex items-center'>*</span>}
     </div>
   )
@@ -379,7 +379,7 @@ const BaseInfo = memo(
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
             <div className=' grid grid-cols-4 font-normal gap-x-6'>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t3')} />
+                <FormItemLabel title={t('kyc.t3')} hide />
                 <InputBox>
                   <KycInput
                     className=''
@@ -402,7 +402,7 @@ const BaseInfo = memo(
                 </InputBox>
               </FormItemBox>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t5')} />
+                <FormItemLabel title={t('kyc.t5')} hide />
                 <InputBox>
                   <KycInput
                     className=''
@@ -432,7 +432,7 @@ const BaseInfo = memo(
               </FormItemBox>
               <div className=' col-span-2'>
                 <FormItemBox>
-                  <FormItemLabel title={t('kyc.t6')} />
+                  <FormItemLabel title={t('kyc.t6')} hide />
                   <InputBox>
                     <KycInput
                       className=''
@@ -481,11 +481,11 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-3 font-normal gap-x-6'>
               {/* 性别 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t7')} />
+                <FormItemLabel title={t('kyc.t7')} hide />
                 <InputBox>
                   <Select
                     activeColor='#FFFFFF'
-                    className='h-[44px] rounded-[6px]'
+                    className='h-[38px] rounded-[4px]'
                     placeholder={t('identity.select')}
                     data={genderList}
                     defaultValue={String(gendar)}
@@ -497,7 +497,7 @@ const BaseInfo = memo(
               </FormItemBox>
               {/* 出生日期 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t8')} />
+                <FormItemLabel title={t('kyc.t8')} hide />
                 <InputBox>
                   <div className='bg-[rgba(255,255,255,0.08)] rounded-[6px]'>
                     <DatePicker
@@ -505,7 +505,7 @@ const BaseInfo = memo(
                       minDate={dateOptions.minDate}
                       maxDate={dateOptions.maxDate}
                       activeColor='#FFFFFF'
-                      className='h-[44px]'
+                      className='h-[38px] bg-[#1A1B1E] text-[14px] rounded-[4px]'
                       placeholder={t('identity.selectDate')}
                       userSelectedDate={dob ? new Date(dob).getTime() : dateOptions.maxDate}
                       onUserSelectedDateChanged={value => {
@@ -519,7 +519,7 @@ const BaseInfo = memo(
               </FormItemBox>
               {/* 邮箱 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t9')} />
+                <FormItemLabel title={t('kyc.t9')} hide />
                 <InputBox>
                   <KycInput
                     className=''
@@ -555,7 +555,7 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-3 font-normal gap-x-6'>
               {/* 证件类型 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t11')} />
+                <FormItemLabel title={t('kyc.t11')} hide />
 
                 <InputBox>
                   <DoctypeSelect
@@ -568,7 +568,7 @@ const BaseInfo = memo(
                 </InputBox>
               </FormItemBox>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t12')} />
+                <FormItemLabel title={t('kyc.t12')} hide />
                 {/* 证件签发国 */}
                 <InputBox>
                   <CountrySelect
@@ -584,7 +584,7 @@ const BaseInfo = memo(
                 </InputBox>
               </FormItemBox>
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t13')} />
+                <FormItemLabel title={t('kyc.t13')} hide />
                 {/* 证件号码 */}
                 <InputBox>
                   <KycInput
@@ -701,7 +701,7 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-3 font-normal gap-x-6'>
               {/* 就业状况 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t17')} />
+                <FormItemLabel title={t('kyc.t17')} hide />
                 <InputBox>
                   <EmploymentSelect
                     defaultValue={String(employment)}
@@ -714,7 +714,7 @@ const BaseInfo = memo(
               <div className=' col-span-2'>
                 {employment === 4 && (
                   <FormItemBox>
-                    <FormItemLabel title={t('kyc.t23')} />
+                    <FormItemLabel title={t('kyc.t23')} hide />
                     <InputBox>
                       <KycInput
                         className=''
@@ -751,7 +751,7 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-2 font-normal gap-x-6'>
               {/* 收入类型 */}
               <FormItemBox>
-                <FormItemLabel title={t('kyc.t22')} />
+                <FormItemLabel title={t('kyc.t22')} hide />
                 <InputBox>
                   <IncomeSelect
                     defaultValue={String(source)}
@@ -767,7 +767,7 @@ const BaseInfo = memo(
             <SectionTitle>{t('kyc.t19')}</SectionTitle>
             
             <div className="my-5">
-              <Text text='uploadIncome' className=' text-white' />
+              <Text text='uploadIncome' className=' text-[#9DA3AF]' />
               <Text text='extraTips' className='text-sm mt-2' />
             </div>
             <Upload

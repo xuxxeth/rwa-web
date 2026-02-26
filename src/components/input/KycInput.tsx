@@ -28,7 +28,7 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
       <input
         type={type}
         className={cn(
-          "caret-[#9CFF3A] flex h-[44px] w-full bg-[#1D1D1D] px-3 py-1 rounded-[6px] text-[16px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 outline-0 border border-[#1D1D1D] ",
+          "caret-[#9CFF3A] flex h-[38px] w-full bg-[#1A1B1E] px-3 py-1 rounded-[4px] text-[14px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 outline-0 border border-[#1D1D1D] placeholder:text-[#737A87] ",
           className,
           error ? "border-[#CA3F64]" : "focus:border-[#FFFFFF]"
         )}

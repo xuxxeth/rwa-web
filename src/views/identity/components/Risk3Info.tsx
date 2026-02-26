@@ -88,7 +88,7 @@ const Risk3Info = memo(
           }
           
           <div className="my-5">
-            <Text text='uploadIncome' className=' text-white' />
+            <Text text='uploadIncome' className=' ' />
             <Text text='extraTips' className='text-sm mt-2' />
           </div>
           <Upload

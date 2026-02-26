@@ -168,7 +168,6 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
-      
       // 已过期/即将过期
       {
         match: () =>
@@ -360,7 +359,7 @@ function Identity({ account }: { account: string }) {
 function MainContentWrapper(props: { children: ReactNode }) {
   return (
     <>
-      <MainLayout>
+      <MainLayout className="bg-[#0E0E0E] pb-11">
         <IdentityLayout>{props.children}</IdentityLayout>
       </MainLayout>
       <XFooter />

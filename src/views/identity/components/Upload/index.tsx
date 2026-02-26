@@ -224,7 +224,7 @@ function AddressUpload({
       </div>
       <div className='flex flex-row gap-5 mt-5'>
         <div className='flex-1'>
-          <Text text='addrEnsure' className='text-base mb-5' />
+          <Text text='addrEnsure' className='text-sm mb-5' />
           <ul className='list-disc pl-3.5'>
             {['ensure1', 'ensure2', 'ensure3', 'ensure4', 'ensure5'].map(item => (
               <li key={item}>
@@ -234,7 +234,7 @@ function AddressUpload({
           </ul>
         </div>
         <div className='flex-1'>
-          <Text text='addrNote' className='text-base mb-5' />
+          <Text text='addrNote' className='text-sm mb-5' />
           <ul className='list-disc pl-3.5'>
             {['note1', 'note2'].map(item => (
               <li key={item}>
@@ -280,7 +280,7 @@ function PassportUpload({
           step={step}
         />
         <div className='flex-1 flex flex-row items-center justify-center'>
-          <Text text='passportTips' className='text-base' />
+          <Text text='passportTips' className='text-sm' />
         </div>
       </div>
     </div>

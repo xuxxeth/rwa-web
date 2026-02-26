@@ -301,7 +301,7 @@ export function DatePicker({
             )}
             style={{ borderColor: isOpen ? (activeColor ? activeColor : '') : '' }}
           >
-            <div className='text-[16px] font-normal'>
+            <div className='text-[14px] font-normal'>
               {selected ? (
                 format(selected?.getTime(), FormatStr)
               ) : userSelectedDate ? (
