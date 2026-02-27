@@ -134,7 +134,9 @@ export interface IStatistic {
   "netIncomeLtm": number,
   "netIncomeLastYear": number,
   "netAsset": number,
-  "onchainAddr": string
+  "onchainAddr": string,
+  "eps": string,
+  "epsTtm": string
 }
 
 export interface IToptenshareholder {
