@@ -135,8 +135,8 @@ const CountrySelect = memo(
                 
               )
               .map(ct2 => (
-            <SelectItem key={ct2.code} value={ct2.code}>
-              <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
+            <SelectItem key={ct2.code} value={ct2.code} className="h-[34px]">
+              <div className="flex items-center justify-between w-full gap-2 text-white text-[14px]">
                 <div className=" flex items-center gap-x-2">
                   {/* 
                   <div className="w-6 h-6 flex items-center justify-center">

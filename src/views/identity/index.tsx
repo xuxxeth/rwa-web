@@ -358,12 +358,12 @@ function Identity({ account }: { account: string }) {
 
 function MainContentWrapper(props: { children: ReactNode }) {
   return (
-    <>
-      <MainLayout className="bg-[#0E0E0E] pb-11">
+    <div className=' min-h-screen bg-[#0E0E0E]'>
+      <MainLayout className="pb-11">
         <IdentityLayout>{props.children}</IdentityLayout>
       </MainLayout>
       <XFooter />
-    </>
+    </div>
   )
 }
 

@@ -76,40 +76,41 @@ const Risk3Info = memo(
     }
 
     return (
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
-        
-        <SectionBox className="pb-2">
-          <SectionTitle>{t('kyc.t19')}</SectionTitle>
-          {
-            reviewCommentToUser && 
-            <div className=" my-5">
-              <WarningInfo text={reviewCommentToUser } />
-            </div>
-          }
-          
-          <div className="my-5">
-            <Text text='uploadIncome' className=' ' />
-            <Text text='extraTips' className='text-sm mt-2' />
-          </div>
-          <Upload
-            step={pendingStep.step}
-            type='extra'
-            keys={incomeCertifications}
-            onChanged={keys => {
-              setValue('incomeCertifications', keys as string[])
-            }}
-          />
-          
-        </SectionBox>
-        <div className="flex justify-center mt-8">
-          <Button disabled={submiting} loading={submiting} type="submit" className="bg-white text-black w-full lg:w-[400px] rounded-[8px]"
-          >
-            { t('identity.continue') }
-            
-          </Button>
-        </div>
 
-      </form>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+            <SectionBox className="pb-2">
+              <SectionTitle>{t('kyc.t19')}</SectionTitle>
+              {
+                reviewCommentToUser && 
+                <div className=" my-5">
+                  <WarningInfo text={reviewCommentToUser } />
+                </div>
+              }
+              
+              <div className="my-5">
+                <Text text='uploadIncome' className=' ' />
+                <Text text='extraTips' className='text-sm mt-2' />
+              </div>
+              <Upload
+                step={pendingStep.step}
+                type='extra'
+                keys={incomeCertifications}
+                onChanged={keys => {
+                  setValue('incomeCertifications', keys as string[])
+                }}
+              />
+              
+            </SectionBox>
+          <div className="flex justify-center mt-8">
+            <Button disabled={submiting} loading={submiting} type="submit" className="bg-white text-black w-full lg:w-[400px] rounded-[8px]"
+            >
+              { t('identity.continue') }
+              
+            </Button>
+          </div>
+
+        </form>
+
     )
   }
 )

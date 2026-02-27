@@ -91,9 +91,9 @@ const EmploymentSelect = memo(
             
             <div className="border-[#1D1D1D] border rounded-[4px] px-3 py-0 h-[38px] flex items-center text-white">
               {currentCode ? (
-                <span className=" font-normal md:text-[16px]">{currentItem.label}</span>
+                <span className=" font-normal md:text-[14px]">{currentItem.label}</span>
               ) : (
-                <span className="md:text-[1.04vw] text-5">{''}</span>
+                <span className="md:text-[14px] text-5">{''}</span>
               )}
             </div> 
           </>
@@ -119,8 +119,8 @@ const EmploymentSelect = memo(
         
         <SelectContent className="">
           {dataList.map(id => (
-            <SelectItem key={id.code} value={id.code}>
-              <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
+            <SelectItem key={id.code} value={id.code} className="h-[34px]">
+              <div className="flex items-center justify-between w-full gap-2 text-white text-[14px]">
                 <div className=" flex items-center  gap-x-2">
                   <span>{id.label}</span>
                 </div>

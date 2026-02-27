@@ -89,8 +89,8 @@ const IncomeSelect = memo(
         </SelectTrigger>
         <SelectContent className=" ">
           {dataList.map(id => (
-            <SelectItem key={id.code} value={id.code}>
-              <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
+            <SelectItem key={id.code} value={id.code} className="h-[34px]">
+              <div className="flex items-center justify-between w-full gap-2 text-white text-[14px]">
                 <div className=" flex items-center  gap-x-2">
                   <span>{id.label}</span>
                 </div>

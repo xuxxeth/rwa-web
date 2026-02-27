@@ -580,8 +580,8 @@
     "t22": "Income Sources",
     "t23": "Description",
     "t24": ", please re-upload and complete verification.",
-    "t241": "Passport/ID is about to expire",
-    "t242": "Passport/ID has expired",
+    "t241": "Passport is about to expire",
+    "t242": "Passport has expired",
     "t25": "Upload Additional Documents",
     "t26": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted.",
     "t27": "Verification failed",
@@ -624,7 +624,8 @@
     "t64": "Only Chinese characters, English letters, numbers, spaces, and commas are supported.",
     "t65": "At least one of the document photo and description must be submitted.",
     "t66": "Only numeric and alphabetic characters are supported.",
-    "t67": "Incorrect Date of Birth"
+    "t67": "Incorrect Date of Birth",
+    "t68": "Please enter a residential address outside of Mainland China."
   },
   "employment": {
     "t1": "Retired",

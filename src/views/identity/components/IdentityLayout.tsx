@@ -30,8 +30,8 @@ const IdentityLayout = memo(
     const { t } = useTranslation()
     const router = useRouter()
     return (
-      <div className="flex justify-center">
-        <div className=" px-5 min-h-[600px] text-white  w-[928px]">
+      <div className="flex justify-center ">
+        <div className=" px-5 min-h-[600px] text-white w-[926px]">
           {/* <div className=" text-[24px] font-medium mt-8">{t('identity.Identity_verification')}</div> */}
           {/* <div className="mt-5 flex items-center gap-x-[4px]">
             <TipLine active />
@@ -41,14 +41,14 @@ const IdentityLayout = memo(
             <TipLine />
           </div> */}
           <div className="relative pt-5">
-            <div className=" absolute -left-[120px] top-0 flex items-center cursor-pointer"
+            {/* <div className=" absolute -left-[120px] top-0 flex items-center cursor-pointer"
               onClick={() => {
                 router.back()
               }}
             >
               <LazyImage src="/images/icons/identity/back.png" className="w-6 h-6 mr-1" />
               {t('Back')}
-            </div>
+            </div> */}
             {children}
           </div>
         </div>

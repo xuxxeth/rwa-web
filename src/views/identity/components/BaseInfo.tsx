@@ -560,7 +560,7 @@ const BaseInfo = memo(
                 <InputBox>
                   <DoctypeSelect
                     countryCode={issueCountry}
-                    defaultValue={String(type)}
+                    defaultValue={'1'}
                     onChange={data => {
                       setValue('type', Number(data.code))
                     }}
@@ -621,10 +621,12 @@ const BaseInfo = memo(
                         setValue('useCertificateAddress', v)
                       }}
                     />
-                    <div className='text-[rgba(255,255,255,0.6)] text-[16px]'>{t('kyc.t15')}</div>
+                    <div className='text-[rgba(255,255,255,0.6)] text-[14px]'>{t('kyc.t15')}</div>
                   </div>
                 )}
-
+                <div className='text-[#9DA3AF] text-[14px] mt-2'>
+                  {t('kyc.t68')}
+                </div>
                 {(!useCertificateAddress || type === 1) && (
                   <InputBox>
                     <KycInput

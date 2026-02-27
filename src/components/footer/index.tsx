@@ -12,9 +12,9 @@ export function XFooter({
 }) {
   const { t } = useTranslation()
   return (
-    <div className=' pt-[40px] pb-[40px] font-normal text-[#9DA3AF]'>
+    <div className=' pt-[40px] pb-[40px] font-normal text-[#9DA3AF] bg-[#131416]'>
 
-    <MainLayout className='bg-[#131416]'>
+    <MainLayout className=''>
       <div className='md:flex justify-between px-5 font-normal'>
         <div>
           {/* <LazyImage src={from === 'home' ? '/images/home/new/logo.png' : '/images/logo_text.png'} className='w-[182px]' alt='' /> */}

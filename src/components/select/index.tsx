@@ -80,8 +80,8 @@ const Select = memo(
         </SelectTrigger>
         <SelectContent className="">
           {data.map(item => (
-            <SelectItem key={item.value} value={item.value}>
-              <div className="flex items-center justify-between gap-2 text-white text-[16px] w-full">
+            <SelectItem key={item.value} value={item.value} className="h-[34px]">
+              <div className="flex items-center justify-between gap-2 text-white text-[14px] w-full">
                 <span>{item.label}</span>
                 {
                   item.value === curretnValue && <img src="/images/icons/item_selected.png" className="w-[12px]" alt="" />

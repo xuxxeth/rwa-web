@@ -40,7 +40,7 @@ const IDExpired = memo(
     const idCardBack = watch('idCardBack')
     const idCard = watch('idCard')
     const passport = watch('passport')
-    const type = useMemo(() => userInfo?.idInfo.type ?? 0, [userInfo])
+    const type = useMemo(() => userInfo?.idInfo.type ?? 1, [userInfo])
     
     const [submiting, setSubmiting] = useState(false)
     

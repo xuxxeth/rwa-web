@@ -55,10 +55,31 @@ const DoctypeSelect = memo(
     }, [defaultValue, countryCode, i18n.language]) 
 
     return (
+      <div 
+        className={cn(
+          "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] bg-[#1A1B1E] border border-solid border-[rgba(255,255,255,0)]",
+          className,
+          open ? 'border-[#ffffff]' : ''
+        )}
+      >
+        <div className="flex items-center gap-2 w-[70px] text-white">
+          {currentCode ? (
+            <>
+              <LazyImage className="w-5" src={currentDoctype.icon} />
+              <span className=" font-normal md:text-[14px]">{currentDoctype.label}</span>
+            </>
+          ) : (
+            <span className="md:text-[14px] text-5">{''}</span>
+          )}
+        </div>
+      </div>
+    )
+
+    return (
       <Select 
         value={value} 
         onOpenChange={open => {
-          setOpen(open)
+          // setOpen(open)
         }}
         onValueChange={(code) => {
           if (code) {
@@ -83,7 +104,7 @@ const DoctypeSelect = memo(
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentCode ? (
               <>
-                <LazyImage className="w-6 h-6" src={currentDoctype.icon} />
+                <LazyImage className="w-5" src={currentDoctype.icon} />
                 <span className=" font-normal md:text-[14px]">{currentDoctype.label}</span>
               </>
             ) : (
