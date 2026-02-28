@@ -188,7 +188,7 @@ const BaseInfo = memo(
       fullName: '',
       gendar: 1,
       email: '',
-      type: 0,
+      type: 1,
       employment: 1,
       source: 1,
       issueCountry: 'CHN',
@@ -613,7 +613,7 @@ const BaseInfo = memo(
             <div className=' grid grid-cols-1 font-normal'>
               <FormItemBox>
                 <FormItemLabel title={t('kyc.t14')} hide />
-                {type === 0 && (
+                {/* {type === 0 && (
                   <div className='mt-3 flex gap-x-2 items-center mb-3'>
                     <CheckBox
                       checked={useCertificateAddress}
@@ -623,7 +623,7 @@ const BaseInfo = memo(
                     />
                     <div className='text-[rgba(255,255,255,0.6)] text-[14px]'>{t('kyc.t15')}</div>
                   </div>
-                )}
+                )} */}
                 <div className='text-[#9DA3AF] text-[14px] mt-2'>
                   {t('kyc.t68')}
                 </div>

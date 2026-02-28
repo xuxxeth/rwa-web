@@ -213,7 +213,7 @@ function AddressUpload({
           <div>
             <Text text='validAddrInc' className='mb-5' />
             <ul className='list-disc pl-3.5'>
-              {['addr1', 'addr2', 'addr3', 'addr4', 'addr5', 'addr6', 'addr7'].map(item => (
+              {['addr2', 'addr3', 'addr4', 'addr5', 'addr6', 'addr7'].map(item => (
                 <li key={item}>
                   <Text text={item} className='text-sm/[17px]' />
                 </li>
