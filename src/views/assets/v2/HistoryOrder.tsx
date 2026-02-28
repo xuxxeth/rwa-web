@@ -64,6 +64,19 @@ function HistoryOrder(props: {
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
           <DropDownFilter
+            data={orderHistoryFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateOrderHistoryFilters({
+                orderType: reduce(orderHistoryFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          />
+          <DropDownFilter
             data={orderHistoryFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
               updateOrderHistoryFilters({
@@ -174,9 +187,14 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOrder) => (
-      <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
-    ),
+    render: (item: IOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
+      )
+    },
   },
   {
     key: 'filledAmount',

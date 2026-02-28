@@ -61,6 +61,19 @@ function TradeHistory(props: {
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
           <DropDownFilter
+            data={tradeHistoryFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateTradeHistoryFilters({
+                orderType: reduce(tradeHistoryFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          />
+          <DropDownFilter
             data={tradeHistoryFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
               updateTradeHistoryFilters({

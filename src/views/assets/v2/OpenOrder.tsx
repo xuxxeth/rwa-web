@@ -69,6 +69,19 @@ function OpenOrder(props: {
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
           <DropDownFilter
+            data={openOrderFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateOpenOrderFilters({
+                orderType: reduce(openOrderFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          />
+          <DropDownFilter
             data={openOrderFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
               updateOpenOrderFilters({
@@ -153,9 +166,14 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => (
-      <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
-    ),
+    render: (item: IOpenOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
+      )
+    },
   },
   {
     key: 'filledAmount',
@@ -196,6 +214,9 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'expiration',
     sortable: false,
     render: (item: IOpenOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
       if (item.tif === 0) {
         return <TextCellWithTranslation text='assets.order.intraday' />
       }
@@ -217,14 +238,19 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'action',
     sortable: false,
-    render: (item: IOpenOrder, { refetch }) => (
-      <CancelOrderButton
-        refetch={refetch}
-        className='max-w-[50px] text-ellipsis overflow-hidden'
-        orderId={item.orderId}
-        disabled={item.state === 8}
-      />
-    ),
+    render: (item: IOpenOrder, { refetch }) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <CancelOrderButton
+          refetch={refetch}
+          className='max-w-[50px] text-ellipsis overflow-hidden'
+          orderId={item.orderId}
+          disabled={item.state === 8}
+        />
+      )
+    },
     width: 65,
   },
 ]

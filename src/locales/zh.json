@@ -275,8 +275,8 @@
 
       "action": "操作",
       "orderHistory": "歷史委託",
-      "market": "市價單",
-      "limit": "限價單",
+      "market": "市價",
+      "limit": "限價",
       "side": "方向",
       "orderType": "訂單類型",
       "orderSide": "買賣方向",
@@ -329,7 +329,7 @@
     "signSubd": "請使用錢包簽名以完成 KYC。",
     "verifyTip": "請完成身份驗證以開始交易。",
     "verifyID": "驗證身分",
-    "verify": "驗證中",     
+    "verify": "驗證中",
     "Identity_verification": "身份驗證",
     "continue": "繼續",
     "upload": {
@@ -448,7 +448,6 @@
     "reVerify": "重新驗證",
     "state7": "身分驗證已通過",
     "state8": "您的身分驗證已通過"
-    
   },
   "scanCode": "請使用您的手機相機掃描二維碼",
   "balance": "餘額",

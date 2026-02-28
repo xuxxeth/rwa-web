@@ -269,7 +269,7 @@ export function DropDownFilter(props: {
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger
             className={cn(
-              'cursor-pointer w-[211px] h-8 flex items-center px-3 py-2 border border-gray-850 rounded-[8px] outline-none focus:outline-none focus:ring-0',
+              'cursor-pointer w-[211px] max-[1440px]:w-[190px] h-8 flex items-center px-3 py-2 border border-gray-850 rounded-[8px] outline-none focus:outline-none focus:ring-0',
               open ? 'border-[rgba(156,255,58,0.8)]' : ''
             )}
           >
@@ -297,7 +297,7 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='w-[211px] bg-gray-900 border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='w-[211px] max-[1440px]:w-[190px] bg-gray-900 border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
             <div>
