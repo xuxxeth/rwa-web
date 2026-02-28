@@ -15,6 +15,7 @@ export function useTradeStoreBindings() {
   const setTxError = useTradeStore(state => state.setTxError)
   const setTxSuccess = useTradeStore(state => state.setTxSuccess)
   const setTxStep = useTradeStore(state => state.setTxStep)
+  const updateSlippage = useTradeStore(state => state.updateSlippage)
 
   const limitPrice = useTradeStore(state => state.limitPrice)
   const inputSize = useTradeStore(state => state.inputSize)
@@ -23,6 +24,7 @@ export function useTradeStoreBindings() {
   const outputToken = useTradeStore(state => state.outputToken)
   const action = useTradeStore(state => state.activeConvertTab) as "buy" | "sell"
   const realtimeData = useTradeStore(state => state.realtimeRwaData)
+  const slippage = useTradeStore(state => state.slippage)
 
   return {
     marketInfo,
@@ -35,6 +37,7 @@ export function useTradeStoreBindings() {
     setTxError,
     setTxSuccess,
     setTxStep,
+    updateSlippage,
     limitPrice,
     inputSize,
     expires,
@@ -42,5 +45,6 @@ export function useTradeStoreBindings() {
     outputToken,
     action,
     realtimeData,
+    slippage,
   }
 }

@@ -101,7 +101,8 @@ export interface IMarket {
   "networkFeeInNative": string, // 原生代币网络费
   "networkFeeInStable": string // 稳定币网络费
   "timeInForce": number,
-  "validDate": number
+  "validDate": number,
+  "slippage": string, // 默认滑点容忍度
 }
 // 券商状态信息
 /**

@@ -9,6 +9,7 @@ import { LiteTradeInfo } from "@/components/markets/LiteTradeInfo";
 import { PositionRwa } from "./components/PositionRwa";
 import { openUrl } from "@/utils/scan";
 import { PreMarketOpen } from "@/components/markets/PreMarketOpen";
+import { TradeTypeSwitch } from "../markets/MarketTrading/TradeTypeSwitch";
 
 function LiteTrade() {
   const { account } = useActiveWeb3()
@@ -45,6 +46,9 @@ function LiteTrade() {
           <div className="flex gap-x-[14px]">
             <div className="w-[420px]">
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
+                <div className="mb-3">
+                  <TradeTypeSwitch />
+                </div>
                 <TradeBox from="lite-trade" />
               </BoxCard>
               <div className="border border-[#232427] rounded-[16px] px-3 py-2 mt-2">

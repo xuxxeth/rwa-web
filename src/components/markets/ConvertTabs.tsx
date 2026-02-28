@@ -41,7 +41,7 @@ const ConvertTabItem = memo(
 )
 
 const ConvertTabs = memo(
-  ({ onChange, from }: ConvertTabsProps) => {
+  ({ from }: ConvertTabsProps) => {
     const { t } = useTranslation()
     const activeConvertTab = useTradeStore(state => state.activeConvertTab)
     const updateActiveConvertTab = useTradeStore(state => state.updateActiveConvertTab)
@@ -56,7 +56,6 @@ const ConvertTabs = memo(
         <div 
           onClick={() => {
             updateActiveConvertTab('buy')
-            onChange && onChange(tabs[0])
           } }
           className={cn(
           "flex-1 flex items-center justify-center rounded-[4px] cursor-pointer font-medium text-[12px]",
@@ -71,7 +70,6 @@ const ConvertTabs = memo(
         <div 
           onClick={() => {
             updateActiveConvertTab('sell')
-            onChange && onChange(tabs[1])
           } }
           className={cn(
           "flex-1 flex items-center justify-center rounded-[4px] cursor-pointer font-medium text-[12px]",
@@ -85,16 +83,6 @@ const ConvertTabs = memo(
         </div>
       </div>
     )
-    // return (
-    //   <div className=" flex items-center w-full h-[48px] bg-[#131823] rounded-[16px]">
-    //     {
-    //       tabs.map(tab => (<ConvertTabItem key={tab.key} tab={tab} selected={tab.key} onClick={tab => {
-    //         setSelected(tab.key)
-    //         onChange && onChange(tab)
-    //       }} />))
-    //     }
-    //   </div>
-    // )
   }
 )
 

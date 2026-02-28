@@ -15,7 +15,7 @@ import { toFixed, truncate } from "@/utils/format"
 import { useBaseStore } from "@/stores/baseStore"
 
 export const LabelWrap = memo(
-  ({ children, tooltip }: { children: React.ReactNode, tooltip?: string }) => {
+  ({ children, tooltip }: { children: React.ReactNode, tooltip?: string | React.ReactNode }) => {
     if (!tooltip) return (
       <div className="text-[12px] w-full font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
         {children}

@@ -6,6 +6,7 @@ import { useRouter } from "@/hooks/useRouter"
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { OrderConfirm } from "../../order-confirm"
 import { useTranslation } from "@/hooks/useTranslation"
+import type { TradeType } from "node_modules/ca-common-web/dist/types/contract/types"
 
 type TradeButtonUIProps = {
   from?: string
@@ -17,6 +18,8 @@ type TradeButtonUIProps = {
   kycButtonText: string
   buttonVariant: "primary" | "warning"
   action: "buy" | "sell"
+  tradeType: TradeType
+  slippage: number
   buying: boolean
   disabled: boolean
   buttonText: string
@@ -41,6 +44,8 @@ export function TradeButtonUI({
   kycButtonText,
   buttonVariant,
   action,
+  tradeType,
+  slippage,
   buying,
   disabled,
   buttonText,
@@ -117,6 +122,8 @@ export function TradeButtonUI({
       >
         <OrderConfirm
           action={action}
+          tradeType={tradeType}
+          slippage={slippage}
           orderValue={orderValue}
           platformFee={platformFee}
           brokerageFee={brokerageFee}

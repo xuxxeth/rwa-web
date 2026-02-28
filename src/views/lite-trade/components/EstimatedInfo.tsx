@@ -1,18 +1,24 @@
 import { BetweenText } from "@/components/between-text"
+import IconWithTooltip from "@/components/icon-tooltip"
 import { LazyImage } from "@/components/image/LazyImage"
+import { LabelWrap } from "@/components/markets/Klinebody"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
+import { TradeType } from "ca-common-web"
 import { memo } from "react"
 
 type EstimatedInfoProps = {
   estimatedFee: string
   networkFeeInNative: string
   expires: number,
+  tradeType: TradeType
+  slippage: number,
+  maxSlippage: string,
   onEdit?: () => void
 }
 
 const EstimatedInfo = memo(
-  ({ estimatedFee, networkFeeInNative, onEdit }: EstimatedInfoProps) => {
+  ({ estimatedFee, networkFeeInNative, tradeType, slippage, maxSlippage, onEdit }: EstimatedInfoProps) => {
     const { t } = useTranslation()
     // const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
     return (
@@ -29,19 +35,56 @@ const EstimatedInfo = memo(
             </div>
           }
         /> */}
-        <BetweenText 
-          left={t("Expires in")}
-          right={
-            <div className=""
-              onClick={() => {
-                // onEdit && onEdit()
-              }}
-            >
-              {t('assets.order.intraday')} 
-              {/* <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" /> */}
-            </div>
-          }
-        />
+        {
+          tradeType === TradeType.MARKET && (
+            <BetweenText 
+              left={
+                <LabelWrap tooltip={
+                  <div className="text-xs ">
+                    <div className="text-white mt-1">滑点</div>
+                    <div className="text-[#C7CCD6] mt-1">市价单将以附带生效时间的限价单形式下达，即立即成交或取消订单</div>
+                    <div className="mt-1">最大滑点百分比 = {Number(maxSlippage) * 100}%</div>
+                    <div className="mt-1">最大价格滑点 = 最新价*(1+{maxSlippage})%</div>
+                    <div className="mt-1 flex items-center cursor-pointer">
+                      <div className="text-[#009DFF]">了解更多</div>
+                      <img src="/images/v2/icons/link-active.png" className="w-[14px] ml-1" alt="" />
+                    </div>
+                  </div>
+                }>
+                  {"滑点"}
+                </LabelWrap>
+              }
+              right={
+                <div className="flex items-center cursor-pointer"
+                  onClick={() => {
+                    onEdit && onEdit()
+                  }}
+                >
+                  {`${slippage}%`}{slippage === 3 && ' (推荐)'}
+                  <LazyImage src="/images/v2/icons/edit.png" className="w-2 h-2 ml-[4px]" />
+                </div>
+              }
+            />
+          )
+        }
+        {
+          tradeType === TradeType.LIMIT && (
+            <BetweenText 
+              left={t("Expires in")}
+              right={
+                <div className=""
+                  onClick={() => {
+                    // onEdit && onEdit()
+                  }}
+                >
+                  {t('assets.order.intraday')} 
+                  {/* <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" /> */}
+                </div>
+              }
+            />
+          )
+        }
+        
         <BetweenText 
           left={t('v2.tx.t28')}
           right={`${estimatedFee} USDT` }

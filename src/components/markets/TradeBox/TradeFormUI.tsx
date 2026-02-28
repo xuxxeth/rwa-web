@@ -9,10 +9,12 @@ import { ConvertAction } from "../ConvertAction"
 import { EstimatedInfo } from "../../../views/lite-trade/components/EstimatedInfo"
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { ExpiresSetting } from "../../expires-setting"
+import type { TradeType } from "ca-common-web"
 
 type TradeFormUIProps = {
   from?: string
   action: "buy" | "sell"
+  tradeType: TradeType
   limitPrice: string
   inputSize: string
   orderValue: string
@@ -30,12 +32,12 @@ type TradeFormUIProps = {
   onPriceChange: (value: string) => void
   onSizeChange: (value: string) => void
   onChangePriceType: (value: number) => void
-  onExpiresChange: (value: number) => void
 }
 
 export function TradeFormUI({
   from,
   action,
+  tradeType,
   limitPrice,
   inputSize,
   orderValue,
@@ -53,25 +55,25 @@ export function TradeFormUI({
   onPriceChange,
   onSizeChange,
   onChangePriceType,
-  onExpiresChange,
 }: TradeFormUIProps) {
   const { t } = useTranslation()
-  const expiresDialog = useShowDialog()
 
   return (
     <>
       {from === 'markets' && (
         <>
           <CurrencyInputPanel
+            tradeType={tradeType}
             value={limitPrice}
             from={from}
             mode="price"
             label={t('v2.tx.t24')}
             onUserInput={onPriceChange}
           />
-          <PriceChangeTab onChange={onChangePriceType} />
+          <PriceChangeTab onChange={onChangePriceType} tradeType={tradeType} />
           <div className="h-3"></div>
           <CurrencyInputPanel
+            tradeType={tradeType}
             value={inputSize}
             regex="^\d*\.?\d*$"
             from={from}
@@ -92,6 +94,7 @@ export function TradeFormUI({
       {from === 'lite-trade' && (
         <>
           <CurrencyInputPanelLite
+            tradeType={tradeType}
             value={limitPrice}
             from={from}
             mode="price"
@@ -150,21 +153,6 @@ export function TradeFormUI({
         </div>
       )}
 
-
-      
-
-      <DialogController
-        title={t("Expires in")}
-        open={expiresDialog.open}
-        openChange={expiresDialog.setOpen}
-      >
-        <ExpiresSetting
-          onConfirm={(value) => {
-            onExpiresChange(value)
-            expiresDialog.hide()
-          }}
-        />
-      </DialogController>
     </>
   )
 }

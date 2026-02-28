@@ -10,6 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation"
 import { useSettingStore } from "@/stores/settingStore"
 import IconWithTooltip, { TooltipWithBorder } from "../icon-tooltip"
 import { useBaseStore } from "@/stores/baseStore"
+import { TradeType } from "ca-common-web"
 
 
 
@@ -21,6 +22,8 @@ type OrderConfirmProps = {
   tradingActivityFee: string,
   estimatedFee: string,
   action: string
+  tradeType: TradeType
+  slippage: number
   feeRate: string
   onClick?: () => void
 }
@@ -28,6 +31,8 @@ type OrderConfirmProps = {
 const OrderConfirm = memo(
   ({ 
     action,
+    tradeType,
+    slippage,
     orderValue,
     platformFee, 
     brokerageFee, 
@@ -68,6 +73,8 @@ const OrderConfirm = memo(
 
     const feeRatePercent = `${(Number(feeRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
 
+    const isMarketOrder = tradeType === TradeType.MARKET
+
     return (
       <div className="w-[420px] border-t border-[#232427] px-6 py-4 min-h-[426px]">
         <div className={cn(
@@ -95,12 +102,25 @@ const OrderConfirm = memo(
         <div className="mt-4 space-y-1">
           <BetweenText 
             left={t('v2.tx.t30')}
-            right={t('limit')}
+            right={ isMarketOrder ? t('market') : t('limit')}
           />
-          <BetweenText 
-            left={t('Limit price')}
-            right={`${limitPrice}`}
-          />
+          {
+            !isMarketOrder && (
+              <BetweenText 
+                left={t('Limit price')}
+                right={`${limitPrice}`}
+              />
+            )
+          }
+          {
+            isMarketOrder && (
+              <BetweenText 
+                left={'滑点'}
+                right={`${slippage}%`}
+              />
+            )
+          }
+          
           <BetweenText 
             left={t("Expires in")}
             right={t('assets.order.intraday')}

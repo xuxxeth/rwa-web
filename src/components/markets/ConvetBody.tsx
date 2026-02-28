@@ -532,6 +532,9 @@ export function ConverBody({
       {
         Number(orderValue) > 0 && 
           <EstimatedInfo
+            slippage={3}
+            maxSlippage={'5'}
+            tradeType={TradeType.LIMIT}
             estimatedFee={estimatedFee}
             networkFeeInNative={marketInfo.networkFeeInNative}
             expires={expires}
@@ -560,6 +563,8 @@ export function ConverBody({
         openChange={orderDialog.setOpen}
       > 
         <OrderConfirm 
+          tradeType={TradeType.LIMIT}
+          slippage={3}
           action={action}
           orderValue={orderValue}
           platformFee={platformFee}

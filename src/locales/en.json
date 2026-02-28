@@ -708,7 +708,7 @@
       "t21": "Day Low",
       "t211": "The lowest traded price during the current trading session.",
       "t22": "Last Price",
-      "t23": "Markets Closed — Orders will be queued and executed in the next trading session.",
+      "t23": "Market is currently closed. Market orders are unavailable，please use limit order.",
       "t24": "Limit prcie",
       "t25": "Quantity",
       "t26": "Est. Pay",

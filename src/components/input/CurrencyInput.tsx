@@ -44,7 +44,7 @@ const CurrencyInput = memo(
       <div className="flex items-center justify-between w-full">
         <NumberInput 
           className={cn(
-            "flex-1 min-w-0 placeholder:text-[16px] text-[18px] font-medium disabled:text-[#9DA3AF]",
+            "flex-1 min-w-0 placeholder:text-[16px] text-[18px] font-medium disabled:text-[#9DA3AF] h-[23px]",
             isInsufficient ? "text-[#F6465D]" : ""
           )}
           placeholder={placeholder}

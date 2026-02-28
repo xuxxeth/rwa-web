@@ -4,6 +4,7 @@ import type { TradeStore } from './types'
 
 import type { IRwa, IToken } from '@/service/base/types'
 import type { ISummaryDataItem } from '@/service/webSocket/types';
+import { TradeType } from 'ca-common-web';
 
 export const useTradeStore = create<TradeStore>()(
   persist(
@@ -15,6 +16,8 @@ export const useTradeStore = create<TradeStore>()(
       inputSize: '',
       expires: 7,
       activeConvertTab: 'buy' as const,
+      tradeType: TradeType.MARKET,
+      slippage: 3,
       isSignatureValid: false,
       txStep: 0,
       txError: '',
@@ -36,6 +39,12 @@ export const useTradeStore = create<TradeStore>()(
       },
       updateActiveConvertTab: (tab: 'buy' | 'sell') => {
         set({activeConvertTab: tab})
+      },
+      updateTradeType: (tradeType: TradeType) => {
+        set({tradeType})
+      },
+      updateSlippage: (slippage: number) => {
+        set({slippage})
       },
       setIsSignatureValid: (valid: boolean) => {
         set({isSignatureValid: valid})
