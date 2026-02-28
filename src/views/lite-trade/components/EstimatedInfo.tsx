@@ -41,17 +41,17 @@ const EstimatedInfo = memo(
               left={
                 <LabelWrap tooltip={
                   <div className="text-xs ">
-                    <div className="text-white mt-1">滑点</div>
-                    <div className="text-[#C7CCD6] mt-1">市价单将以附带生效时间的限价单形式下达，即立即成交或取消订单</div>
-                    <div className="mt-1">最大滑点百分比 = {Number(maxSlippage) * 100}%</div>
-                    <div className="mt-1">最大价格滑点 = 最新价*(1+{maxSlippage})%</div>
+                    <div className="text-white mt-1">{t('v3.t2')}</div>
+                    <div className="text-[#C7CCD6] mt-1">{t('v3.t6')}</div>
+                    <div className="mt-1">{t('v3.t7', { slippage: Number(maxSlippage) * 100 })}</div>
+                    <div className="mt-1">{t('v3.t8', { slippage: maxSlippage })}</div>
                     <div className="mt-1 flex items-center cursor-pointer">
-                      <div className="text-[#009DFF]">了解更多</div>
+                      <div className="text-[#009DFF]">{t('v3.t9')}</div>
                       <img src="/images/v2/icons/link-active.png" className="w-[14px] ml-1" alt="" />
                     </div>
                   </div>
                 }>
-                  {"滑点"}
+                  {t('v3.t2')}
                 </LabelWrap>
               }
               right={
@@ -60,7 +60,7 @@ const EstimatedInfo = memo(
                     onEdit && onEdit()
                   }}
                 >
-                  {`${slippage}%`}{slippage === 3 && ' (推荐)'}
+                  {`${slippage}%`}{slippage === 3 && ` (${t('v3.t3')})`}
                   <LazyImage src="/images/v2/icons/edit.png" className="w-2 h-2 ml-[4px]" />
                 </div>
               }

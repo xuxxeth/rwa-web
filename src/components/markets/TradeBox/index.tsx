@@ -84,6 +84,7 @@ export function TradeBox({
     inputToken,
     rwaPrice: inputTokenBalance,
     realtimeData,
+    tradeType,
     limitPrice,
     updateLimitPrice,
   })
@@ -274,7 +275,7 @@ export function TradeBox({
       <DialogController
         className="bg-[#131416] px-0"
         headerClassName="px-6"
-        title={"调整滑点"}
+        title={t('v3.t5')}
         open={expiresDialog.open}
         openChange={expiresDialog.setOpen}
       >

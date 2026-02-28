@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import BigNumber from "bignumber.js"
 import { truncateUP } from "@/utils"
 import { useRealtimeRwa } from "@/hooks/useRealtimeRwa"
+import { TradeType } from "@/hooks/useCaCommon"
 import type { IRwa, ITokenWithPrice } from "@/service/base/types"
 
 interface UseRealtimePriceSyncParams {
   inputToken?: IRwa | null
   rwaPrice?: Record<string, any> | null
   realtimeData?: { p?: string | number } | null
+  tradeType: TradeType
   limitPrice: string
   updateLimitPrice: (price: string) => void
 }
@@ -16,6 +18,7 @@ export function useRealtimePriceSync({
   inputToken,
   rwaPrice,
   realtimeData,
+  tradeType,
   limitPrice,
   updateLimitPrice,
 }: UseRealtimePriceSyncParams) {
@@ -35,11 +38,19 @@ export function useRealtimePriceSync({
   }, [updateLimitPrice])
 
   useEffect(() => {
-    if (rwaPrice && realtimeData && !initPrice.current) {
+    if (!rwaPrice || !realtimeData) return
+
+    if (tradeType === TradeType.MARKET) {
+      initPrice.current = true
+      setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p ?? 0) })
+      return
+    }
+
+    if (!initPrice.current) {
       initPrice.current = true
       setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p ?? 0) })
     }
-  }, [rwaPrice, realtimeData])
+  }, [rwaPrice, realtimeData, tradeType])
 
   useEffect(() => {
     if (inputToken && realtimeData && preToken.current?.symbol !== inputToken.symbol) {

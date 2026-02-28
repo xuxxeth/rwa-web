@@ -27,7 +27,10 @@ const Slippage = memo(
               setCurrent(0)
             }}
           >
-            <SlippageCheckBox checked={current === 0} />
+            <div className="flex items-center gap-x-2">
+              <SlippageCheckBox checked={current === 0} />
+              <div className="ml-2">{t('v3.t3')}</div>
+            </div>
             <div className=" text-[12px]">3%</div>
           </div>
           <div className={cn(
@@ -38,7 +41,10 @@ const Slippage = memo(
               setCurrent(1)
             }}
           >
-            <SlippageCheckBox checked={current === 1} />
+            <div className="flex items-center gap-x-2">
+              <SlippageCheckBox checked={current === 1} />
+              <div className="ml-2">{t('v3.t4')}</div>
+            </div>
             <div className="bg-[#131416] px-2 rounded-[4px] h-[31px] w-[129px] flex items-center justify-between text-[#9DA3AF] text-[12px]">
               <NumberInput
                 className="text-[12px] h-[29px] placeholder:text-[12px] text-center  w-[100px]" 
@@ -55,7 +61,11 @@ const Slippage = memo(
           </div>
         </div>
         <div className="px-6">
-          <Button onClick={() => onConfirm && onConfirm(current === 0 ? 3 : Number(inputValue))} className="w-full h-[48px] rounded-[8px]">{t('Confirm')}</Button>
+          <Button 
+            disabled={current === 1 && (Number(inputValue) <= 0 || Number(inputValue) > Number(maxSlippage || 5))}
+            onClick={() => onConfirm && onConfirm(current === 0 ? 3 : Number(inputValue))} 
+            className="w-full h-[48px] rounded-[8px]">{t('Confirm')}
+          </Button>
         </div>
       </div>
     )

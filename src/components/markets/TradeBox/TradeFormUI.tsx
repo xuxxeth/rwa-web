@@ -9,7 +9,7 @@ import { ConvertAction } from "../ConvertAction"
 import { EstimatedInfo } from "../../../views/lite-trade/components/EstimatedInfo"
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { ExpiresSetting } from "../../expires-setting"
-import type { TradeType } from "ca-common-web"
+import { TradeType } from "ca-common-web"
 
 type TradeFormUIProps = {
   from?: string
@@ -57,7 +57,7 @@ export function TradeFormUI({
   onChangePriceType,
 }: TradeFormUIProps) {
   const { t } = useTranslation()
-
+  const isMarket = tradeType === TradeType.MARKET
   return (
     <>
       {from === 'markets' && (
@@ -67,7 +67,7 @@ export function TradeFormUI({
             value={limitPrice}
             from={from}
             mode="price"
-            label={t('v2.tx.t24')}
+            label={ isMarket ? t('v3.price') : t('v2.tx.t24')}
             onUserInput={onPriceChange}
           />
           <PriceChangeTab onChange={onChangePriceType} tradeType={tradeType} />
