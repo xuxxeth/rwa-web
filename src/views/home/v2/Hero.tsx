@@ -145,7 +145,7 @@ const StockCard: React.FC<{
           </div>
         </div>
         <div className='flex justify-between items-end'>
-          <div className='text-3xl font-bold text-gray-900 tracking-tight'>
+          <div className={`text-3xl font-medium ${stock.color} text-gray-900 tracking-tight`}>
             {stock.price ? textPrefix(stock.price, '$') : ''}
           </div>
           <div className={`text-sm font-bold ${stock.color} bg-white/50 px-2 py-1 rounded-lg`}>
@@ -177,12 +177,9 @@ export const Hero: React.FC = () => {
 
   const centerIndex = Math.floor(stockData.length / 2)
 
-  const handleClick = useCallback(
-    (rwa: IRwa) => {
-      router.push('/trade/' + rwa.symbol)
-    },
-    []
-  )
+  const handleClick = useCallback((rwa: IRwa) => {
+    router.push('/trade/' + rwa.symbol)
+  }, [])
 
   return (
     <div className='relative z-20 pt-24 pb-10 md:pt-42 md:pb-10 px-6 !overflow-visible'>

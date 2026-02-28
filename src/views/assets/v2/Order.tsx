@@ -1,9 +1,10 @@
 import { useTranslation } from '@/hooks/useTranslation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from '@/utils'
 import OpenOrder from './OpenOrder'
 import HistoryOrder from './HistoryOrder'
 import TradeHistory from './TradeHistory'
+import { useOrderFilterStore } from '@/stores/orderFilterStore'
 
 function Order(props: {
   chainId?: number | null
@@ -11,12 +12,22 @@ function Order(props: {
   tabClassName?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
+  allowUserFilter: boolean
 }) {
   const { t } = useTranslation()
 
   const [activeTab, setActiveTab] = useState<'openOrder' | 'historyOrder' | 'tradeHistory'>(
     'openOrder'
   )
+
+  const clearAllFilters = useOrderFilterStore(state => state.clearAllFilters)
+
+  useEffect(() => {
+    return () => {
+      clearAllFilters()
+    }
+  }, [])
+
   return (
     <>
       <div className={cn('gap-1 mb-3 flex-0 ', props.tabClassName)}>

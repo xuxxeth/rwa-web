@@ -122,8 +122,8 @@ export function DatePickerWithRange({
   const { t, i18n } = useTranslation()
   const locale = i18n.language === 'zh' ? zhTW : enUS
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: userSelectedDateRange.from ? new Date(userSelectedDateRange.from * 1000) : new Date(),
-    to: userSelectedDateRange.end ? new Date(userSelectedDateRange.end * 1000) : new Date(),
+    from: userSelectedDateRange.from ? new Date(userSelectedDateRange.from * 1000) : undefined,
+    to: userSelectedDateRange.end ? new Date(userSelectedDateRange.end * 1000) : undefined,
   })
 
   const [isOpen, setIsOpen] = React.useState(false)
@@ -137,9 +137,14 @@ export function DatePickerWithRange({
         onOpenChange={_open => {
           setIsOpen(_open)
           if (!_open) {
+            // onUserSelectedDataRangeChanged({
+            //   startTime: date?.from ? Math.floor(date.from.getTime() / 1000) : undefined,
+            //   endTime: date?.to ? Math.ceil(date.to.getTime() / 1000) : undefined,
+            // })
+            // 从毫秒转换为秒，去掉小数部分
             onUserSelectedDataRangeChanged({
-              startTime: date?.from ? Math.floor(date.from.getTime() / 1000) : undefined,
-              endTime: date?.to ? Math.ceil(date.to.getTime() / 1000) : undefined,
+              startTime: date?.from ? Math.trunc(date.from.getTime() / 1000) : undefined,
+              endTime: date?.to ? Math.trunc(date.to.getTime() / 1000) : undefined,
             })
           }
         }}

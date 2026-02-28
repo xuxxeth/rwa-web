@@ -13,6 +13,7 @@ export function OrderInTrade() {
         showFilter={false}
         tabClassName='mb-2'
         dataMode='scroll'
+        allowUserFilter={false}
       />
     </div>
   )

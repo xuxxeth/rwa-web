@@ -32,12 +32,13 @@ import { OrderTable } from './shared'
 const PAGE_LIMIT = 20
 
 function HistoryOrder(props: {
+  allowUserFilter: boolean
   chainId?: number | null
   account?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
 }) {
-  const { chainId, account, showFilter, dataMode } = props
+  const { chainId, account, showFilter, dataMode, allowUserFilter } = props
   const rwaTokens = useRwaTokens()
 
   const orderHistoryFilters = useOrderFilterStore(state => state.orderHistoryFilters)
@@ -51,9 +52,12 @@ function HistoryOrder(props: {
   }
 
   const filters = useMemo(() => {
+    if (!allowUserFilter) {
+      return { limit: PAGE_LIMIT }
+    }
     const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters)
     return userSelectFilter
-  }, [orderHistoryFilters])
+  }, [orderHistoryFilters, allowUserFilter])
 
   return (
     <>
@@ -124,7 +128,7 @@ function HistoryOrder(props: {
           />
         </div>
       )}
-      <OrderTable<IOrder, IOrderHistoryFilter>
+      <OrderTable<IOrder, IOrderHistoryFilter & { limit?: number }>
         chainId={chainId}
         dataMode={dataMode}
         account={account}
@@ -170,7 +174,9 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOrder) => <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />,
+    render: (item: IOrder) => (
+      <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
+    ),
   },
   {
     key: 'filledAmount',
@@ -188,7 +194,9 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'filledValue',
     breakOnSpace: false,
     sortable: false,
-    render: (item: IOrder) => <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />,
+    render: (item: IOrder) => (
+      <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />
+    ),
   },
   {
     key: 'filledAvg',

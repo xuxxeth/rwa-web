@@ -28,12 +28,13 @@ import { OrderTable } from './shared'
 const PAGE_LIMIT = 20
 
 function TradeHistory(props: {
+  allowUserFilter: boolean
   chainId?: number | null
   account?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
 }) {
-  const { chainId, account, showFilter, dataMode } = props
+  const { chainId, account, showFilter, dataMode, allowUserFilter } = props
   const rwaTokens = useRwaTokens()
 
   const tradeHistoryFilters = useOrderFilterStore(state => state.tradeHistoryFilters)
@@ -47,10 +48,13 @@ function TradeHistory(props: {
   }
 
   const filters = useMemo(() => {
+    if (!allowUserFilter) {
+      return { limit: PAGE_LIMIT }
+    }
     const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters)
 
     return userSelectFilter
-  }, [tradeHistoryFilters])
+  }, [tradeHistoryFilters, allowUserFilter])
 
   return (
     <>
@@ -98,7 +102,7 @@ function TradeHistory(props: {
           />
         </div>
       )}
-      <OrderTable<ITrade, ITradeHistoryFilter>
+      <OrderTable<ITrade, ITradeHistoryFilter & { limit?: number }>
         chainId={chainId}
         dataMode={dataMode}
         PAGE_LIMIT={PAGE_LIMIT}
@@ -150,7 +154,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'tradeValue',
     sortable: false,
-    render: (item: ITrade) => <ValueCell value={toFixed(item.amount) } currency={item.currency} />,
+    render: (item: ITrade) => <ValueCell value={toFixed(item.amount)} currency={item.currency} />,
   },
   {
     key: 'avgPrice',

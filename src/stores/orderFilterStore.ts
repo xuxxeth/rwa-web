@@ -13,28 +13,34 @@ function generateDefaultEndTime() {
   return Math.floor(setEndOfDay(now).getTime() / 1000)
 }
 
+const defaultOpenOrderFilters: OrderFilterStore['openOrderFilters'] = {
+  stockIds: ['all'],
+  side: ['all'],
+  states: ['all'],
+}
+
+const defaultOrderHistoryFilters: OrderFilterStore['orderHistoryFilters'] = {
+  stockIds: ['all'],
+  side: ['all'],
+  states: ['all'],
+  orderType: ['all'],
+  startTime: generateDefaultStartTime(),
+  endTime: generateDefaultEndTime(),
+}
+
+const defaultTradeHistoryFilters: OrderFilterStore['tradeHistoryFilters'] = {
+  stockIds: ['all'],
+  side: ['all'],
+  states: ['all'],
+  orderType: ['all'],
+  startTime: generateDefaultStartTime(),
+  endTime: generateDefaultEndTime(),
+}
+
 export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
-  openOrderFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-  },
-  orderHistoryFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-    orderType: ['all'],
-    startTime: generateDefaultStartTime(),
-    endTime: generateDefaultEndTime(),
-  },
-  tradeHistoryFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-    orderType: ['all'],
-    startTime: generateDefaultStartTime(),
-    endTime: generateDefaultEndTime(),
-  },
+  openOrderFilters: defaultOpenOrderFilters,
+  orderHistoryFilters: defaultOrderHistoryFilters,
+  tradeHistoryFilters: defaultTradeHistoryFilters,
 
   updateOpenOrderFilters: (filters: Partial<OrderFilterStore['openOrderFilters']>) =>
     set(state => ({
@@ -48,6 +54,13 @@ export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
     set(state => ({
       tradeHistoryFilters: { ...state.tradeHistoryFilters, ...filters },
     })),
+
+  clearAllFilters: () =>
+    set({
+      openOrderFilters: defaultOpenOrderFilters,
+      orderHistoryFilters: defaultOrderHistoryFilters,
+      tradeHistoryFilters: defaultTradeHistoryFilters,
+    }),
 }))
 
 export interface IOpenOrderFilter {
@@ -164,4 +177,6 @@ interface OrderFilterStore {
   updateOpenOrderFilters: (filters: Partial<OrderFilterStore['openOrderFilters']>) => void
   updateOrderHistoryFilters: (filters: Partial<OrderFilterStore['orderHistoryFilters']>) => void
   updateTradeHistoryFilters: (filters: Partial<OrderFilterStore['tradeHistoryFilters']>) => void
+
+  clearAllFilters: () => void
 }
