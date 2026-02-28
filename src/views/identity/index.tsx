@@ -229,7 +229,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           (overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
             verifyType === KYC_VERIFY_TYPE.OCR &&
-            status === KYC_STATUS.VERIFYING) ||
+            (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW)) ||
           // 认证后，子流程需要重新提交收入证明材料
           (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW),
         render: () => <Verifying refresh={refresh} />,
