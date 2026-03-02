@@ -69,7 +69,8 @@ const CurrencyInputPanel = memo(
         "bg-[#1A1B1E] h-[38px] pl-3 pr-2 border border-[#1A1B1E] flex items-center justify-between",
         mode === "out" ? "border-[#232427] bg-[#131416] rounded-[4px] " : "",
         type === "size" ? "rounded-[4px]" : "rounded-t-[4px]",
-        inputFocus ? " border-[rgba(156,255,58,0.8)]" : ""
+        inputFocus ? " border-[rgba(156,255,58,0.8)]" : "",
+        tradeType === TradeType.MARKET && mode === "price" ? "bg-[#131416] border-[#232427]" : ""
       )}>
         <div className={cn(
           "text-[#9DA3AF] font-normal shrink-0",

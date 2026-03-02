@@ -229,6 +229,7 @@ function Identity({ account }: { account: string }) {
         match: () =>
           (overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
             verifyType === KYC_VERIFY_TYPE.OCR &&
+            // 认证中或人工审核中都显示 认证中状态， 因为人工审核中也是在审核这个 OCR 结果
             (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW)) ||
           // 认证后，子流程需要重新提交收入证明材料
           (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW),

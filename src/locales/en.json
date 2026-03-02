@@ -690,7 +690,7 @@
       "t11": "Cancel order submitted",
       "t12": "Cancel order failed",
       "t13": "Order cancelled successfully",
-      "s": "{{orderType}} order placed successfully, ",
+      "s": "{{orderType}} {{orderSide}} order placed successfully, ",
       "cs": "{{orderType}} {{orderSide}} cancel order submitted successfully.",
       "f": "{{orderType}} {{orderSide}} cancellation failed. Please try again later.",
       "t14": "Markets Open | Trading hour",
@@ -763,6 +763,7 @@
     "t6": "Market orders will be placed as Limit orders with Time in Force.",
     "t7": "Maximum Percentage Slippage={{slippage}}%",
     "t8": "Maximum Price Slippage=Mark Price*（1+{{slippage}}）%.",
-    "t9": "More detail"
+    "t9": "More detail",
+    "t10": "The market is closed. Please resubmit using a limit order."
   }
 }

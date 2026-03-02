@@ -143,7 +143,7 @@ export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'vie
       disabled={props.mode === 'view'}
       onClick={props.onClick}
       className={cn(
-        'w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#5B5B5B] border-dashed',
+        'w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#383A40] border-dashed',
         props.mode === 'view' ? 'cursor-not-allowed disabled' : 'cursor-pointer'
       )}
     >

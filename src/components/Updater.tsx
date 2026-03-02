@@ -45,7 +45,8 @@ const Updater = memo(
 
       console.log("new order info: ", newOrder)
       const orderType = newOrder.y === "LIMIT" ? t("limit") : t("market")
-      let message = t("v2.tx.s", { orderType })
+      const orderSide = newOrder.S === "BUY" ? t("Buy") : t("Sell")
+      let message = t("v2.tx.s", { orderType, orderSide })
       if (newOrder.x === "CANCELLED") {
         message = t("v2.tx.t11")
       }

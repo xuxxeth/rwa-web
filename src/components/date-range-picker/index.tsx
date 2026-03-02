@@ -153,7 +153,7 @@ export function DatePickerWithRange({
           <Button
             id='date'
             className={cn(
-              'w-[211px] h-8 rounded-sm border border-gray-850 text-gray-400 bg-transparent justify-start text-left font-normal text-xs/4 font-normal',
+              'w-[211px] h-8 rounded-sm border border-gray-850 text-gray-400 bg-transparent justify-start text-left text-xs/4 font-normal',
               isOpen ? 'border-[rgba(156,255,58,0.5)]' : ''
             )}
           >

@@ -19,7 +19,7 @@ const ChangeItemWrap = ({
     <div className={cn(
       "border border-[#232427] bg-[#1A1B1E] h-[24px] flex items-center justify-center text-[12px] text-[#9DA3AF] font-normal cursor-pointer px-2",
       !isMarket && "hover:bg-[#383A40] hover:border-[#383A40] hover:text-white",
-      isMarket && "border-[#383A40] text-[#383A40]",
+      isMarket && "border-[#232427] text-[#383A40] bg-[#131416]",
       className
     )}
       onClick={() => onClick && onClick()}
