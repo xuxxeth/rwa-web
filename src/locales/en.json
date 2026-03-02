@@ -203,12 +203,12 @@
       "bf": "Brokerage Fee",
       "pf": "Platform Service Fee",
       "reason": {
-        "1": "System Initiated",
-        "2": "Market Close Cancelled",
-        "3": "Rejected",
-        "4": "Suspected Irregular Trading Activity",
-        "5": "Price Too Far from Current Market",
-        "6": "Account Not Found"
+        "1": "System Operation",
+        "2": "Market Closed",
+        "3": "Order Canceled",
+        "4": "Potential Wash Trade",
+        "5": "Order Price Deviation",
+        "6": "User ID not exist"
       }
     }
   },
