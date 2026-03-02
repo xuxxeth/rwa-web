@@ -49,7 +49,11 @@ function TradeHistory(props: {
 
   const filters = useMemo(() => {
     if (!allowUserFilter) {
-      return { limit: PAGE_LIMIT }
+      return {
+        limit: PAGE_LIMIT,
+        startTime: tradeHistoryFilters.startTime,
+        endTime: tradeHistoryFilters.endTime,
+      }
     }
     const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters)
 
@@ -60,7 +64,7 @@ function TradeHistory(props: {
     <>
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
-          <DropDownFilter
+          {/* <DropDownFilter
             data={tradeHistoryFilters.orderType}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
               updateTradeHistoryFilters({
@@ -72,7 +76,7 @@ function TradeHistory(props: {
               { key: 'market', value: '1' },
             ]}
             title={'orderType'}
-          />
+          /> */}
           <DropDownFilter
             data={tradeHistoryFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -136,12 +140,12 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
     render: (item: ITrade) => <SideCell side={item.side} />,
     width: 60,
   },
-  {
-    key: 'type',
-    sortable: false,
-    render: (item: ITrade) => <OrderTypeCell orderType={item.orderType} />,
-    width: 60,
-  },
+  // {
+  //   key: 'type',
+  //   sortable: false,
+  //   render: (item: ITrade) => <OrderTypeCell orderType={item.orderType} />,
+  //   width: 60,
+  // },
   {
     key: 'token',
     sortable: false,

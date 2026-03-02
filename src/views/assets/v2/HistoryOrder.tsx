@@ -53,7 +53,11 @@ function HistoryOrder(props: {
 
   const filters = useMemo(() => {
     if (!allowUserFilter) {
-      return { limit: PAGE_LIMIT }
+      return {
+        limit: PAGE_LIMIT,
+        startTime: orderHistoryFilters.startTime,
+        endTime: orderHistoryFilters.endTime,
+      }
     }
     const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters)
     return userSelectFilter
@@ -258,7 +262,12 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'details',
     sortable: false,
     width: 50,
-    render: (item: IOrder) => <ReasonCell reason={item.reason} />,
+    render: (item: IOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return <ReasonCell reason={item.reason} />
+    },
   },
 ]
 
