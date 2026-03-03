@@ -698,7 +698,7 @@
       "t124": "委託失敗：委託價與現價偏離過大，請調整後重新下單",
       "t125": "委託失敗：請稍後再試",
       "t13": "订单取消",
-      "s": "{{orderType}}單{{orderSide}}委託成功，",
+      "s": "{{orderType}}單{{orderSide}}委託成功。",
       "cs": "{{orderType}}{{orderSide}}撤單委託提交成功。",
       "f": "{{orderType}}{{orderSide}}撤單委託失敗，請稍後再試。",
       "fs": "{{orderType}}單{{orderSide}}成功，成交數量{{filled}}{{token}}。",
