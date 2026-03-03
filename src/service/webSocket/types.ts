@@ -76,4 +76,5 @@ export type IOrderData = {
     "E": number  // Event time(Unix timestamp: ms)
     "sl": string  // 提取的具体的 rwa symbol
     "c": number // Cumulative trade amount
+    "r"?: number
   }

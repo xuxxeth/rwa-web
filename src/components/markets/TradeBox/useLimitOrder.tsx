@@ -90,10 +90,10 @@ export function useLimitOrder({
   }, [tradeType, slippage, effectivePrice, toastError])
 
   const submit = useCallback(async () => {
-    if (tradeType === TradeType.MARKET && marketTradeState === MARKET_STATUS.CLOSE) {
-      toastError({ title: t("v3.t10") })
-      return
-    }
+    // if (tradeType === TradeType.MARKET && marketTradeState === MARKET_STATUS.CLOSE) {
+    //   toastError({ title: t("v3.t10") })
+    //   return
+    // }
 
     if (!validateRisk()) return
 
