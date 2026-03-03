@@ -24,7 +24,7 @@ const Updater = memo(
     //   interval: 15000 // 15秒检查一次
     // });
     const router = useRouter()
-    const { toastSuccess } = useToast()
+    const { toastSuccess, toastError } = useToast()
     const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const newOrder = useWssStore(state => state.newOrder)
@@ -48,6 +48,7 @@ const Updater = memo(
       const orderType = !isMarket ? t("limit") : t("market")
       const orderSide = newOrder.S === "BUY" ? t("Buy") : t("Sell")
       let message = ''
+      let isFailed = false
       if (newOrder.x === "NEW") {
         message = t("v2.tx.s", { orderType, orderSide })
       }
@@ -75,6 +76,7 @@ const Updater = memo(
           }
           // FAILED状态
           if (newOrder.r === 3 || newOrder.r === 4 || newOrder.r === 5 || newOrder.r === 6 || newOrder.r === 7) {
+            isFailed = true
             if (newOrder.r === 3 || newOrder.r === 4) {
               message = t("v2.tx.t123")
             }
@@ -96,7 +98,12 @@ const Updater = memo(
       if (toastId && newOrder.x !== "CANCELLED") {
         setTxSuccess("success", message, newOrder.hx)
       } else if (!NO_SHOW_PATH.includes(router.location.pathname)) {
-        toastSuccess({ title: message, tx: newOrder.hx })
+        if (isFailed) {
+          toastError({ title: message, tx: newOrder.hx })
+        } else {
+          toastSuccess({ title: message, tx: newOrder.hx })
+        }
+        
       }
       freshTokenBalances()
     }, [newOrder, freshTokenBalances, t, router.location.pathname, setTxSuccess, toastSuccess])
