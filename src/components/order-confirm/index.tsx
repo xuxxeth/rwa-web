@@ -115,7 +115,7 @@ const OrderConfirm = memo(
           {
             isMarketOrder && (
               <BetweenText 
-                left={'滑点'}
+                left={t('v3.t2')}
                 right={`${slippage}%`}
               />
             )
