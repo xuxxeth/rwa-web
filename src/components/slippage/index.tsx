@@ -1,20 +1,32 @@
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/lib/utils"
-import { memo, useId, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { SlippageCheckBox } from "../check-box"
 import { NumberInput } from "../input/NumberInput"
 
 type SlippageProps = {
   maxSlippage?: string,
+  slippage?: number,
   onConfirm?: (value: number) => void
 }
 
 const Slippage = memo(
-  ({ maxSlippage, onConfirm }: SlippageProps) => {
+  ({ maxSlippage, slippage, onConfirm }: SlippageProps) => {
     const { t } = useTranslation()
     const [current, setCurrent] = useState(0)
     const [inputValue, setInputValue] = useState('')
+
+    useEffect(() => {
+      if (typeof slippage !== "number") return
+      if (slippage !== 3) {
+        setCurrent(1)
+        setInputValue(String(slippage))
+        return
+      }
+      setCurrent(0)
+      setInputValue("")
+    }, [slippage])
 
     return (
       <div className="w-[410px]">

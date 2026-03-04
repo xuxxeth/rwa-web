@@ -393,7 +393,7 @@ const BaseInfo = memo(
                         message: t('kyc.t54', { num: 30 }),
                       },
                       pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                        value: /^[a-zA-Z\u4e00-\u9fa5\s]+$/,
                         message: t('kyc.t64'),
                       },
                     })}
@@ -416,7 +416,7 @@ const BaseInfo = memo(
                         message: t('kyc.t54', { num: 30 }),
                       },
                       pattern: {
-                        value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                        value: /^[a-zA-Z\u4e00-\u9fa5\s]+$/,
                         message: t('kyc.t64'),
                       },
                       onChange: e => {

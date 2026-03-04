@@ -281,6 +281,7 @@ export function TradeBox({
       >
         <Slippage
           maxSlippage={Number(marketInfo.slippage) * 100 + ''}
+          slippage={slippage}
           onConfirm={(value) => {
             handleSlippageChange(value)
             expiresDialog.hide()
