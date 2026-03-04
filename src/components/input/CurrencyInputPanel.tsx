@@ -80,7 +80,7 @@ const CurrencyInputPanel = memo(
         )}>{label || ''}</div>
         {
           tradeType === TradeType.MARKET && mode === 'price' ? (
-            <div className="text-[#9DA3AF] text-[14px] pr-1 h-[23px]">按市价下单</div>
+            <div className="text-[#9DA3AF] text-[14px] pr-1 h-[23px]">{t('v3.t1')}</div>
           ) : (
             <CurrencyInput 
               isInsufficient={isInsufficient}

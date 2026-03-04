@@ -667,7 +667,7 @@ const BaseInfo = memo(
 
             {/* 上传证件 */}
             <Upload
-              type={type === 1 ? 'passport' : 'identity'}
+              type={'passport'}
               keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
 
               onChanged={keys => {
