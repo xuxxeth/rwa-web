@@ -23,7 +23,7 @@ export function keyToMinutes(key: string): number {
     "1D": 24 * 60,        // 1 day = 1440 minutes
     "1W": 7 * 24 * 60,    // 1 week = 10080 minutes
     // "1M": 30 * 24 * 60,   // 1 month (approx) = 43200 minutes
-    "1M": 40320,   // 后端接口配置
+    "1M": 43200,   // 后端接口配置
   };
 
   return map[key.toUpperCase()] ?? 15; // 未匹配返回 0

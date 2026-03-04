@@ -120,11 +120,15 @@ const OrderConfirm = memo(
               />
             )
           }
+          {
+            !isMarketOrder && (
+              <BetweenText 
+                left={t("Expires in")}
+                right={t('assets.order.intraday')}
+              />
+            )
+          }
           
-          <BetweenText 
-            left={t("Expires in")}
-            right={t('assets.order.intraday')}
-          />
           <BetweenText 
             left={
               <TooltipWithBorder tooltip={t('v2.tx.t311')}>
