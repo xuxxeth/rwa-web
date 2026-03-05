@@ -399,6 +399,21 @@ export function ScrollLoadMore<TData>(props: {
     )
   }
 
+  function renderViewMore(showIcon: boolean) {
+    if (type === 'open') {
+      return null
+    }
+    return (
+      <NoRecordAndSeeMore
+        showIcon={showIcon}
+        moreLang='portfolio.seeMore'
+        onClick={() => {
+          navigate(`/order?type=${type}`)
+        }}
+      />
+    )
+  }
+
   return (
     <>
       <div ref={loadMoreRef} className='py-1 text-xs/[15px] text-gray-400 text-center'>
@@ -407,7 +422,7 @@ export function ScrollLoadMore<TData>(props: {
         ) : hasNextPage ? (
           <div>{t('assets.scrollToLoadMore')}</div>
         ) : data.length > 0 ? (
-          renderNoMoreData(false)
+          renderViewMore(false)
         ) : null}
       </div>
       {!isLoading && data.length === 0 && renderNoMoreData(true)}
