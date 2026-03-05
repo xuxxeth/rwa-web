@@ -168,13 +168,14 @@
     "quantity": "鎖定數量",
     "ratio": "資產佔比",
     "allc": "佔比",
-    "openOrder": "當前委託",
-    "historyOrder": "歷史委託",
-    "tradeHistory": "成交紀錄",
+    "open": "當前委託",
+    "history": "歷史委託",
+    "trade": "成交紀錄",
     "noMore": "沒有更多數據",
     "frozen": "凍結數量",
     "start": "開始日期",
     "end": "結束日期",
+    "seeMore": "當前列表僅顯示近一個月數據，可在【我的】-【訂單】中<1>查看更多</1>",
     "orderTable": {
       "side": "方向",
       "type": "類型",
@@ -202,7 +203,8 @@
         "3": "廢單",
         "4": "自成交風險",
         "5": "委託價格偏移",
-        "6": "用户ID不存在"
+        "6": "用户ID不存在",
+        "7": "價格精度不支援"
       }
     }
   },
@@ -210,56 +212,11 @@
     "walletNotConnected": "錢包未連接",
     "connectWalletTip": "若要查看資產並開始交易，請連接您的錢包。",
     "walletAddress": "錢包地址",
-    "identityVerification": "身份驗證",
-    "estimatedBalance": "預估餘額",
-    "tabList": {
-      "assets": "資產",
-      "orderHistory": "委託記錄",
-      "tradeHistory": "成交紀錄"
-    },
-    "assetsTab": {
-      "token": "代幣",
-      "holdings": "持倉數量",
-      "price": "價格",
-      "value": "價值（USD）",
-      "actions": "操作"
-    },
-    "tradeHistory": {
-      "tableHeader": {
-        "side": "方向",
-        "type": "類型",
-        "token": "代幣",
-        "filledAmount": "成交數量",
-        "tradeValue": "成交金額",
-        "avgPrice": "平均成交價",
-        "time": "時間",
-        "txHash": "交易哈希"
-      }
-    },
     "order": {
       "openOrders": "當前委託",
       "cancelOrder": "撤單",
       "cancelOrderFailed": "撤單失敗。",
       "rk": "風險鎖定",
-
-      "tableHeader": {
-        "side": "方向",
-        "type": "類型",
-        "token": "代幣",
-        "orderPrice": "委託價格",
-        "orderAmount": "委託數量",
-        "filledPrice": "成交價格",
-        "filledAmount": "成交數量",
-        "filledValue": "成交金額",
-        "orderTime": "委託時間",
-        "expiration": "有效期限",
-        "executionTime": "成交時間",
-        "txHash": "交易哈希",
-        "details": "詳情",
-        "status": "狀態",
-        "action": "操作"
-      },
-
       "state": {
         "open": "委託中",
         "partiallyFilled": "部分成交",
@@ -272,9 +229,7 @@
         "marketCloseCancelled": "收市撤單",
         "pendingCancel": "撤單中"
       },
-
       "action": "操作",
-      "orderHistory": "歷史委託",
       "market": "市價",
       "limit": "限價",
       "side": "方向",

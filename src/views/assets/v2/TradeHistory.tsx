@@ -128,6 +128,7 @@ function TradeHistory(props: {
         scrollId={(item: ITrade) => item.id}
         filter={filters}
         tableConfig={tradeHistoryTableConfig}
+        type="trade"
       />
     </>
   )

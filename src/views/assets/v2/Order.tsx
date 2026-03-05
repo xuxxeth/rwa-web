@@ -5,6 +5,7 @@ import OpenOrder from './OpenOrder'
 import HistoryOrder from './HistoryOrder'
 import TradeHistory from './TradeHistory'
 import { useOrderFilterStore } from '@/stores/orderFilterStore'
+import { useSearchParams } from 'react-router-dom'
 
 function Order(props: {
   chainId?: number | null
@@ -15,10 +16,15 @@ function Order(props: {
   allowUserFilter: boolean
 }) {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
 
-  const [activeTab, setActiveTab] = useState<'openOrder' | 'historyOrder' | 'tradeHistory'>(
-    'openOrder'
-  )
+  const [activeTab, setActiveTab] = useState<'open' | 'history' | 'trade'>(() => {
+    const type = searchParams.get('type')
+    if (type === 'history' || type === 'trade') {
+      return type
+    }
+    return 'open'
+  })
 
   const clearAllFilters = useOrderFilterStore(state => state.clearAllFilters)
 
@@ -34,13 +40,13 @@ function Order(props: {
         <div className='inline-flex flex-row mx-4 p-1 rounded-md items-center border border-gray-850'>
           {[
             {
-              key: 'openOrder' as 'openOrder',
+              key: 'open' as 'open',
             },
             {
-              key: 'historyOrder' as 'historyOrder',
+              key: 'history' as 'history',
             },
             {
-              key: 'tradeHistory' as 'tradeHistory',
+              key: 'trade' as 'trade',
             },
           ].map(({ key }) => {
             return (
@@ -58,9 +64,9 @@ function Order(props: {
           })}
         </div>
       </div>
-      {activeTab === 'openOrder' && <OpenOrder {...props} />}
-      {activeTab === 'historyOrder' && <HistoryOrder {...props} />}
-      {activeTab === 'tradeHistory' && <TradeHistory {...props} />}
+      {activeTab === 'open' && <OpenOrder {...props} />}
+      {activeTab === 'history' && <HistoryOrder {...props} />}
+      {activeTab === 'trade' && <TradeHistory {...props} />}
     </>
   )
 }

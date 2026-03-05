@@ -154,6 +154,7 @@ function HistoryOrder(props: {
         scrollId={(item: IOrder) => item.orderId}
         filter={filters}
         tableConfig={orderHistoryTableConfig}
+        type="history"
       />
     </>
   )

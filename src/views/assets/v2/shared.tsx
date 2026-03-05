@@ -186,6 +186,7 @@ export function OrderTable<
   tableConfig,
   dataMode,
   scrollId,
+  type,
 }: {
   chainId?: number | null
   account?: string
@@ -195,6 +196,7 @@ export function OrderTable<
   tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
   dataMode: 'pagination' | 'scroll'
   scrollId: (item: T) => string
+  type: 'open' | 'history' | 'trade'
 }) {
   if (!chainId || !account) {
     return (
@@ -242,6 +244,7 @@ export function OrderTable<
           tableConfig={tableConfig}
           isSignatureValid={isSignatureValid}
           refreshIsSignatureValid={refreshIsSignatureValid}
+          type={type}
         />
       )}
     </WithTableHeader>
@@ -284,6 +287,7 @@ export function OrderContentByScroll<
   isSignatureValid,
   scrollId,
   refreshIsSignatureValid,
+  type,
 }: {
   chainId: number
   account: string
@@ -293,6 +297,7 @@ export function OrderContentByScroll<
   isSignatureValid: boolean
   refreshIsSignatureValid: (_isValid: boolean) => void
   scrollId: (item: T) => string
+  type: 'open' | 'history' | 'trade'
 }) {
   const rwaTokens = useRwaTokens()
 
@@ -363,6 +368,7 @@ export function OrderContentByScroll<
         data={allOrders}
         isLoading={isLoading}
         loadMoreRef={loadMoreRef}
+        type={type}
       />
     </div>
   )

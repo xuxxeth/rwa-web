@@ -125,6 +125,7 @@ function OpenOrder(props: {
         scrollId={(item: IOpenOrder) => item.orderId}
         filter={filter}
         tableConfig={openOrderTableConfig}
+        type={'open'}
       />
     </>
   )

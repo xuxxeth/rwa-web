@@ -14,7 +14,8 @@ import { textSuffix, toFixed, sum } from '@/utils'
 import type { IOrder, OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
-import NoRecord from '@/components/no-record'
+import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
+import { useNavigate } from 'react-router-dom'
 
 export type OrderChanged = {
   orderId: string
@@ -47,18 +48,23 @@ export function TradingFees(props: { currency: string; commission: string; fee: 
   const { t } = useTranslation()
   const tooltip = (
     <div className='flex flex-col gap-1'>
-      <div className='text-xs/[15px] text-gray-300'>
-        {t('portfolio.orderTable.bf')}{' '}
-        <span className='ml-9'>
-          {commission} {currency}
-        </span>
-      </div>
-      <div className='text-xs/[15px] text-gray-300'>
-        {t('portfolio.orderTable.pf')}{' '}
-        <span className='ml-9'>
-          {fee} {currency}
-        </span>
-      </div>
+      {[
+        {
+          title: 'bf',
+          value: commission,
+        },
+        {
+          title: 'pf',
+          value: fee,
+        },
+      ].map(({ value, title }) => (
+        <div className='text-xs/[15px] text-gray-300 flex flex-row justify-between'>
+          {t(`portfolio.orderTable.${title}`)}
+          <span className='ml-9'>
+            {value} {currency}
+          </span>
+        </div>
+      ))}
     </div>
   )
   return (
@@ -373,24 +379,38 @@ export function ScrollLoadMore<TData>(props: {
   data: TData[]
   isLoading: boolean
   loadMoreRef: RefObject<HTMLDivElement | null>
+  type: 'open' | 'history' | 'trade'
 }) {
   const { t } = useTranslation()
-  const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef } = props
+  const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef, type } = props
+  const navigate = useNavigate()
+
+  function renderNoMoreData(showIcon: boolean) {
+    return type === 'open' ? (
+      <NoRecord />
+    ) : (
+      <NoRecordAndSeeMore
+        showIcon={showIcon}
+        moreLang='portfolio.seeMore'
+        onClick={() => {
+          navigate(`/order?type=${type}`)
+        }}
+      />
+    )
+  }
+
   return (
     <>
       <div ref={loadMoreRef} className='py-1 text-xs/[15px] text-gray-400 text-center'>
-        {
-          isFetchingNextPage ? (
-            <div>{t('assets.loading')}...</div>
-          ) : hasNextPage ? (
-            <div>{t('assets.scrollToLoadMore')}</div>
-          ) : data.length > 0 ? null : null // <div>{t('assets.noMoreData')}</div>
-        }
+        {isFetchingNextPage ? (
+          <div>{t('assets.loading')}...</div>
+        ) : hasNextPage ? (
+          <div>{t('assets.scrollToLoadMore')}</div>
+        ) : data.length > 0 ? (
+          renderNoMoreData(false)
+        ) : null}
       </div>
-      {/* {isLoading && data.length === 0 && (
-        <div className='py-1 text-center text-gray-400'>{t('assets.loading')}...</div>
-      )} */}
-      {!isLoading && data.length === 0 && <NoRecord />}
+      {!isLoading && data.length === 0 && renderNoMoreData(true)}
     </>
   )
 }

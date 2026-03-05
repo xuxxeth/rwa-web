@@ -174,13 +174,14 @@
     "quantity": "Quantity",
     "ratio": "Asset Allocation",
     "allc": "Allocation",
-    "openOrder": "Open Orders",
-    "historyOrder": "Order History",
-    "tradeHistory": "Trade History",
+    "open": "Open Orders",
+    "history": "Order History",
+    "trade": "Trade History",
     "noMore": "No more data",
     "frozen": "Frozen Amount",
     "start": "Start Date",
     "end": "End Date",
+    "seeMore": "This list only shows data from the past month. Please <1>view more</1> in Portfolio > Order",
     "orderTable": {
       "side": "Side",
       "type": "Type",
@@ -208,7 +209,8 @@
         "3": "Order Canceled",
         "4": "Potential Wash Trade",
         "5": "Order Price Deviation",
-        "6": "User ID not exist"
+        "6": "User ID not exist",
+        "7": "Unsupported price precision"
       }
     }
   },
@@ -216,54 +218,11 @@
     "walletNotConnected": "Wallet Not Connected",
     "connectWalletTip": "Connect your wallet to view your assets and start trading.",
     "walletAddress": "Wallet Address",
-    "identityVerification": "Identity Verification",
-    "estimatedBalance": "Estimated Balance",
-    "tabList": {
-      "assets": "Assets",
-      "orderHistory": "Order History",
-      "tradeHistory": "Trade History"
-    },
-    "assetsTab": {
-      "token": "Token",
-      "holdings": "Holdings",
-      "price": "Price",
-      "value": "Value(USD)",
-      "actions": "Actions"
-    },
-    "tradeHistory": {
-      "tableHeader": {
-        "side": "Side",
-        "type": "Type",
-        "token": "Token",
-        "filledAmount": "Filled Amount",
-        "tradeValue": "Trade Value",
-        "avgPrice": "Avg. Price",
-        "time": "Time",
-        "txHash": "TX Hash"
-      }
-    },
     "order": {
       "openOrders": "Open Orders",
       "cancelOrder": "Cancel Order",
       "cancelOrderFailed": "Order cancellation failed.",
       "rk": "Risk Lock",
-      "tableHeader": {
-        "side": "Side",
-        "type": "Type",
-        "token": "Token",
-        "orderPrice": "Order Price",
-        "orderAmount": "Order Amount",
-        "filledPrice": "Filled Price",
-        "filledAmount": "Filled Amount",
-        "filledValue": "Filled Value",
-        "orderTime": "Order Time",
-        "expiration": "Expiration",
-        "executionTime": "Execution Time",
-        "txHash": "TX Hash",
-        "details": "Details",
-        "status": "Status",
-        "action": "Action"
-      },
       "state": {
         "open": "Open",
         "partiallyFilled": "Partially Filled",
