@@ -220,6 +220,7 @@ export default function HistoryOrderTable(props: {
             data={allOrders}
             isLoading={isLoading}
             loadMoreRef={loadMoreRef}
+            type="history"
           />
         </>
       ) : (

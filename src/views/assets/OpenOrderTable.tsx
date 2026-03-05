@@ -165,6 +165,7 @@ export default function OpenOrderTable(props: {
             data={allOpenOrders}
             isLoading={isLoading}
             loadMoreRef={loadMoreRef}
+            type="open"
           />
         </>
       ) : (
