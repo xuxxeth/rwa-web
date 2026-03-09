@@ -16,6 +16,8 @@ const Slippage = memo(
     const { t } = useTranslation()
     const [current, setCurrent] = useState(0)
     const [inputValue, setInputValue] = useState('')
+    const max = Number(maxSlippage)
+    const maxValue = Number.isFinite(max) && max > 0 ? Math.floor(max) : 5
 
     useEffect(() => {
       if (typeof slippage !== "number") return
@@ -60,8 +62,8 @@ const Slippage = memo(
             <div className="bg-[#131416] px-2 rounded-[4px] h-[31px] w-[129px] flex items-center justify-between text-[#9DA3AF] text-[12px]">
               <NumberInput
                 className="text-[12px] h-[29px] placeholder:text-[12px] text-center  w-[100px]" 
-                placeholder={`1～${maxSlippage || 5}`}
-                regex={`^[1-${maxSlippage || 5}]$`}
+                placeholder={`1～${maxValue}`}
+                regex={`^[1-${maxValue}]$`}
                 value={inputValue}
                 onInput={(e) => {
                   setInputValue(e)
@@ -74,7 +76,7 @@ const Slippage = memo(
         </div>
         <div className="px-6">
           <Button 
-            disabled={current === 1 && (Number(inputValue) <= 0 || Number(inputValue) > Number(maxSlippage || 5))}
+            disabled={current === 1 && (maxValue <= 0 || Number(inputValue) <= 0 || Number(inputValue) > maxValue)}
             onClick={() => onConfirm && onConfirm(current === 0 ? 3 : Number(inputValue))} 
             className="w-full h-[48px] rounded-[8px]">{t('Confirm')}
           </Button>

@@ -242,7 +242,7 @@ export function TradeBox({
           tradeType={tradeType}
           slippage={slippage}
           buying={order.loading}
-          disabled={uiState.disabled}
+          disabled={uiState.disabled || isMarketCloseDisabled}
           buttonText={uiState.buttonText}
           showConfirm={showConfirm}
           onSubmit={order.submit}
