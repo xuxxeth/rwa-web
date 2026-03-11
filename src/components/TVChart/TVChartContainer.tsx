@@ -137,26 +137,21 @@ export const TVChartContainer = memo(
       };
     }, []);
 
-        // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
+    // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
     useEffect(() => {
-      if (tvWidgetRef.current && token?.symbol && tvWidgetReady.current ) {
-        tvWidgetRef.current.remove(); // 或 chartRef.current.dispose() 视库而定
-        tvWidgetRef.current = null;
-        dataFeedRef.current = null
-        initChart && initChart(token)
-        // const chart = tvWidgetRef.current?.activeChart();
-        // if (chart) {
-        //   console.log("[TradingView] setSymbol:", token.symbol);
-        //   chart.resetData?.();         // 清除 TradingView 自身缓存
-        //   // ✅ 重新生成 datafeed
-        //   const newFeed = getDataFeed({ name: token.symbol, token })
-        //   dataFeedRef.current = newFeed
-        //   // @ts-ignore
-        //   chart?.setSymbol(token.symbol, "15", () => {
-        //     console.log("symbol updated");
-        //   });
-        // }
-      }
+      if (!tvWidgetRef.current || !token?.symbol || !tvWidgetReady.current) return
+
+      const chart = tvWidgetRef.current.activeChart()
+      if (!chart) return
+
+      // 更新 datafeed 中的 token
+      ;(dataFeedRef.current as any)?.setToken?.(token)
+
+      const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
+      chart.resetData?.()
+      chart.setSymbol(token.symbol, resolution, () => {
+        // no-op
+      })
     }, [token?.symbol])
 
     // ✅ 当语言变化时，重新初始化图表

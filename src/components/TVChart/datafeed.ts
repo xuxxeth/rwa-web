@@ -79,8 +79,13 @@ export function getDataFeed({
   name = 'AAPL',
   token
 }: any): IBasicDataFeed {
+  let currentToken = token
   let initialLoadComplete = false;
   return {
+    // @ts-ignore
+    setToken: (nextToken: any) => {
+      currentToken = nextToken
+    },
     onReady: (callback) => {
       setTimeout(() => callback(configurationData));
     },
@@ -157,7 +162,7 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       try {
-        const res = await klineApi.getCandles({ stock: token.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
+        const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
         const _data = res?.data || []
         if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
           onHistoryCallback([], { noData: true });
