@@ -637,17 +637,17 @@ const BaseInfo = memo(
                       {...register('residentAddress', {
                         required: t('kyc.t4'),
                         maxLength: {
-                          value: 60,
-                          message: t('kyc.t54', { num: 60 }),
+                          value: 160,
+                          message: t('kyc.t54', { num: 160 }),
                         },
                         pattern: {
-                          value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,60}$/,
+                          value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,160}$/,
                           message: t('kyc.t64'),
                         },
                         onChange: e => {
                           // 实时限制输入长度
-                          if (e.target.value.length > 40) {
-                            e.target.value = e.target.value.slice(0, 40)
+                          if (e.target.value.length > 160) {
+                            e.target.value = e.target.value.slice(0, 160)
                           }
                         },
                       })}
@@ -736,8 +736,8 @@ const BaseInfo = memo(
                           },
                           onChange: e => {
                             // 实时限制输入长度
-                            if (e.target.value.length > 40) {
-                              e.target.value = e.target.value.slice(0, 40)
+                            if (e.target.value.length > 60) {
+                              e.target.value = e.target.value.slice(0, 60)
                             }
                           },
                         })}
