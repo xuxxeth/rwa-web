@@ -14,7 +14,7 @@ const KlineBody = memo(
     const { t } = useTranslation()
     const [activeTab, setActiveTab] = useState<string>('kline')
     return (
-      <div className="w-full">
+      <div className="w-full h-full">
         <StockInfo from="pro-trading" />
         <div className="h-1 bg-[#1A1B1E]"></div>
         <div className="py-2">
@@ -46,10 +46,12 @@ const KlineBody = memo(
             })}
           </div>
         </div>
-        <div hidden={activeTab !== 'kline'} className="w-full">
+        <div hidden={activeTab !== 'kline'} className="w-full h-full relative">
           <TradingChart from={from} />
           <div className="h-1 bg-[#1A1B1E]"></div>
-          <OrderInTrade />
+          <div className="absolute w-full" style={{ height: 'calc(100% - 619px)'}}>
+            <OrderInTrade />
+          </div>
         </div>
 
         <div hidden={activeTab !== 'com'} className="px-4 mb-2">
