@@ -46,10 +46,10 @@ const KlineBody = memo(
             })}
           </div>
         </div>
-        <div hidden={activeTab !== 'kline'} className="w-full h-full relative">
+        <div hidden={activeTab !== 'kline'} className="w-full relative" style={{ height: 'calc(100% - 115px)'}}>
           <TradingChart from={from} />
           <div className="h-1 bg-[#1A1B1E]"></div>
-          <div className="absolute w-full" style={{ height: 'calc(100% - 619px)'}}>
+          <div className="absolute w-full" style={{ height: 'calc(100% - 504px)',minHeight: 400 }}>
             <OrderInTrade />
           </div>
         </div>
