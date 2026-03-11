@@ -1,7 +1,6 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { escapeRegExp } from "@/utils"
 
 interface KycInputProps extends React.ComponentProps<"input"> {
   error?: string
@@ -9,21 +8,61 @@ interface KycInputProps extends React.ComponentProps<"input"> {
 }
 
 const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
-  ({ className, type, error, value = '', regex, ...props }, ref) => {
-    const inputRegex = RegExp(regex || '.*')
-    const enforcer = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const nextUserInput = e.target.value
-      if (regex) {
-        if (nextUserInput === '' || inputRegex.test(escapeRegExp(nextUserInput))) {
-          e.target.value = nextUserInput
-          props.onChange && props.onChange(e)
-        }
-        
-      } else {
-        props.onChange && props.onChange(e)
+  ({ className, type, error, value, regex, ...props }, ref) => {
+    const inputRegex = RegExp(regex || ".*")
+
+    const handleBeforeInput = (e: React.InputEvent<HTMLInputElement>) => {
+      if (!regex) {
+        props.onBeforeInput && props.onBeforeInput(e)
+        return
       }
-      
+
+      const nativeEvent = e.nativeEvent as InputEvent
+      const inputType = nativeEvent.inputType || ""
+      if (inputType.startsWith("delete") || inputType === "insertCompositionText") {
+        props.onBeforeInput && props.onBeforeInput(e)
+        return
+      }
+
+      const data = nativeEvent.data
+      if (typeof data !== "string" || data.length === 0) {
+        props.onBeforeInput && props.onBeforeInput(e)
+        return
+      }
+
+      const target = e.currentTarget
+      const start = target.selectionStart ?? target.value.length
+      const end = target.selectionEnd ?? target.value.length
+      const nextValue = target.value.slice(0, start) + data + target.value.slice(end)
+
+      if (nextValue !== "" && !inputRegex.test(nextValue)) {
+        e.preventDefault()
+        return
+      }
+
+      props.onBeforeInput && props.onBeforeInput(e)
     }
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+      if (!regex) {
+        props.onPaste && props.onPaste(e)
+        return
+      }
+
+      const text = e.clipboardData.getData("text")
+      const target = e.currentTarget
+      const start = target.selectionStart ?? target.value.length
+      const end = target.selectionEnd ?? target.value.length
+      const nextValue = target.value.slice(0, start) + text + target.value.slice(end)
+
+      if (nextValue !== "" && !inputRegex.test(nextValue)) {
+        e.preventDefault()
+        return
+      }
+
+      props.onPaste && props.onPaste(e)
+    }
+
     return (
       <input
         type={type}
@@ -33,10 +72,13 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
           error ? "border-[#CA3F64]" : "focus:border-[#FFFFFF]"
         )}
         ref={ref}
+        pattern={regex}
         {...props}
-        value={value}
+        {...(value !== undefined ? { value } : {})}
+        onBeforeInput={handleBeforeInput}
+        onPaste={handlePaste}
         onChange={e => {
-          enforcer(e)
+          props.onChange && props.onChange(e)
         }}
       />
     )

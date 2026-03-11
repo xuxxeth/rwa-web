@@ -644,12 +644,7 @@ const BaseInfo = memo(
                           value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,160}$/,
                           message: t('kyc.t64'),
                         },
-                        onChange: e => {
-                          // 实时限制输入长度
-                          if (e.target.value.length > 160) {
-                            e.target.value = e.target.value.slice(0, 160)
-                          }
-                        },
+                        
                       })}
                     />
                     <ErrorBox error={errors.residentAddress?.message} />
@@ -734,12 +729,7 @@ const BaseInfo = memo(
                             value: /^[\u4e00-\u9fa5a-zA-Z0-9 ,，]{1,60}$/,
                             message: t('kyc.t64'),
                           },
-                          onChange: e => {
-                            // 实时限制输入长度
-                            if (e.target.value.length > 60) {
-                              e.target.value = e.target.value.slice(0, 60)
-                            }
-                          },
+                          
                         })}
                       />
                       <ErrorBox error={errors.description?.message} />
