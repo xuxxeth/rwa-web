@@ -66,7 +66,7 @@ const IntradayLineChart = memo(({ from, data, session = "pre" }: IntradayLineCha
     return series.filter((p) => p.ts >= start && p.ts <= end);
   }, [series, sessionRange]);
 
-  const lastPoint = displaySeries[displaySeries.length - 1];
+  const lastIndex = displaySeries.length - 1;
 
  
   const priceDomain = useMemo(() => {
@@ -129,21 +129,23 @@ const IntradayLineChart = memo(({ from, data, session = "pre" }: IntradayLineCha
               dataKey="price"
               stroke="#25A750"
               strokeWidth={1.5}
-              dot={false}
+              dot={({ index, cx, cy }) => {
+                if (index !== lastIndex || cx === undefined || cy === undefined) return null;
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={3}
+                    fill="#25A750"
+                    stroke="#FFFFFF"
+                    strokeWidth={1}
+                  />
+                );
+              }}
+              activeDot={{ r: 3 }}
               isAnimationActive={false}
               connectNulls={false}
             />
-            {lastPoint && (
-              <Line
-                type="linear"
-                dataKey="price"
-                data={[lastPoint]}
-                stroke="transparent"
-                dot={{ r: 3, fill: "#25A750", stroke: "#FFFFFF", strokeWidth: 1 }}
-                isAnimationActive={false}
-                connectNulls={false}
-              />
-            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
