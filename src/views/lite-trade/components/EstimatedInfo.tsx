@@ -45,10 +45,10 @@ const EstimatedInfo = memo(
                     <div className="text-[#C7CCD6] mt-1">{t('v3.t6')}</div>
                     <div className="mt-1">{t('v3.t7', { slippage: Number(maxSlippage) * 100 })}</div>
                     <div className="mt-1">{t('v3.t8', { slippage: maxSlippage })}</div>
-                    <div className="mt-1 flex items-center cursor-pointer">
+                    {/* <div className="mt-1 flex items-center cursor-pointer">
                       <div className="text-[#009DFF]">{t('v3.t9')}</div>
                       <img src="/images/v2/icons/link-active.png" className="w-[14px] ml-1" alt="" />
-                    </div>
+                    </div> */}
                   </div>
                 }>
                   {t('v3.t2')}

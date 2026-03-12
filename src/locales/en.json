@@ -727,7 +727,7 @@
     "t3": "Auto",
     "t4": "Custom",
     "t5": "Adjust Slippage",
-    "t6": "Market orders will be placed as Limit orders with Time in Force.",
+    "t6": "Market orders will be placed as Limit orders with Time in Force=IOC (Immediate or Canceled). ",
     "t7": "Maximum Percentage Slippage={{slippage}}%",
     "t8": "Maximum Price Slippage=Mark Price*（1+{{slippage}}）%.",
     "t9": "More detail",
