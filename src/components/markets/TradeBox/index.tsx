@@ -29,6 +29,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { ExpiresSetting } from "@/components/expires-setting";
 import { Slippage } from "@/components/slippage";
+import { isTiko } from "@/service/client";
 
 type TradeBoxProps = {
   action?: string
@@ -66,7 +67,7 @@ export function TradeBox({
   const { account, isSameChain } = useActiveWeb3()
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
-  const isMarketCloseDisabled = marketTradeState === MARKET_STATUS.CLOSE && tradeType === TradeType.MARKET
+  const isMarketCloseDisabled = marketTradeState === MARKET_STATUS.CLOSE && tradeType === TradeType.MARKET && isTiko
   const effectivePrice = useEffectivePrice({
     tradeType,
     action,
