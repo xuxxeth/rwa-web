@@ -119,6 +119,7 @@ const IntradayLineChart = memo(({ from, data, session = "pre" }: IntradayLineCha
               width={40}
             />
             <Tooltip
+              cursor={{ stroke: "#25A750", strokeWidth: 1, strokeDasharray: "3 3" }}
               labelFormatter={(label) => formatTime(Number(label))}
               formatter={(val) => [val, "Price"]}
               contentStyle={{ background: "#131416", border: "1px solid #232427" }}
@@ -130,7 +131,12 @@ const IntradayLineChart = memo(({ from, data, session = "pre" }: IntradayLineCha
               stroke="#25A750"
               strokeWidth={1.5}
               dot={({ index, cx, cy }) => {
-                if (index !== lastIndex || cx === undefined || cy === undefined) return null;
+                if (cx === undefined || cy === undefined) {
+                  return <circle cx={0} cy={0} r={0} />;
+                }
+                if (index !== lastIndex) {
+                  return <circle cx={cx} cy={cy} r={0} />;
+                }
                 return (
                   <circle
                     cx={cx}
