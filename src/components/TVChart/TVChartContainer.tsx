@@ -149,9 +149,7 @@ export const TVChartContainer = memo(
 
       const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
       chart.resetData?.()
-      chart.setSymbol(token.symbol, resolution, () => {
-        // no-op
-      })
+      chart.setSymbol(token.symbol, resolution)
     }, [token?.symbol])
 
     // ✅ 当语言变化时，重新初始化图表
