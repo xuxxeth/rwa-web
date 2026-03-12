@@ -24,10 +24,15 @@ export function useTxStepLifecycle({
   refetchAllowance,
 }: UseTxStepLifecycleParams) {
   const stepStartRef = useRef(false)
+  const lastSyncedStepRef = useRef(0)
 
   useEffect(() => {
-    if (stepStartRef.current) {
+    if (!stepStartRef.current) return
+
+    // Ignore resets on context changes, only allow progress to move forward.
+    if (txStep >= lastSyncedStepRef.current) {
       setTxStep(txStep)
+      lastSyncedStepRef.current = txStep
     }
   }, [txStep, setTxStep])
 
@@ -47,7 +52,9 @@ export function useTxStepLifecycle({
     dismissTxToast()
     setTxError('')
     setTxSuccess('', '', '')
-    setTxStep(approvalState === 3 ? 1 : 0)
+    const initialStep = approvalState === 3 ? 1 : 0
+    setTxStep(initialStep)
+    lastSyncedStepRef.current = initialStep
     toastTxSteps({ action: 'place', approveed: approvalState === 3, onClick: handleEndStep })
   }, [dismissTxToast, setTxError, setTxSuccess, setTxStep, approvalState, toastTxSteps, handleEndStep])
 
