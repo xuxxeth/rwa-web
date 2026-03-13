@@ -2,6 +2,7 @@ import { BetweenText } from "@/components/between-text"
 import IconWithTooltip from "@/components/icon-tooltip"
 import { LazyImage } from "@/components/image/LazyImage"
 import { LabelWrap } from "@/components/markets/Klinebody"
+import { DEFAULT_SLIPPAGE } from "@/config/constants"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
 import { TradeType } from "ca-common-web"
@@ -60,7 +61,7 @@ const EstimatedInfo = memo(
                     onEdit && onEdit()
                   }}
                 >
-                  {`${slippage}%`}{slippage === 3 && ` (${t('v3.t3')})`}
+                  {`${slippage}%`}{slippage === DEFAULT_SLIPPAGE && ` (${t('v3.t3')})`}
                   <LazyImage src="/images/v2/icons/edit.png" className="w-2 h-2 ml-[4px]" />
                 </div>
               }
