@@ -4,6 +4,7 @@ import { memo, useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { SlippageCheckBox } from "../check-box"
 import { NumberInput } from "../input/NumberInput"
+import { DEFAULT_SLIPPAGE } from "@/config/constants"
 
 type SlippageProps = {
   maxSlippage?: string,
@@ -17,11 +18,11 @@ const Slippage = memo(
     const [current, setCurrent] = useState(0)
     const [inputValue, setInputValue] = useState('')
     const max = Number(maxSlippage)
-    const maxValue = Number.isFinite(max) && max > 0 ? Math.floor(max) : 5
+    const maxValue = Number.isFinite(max) && max > 0 ? Math.floor(max) : 3
 
     useEffect(() => {
       if (typeof slippage !== "number") return
-      if (slippage !== 3) {
+      if (slippage !== DEFAULT_SLIPPAGE) {
         setCurrent(1)
         setInputValue(String(slippage))
         return
@@ -45,7 +46,7 @@ const Slippage = memo(
               <SlippageCheckBox checked={current === 0} />
               <div className="ml-2">{t('v3.t3')}</div>
             </div>
-            <div className=" text-[12px]">3%</div>
+            <div className=" text-[12px]">{DEFAULT_SLIPPAGE}%</div>
           </div>
           <div className={cn(
             "h-[59px] border border-[#232427] bg-[#1A1B1E] rounded-[4px] px-[15px] flex items-center justify-between cursor-pointer mt-5",
@@ -62,11 +63,11 @@ const Slippage = memo(
             <div className="bg-[#131416] px-2 rounded-[4px] h-[31px] w-[129px] flex items-center justify-between text-[#9DA3AF] text-[12px]">
               <NumberInput
                 className="text-[12px] h-[29px] placeholder:text-[12px] text-center  w-[100px]" 
-                placeholder={`1～${maxValue}`}
-                regex={`^[1-${maxValue}]$`}
+                placeholder={`0.1～${maxValue}`}
+                regex = '^(?:[0-2](?:\\.\\d{0,1})?|3(?:\\.0?)?)$'
                 value={inputValue}
-                onInput={(e) => {
-                  setInputValue(e)
+                onInput={(value) => {
+                  setInputValue(value)
                   
                 }}
               />
@@ -77,7 +78,7 @@ const Slippage = memo(
         <div className="px-6">
           <Button 
             disabled={current === 1 && (maxValue <= 0 || Number(inputValue) <= 0 || Number(inputValue) > maxValue)}
-            onClick={() => onConfirm && onConfirm(current === 0 ? 3 : Number(inputValue))} 
+            onClick={() => onConfirm && onConfirm(current === 0 ? DEFAULT_SLIPPAGE : Number(inputValue))} 
             className="w-full h-[48px] rounded-[8px]">{t('Confirm')}
           </Button>
         </div>
