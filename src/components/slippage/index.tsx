@@ -64,7 +64,7 @@ const Slippage = memo(
               <NumberInput
                 className="text-[12px] h-[29px] placeholder:text-[12px] text-center  w-[100px]" 
                 placeholder={`0.1～${maxValue}`}
-                regex = '^(?:[0-2](?:\\.\\d{0,1})?|3(?:\\.0?)?)$'
+                regex={/^(?:[0-2](?:\.[0-9]{0,1})?|3(?:\.0?)?)$/}
                 value={inputValue}
                 onInput={(value) => {
                   setInputValue(value)

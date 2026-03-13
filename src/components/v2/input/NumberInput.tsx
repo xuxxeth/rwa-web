@@ -11,7 +11,7 @@ type NumberInputProps = {
   value: string | number
   placeholder?: string
   className?: string
-  regex?: string
+  regex?: string | RegExp
   onInput: (input: string) => void
   onFocus?: (focus: boolean) => void
 }
@@ -26,7 +26,7 @@ const NumberInput = memo(
     onInput,
     onFocus
   }: NumberInputProps) => {
-    const inputRegex = RegExp(regex)
+    const inputRegex = regex instanceof RegExp ? regex : RegExp(regex)
     const inputRef = useRef<HTMLInputElement>(null)
 
     const enforcer = (nextUserInput: string) => {
