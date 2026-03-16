@@ -76,10 +76,10 @@ export function useLimitOrder({
   }, [riskUserConfig, action, t, toastError])
 
   const getOrderPrice = useCallback(() => {
-    if (tradeType === TradeType.MARKET && (!Number.isInteger(slippage) || slippage < 1 || slippage > 5)) {
-      toastError({ title: "Slippage must be an integer between 1 and 5." })
-      return null
-    }
+    // if (tradeType === TradeType.MARKET && (!Number.isInteger(slippage) || slippage < 0.1 || slippage > 3)) {
+    //   toastError({ title: "Slippage must be an integer between 1 and 5." })
+    //   return null
+    // }
 
     const finalPrice = new BigNumber(effectivePrice || 0)
     if (!finalPrice.isFinite() || finalPrice.lte(0)) {

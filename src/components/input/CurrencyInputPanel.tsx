@@ -20,7 +20,7 @@ type CurrencyInputPanelProps = {
   label?: string
   placeholder?: string
   value?: string
-  regex?: string
+  regex?: string | RegExp
   isInsufficient?: boolean
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void
