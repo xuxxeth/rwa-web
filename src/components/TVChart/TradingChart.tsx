@@ -2,11 +2,12 @@ import { useScript } from "@/hooks/useScript";
 import { cn } from "@/lib/utils";
 import { useTradeStore } from "@/stores/tradeStore";
 import { lazy, memo, useEffect, useState } from "react";
+import { IntradayLineChart } from "@/components/TVChart/IntradayLineChart";
 
 const TVChartContainer = lazy(() => import("@/components/TVChart/TVChartContainer"))
 
 export const TradingChart = memo(
-  ({ from }: { from?: string }) => {
+  ({ from, mode = "tv", session = "pre" }: { from?: string; mode?: "tv" | "line"; session?: "pre" | "after" }) => {
     // const status = useScript("/libraries/datafeeds/udf/dist/bundle.js");
     const statusLibrary = useScript("/libraries/charting_library/charting_library.js");
     const [ready, setReady] = useState(false);
@@ -27,12 +28,18 @@ export const TradingChart = memo(
     }, [statusLibrary]);
 
 
-    return ready && inputToken?.address ? 
-      <TVChartContainer token={inputToken} from={from} /> : 
+    if (mode === "line") {
+      return <IntradayLineChart from={from} session={session} />
+    }
+
+    return ready && inputToken?.address ? (
+      <TVChartContainer token={inputToken} from={from} />
+    ) : (
       <div className={cn(
         "",
         from === 'market' ? "h-[500px]" : "h-[300px]"
       )}></div>
+    )
 
   }
 ) 
