@@ -75,7 +75,7 @@ export function TradeFormUI({
           <CurrencyInputPanel
             tradeType={tradeType}
             value={inputSize}
-            regex="^\d*\.?\d*$"
+            regex={/^(?:|[1-9]\d*)$/}
             from={from}
             type="size"
             label={t('v2.tx.t25')}
@@ -112,7 +112,7 @@ export function TradeFormUI({
           >
             <CurrencyInputPanelLite
               value={inputSize}
-              regex="^\d*\.?\d*$"
+              regex={/^(?:|[1-9]\d*)$/}
               from={from}
               label={action === 'sell' ? t('v2.tx.t26') : t('v2.tx.t27')}
               placeholder={t('Enter an amount')}

@@ -723,11 +723,11 @@
   "v3": {
     "price": "Price",
     "t1": "Market order",
-    "t2": "Slippage",
+    "t2": "Slippage Protection",
     "t3": "Auto",
     "t4": "Custom",
     "t5": "Adjust Slippage",
-    "t6": "Market orders will be placed as Limit orders with Time in Force.",
+    "t6": "Slippage Protection shields your orders from market volatility. If the price moves beyond your set limit, the order cancels automatically. Otherwise, we guarantee execution at the most favorable market price within your range.",
     "t7": "Maximum Percentage Slippage={{slippage}}%",
     "t8": "Maximum Price Slippage=Mark Price*（1+{{slippage}}）%.",
     "t9": "More detail",

@@ -2,6 +2,7 @@ import { BetweenText } from "@/components/between-text"
 import IconWithTooltip from "@/components/icon-tooltip"
 import { LazyImage } from "@/components/image/LazyImage"
 import { LabelWrap } from "@/components/markets/Klinebody"
+import { DEFAULT_SLIPPAGE } from "@/config/constants"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
 import { TradeType } from "ca-common-web"
@@ -43,12 +44,12 @@ const EstimatedInfo = memo(
                   <div className="text-xs ">
                     <div className="text-white mt-1">{t('v3.t2')}</div>
                     <div className="text-[#C7CCD6] mt-1">{t('v3.t6')}</div>
-                    <div className="mt-1">{t('v3.t7', { slippage: Number(maxSlippage) * 100 })}</div>
-                    <div className="mt-1">{t('v3.t8', { slippage: maxSlippage })}</div>
-                    <div className="mt-1 flex items-center cursor-pointer">
+                    {/* <div className="mt-1">{t('v3.t7', { slippage: Number(maxSlippage) * 100 })}</div>
+                    <div className="mt-1">{t('v3.t8', { slippage: maxSlippage })}</div> */}
+                    {/* <div className="mt-1 flex items-center cursor-pointer">
                       <div className="text-[#009DFF]">{t('v3.t9')}</div>
                       <img src="/images/v2/icons/link-active.png" className="w-[14px] ml-1" alt="" />
-                    </div>
+                    </div> */}
                   </div>
                 }>
                   {t('v3.t2')}
@@ -60,7 +61,7 @@ const EstimatedInfo = memo(
                     onEdit && onEdit()
                   }}
                 >
-                  {`${slippage}%`}{slippage === 3 && ` (${t('v3.t3')})`}
+                  {`${slippage}%`}{slippage === DEFAULT_SLIPPAGE && ` (${t('v3.t3')})`}
                   <LazyImage src="/images/v2/icons/edit.png" className="w-2 h-2 ml-[4px]" />
                 </div>
               }

@@ -13,7 +13,7 @@ type CurrencyInputProps = {
   value?: string
   placeholder?: string
   from?: string
-  regex?: string
+  regex?: string | RegExp
   isInsufficient?: boolean
   onCurrencyClick?: () => void
   onUserInput?: (value: string) => void

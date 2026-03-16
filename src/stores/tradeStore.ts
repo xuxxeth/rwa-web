@@ -5,6 +5,7 @@ import type { TradeStore } from './types'
 import type { IRwa, IToken } from '@/service/base/types'
 import type { ISummaryDataItem } from '@/service/webSocket/types';
 import { TradeType } from 'ca-common-web';
+import { DEFAULT_SLIPPAGE } from '@/config/constants';
 
 export const useTradeStore = create<TradeStore>()(
   persist(
@@ -17,7 +18,7 @@ export const useTradeStore = create<TradeStore>()(
       expires: 7,
       activeConvertTab: 'buy' as const,
       tradeType: TradeType.MARKET,
-      slippage: 3,
+      slippage: DEFAULT_SLIPPAGE,
       isSignatureValid: false,
       txStep: 0,
       txError: '',
