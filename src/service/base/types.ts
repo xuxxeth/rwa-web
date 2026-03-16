@@ -108,12 +108,29 @@ export interface IMarket {
 /**
  * tradingDayType： 4-美股全日市 5-美股上半日市 6-美股下半日市 7-新股全日市 8-新股上半日市 9-新股下半日市 10-美股期权全日市 11-美股期权上半日市 12- 美股期权下半日）
  * status: 0-未开盘 1-港股早盘竞价 2- 美股/期权盘前交易 3-交易中 4-午间休市 5-港股收 市竞价 6-美股/期权盘后交易 7-已收盘 8-新股开市 前交易 9-新股收市前交易 10-新股收盘交易 11-A 股通待开盘 12-美股夜盘 13-全球交易时段 14-场 外交易
+ * 
+ *  trading: 第一位LimitOrder,第二位MarketOrder
+    0-00: 都不能交易
+    1-01: 限价单不可交易，市价单可交易
+    2-10: 限价单可交易，市价单不可交易
+    3-11: 限价单、市价单均可交易
+    pre_after_trading
+    第一位LimitOrder,第二位MarketOrder
+    0-00: 都不能交易
+    1-01: 限价单不可交易，市价单可交易
+    2-10: 限价单可交易，市价单不可交易
+    3-11: 限价单、市价单均可交易
+
  */
 export interface IMarketState {
   "market": string,
   "desc": string,
   "tradingDayType": number,
-  "status": number
+  "status": number,
+  "availability": {
+   "trading": number,
+   "pre_after_trading": number, 
+  }
 }
 
 export interface IRwaPrice {
