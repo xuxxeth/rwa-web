@@ -183,6 +183,12 @@ export const useBaseStore = create<BaseStore>()(
           lastInitTime: Date.now(),
         }))
       },
+      refreshByLanguage: async () => {
+        const chainId = get().lastChainId
+        if (chainId) {
+          await get().getBaseRwas(chainId)
+        }
+      },
       updateRwasPrice: (priceList: IRwaPrice[]) => {
         const rwaList = get().rwaList.map(rwa => {
           const price = priceList.find(price => price.S === rwa.symbol)
