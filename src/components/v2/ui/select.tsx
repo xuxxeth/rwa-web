@@ -14,8 +14,9 @@ const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
     open?: boolean // ✅ 自定义扩展 open prop
+    hideArrow?: boolean // ✅ 自定义扩展 showArrow prop
   }
->(({ className, children, ...props }, ref) => (
+>(({ className, children, hideArrow = false, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -25,16 +26,21 @@ const SelectTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <SelectPrimitive.Icon asChild>
-      <img src="/images/v2/icons/arrow-down-active.png" className={cn(
-        "w-[12px] opacity-80 rotate-180 ",
-        props.open ? "rotate-0 opacity-100" : ""
-      )} />
-      {/* <ChevronDown className={cn(
-        "h-5 w-5 text-white",
-        props.open ? " rotate-180" : ""
-      )} /> */}
-    </SelectPrimitive.Icon>
+    {
+      !hideArrow && (
+        <SelectPrimitive.Icon asChild>
+          <img src="/images/v2/icons/arrow-down-active.png" className={cn(
+            "w-[12px] opacity-80 rotate-180 ",
+            props.open ? "rotate-0 opacity-100" : ""
+          )} />
+          {/* <ChevronDown className={cn(
+            "h-5 w-5 text-white",
+            props.open ? " rotate-180" : ""
+          )} /> */}
+        </SelectPrimitive.Icon>
+      )
+    }
+    
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName

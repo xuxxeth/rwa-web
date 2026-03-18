@@ -167,9 +167,10 @@ export function TokenCell(props: {
   name: string | undefined
   tokenClassName?: string
   nameClassName?: string
+  onClick?: () => void
 }) {
   return (
-    <div className={'flex flex-row gap-2 font-normal'}>
+    <div className={'flex flex-row gap-2 font-normal cursor-pointer'} onClick={() => props.onClick?.()}>
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>

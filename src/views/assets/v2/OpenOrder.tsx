@@ -39,6 +39,7 @@ import { useTradeUtils } from '@/hooks/useTrading'
 import { useToast } from '@/hooks/useToast'
 import { OrderTable } from './shared'
 import useDebounce from '@/hooks/useDebounce'
+import { on } from 'events'
 
 const PAGE_LIMIT = 20
 
@@ -133,7 +134,7 @@ function OpenOrder(props: {
 
 const Day = 1 * 60 * 60 * 24
 
-const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> = [
+const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
   {
     key: 'side',
     sortable: false,
@@ -151,7 +152,7 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'token',
     sortable: false,
-    render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (item: IOpenOrder, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -159,6 +160,10 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => {
+            console.log('rwa', rwa, onTokenClick)
+            onTokenClick?.(rwa!)
+          }}
         />
       )
     },

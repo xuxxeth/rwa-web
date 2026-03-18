@@ -12,6 +12,8 @@ import { infiniteOrderOptions } from '@/queries'
 import { ScrollLoadMore, type OrderChanged, checkOrderChangedEqual } from '../Shared'
 import { useWssStore } from '@/stores/wssStore'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
+import { useRouter } from '@/hooks/useRouter'
+import { ta } from 'date-fns/locale'
 
 export function useOrderChanged() {
   const [orderChanged, _setOrderChanged] = useState<OrderChanged | null>(null)
@@ -193,7 +195,7 @@ export function OrderTable<
   PAGE_LIMIT: number
   api: (filter: F) => Promise<{ data: T[] }>
   filter: F
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
   dataMode: 'pagination' | 'scroll'
   scrollId: (item: T) => string
   type: 'open' | 'history' | 'trade'
@@ -293,12 +295,13 @@ export function OrderContentByScroll<
   account: string
   filter: F
   api: (filter: F) => Promise<{ data: T[] }>
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
   isSignatureValid: boolean
   refreshIsSignatureValid: (_isValid: boolean) => void
   scrollId: (item: T) => string
   type: 'open' | 'history' | 'trade'
 }) {
+  const router = useRouter()
   const rwaTokens = useRwaTokens()
 
   const {
@@ -351,12 +354,17 @@ export function OrderContentByScroll<
     }
   }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
+  const onTokenClick = (rwa: IRwa) => { 
+    console.log('rwa', rwa)
+    router.push(`/trade/${rwa.symbol}`)
+  }
+  console.log(tableConfig, 'tableConfig')
   return (
     <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
         data={allOrders}
         config={tableConfig}
-        extra={{ rwaTokens, refetch }}
+        extra={{ rwaTokens, refetch, onTokenClick }}
         getKey={(item: T) => item.id}
         isLoading={isLoading}
         className={cn('hover:bg-opacity-01 px-4 group')}
