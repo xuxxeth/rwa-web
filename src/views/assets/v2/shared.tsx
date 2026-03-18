@@ -358,7 +358,7 @@ export function OrderContentByScroll<
     console.log('rwa', rwa)
     router.push(`/trade/${rwa.symbol}`)
   }
-  
+
   return (
     <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
       <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
@@ -426,7 +426,8 @@ export function OrderContentByPagination<
   }, [orderChanged, isFirstLoadDone])
 
   const onTokenClick = (rwa: IRwa) => {
-    router.push(`/trade/${rwa.symbol}`)
+    // router.push(`/trade/${rwa.symbol}`)
+    window.open(`/trade/${rwa.symbol}`, '_blank')
   }
 
   if (isListEmpty) {
