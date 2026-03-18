@@ -161,7 +161,6 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
           token={rwa?.symbol}
           name={rwa?.name}
           onClick={() => {
-            console.log('rwa', rwa, onTokenClick)
             onTokenClick?.(rwa!)
           }}
         />

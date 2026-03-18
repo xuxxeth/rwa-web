@@ -259,12 +259,12 @@ function WithTableHeader<T extends { orderId: string }>({
   dataMode,
 }: {
   children: React.ReactNode
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
   dataMode: 'pagination' | 'scroll'
 }) {
   return (
     <>
-      <TableHeader<'', T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableHeader<'', T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
         lngPrefix='portfolio.orderTable'
         config={tableConfig}
         sort={null}
@@ -358,7 +358,7 @@ export function OrderContentByScroll<
     console.log('rwa', rwa)
     router.push(`/trade/${rwa.symbol}`)
   }
-  console.log(tableConfig, 'tableConfig')
+  
   return (
     <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
       <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
@@ -400,8 +400,9 @@ export function OrderContentByPagination<
   api: (filter: F) => Promise<{ data: T[] }>
   scrollId: (item: T) => string
   filter: F
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
 }) {
+  const router = useRouter()
   const rwaTokens = useRwaTokens()
 
   const {
@@ -424,17 +425,21 @@ export function OrderContentByPagination<
     fetchFirstPage()
   }, [orderChanged, isFirstLoadDone])
 
+  const onTokenClick = (rwa: IRwa) => {
+    router.push(`/trade/${rwa.symbol}`)
+  }
+
   if (isListEmpty) {
     return <NoRecord />
   }
 
   return (
     <>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void, onTokenClick?: (rwa: IRwa) => void }>
         data={data}
         isLoading={isLoading}
         config={tableConfig}
-        extra={{ rwaTokens, refetch: fetchFirstPage }}
+        extra={{ rwaTokens, refetch: fetchFirstPage, onTokenClick }}
         getKey={(item: T) => item.orderId}
         className={cn('hover:bg-opacity-01 px-4 group')}
         tdClassName='h-[56px] text-xs/4'
