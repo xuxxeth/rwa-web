@@ -48,6 +48,7 @@ export interface BaseStore {
   setTokenWithPrice: (tokenWithPrice: Record<string, ITokenWithPrice>) => void;
   setTokenWithPriceByWebSocketData: (data: IRwaPrice[]) => void;
   init: (chainId: number | null) => Promise<void>;
+  refreshByLanguage: () => Promise<void>
   setTokens: (tokenList: IToken[]) => void;
   setRwas: (rwaList: IRwa[]) => void;
   getChains: () => Promise<ApiResponse<IChain[]>>;

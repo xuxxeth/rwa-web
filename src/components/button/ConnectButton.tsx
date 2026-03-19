@@ -380,7 +380,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
-        topFixed
         open={showConnect}
         openChange={open => {
           setShowConnect(open)
