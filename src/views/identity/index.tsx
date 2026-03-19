@@ -363,7 +363,7 @@ function MainContentWrapper(props: { children: ReactNode }) {
       <MainLayout className="pb-11">
         <IdentityLayout>{props.children}</IdentityLayout>
       </MainLayout>
-      <XFooter />
+      {/* <XFooter /> */}
     </div>
   )
 }

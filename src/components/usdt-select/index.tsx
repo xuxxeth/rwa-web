@@ -55,7 +55,9 @@ const USDTSelect = memo(
       <Select 
         value={value} 
         onOpenChange={open => {
-          setOpen(open)
+          if (tokenListWithBalance.length > 1) {
+            setOpen(open)
+          }
         }}
         onValueChange={(code) => {
           if (code) {
@@ -68,6 +70,7 @@ const USDTSelect = memo(
         }}
       >
         <SelectTrigger 
+          hideArrow={tokenListWithBalance.length <= 1}
           open={open}
           className={cn(
             "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer",
@@ -104,23 +107,28 @@ const USDTSelect = memo(
             
           </div>
         </SelectTrigger>
-        <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
-          {tokenListWithBalance.map(token => (
-            <SelectItem key={token.address} value={token.address} className="my-1">
-              <div className="w-full">
-                <div className="flex items-center justify-between w-full text-white text-[12px]">
-                  <span>{token.symbol}</span>
-                  <span>{formatTokenAmountWithCommas(token.balance || '0')}</span>
-                </div>
-                <div className="flex items-center justify-between w-full text-[#9DA3AF] text-[12px]">
-                  <span>{token.name}</span>
-                  <span>{'≈ $'}{token.balance}</span>
-                </div>
-              </div>
-              
-            </SelectItem>
-          ))}
-        </SelectContent>
+        {
+            tokenListWithBalance.length > 1 && (
+              <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
+                {tokenListWithBalance.map(token => (
+                  <SelectItem key={token.address} value={token.address} className="my-1">
+                    <div className="w-full">
+                      <div className="flex items-center justify-between w-full text-white text-[12px]">
+                        <span>{token.symbol}</span>
+                        <span>{formatTokenAmountWithCommas(token.balance || '0')}</span>
+                      </div>
+                      <div className="flex items-center justify-between w-full text-[#9DA3AF] text-[12px]">
+                        <span>{token.name}</span>
+                        <span>{'≈ $'}{token.balance}</span>
+                      </div>
+                    </div>
+                    
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            )
+        }
+        
       </Select>
     )
   }
