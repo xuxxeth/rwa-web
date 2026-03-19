@@ -19,7 +19,6 @@ import { useRouter } from './hooks/useRouter'
 import { HomeMenus } from './components/menu/HomeMenus'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import { createPortal } from 'react-dom'
-import { CA_LANGUAGE } from './config/constants'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -39,12 +38,15 @@ function App() {
   const router = useRouter()
   const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
+  const refreshByLanguage = useBaseStore(state => state.refreshByLanguage)
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
   const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
   useEffect(() => {
-    const lng = storage.getItem(CA_LANGUAGE) || 'en'
-    i18n.changeLanguage(lng)
+    const lng = storage.getItem('CA_LANGUAGE') || 'en'
+    if (i18n.language !== lng) {
+      i18n.changeLanguage(lng)
+    }
   }, [i18n])
 
   // 两个汇总到一起处理了
@@ -68,8 +70,16 @@ function App() {
 
   useEffect(() => {
     wsService.init({})
+    
+    // 监听语言变化，重新获取 rwa 列表，因为 rwa 列表中的公司名称是根据语言返回的
+    const handleLangChange = (lng: string) => {
+      refreshByLanguage()
+    }
+    i18n.on('languageChanged', handleLangChange)
+
     return () => {
       wsService.close()
+      i18n.off('languageChanged', handleLangChange)
     }
   }, [])
 
