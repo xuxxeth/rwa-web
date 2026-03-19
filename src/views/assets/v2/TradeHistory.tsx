@@ -134,7 +134,7 @@ function TradeHistory(props: {
   )
 }
 
-const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch: () => void }> = [
+const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
   {
     key: 'side',
     sortable: false,
@@ -150,7 +150,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'token',
     sortable: false,
-    render: (item: ITrade, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (item: ITrade, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -158,6 +158,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => onTokenClick?.(rwa!)}
         />
       )
     },

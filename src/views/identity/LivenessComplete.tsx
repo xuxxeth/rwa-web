@@ -1,4 +1,5 @@
 import { LazyImage } from '@/components/image/LazyImage'
+import { CA_LANGUAGE } from '@/config/constants'
 import { useTranslation } from '@/hooks/useTranslation'
 import storage from '@/utils/storage'
 import { useEffect } from 'react'
@@ -12,12 +13,12 @@ export default function LivenessComplete() {
   const success = searchParams.get('success') === 'true'
   const failReason = parseInt(searchParams.get('failReason') || '0')
 
-  const lang = searchParams.get('language') || storage.getItem('CA_LANGUAGE') || i18n.language
+  const lang = searchParams.get('language') || storage.getItem(CA_LANGUAGE) || i18n.language
 
   useEffect(() => {
     if (!lang) return
-    if (lang === storage.getItem('CA_LANGUAGE')) return
-    storage.setItem('CA_LANGUAGE', lang)
+    if (lang === storage.getItem(CA_LANGUAGE)) return
+    storage.setItem(CA_LANGUAGE, lang)
   }, [lang, i18n])
 
   const { icon, title, subTitle } = getIconAndText(success, failReason)

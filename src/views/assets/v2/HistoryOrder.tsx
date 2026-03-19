@@ -160,7 +160,7 @@ function HistoryOrder(props: {
   )
 }
 
-const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
+const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }> = [
   {
     key: 'side',
     sortable: false,
@@ -176,7 +176,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'token',
     sortable: false,
-    render: (item: IOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (item: IOrder, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -184,6 +184,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => onTokenClick?.(rwa!)}
         />
       )
     },

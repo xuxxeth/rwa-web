@@ -1,14 +1,19 @@
 import { useTranslation } from '@/hooks/useTranslation'
 import SpinSVG from './spin.svg?react'
 import { cn } from '@/utils'
+import { useEffect, useState } from 'react'
+import { CA_LANGUAGE } from '@/config/constants'
+import storage from '@/utils/storage'
 
 const Loading = () => {
-  const { t } = useTranslation()
-
+  const [localLanguage, setLocalLanguage] = useState('')
+  useEffect(() => {
+    setLocalLanguage(storage.getItem(CA_LANGUAGE) || 'en')
+  }, [])
   return (
     <div className=' flex flex-col justify-center items-center'>
       <img src='/images/icons/loading-white.png' className='w-[32px] h-[32px] animate-spin' />
-      <div className=' text-white text-[14px] font-normal mt-2'>{t('Loading')}...</div>
+      <div className=' text-white text-[14px] font-normal mt-2'>{ localLanguage ? localLanguage === 'zh' ? '加载中...' : 'Loading...' : ' ' }</div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { cn } from "@/utils";
 import storage from "@/utils/storage";
 import { lazy, useState } from "react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { CA_LANGUAGE } from "@/config/constants";
 
 export function LanguageItem({
   title,
@@ -34,7 +35,7 @@ export function LngSubMenus({
 }: {from?: string}) {
   const { t, i18n } = useTranslation();
   const changeLanguage = (lng: string) => {
-    storage.setItem('CA_LANGUAGE', lng)
+    storage.setItem(CA_LANGUAGE, lng)
     i18n.changeLanguage(lng);
   };
   const [currentSub, setCurrentSub] = useState(1)
