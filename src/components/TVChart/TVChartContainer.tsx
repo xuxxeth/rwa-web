@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from "react";
 import { getDataFeed, tagSession } from "./datafeed";
 import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IBasicDataFeed, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
-import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
+import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
 import storage from "@/utils/storage";
@@ -27,7 +27,7 @@ export const TVChartContainer = memo(
 
       initChart = (rwa?: IRwa) => {
         const elem = chartContainerRef.current;
-        const language = storage.getItem('CA_LANGUAGE') || 'en'
+        const language = storage.getItem(CA_LANGUAGE) || 'en'
         if (!mounted || !elem) {
           initTimer = window.setTimeout(initChart, 100);
           return;

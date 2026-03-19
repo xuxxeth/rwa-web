@@ -19,6 +19,7 @@ import { useRouter } from './hooks/useRouter'
 import { HomeMenus } from './components/menu/HomeMenus'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import { createPortal } from 'react-dom'
+import { CA_LANGUAGE } from './config/constants'
 
 BigNumber.config({
   DECIMAL_PLACES: 80, // 足够精度，避免 DeFi 里丢失小数
@@ -42,7 +43,7 @@ function App() {
   const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
   useEffect(() => {
-    const lng = storage.getItem('CA_LANGUAGE') || 'en'
+    const lng = storage.getItem(CA_LANGUAGE) || 'en'
     i18n.changeLanguage(lng)
   }, [i18n])
 
