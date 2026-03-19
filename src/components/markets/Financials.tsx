@@ -188,7 +188,7 @@ const Financials = memo(() => {
           <ResponsiveContainer width='100%' height='100%'>
             <ComposedChart
               data={filterData}
-              margin={{ top: 5, right: 40, bottom: 20, left: 0 }} // ✅ 给够空间
+              margin={{ top: 5, right: 40, bottom: 20, left: 10 }} // ✅ 给够空间
               barCategoryGap='25%'
               barGap={6}
             >
