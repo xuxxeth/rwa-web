@@ -125,7 +125,7 @@ const Financials = memo(() => {
   const [indicatorsData, setIndicatorsData] = useState<IIndicators[]>([])
 
   useEffect(() => {
-    if (inputToken?.stockId && !initRef.current) {
+    if (inputToken?.stockId) {
       initRef.current = true
       baseApi.getIndicators(inputToken.stockId).then(res => {
         // @ts-ignore
