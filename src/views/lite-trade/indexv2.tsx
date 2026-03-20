@@ -52,7 +52,7 @@ function LiteTrade() {
                 <TradeBox from="lite-trade" />
               </BoxCard>
               <div className="border border-[#232427] rounded-[16px] px-3 py-2 mt-2">
-                <PreMarketOpen />
+                <PreMarketOpen from="lite-trade" />
               </div>
 
             </div>

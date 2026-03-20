@@ -152,9 +152,19 @@ export const useBaseStore = create<BaseStore>()(
         if (res && res.code === RESPONSE_CODE.SUCCESS) {
           const _data = res.data || {}
           let marketState = MARKET_STATUS.CLOSE
+          // 盘中
           if ((_data.tradingDayType === 4 || _data.tradingDayType === 5) && _data.status === 3) {
             marketState = MARKET_STATUS.OPEN
           }
+          // 盘前
+          if (_data.tradingDayType === 2) { 
+            marketState = MARKET_STATUS.BEFORE
+          }
+          // 盘后
+          if (_data.tradingDayType === 6) { 
+            marketState = MARKET_STATUS.AFTER
+          }
+          // marketState = MARKET_STATUS.AFTER
           set({ marketState: _data, marketTradeState: marketState })
         }
         return res

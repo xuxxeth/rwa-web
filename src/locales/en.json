@@ -731,6 +731,11 @@
     "t7": "Maximum Percentage Slippage={{slippage}}%",
     "t8": "Maximum Price Slippage=Mark Price*（1+{{slippage}}）%.",
     "t9": "More detail",
-    "t10": "The market is closed. Please resubmit using a limit order."
+    "t10": "The market is closed. Please resubmit using a limit order.",
+    "t11": "Pre-Market",
+    "t12": "Regular-Market",
+    "t13": "Post-Market",
+    "t14": "Market Close",
+    "t15": "Time Until "
   }
 }
