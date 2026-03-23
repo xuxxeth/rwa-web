@@ -675,7 +675,7 @@
       "t21": "Day Low",
       "t211": "The lowest traded price during the current trading session.",
       "t22": "Last Price",
-      "t23": "Market is currently closed. Market orders are unavailable，please use limit order.",
+      "t23": "In pre-market, after-hours, and closed session, only limit orders are supported. Your regular-session limit orders will be queued for the next market open.",
       "t24": "Limit prcie",
       "t25": "Quantity",
       "t26": "Est. Pay",
@@ -736,6 +736,11 @@
     "t12": "Regular-Market",
     "t13": "Post-Market",
     "t14": "Market Close",
-    "t15": "Time Until "
+    "t15": "Time Until ",
+    "t16": "RTH Only",
+    "t17": "Pre + After-hours",
+    "t18": "Session",
+    "t19": "Orders executed during 09:30 - 16:00 (ET) only. Orders placed outside of regular hours will be queued for the next regular hour. Unfilled orders expire when Market Closed.",
+    "t20": "Orders executed during 04:00 - 20:00 (ET). Orders can only be placed during pre/after-market sessions. Unfilled orders expire when POST-Session Closed"
   }
 }

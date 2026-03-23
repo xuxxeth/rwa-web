@@ -5,7 +5,7 @@ import { LabelWrap } from "@/components/markets/Klinebody"
 import { DEFAULT_SLIPPAGE } from "@/config/constants"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
-import { TradeType } from "ca-common-web"
+import { SessionType, TradeType } from "ca-common-web"
 import { memo } from "react"
 
 type EstimatedInfoProps = {

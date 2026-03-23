@@ -10,7 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation"
 import { useSettingStore } from "@/stores/settingStore"
 import IconWithTooltip, { TooltipWithBorder } from "../icon-tooltip"
 import { useBaseStore } from "@/stores/baseStore"
-import { TradeType } from "ca-common-web"
+import { TradeType, SessionType } from "ca-common-web"
 
 
 
@@ -23,6 +23,7 @@ type OrderConfirmProps = {
   estimatedFee: string,
   action: string
   tradeType: TradeType
+  sessionType: SessionType
   slippage: number
   feeRate: string
   onClick?: () => void
@@ -32,6 +33,7 @@ const OrderConfirm = memo(
   ({ 
     action,
     tradeType,
+    sessionType,
     slippage,
     orderValue,
     platformFee, 
@@ -103,6 +105,10 @@ const OrderConfirm = memo(
           <BetweenText 
             left={t('v2.tx.t30')}
             right={ isMarketOrder ? t('market') : t('limit')}
+          />
+          <BetweenText 
+            left={t('v3.t18')}
+            right={ sessionType === SessionType.PRE_MARKET_AND_AFTER_HOURS ? t('v3.t17') : t('v3.t16')}
           />
           {
             !isMarketOrder && (

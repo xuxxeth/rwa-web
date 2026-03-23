@@ -554,32 +554,7 @@ export function ConverBody({
           expiresDialog.hide()
         } } />
       </DialogController>
-      <DialogController
-        className="p-0"
-        headerClassName="px-4 pt-4"
-        overlayClassName='z-[49]'
-        title={t('v2.tx.t29')}
-        open={orderDialog.open}
-        openChange={orderDialog.setOpen}
-      > 
-        <OrderConfirm 
-          tradeType={TradeType.LIMIT}
-          slippage={3}
-          action={action}
-          orderValue={orderValue}
-          platformFee={platformFee}
-          brokerageFee={brokerageFee}
-          tradingActivityFee={tradingActivityFee}
-          estimatedFee={estimatedFee}
-          feeRate={inputToken?.feeRate ?? ''}
-          networkFeeInNative={marketInfo.networkFeeInNative}
-          onClick={() => {
-            orderDialog.hide()
-            handlePlaceOrder()
-          }}
-        />
-        
-      </DialogController>
+
     </div>
   )
 }

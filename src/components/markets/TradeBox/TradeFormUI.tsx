@@ -10,6 +10,7 @@ import { EstimatedInfo } from "../../../views/lite-trade/components/EstimatedInf
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { ExpiresSetting } from "../../expires-setting"
 import { TradeType } from "ca-common-web"
+import { SessionTypeSelect } from "@/components/session-type-select"
 
 type TradeFormUIProps = {
   from?: string
@@ -62,6 +63,11 @@ export function TradeFormUI({
     <>
       {from === 'markets' && (
         <>
+          {
+            !isMarket && (
+              <SessionTypeSelect />
+            )
+          }
           <CurrencyInputPanel
             tradeType={tradeType}
             value={limitPrice}
@@ -70,7 +76,12 @@ export function TradeFormUI({
             label={ isMarket ? t('v3.price') : t('v2.tx.t24')}
             onUserInput={onPriceChange}
           />
-          <PriceChangeTab onChange={onChangePriceType} tradeType={tradeType} />
+          {
+              !isMarket && (
+                <PriceChangeTab onChange={onChangePriceType} tradeType={tradeType} />
+              )
+          }
+          
           <div className="h-3"></div>
           <CurrencyInputPanel
             tradeType={tradeType}

@@ -39,7 +39,6 @@ import { useTradeUtils } from '@/hooks/useTrading'
 import { useToast } from '@/hooks/useToast'
 import { OrderTable } from './shared'
 import useDebounce from '@/hooks/useDebounce'
-import { on } from 'events'
 
 const PAGE_LIMIT = 20
 
