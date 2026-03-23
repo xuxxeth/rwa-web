@@ -17,8 +17,10 @@ function useRwaWithPriceAndUp(rwaList: IRwa[]) {
       const upMap = items.reduce(
         (acc: Record<string, { up: string | undefined; price: string | undefined }>, cur) => {
           acc[symbolToLower(cur.S)] = {
-            price: cur.p ? truncate(cur.p, 2) : undefined,
-            up: cur.p && cur.pc ? calculateUp(cur.p, cur.pc) : '0',
+            // 盘中价格
+            price: cur.c ? truncate(cur.c, 2) : undefined,
+            // 盘中价格涨跌幅
+            up: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
           }
           return acc
         },

@@ -10,6 +10,7 @@ import {
   TokenFilterItem,
   TextCellWithTranslation,
   TxHashCell,
+  SessionTypeCell,
 } from '../Shared'
 import { type IRwa } from '@/service/base/types'
 import { useRwaTokens } from '@/hooks/useTokens'
@@ -133,7 +134,10 @@ function OpenOrder(props: {
 
 const Day = 1 * 60 * 60 * 24
 
-const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
+const openOrderTableConfig: ITableConfig<
+  IOpenOrder,
+  { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -151,7 +155,10 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'token',
     sortable: false,
-    render: (item: IOpenOrder, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
+    render: (
+      item: IOpenOrder,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -232,6 +239,11 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'status',
     sortable: false,
     render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
+  },
+  {
+    key: 'session',
+    sortable: false,
+    render: (item: IOpenOrder) => <SessionTypeCell sessionType={item.sessionType} />,
   },
   {
     key: 'txHash',

@@ -16,7 +16,6 @@ function Markets() {
     <>
       <div className='w-full'>
         <div className=' bg-[#131416] min-h-[100vh] text-white'>
-          
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
           <div className='flex'>
             <div className='flex-1'>
@@ -32,7 +31,7 @@ function Markets() {
                   <div className=' mt-3 '>
                     <TradeTypeSwitch />
                   </div>
-                  <TradeBox from='markets'/>
+                  <TradeBox from='markets' />
                 </BoxCard>
                 <FAQ />
               </div>

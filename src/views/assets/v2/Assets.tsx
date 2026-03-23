@@ -46,20 +46,20 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
             <div className='pb-4'>
               <div className='text-base/5'>{t('portfolio.total')}</div>
               <div className='text-lg/5.5 font-semibold mt-1'>
-                {formatWithCommas(estimatedBalance, 2)} USD
+                {formatWithCommas(truncate(estimatedBalance, 2), 2)} USD
               </div>
             </div>
             <div className='pt-4 mt-1 flex flex-row justify-between items-center'>
               <div className={assetsClassName}>
                 <div className='text-gray-400 text-sm'>{t('portfolio.rwa')}</div>
                 <div className='mt-2 text-lg/[23px] font-medium'>
-                  {formatWithCommas(estimatedRwaTotalValue, 2)} USD
+                  {formatWithCommas(truncate(estimatedRwaTotalValue, 2), 2)} USD
                 </div>
               </div>
               <div className={assetsClassName}>
                 <div className='text-gray-400 text-sm'>{t('portfolio.settle')}</div>
                 <div className='mt-2 text-lg/[23px] font-medium'>
-                  {formatWithCommas(estimatedStableTokenTotalValue, 2)} USD
+                  {formatWithCommas(truncate(estimatedStableTokenTotalValue, 2), 2)} USD
                 </div>
               </div>
               {isRiskControlled && (
@@ -160,6 +160,7 @@ function AssetsRatio({
                     const isActive = activeIndex === index
                     return (
                       <div
+                        key={item.name}
                         onMouseEnter={() => setActiveIndex(index)}
                         onMouseLeave={() => setActiveIndex(-1)}
                         className={cn(
@@ -324,7 +325,7 @@ const RiskControlAssets = memo(
                     key={item.token}
                   >
                     <span>{item.symbol}</span>
-                    <span>{toFixed(item.quantity, 2)}</span>
+                    <span>{truncate(item.quantity, 2)}</span>
                   </div>
                 )
               })}

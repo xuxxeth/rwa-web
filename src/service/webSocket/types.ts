@@ -3,6 +3,7 @@ export interface IAggregateData {
     items: {
       S: string
       p: number
+      c: number
       pc: number
       s: number
     }[]

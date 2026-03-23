@@ -170,7 +170,10 @@ export function TokenCell(props: {
   onClick?: () => void
 }) {
   return (
-    <div className={'flex flex-row gap-2 font-normal cursor-pointer'} onClick={() => props.onClick?.()}>
+    <div
+      className={'flex flex-row gap-2 font-normal cursor-pointer'}
+      onClick={() => props.onClick?.()}
+    >
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
@@ -238,6 +241,17 @@ export function OrderStatusCell(props: { state: number }) {
       {config.text && t(`assets.order.state.${config.text}`)}
     </div>
   )
+}
+
+export function SessionTypeCell({ sessionType }: { sessionType: number }) {
+  switch (sessionType) {
+    case 0:
+      return <TextCellWithTranslation text='portfolio.rthOnly' />
+    case 4:
+      return <TextCellWithTranslation text='portfolio.preAfter' />
+    default:
+      return null
+  }
 }
 
 export function DropDownFilter(props: {

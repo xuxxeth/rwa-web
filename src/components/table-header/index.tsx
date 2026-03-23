@@ -86,7 +86,12 @@ export function TableHeader<SortableField extends string, Item, Extra>({
 }) {
   const { t } = useTranslation()
   return (
-    <div className={cn('flex flex-row h-12 px-3 border-t border-b border-white/10 shrink-0', className)}>
+    <div
+      className={cn(
+        'flex flex-row h-12 px-3 border-t border-b border-white/10 shrink-0',
+        className
+      )}
+    >
       {config.map(({ key, sortable, width, breakOnSpace }) => {
         const style = width ? { flexBasis: width } : { flex: 1 }
         const order = sort?.field === key ? sort.order : undefined

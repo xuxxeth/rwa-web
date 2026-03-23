@@ -103,8 +103,8 @@
   "marketQuotes": {
     "name": "名稱",
     "token": "代幣",
-    "price": "最新價",
-    "change": "日漲幅(%)",
+    "price": "價格",
+    "change": "漲跌幅(%)",
     "weekChange": "週漲幅(%)",
     "marketCap": "總市值",
     "floatCap": "流通市值",
@@ -176,6 +176,8 @@
     "start": "開始日期",
     "end": "結束日期",
     "seeMore": "當前列表僅顯示近一個月數據，可在【我的】-【訂單】中<1>查看更多</1>",
+    "rthOnly": "僅盤中",
+    "preAfter": "盤前+盤後",
     "orderTable": {
       "side": "方向",
       "type": "類型",
@@ -193,6 +195,7 @@
       "txHash": "交易哈希",
       "details": "詳情",
       "status": "狀態",
+      "session": "交易時段",
       "action": "操作",
       "tf": "交易費用",
       "bf": "券商手續費",

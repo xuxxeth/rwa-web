@@ -104,8 +104,8 @@
   "marketQuotes": {
     "name": "Name",
     "token": "Token",
-    "price": "Last Price",
-    "change": "Daily Change(%)",
+    "price": "Price",
+    "change": "Change(%)",
     "weekChange": "Weekly Change(%)",
     "buy": "Buy",
     "marketCap": "Market Cap",
@@ -182,6 +182,8 @@
     "start": "Start Date",
     "end": "End Date",
     "seeMore": "This list only shows data from the past month. Please <1>view more</1> in Portfolio > Order",
+    "rthOnly": "RTH Only",
+    "preAfter": "Pre + After-hours",
     "orderTable": {
       "side": "Side",
       "type": "Type",
@@ -199,6 +201,7 @@
       "txHash": "TX Hash",
       "details": "Details",
       "status": "Status",
+      "session": "Session",
       "action": "Action",
       "tf": "Trading Fees",
       "bf": "Brokerage Fee",
