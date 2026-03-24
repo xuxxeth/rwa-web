@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Trans, useTranslation as useI18nextTranslation } from "react-i18next";
 
-export * from "react-i18next";
+export { Trans };
 
 export function useI18nLanguage(i18n: any) {
   const [lang, setLang] = useState(i18n.language)
@@ -12,3 +13,8 @@ export function useI18nLanguage(i18n: any) {
   return lang
 }
 
+export function useTranslation(...args: Parameters<typeof useI18nextTranslation>) {
+  const res = useI18nextTranslation(...args)
+  useI18nLanguage(res.i18n)
+  return res
+}

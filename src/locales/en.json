@@ -744,6 +744,11 @@
     "t17": "Pre + After-hours",
     "t18": "Session",
     "t19": "Orders executed during 09:30 - 16:00 (ET) only. Orders placed outside of regular hours will be queued for the next regular hour. Unfilled orders expire when Market Closed.",
-    "t20": "Orders executed during 04:00 - 20:00 (ET). Orders can only be placed during pre/after-market sessions. Unfilled orders expire when POST-Session Closed"
+    "t20": "Orders executed during 04:00 - 20:00 (ET). Orders can only be placed during pre/after-market sessions. Unfilled orders expire when POST-Session Closed",
+    "t21": "Closed",
+    "t22": "Post",
+    "t23": "Pre",
+    "t24": "Regular",
+    "t25": "Post"
   }
 }

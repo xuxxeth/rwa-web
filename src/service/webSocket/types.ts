@@ -26,11 +26,13 @@ export type ISummaryDataItem = {
   s: number // 股票编号
   S: string // 股票Symbol
   p: number // 最新价
+  pt?: number // 最新价格时间
   o: number // 今开价
   l: number // 最低价
   h: number // 最高价
   c: number // 当日收盘价
   pc: number // 昨日收盘价
+  ct: number, // 收盘时间(秒)
   T: number // 时间戳(秒)
 }
 
