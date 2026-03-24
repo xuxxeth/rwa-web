@@ -104,7 +104,9 @@ export function useTradingStartTime() {
       tradeState: marketTradeState,
       countdown,
       openTime: extractHourMinute(tradingStartTime),
-      closeTime: extractHourMinute(tradingEndTime)
+      closeTime: extractHourMinute(tradingEndTime),
+      preOpenTime: extractHourMinute(tradingStartTime - preMarketMinutes * 60 * 1000),
+      afterCloseTime: extractHourMinute(tradingEndTime + afterMarketMinutes * 60 * 1000),
     }
   }, [tradingStartTime, tradingEndTime, countdown, marketTradeState])
 }

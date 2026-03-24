@@ -1,6 +1,7 @@
-import { MARKET_STATUS } from "@/config/constants"
+import { CA_LANGUAGE, MARKET_STATUS } from "@/config/constants"
 import { useTradingStartTime } from "@/hooks/useMarketState"
 import { useTranslation } from "@/hooks/useTranslation"
+import storage from "@/utils/storage"
 import { cn } from "@/utils/tw"
 import { memo, useMemo } from "react"
 
@@ -14,6 +15,15 @@ const PreMarketOpen = memo(
     const tradingTime = useTradingStartTime()
 
     const stateLabel = useMemo(() => {
+      // 获取本地的语言环境
+      const locale = storage.getItem(CA_LANGUAGE);
+      
+      // 如果 i18n 中的语言和本地存储的语言不一致，返回空
+      if (i18n.language !== locale) {
+        return null;
+      }
+      
+      // 根据语言环境返回不同的文本
       if (tradingTime?.tradeState === MARKET_STATUS.BEFORE) {
         return {
           t1: t("v3.t11"),
@@ -45,7 +55,11 @@ const PreMarketOpen = memo(
         c: '#FFB219',
         i: '/images/v2/icons/market_after_close.png'
       }
-    }, [t, tradingTime])
+    }, [t, i18n, tradingTime])
+
+    if (!stateLabel) {
+      return null;
+    }
 
     return (
       <div className={cn(

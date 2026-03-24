@@ -149,6 +149,7 @@ export function TradeBox({
     expires,
     action,
     tradeType,
+    sessionType,
     slippage,
     marketInfo,
     riskUserConfig,

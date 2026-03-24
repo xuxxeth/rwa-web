@@ -10,6 +10,7 @@ import { SessionType, TradeType } from "@/hooks/useCaCommon";
 import IconWithTooltip from "../icon-tooltip";
 import { useBaseStore } from "@/stores/baseStore";
 import { MARKET_STATUS } from "@/config/constants";
+import { useTradingStartTime } from "@/hooks/useMarketState";
 
 export type ISessionTypeItem = {
   code: string,
@@ -34,6 +35,7 @@ const SessionTypeSelect = memo(
     from
   }: SessionTypeSelectProps) => {
     const { t } = useTranslation()
+    const tradingTime = useTradingStartTime()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const updateSessionType = useTradeStore(state => state.updateSessionType)
     const [typeItem, setTypeItem] = useState<{code: SessionType, label: string}>({code: SessionType.DEFAULT, label: t('v3.t16')})
@@ -43,16 +45,17 @@ const SessionTypeSelect = memo(
         {
           code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
           label: t('v3.t17'),
+          timeLabel: tradingTime ? `ET ${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} + ET ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M}` : '--:--'
         },
         {
           code: SessionType.DEFAULT,
           label: t('v3.t16'),
+          timeLabel: tradingTime ? `ET ${tradingTime.openTime.H}:${tradingTime.openTime.M} ~  ${tradingTime.closeTime.H}:${tradingTime.closeTime.M}` : '--:--'
         }
       ]
-    }, [t])
+    }, [t, tradingTime])
 
-    // const isOpenOrClose = marketTradeState === MARKET_STATUS.OPEN || marketTradeState === MARKET_STATUS.CLOSE
-    const isOpenOrClose = false
+    const isOpenOrClose = marketTradeState === MARKET_STATUS.OPEN || marketTradeState === MARKET_STATUS.CLOSE
 
     useEffect(() => {
       // - 盘前/盘后时段，两个选项都支持选，默认为盘前+盘后（Extended Hour）
@@ -97,10 +100,10 @@ const SessionTypeSelect = memo(
           hideArrow={isOpenOrClose}
           open={open}
           className={cn(
-            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer mb-3 bg-[#1A1B1E]",
+            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer bg-[#1A1B1E] ",
             className,
-            from === 'lite-trade' ? ' border-[#232427] w-auto bg-[#1A1B1E] px-[3px] rounded-full h-[21px] ' : ' border border-solid border-[rgba(35,36,39,1)]',
-            open ? from !== 'lite-trade' ? 'border-[rgba(156,255,58,0.8)]' : '' : ''
+            from === 'lite-trade' ? ' bg-[#1A1B1E]  ' : ' border border-solid border-[rgba(35,36,39,1)]',
+            isOpenOrClose ? 'border-[#232427]' : 'border-[#1A1B1E]',
           )}
         >
           <div className={cn(
@@ -125,7 +128,7 @@ const SessionTypeSelect = memo(
               <span className={cn(
                 "text-[#9DA3AF]",
               )}>{orderValue ?? ''}</span>
-              <span className=" text-[#C7CCD6] ml-2 mr-[6px]">{typeItem.label ?? '--'}</span>
+              <span className=" text-[#FFFFFF] ml-2 mr-[6px] text-[14px]">{typeItem.label ?? '--'}</span>
             </div>
             
           </div>
@@ -138,6 +141,16 @@ const SessionTypeSelect = memo(
                     <div className="w-full">
                       <div className="flex items-center justify-between w-full text-white text-[12px]">
                         <span>{session.label}</span>
+                        <div className="w-11"></div>
+                        <div className=" flex items-center">
+                          <span className="text-[#9DA3AF] text-[12px]">{session.timeLabel}</span>
+                          <div className="w-4 h-4 ml-2">
+                            {
+                              String(session.code) === String(typeItem.code) && (<img src="/images/v2/icons/selected.png" className="w-4 h-4" alt="" />)
+                            }
+                          </div>
+                          
+                        </div>
                       </div>
                       
                     </div>

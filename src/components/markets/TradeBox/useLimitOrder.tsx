@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react"
 import BigNumber from "bignumber.js"
 import { TradeType, SideType, TifType, SessionType } from "@/hooks/useCaCommon"
-import { MARKET_STATUS } from "@/config/constants"
 import { useBaseStore } from "@/stores/baseStore"
 import { parseAmount } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
@@ -21,6 +20,7 @@ interface UseLimitOrderParams {
   expires: string | number
   action: "buy" | "sell",
   tradeType: TradeType,
+  sessionType: SessionType,
   slippage: number,
   marketInfo: {
     networkFeeInNative: string
@@ -45,6 +45,7 @@ export function useLimitOrder({
   expires,
   action,
   tradeType,
+  sessionType,
   slippage,
   marketInfo,
   riskUserConfig,
@@ -113,7 +114,7 @@ export function useLimitOrder({
           ? SideType.BUYLIMIT
           : SideType.SELL,
         tif: TifType.DAY,
-        sessionType: SessionType.DEFAULT,
+        sessionType: sessionType,
         paymentToken: outputToken?.address || '',
         validDate: String(expires),
         networkFee: '0',
@@ -151,6 +152,7 @@ export function useLimitOrder({
     expires,
     action,
     tradeType,
+    sessionType,
     slippage,
     marketTradeState,
     marketInfo,

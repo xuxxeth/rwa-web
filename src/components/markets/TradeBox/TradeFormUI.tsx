@@ -65,7 +65,9 @@ export function TradeFormUI({
         <>
           {
             !isMarket && (
-              <SessionTypeSelect />
+              <div className="mb-3">
+                <SessionTypeSelect />
+              </div>
             )
           }
           <CurrencyInputPanel
@@ -104,7 +106,15 @@ export function TradeFormUI({
 
       {from === 'lite-trade' && (
         <>
+          {
+            !isMarket && (
+              <div className="mb-1">
+                <SessionTypeSelect from="lite-trade" />
+              </div>
+            )
+          }
           <CurrencyInputPanelLite
+            isMarket={isMarket}
             tradeType={tradeType}
             value={limitPrice}
             from={from}
