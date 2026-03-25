@@ -90,7 +90,12 @@ export const chartOverrides = {
   "scalesProperties.fontSize": 12,
   "scalesProperties.showSymbolLabels": true,
   "priceScaleProperties.autoScale": true,
+  "mainSeriesProperties.style": 3, // 3 = area
+  "mainSeriesProperties.areaStyle.color1": "rgba(37, 167, 80, 0.42)", // 上
+  "mainSeriesProperties.areaStyle.color2": "rgba(37, 167, 80, 0)",   // 下
+  "mainSeriesProperties.areaStyle.linecolor": "#25A750",             // 线
   priceScaleSelectionStrategyName: 'right',
+  // "paneProperties.rightMargin": 0,
   ...chartStyleOverrides,
 }
 
@@ -119,7 +124,7 @@ export const disabledFeatures: ChartingLibraryFeatureset[] = [
   // 'timeframes_toolbar',
   'use_localstorage_for_settings',  // 不从本地加载模板
   'study_templates',  
-
+  "header_chart_type",
   
 ]
 export const enabledFeatures: ChartingLibraryFeatureset[] = [

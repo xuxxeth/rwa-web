@@ -43,7 +43,7 @@ const RwaItemPrice = memo(
     const tradingTime = useTradingStartTime()
     
     const pup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.pc ? (realtimeData.c - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.pc])
-    const nup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.p ? (realtimeData.p - realtimeData.c) / realtimeData.c : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.p])
+    const nup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.pc && realtimeData?.p ? (realtimeData.p - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.pc, realtimeData?.p])
     const openUp = useMemo(() => {
       return tradingTime?.tradeState === MARKET_STATUS.OPEN ? nup : pup
     }, [tradingTime?.tradeState, pup, nup])
@@ -84,10 +84,10 @@ const RwaItemPrice = memo(
       tradingTime
     ])
 
-    if (!realtimeData) return <div className="min-w-[70px]"></div>
+    if (!realtimeData) return <div className="min-w-[126px]"></div>
 
     return (
-      <div className=" flex items-center gap-x-5 min-w-[70px] shrink-0">
+      <div className=" flex items-center gap-x-5 min-w-[126px] shrink-0">
         
         <div className=" shrink-0">
           <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel1} ET {!timeLabel1 ? currentTime.label : timeLabel1}</div>
@@ -98,7 +98,7 @@ const RwaItemPrice = memo(
                   : "text-[#CA3F64] ",
           )}>
             <div className={cn(
-              "text-[18px] leading-[100%] font-semibold mt-1",
+              "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
             )}>${realtimeData.c || '--'}</div>
             <span
               className={cn(
@@ -107,13 +107,13 @@ const RwaItemPrice = memo(
               }
             >
               {openUp !== 0 && (openUp > 0 ? '+' : '-')}
-              {Math.abs(Number(openUp || "0"))}%
+              {Math.abs(Number(openUp || "0")).toFixed(2)}%
             </span>
           </div>
         </div>
         {
           tradingTime?.tradeState !== MARKET_STATUS.OPEN && (
-            <div className=" shrink-0">
+            <div className=" shrink-0 min-w-[110px]">
               <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel2} ET {timeLabel2 || currentTime.label}</div>
               <div className={cn(
                 " flex items-baseline gap-x-1 text-[14px] text-white mt-[3px]"
@@ -129,7 +129,7 @@ const RwaItemPrice = memo(
                   }
                 >
                   {nup !== 0 && (nup > 0 ? '+' : '-')}
-                  {Math.abs(Number(nup || "0"))}%
+                  {Math.abs(Number(nup || "0")).toFixed(2)}%
                 </span>
               </div>
             </div>
