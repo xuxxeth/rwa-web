@@ -62,7 +62,6 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
 
   useEffect(() => {
     const listener = (data: ISummaryData) => {
-      debugger
       const obj = data.reduce(
         (acc, item) => {
           acc[symbolToLower(item.S)] = {
