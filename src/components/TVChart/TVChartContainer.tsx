@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { getDataFeed, tagSession, type IExtaIBasicDataFeed } from "./datafeed";
 import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString } from "@/lib/charting_library/charting_library";
 import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
@@ -35,8 +35,10 @@ export const TVChartContainer = memo(
     const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
     const dataFeedRef = useRef<IExtaIBasicDataFeed | null>(null)
+    const [tvWidgetShow, setTvWidgetShow] = useState(false)
     const tvWidgetReady = useRef(false)
     const skipIntervalChangeRef = useRef(false)
+    const wasAreaModeRef = useRef(false)
     const { i18n } = useTranslation()
     
     useEffect(() => {
@@ -75,7 +77,7 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.4",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
           timezone:"Asia/Hong_Kong",
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
@@ -92,6 +94,7 @@ export const TVChartContainer = memo(
         if (window.TradingView?.widget) {
           tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
           tvWidgetRef.current?.onChartReady(function () {
+            setTvWidgetShow(true)
             tvWidgetReady.current = true
               // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
               // priceScale?.setAutoScale(true)
@@ -141,18 +144,24 @@ export const TVChartContainer = memo(
                   skipIntervalChangeRef.current = false
                   return
                 }
-                console.log(interval, 1111)
-                // 如果 是1m线，则切回area
-                // @ts-ignore
-                if (Number(interval) === 1) {
-                  dataFeedRef.current?.setCurrentType(3)
-                  chart.setChartType(3);
-                  addOrRemoveMA(chart, 3)
-                } else {
-                  dataFeedRef.current?.setCurrentType(1)
-                  chart.setChartType(1);
+                // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
+                dataFeedRef.current?.setCurrentType(1)
+                chart.setChartType(1)
+                const applyCandle = () => {
                   addOrRemoveMA(chart, 1)
-
+                  wasAreaModeRef.current = false
+                  ;(tvWidgetRef.current as any)?.resetCache?.()
+                  chart.resetData()
+                }
+                if (tvWidgetRef.current) {
+                  const emptySymbol = `__empty__${Date.now()}`
+                  tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
+                    const emptySymbol = `__new__${Date.now()}`
+                    tvWidgetRef.current?.setSymbol(emptySymbol, interval as ResolutionString, () => {
+                      applyCandle()
+                    })
+                  })
+                  return
                 }
                 
                 // @ts-ignore
@@ -224,6 +233,7 @@ export const TVChartContainer = memo(
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
+        wasAreaModeRef.current = true
         addOrRemoveMA(chart, 3)
         chart.setChartType(3);
         dataFeedRef.current?.setCurrentType(3)
@@ -234,7 +244,8 @@ export const TVChartContainer = memo(
         })
         const resolution = ("1" as ResolutionString)
         chart.resetData?.()
-        chart.setSymbol(String(Date.now()))
+        const emptySymbol = `__new__${Date.now()}`
+        chart.setSymbol(emptySymbol)
         chart.setResolution(resolution)
       }
       
@@ -247,9 +258,14 @@ export const TVChartContainer = memo(
       )}>
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
         <div className=" absolute w-4 h-1 -right-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
-        <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
-          <SessionLineSelectt onChange={handleSessionChange} />
-        </div>
+        {
+          tvWidgetShow && (
+            <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
+              <SessionLineSelectt onChange={handleSessionChange} />
+            </div>
+          )
+        }
+        
         <div
           className="h-full pl-4"
           ref={chartContainerRef}

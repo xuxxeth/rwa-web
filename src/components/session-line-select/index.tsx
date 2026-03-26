@@ -35,8 +35,8 @@ const SessionLineSelectt = memo(
         
       ]
     }, [t]) 
-    const [currentCode, setCurrentCode] = useState(dataList[0].code)
-    const [currentItem, setCurrentItem] = useState(dataList[0])
+    const [currentCode, setCurrentCode] = useState(dataList[2].code)
+    const [currentItem, setCurrentItem] = useState(dataList[2])
     const [open, setOpen] = useState(false)
 
     const currentLabel = useMemo(() => {

@@ -99,7 +99,7 @@ export function getDataFeed({
 }: any): IExtaIBasicDataFeed {
   let currentToken = token
   let currentChartType = 3;
-  let sessionType = 1
+  let sessionType = 2
   let initialLoadComplete = false;
   return {
     setSessionType: (type: number) => {
@@ -179,6 +179,13 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
+      const symbolName = `${symbolInfo?.name || ''}`
+      
+      if (symbolName.startsWith('__empty__')) {
+        
+        onHistoryCallback([], { noData: true })
+        return
+      }
       const currentTime = Date.now();
       // 防止过于频繁的请求
       // if (currentTime - lastRequestTime < requestInterval) {

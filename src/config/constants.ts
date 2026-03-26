@@ -88,7 +88,8 @@ export const chartOverrides = {
   "scalesProperties.textColor": "#9494A8",
   "scalesProperties.lineColor": "#111114",
   "scalesProperties.fontSize": 12,
-  "scalesProperties.showSymbolLabels": true,
+  "scalesProperties.showSymbolLabels": false,
+  "scalesProperties.showSeriesLastValue": false,
   "priceScaleProperties.autoScale": true,
   "mainSeriesProperties.style": 3, // 3 = area
   "mainSeriesProperties.areaStyle.color1": "rgba(37, 167, 80, 0.42)", // 上
