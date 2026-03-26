@@ -9,9 +9,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { SessionLineSelectt, type IItemCode } from "../session-line-select";
 
 let initChart: any
-let ma1Id: EntityId | null = null
-let ma2Id: EntityId | null = null
-let ma3Id: EntityId | null = null
 
 let maIds: EntityId[] = [];
 
@@ -111,13 +108,17 @@ export const TVChartContainer = memo(
             const chart = tvWidgetRef.current?.activeChart();
             if (chart) {
               chart.onDataLoaded().subscribe(null, () => {
-                const timeScale = chart.getTimeScale();
-                timeScale.setRightOffset(0);
-                const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
-                const range = dataFeedRef.current?.getBarsRange?.(undefined, resolution)
-                if (range?.from && range?.to && range.from < range.to) {
-                  chart.setVisibleRange(range, { percentRightMargin: 0 })
+                let currentChartType = chart.chartType();
+                if (currentChartType === 3) {
+                  const timeScale = chart.getTimeScale();
+                  timeScale.setRightOffset(0);
+                  const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
+                  const range = dataFeedRef.current?.getBarsRange?.(undefined, resolution)
+                  if (range?.from && range?.to && range.from < range.to) {
+                    chart.setVisibleRange(range, { percentRightMargin: 0 })
+                  }
                 }
+                
               }, true);
               // 添加成交量指标，暂时不需要
               // chart?.createStudy("Volume", false, false).then((studyId) => {
@@ -128,7 +129,7 @@ export const TVChartContainer = memo(
               //     volumePane.setHeight(100); // 单位是像素，高度随你调
               //   }
               // });
-              let currentChartType = chart.chartType();
+              
 
               // chart.onChartTypeChanged().subscribe(null, (type) => {
               //   currentChartType = type;
@@ -140,10 +141,23 @@ export const TVChartContainer = memo(
                   skipIntervalChangeRef.current = false
                   return
                 }
-                chart.setChartType(1);
-                currentChartType = 1;
-                dataFeedRef.current?.setCurrentType(1)
-                addOrRemoveMA(chart, currentChartType)
+                console.log(interval, 1111)
+                // 如果 是1m线，则切回area
+                // @ts-ignore
+                if (Number(interval) === 1) {
+                  dataFeedRef.current?.setCurrentType(3)
+                  chart.setChartType(3);
+                  addOrRemoveMA(chart, 3)
+                } else {
+                  dataFeedRef.current?.setCurrentType(1)
+                  chart.setChartType(1);
+                  addOrRemoveMA(chart, 1)
+
+                }
+                
+                // @ts-ignore
+                // dataFeedRef.current?.setSuppressHistory(false)
+                ;(tvWidgetRef.current as any)?.resetCache?.()
                 chart.resetData(); 
                 
               });
@@ -208,7 +222,6 @@ export const TVChartContainer = memo(
     }, [i18n.language])
 
     const handleSessionChange = useCallback((data: IItemCode) => {
-      console.log(data)
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
         addOrRemoveMA(chart, 3)
@@ -216,6 +229,9 @@ export const TVChartContainer = memo(
         dataFeedRef.current?.setCurrentType(3)
         dataFeedRef.current?.setSessionType(Number(data.code))
         skipIntervalChangeRef.current = true
+        queueMicrotask(() => {
+          skipIntervalChangeRef.current = false
+        })
         const resolution = ("1" as ResolutionString)
         chart.resetData?.()
         chart.setSymbol(String(Date.now()))

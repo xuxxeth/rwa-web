@@ -55,6 +55,9 @@ export function tagSession(item: any) {
 
 const lastBarsCache = new Map<string, Bar>();
 const barsRangeCache = new Map<string, { from: number; to: number }>();
+const minuteResultCache = new Map<string, { bars: any[]; ts: number }>();
+const minuteInFlight = new Map<string, Promise<any[]>>();
+const MINUTE_CACHE_TTL = 3000;
 const _minPrice: Number = 0;
 const _maxPrice: Number = 0;
 // DatafeedConfiguration implementation
@@ -130,10 +133,11 @@ export function getDataFeed({
       _extension,
     ) => {
       // Symbol information object
+      const ticker = symbolName || name || ''
       const symbolInfo: LibrarySymbolInfo = {
-        ticker: symbolName || name || '',
-        name: symbolName || name || '',
-        description: symbolName || name || '',
+        ticker: ticker,
+        name: ticker,
+        description: ticker,
         type: "stock",
         // session: "24x7",
         // timezone: "Asia/Hong_Kong",
@@ -192,9 +196,15 @@ export function getDataFeed({
       } 
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
+      // area 模式下仅首次加载，后续拖拽/缩放不再请求
+      if (currentChartType === 3 && !firstDataRequest) {
+        onHistoryCallback([], { noData: true })
+        return
+      }
+      
       // 如果是Kline
       try {
-        if (currentChartType === 1) {
+        if (currentChartType !== 3) {
           const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
@@ -231,24 +241,79 @@ export function getDataFeed({
           }
           onHistoryCallback(bars, { noData: bars.length < countBack ? true : false });
         } else {
-          
-          const res = await klineApi.getMinute({stock: currentToken.stockId, sessionType: sessionType, day: parseInt(String(Date.now() / 1000))})
-          const _data = res?.data?.items || []
-          let bars = _data
-            .sort((a, b) => a.startTime - b.startTime)
-            .filter(bar => bar.startTime >= from && bar.startTime <= to)
-            .map((bar: any) => {
-              return {
-                "time": bar.startTime * 1000,
-                "open": Number(truncate(bar.close, 2)),
-                "high": Number(truncate(bar.close, 2)),
-                "low": Number(truncate(bar.close, 2)),
-                "close": Number(truncate(bar.close, 2)),
-                "volume": bar.volume ?? 0,
-              }
-            })
+          const day = parseInt(String(Date.now() / 1000))
+          const cacheKey = `${currentToken.stockId}|${sessionType}|${day}|${from}|${to}|${resolution}|${countBack ?? ''}`
+          const cached = minuteResultCache.get(cacheKey)
+          if (cached && Date.now() - cached.ts < MINUTE_CACHE_TTL) {
+            const bars = cached.bars
+            if (bars.length === 0) {
+              onHistoryCallback([], { noData: true });
+            } else {
+              onHistoryCallback(bars, { noData: false });
+            }
+            return;
+          }
 
-          if (res.code !== RESPONSE_CODE.SUCCESS || bars.length === 0) {
+          if (minuteInFlight.has(cacheKey)) {
+            const bars = await minuteInFlight.get(cacheKey)!
+            if (bars.length === 0) {
+              onHistoryCallback([], { noData: true });
+            } else {
+              onHistoryCallback(bars, { noData: false });
+            }
+            return;
+          }
+
+          const fetchPromise = (async () => {
+            const res = await klineApi.getMinute({stock: currentToken.stockId, sessionType: sessionType, day})
+            const _data = res?.data?.items || []
+            let bars = _data
+              .sort((a, b) => a.startTime - b.startTime)
+              // .filter(bar => bar.startTime >= from && bar.startTime <= to)
+              .map((bar: any) => {
+                return {
+                  "time": bar.startTime * 1000,
+                  "open": Number(truncate(bar.close, 2)),
+                  "high": Number(truncate(bar.close, 2)),
+                  "low": Number(truncate(bar.close, 2)),
+                  "close": Number(truncate(bar.close, 2)),
+                  "volume": bar.volume ?? 0,
+                }
+              })
+
+            if (res.code !== RESPONSE_CODE.SUCCESS || bars.length === 0) {
+              return []
+            }
+
+            if (typeof countBack === "number" && bars.length < countBack) {
+              const intervalSec = Math.max(keyToMinutes(resolution as any || '1'), 1) * 60
+              const intervalMs = intervalSec * 1000
+              const missing = countBack - bars.length
+              const firstTimeMs = bars[0]?.time ?? (to * 1000)
+              const startTimeMs = firstTimeMs - intervalMs * missing
+              const padBars = Array.from({ length: missing }).map((_, i) => {
+                const t = startTimeMs + intervalMs * i
+                return {
+                  time: t,
+                  open: 0,
+                  high: 0,
+                  low: 0,
+                  close: 0,
+                  volume: 0,
+                }
+              })
+              bars = [...padBars, ...bars]
+            }
+
+            return bars
+          })()
+
+          minuteInFlight.set(cacheKey, fetchPromise)
+          let bars = await fetchPromise
+          minuteInFlight.delete(cacheKey)
+          minuteResultCache.set(cacheKey, { bars, ts: Date.now() })
+
+          if (bars.length === 0) {
             onHistoryCallback([], { noData: true });
             return;
           }
