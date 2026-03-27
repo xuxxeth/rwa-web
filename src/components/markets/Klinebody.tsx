@@ -207,7 +207,7 @@ export const StockInfo = memo(
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
           <div className=" shrink-0">
-            <LabelWrap >{'合约地址'}</LabelWrap>
+            <LabelWrap >{t('v3.t30')}</LabelWrap>
             <div className="flex items-center gap-x-1 mt-1">
               {shortenAddress(inputToken?.address || '')}
               <CopyButton copyText={inputToken?.address || ''} />

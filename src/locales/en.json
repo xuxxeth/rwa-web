@@ -754,6 +754,7 @@
     "t26": "Full Hours",
     "t27": "Pre-Market",
     "t28": "Regular-Market",
-    "t29": "After-Hours"
+    "t29": "After-Hours",
+    "t30": "Contract Address"
   }
 }
