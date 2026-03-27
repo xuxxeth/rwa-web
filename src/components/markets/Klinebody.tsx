@@ -171,7 +171,7 @@ export const StockInfo = memo(
     }, [])
 
     return (
-      <div className="flex text-white pl-4 min-w-[1200px]">
+      <div className="flex text-white pl-4 min-w-[1300px]">
         <StockDialog from={from} />
         <div className={cn(
           " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4 ml-10",
