@@ -679,6 +679,7 @@
       "t211": "The lowest traded price during the current trading session.",
       "t22": "Last Price",
       "t23": "In pre-market, after-hours, and closed session, only limit orders are supported. Your regular-session limit orders will be queued for the next market open.",
+      "t231": "In closed sessions, nothing but RTH Only orders are supported. Your orders will be queued for the next market open.",
       "t24": "Limit prcie",
       "t25": "Quantity",
       "t26": "Est. Pay",
