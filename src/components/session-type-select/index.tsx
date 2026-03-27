@@ -114,11 +114,11 @@ const SessionTypeSelect = memo(
               <div className="">
                 <div>
                   <span className=" font-semibold">{t('v3.t16') ?? ' '}：</span>
-                  <span>{t('v3.t19')}</span>
+                  <span>{t('v3.t19', {duration: sessionTypeList[1]?.timeLabel})}</span>
                 </div>
                 <div className="mt-2">
                   <span className=" font-semibold">{t('v3.t17') ?? ' '}：</span>
-                  <span> {t('v3.t20')}</span>
+                  <span> {t('v3.t20', {duration: sessionTypeList[0]?.timeLabel})}</span>
                 </div>
               </div>
             )}>

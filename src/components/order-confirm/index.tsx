@@ -126,14 +126,14 @@ const OrderConfirm = memo(
               />
             )
           }
-          {
+          {/* {
             !isMarketOrder && (
               <BetweenText 
                 left={t("Expires in")}
                 right={t('assets.order.intraday')}
               />
             )
-          }
+          } */}
           
           <BetweenText 
             left={

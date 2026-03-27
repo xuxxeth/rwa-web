@@ -40,6 +40,7 @@ export const TVChartContainer = memo(
     const skipIntervalChangeRef = useRef(false)
     const wasAreaModeRef = useRef(false)
     const { i18n } = useTranslation()
+    const [chartType, setChartType] = useState(true)
     
     useEffect(() => {
       let mounted = true;
@@ -87,7 +88,7 @@ export const TVChartContainer = memo(
             // "volume.volume.transparency": 30,   
           },
           "favorites": {
-              "intervals": ["5", "15",] as ResolutionString[], // 默认收藏的时间周期
+              "intervals": ["1", "5", "15",] as ResolutionString[], // 默认收藏的时间周期
           },
 
         };
@@ -110,19 +111,18 @@ export const TVChartContainer = memo(
             });
             const chart = tvWidgetRef.current?.activeChart();
             if (chart) {
-              chart.onDataLoaded().subscribe(null, () => {
-                let currentChartType = chart.chartType();
-                if (currentChartType === 3) {
-                  const timeScale = chart.getTimeScale();
-                  timeScale.setRightOffset(0);
-                  const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
-                  const range = dataFeedRef.current?.getBarsRange?.(undefined, resolution)
-                  if (range?.from && range?.to && range.from < range.to) {
-                    chart.setVisibleRange(range, { percentRightMargin: 0 })
-                  }
-                }
-                
-              }, true);
+              // chart.onDataLoaded().subscribe(null, () => {
+              //   let currentChartType = chart.chartType();
+              //   if (currentChartType === 3) {
+              //     const timeScale = chart.getTimeScale();
+              //     timeScale.setRightOffset(0);
+              //     const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
+              //     const range = dataFeedRef.current?.getBarsRange?.(undefined, resolution)
+              //     if (range?.from && range?.to && range.from < range.to) {
+              //       chart.setVisibleRange(range, { percentRightMargin: 0 })
+              //     }
+              //   }
+              // }, true);
               // 添加成交量指标，暂时不需要
               // chart?.createStudy("Volume", false, false).then((studyId) => {
               //   const panes = chart.getPanes();
@@ -145,6 +145,7 @@ export const TVChartContainer = memo(
                   return
                 }
                 // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
+                setChartType(false)
                 dataFeedRef.current?.setCurrentType(1)
                 chart.setChartType(1)
                 const applyCandle = () => {
@@ -233,6 +234,7 @@ export const TVChartContainer = memo(
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
+        setChartType(true)
         wasAreaModeRef.current = true
         addOrRemoveMA(chart, 3)
         chart.setChartType(3);
@@ -261,7 +263,7 @@ export const TVChartContainer = memo(
         {
           tvWidgetShow && (
             <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
-              <SessionLineSelectt onChange={handleSessionChange} />
+              <SessionLineSelectt onChange={handleSessionChange} selected={chartType} />
             </div>
           )
         }

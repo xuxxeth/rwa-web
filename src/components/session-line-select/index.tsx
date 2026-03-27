@@ -16,6 +16,7 @@ export type SessionLineSelecttProps = {
   value?: string;
   onChange?: (code: IItemCode) => void;
   className?: string
+  selected?: boolean
 }
 // 0-全部,1-盘前;2-盘中;3-盘后;5-夜盘
 const SessionLineSelectt = memo(
@@ -23,7 +24,8 @@ const SessionLineSelectt = memo(
     defaultValue,
     value, 
     onChange, 
-    className
+    className,
+    selected
   }: SessionLineSelecttProps) => {
     const { t, i18n } = useTranslation()
     const dataList = useMemo(() => {
@@ -75,13 +77,19 @@ const SessionLineSelectt = memo(
         <SelectTrigger 
           open={open}
           className={cn(
-            "px-[10px] py-0 h-[23px] shadow-none flex items-center justify-between rounded-[4px] border border-solid border-[#232427]",
+            "px-[10px] py-0 h-[23px] shadow-none flex items-center justify-between rounded-[4px] border border-solid ",
             className,
+            selected ? "text-[#ffffff] border-[#FFFFFF]" : "border-[#232427] "
           )}
         >
-          <div className="flex items-center gap-2 w-[110px] text-[#9DA3AF] text-[12px]">
+          <div className={cn(
+            "flex items-center gap-2 w-[110px] text-[12px]",
+          )}>
             {currentCode ? (
-              <span className=" font-normal">{currentLabel}</span>
+              <span className={cn(
+                " font-normal",
+                selected ? "text-white" : "text-[#9DA3AF] "
+              )}>{currentLabel}</span>
             ) : (
               <span className="text-5">{''}</span>
             )}

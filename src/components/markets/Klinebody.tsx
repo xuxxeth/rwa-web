@@ -22,14 +22,19 @@ import { useCurrentTime } from "@/hooks/useCurrentTime"
 export const LabelWrap = memo(
   ({ children, tooltip }: { children: React.ReactNode, tooltip?: string | React.ReactNode }) => {
     if (!tooltip) return (
-      <div className="text-[12px] w-full font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
-        {children}
+      <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
+        <div className=" border-b border-dashed border-[#9DA3AF]">
+          {children}
+        </div>
       </div>
     )
     return (
       <IconWithTooltip tooltip={tooltip}>
-        <div className="text-[12px] w-full font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
-          {children}
+        <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
+          <div className=" border-b border-dashed border-[#9DA3AF]">
+            {children}
+          </div>
+          
         </div>
       </IconWithTooltip>
     )
@@ -149,6 +154,7 @@ export const StockInfo = memo(
     const inputToken = useTradeStore(state => state.inputToken)
     const stockData = useStockStore(state => state.stockData)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
 
     const getMarket = useBaseStore(state => state.getMarket)
 
@@ -186,7 +192,7 @@ export const StockInfo = memo(
           </div> */}
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
-            <div className="mt-1">${realtimeData?.o || '--'}</div>
+            <div className="mt-1">${ marketTradeState === MARKET_STATUS.BEFORE ? '--' : (realtimeData?.o || '--')}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t191')}>{t('v2.tx.t19')}</LabelWrap>
@@ -201,7 +207,7 @@ export const StockInfo = memo(
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
           <div className=" shrink-0">
-            <LabelWrap tooltip={t('v2.tx.t211')}>{'合约地址'}</LabelWrap>
+            <LabelWrap >{'合约地址'}</LabelWrap>
             <div className="flex items-center gap-x-1 mt-1">
               {shortenAddress(inputToken?.address || '')}
               <CopyButton copyText={inputToken?.address || ''} />
