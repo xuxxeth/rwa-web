@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import storage from "@/utils/storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SessionLineSelectt, type IItemCode } from "../session-line-select";
+import { useBaseStore } from "@/stores/baseStore";
 
 let initChart: any
 
@@ -41,6 +42,7 @@ export const TVChartContainer = memo(
     const wasAreaModeRef = useRef(false)
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
     
     useEffect(() => {
       let mounted = true;
@@ -157,7 +159,7 @@ export const TVChartContainer = memo(
                 if (tvWidgetRef.current) {
                   const emptySymbol = `__empty__${Date.now()}`
                   tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
-                    const emptySymbol = `__new__${Date.now()}`
+                    const emptySymbol = `__${rwa?.symbol || token.symbol}__${Date.now()}`
                     tvWidgetRef.current?.setSymbol(emptySymbol, interval as ResolutionString, () => {
                       applyCandle()
                     })
@@ -231,6 +233,11 @@ export const TVChartContainer = memo(
       }
     }, [i18n.language])
 
+    // 监听市场状态变化，更新dataFeed的市场状态
+    useEffect(() => {
+      dataFeedRef.current?.setMarketState(marketTradeState)
+    }, [marketTradeState])
+
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
@@ -246,7 +253,7 @@ export const TVChartContainer = memo(
         })
         const resolution = ("1" as ResolutionString)
         chart.resetData?.()
-        const emptySymbol = `__new__${Date.now()}`
+        const emptySymbol = `__${token.symbol}__${Date.now()}`
         chart.setSymbol(emptySymbol)
         chart.setResolution(resolution)
       }

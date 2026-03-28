@@ -8,7 +8,7 @@ import type {
 } from "@/lib/charting_library/charting_library";
 
 import { klineApi } from "@/service/kline/api";
-import { RESPONSE_CODE } from "@/config/constants";
+import { MARKET_STATUS, RESPONSE_CODE } from "@/config/constants";
 import wsService from "@/service/webSocket/service";
 import { truncate } from "@/utils/format";
 
@@ -53,6 +53,15 @@ export function tagSession(item: any) {
   return "off"; // 非交易时段
 }
 
+export function getSymbol(symbolName: string) {
+  let symbol = symbolName
+  if (symbolName.startsWith('__')) {
+    const match = symbolName.match(/__([^_]+?)__/)
+    symbol = match?.[1] || ''
+  }
+  return symbol
+}
+
 const lastBarsCache = new Map<string, Bar>();
 const barsRangeCache = new Map<string, { from: number; to: number }>();
 const minuteResultCache = new Map<string, { bars: any[]; ts: number }>();
@@ -89,6 +98,7 @@ export type IExtaIBasicDataFeed = IBasicDataFeed & {
   setCurrentType: (type: number) => void,
   setToken: (token: any) => void,
   getBarsRange: (symbol?: string, resolution?: string) => { from: number; to: number } | undefined,
+  setMarketState: (state: number) => void
 }
 
 export function getDataFeed({
@@ -101,7 +111,12 @@ export function getDataFeed({
   let currentChartType = 3;
   let sessionType = 2
   let initialLoadComplete = false;
+  let marketState = -1; // 市场状态
+
   return {
+    setMarketState: (state) => {
+      marketState = state
+    },
     setSessionType: (type: number) => {
       sessionType = type
     },
@@ -146,7 +161,7 @@ export function getDataFeed({
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 100,  // 小数点后2位精度
-        exchange: "",
+        exchange: "TIKO",
         has_intraday: true,
         visible_plots_set: 'ohlc',
         has_weekly_and_monthly: true,
@@ -228,9 +243,9 @@ export function getDataFeed({
               "volume": bar.volume ?? 0,
             }
           })
-
+          let symbolName = getSymbol(symbolInfo.name)
           if (firstDataRequest) {
-            lastBarsCache.set(symbolInfo.name, { ...bars[bars.length - 1] });
+            lastBarsCache.set(symbolName, { ...bars[bars.length - 1] });
           }
           if (bars.length > 0) {
             const firstTime = bars[0]?.time
@@ -242,12 +257,13 @@ export function getDataFeed({
                 const minutes = keyToMinutes(resolution as any || '15')
                 toSec = fromSec + Math.max(minutes, 1) * 60
               }
-              barsRangeCache.set(`${symbolInfo.name}|${resolution}`, { from: fromSec, to: toSec })
-              barsRangeCache.set(symbolInfo.name, { from: fromSec, to: toSec })
+              barsRangeCache.set(`${symbolName}|${resolution}`, { from: fromSec, to: toSec })
+              barsRangeCache.set(symbolName, { from: fromSec, to: toSec })
             }
           }
           onHistoryCallback(bars, { noData: bars.length < countBack ? true : false });
         } else {
+          let symbolName = getSymbol(symbolInfo.name)
           const day = parseInt(String(Date.now() / 1000))
           const cacheKey = `${currentToken.stockId}|${sessionType}|${day}|${from}|${to}|${resolution}|${countBack ?? ''}`
           const cached = minuteResultCache.get(cacheKey)
@@ -335,8 +351,8 @@ export function getDataFeed({
                 const minutes = keyToMinutes(resolution as any || '15')
                 toSec = fromSec + Math.max(minutes, 1) * 60
               }
-              barsRangeCache.set(`${symbolInfo.name}|${resolution}`, { from: fromSec, to: toSec })
-              barsRangeCache.set(symbolInfo.name, { from: fromSec, to: toSec })
+              barsRangeCache.set(`${symbolName}|${resolution}`, { from: fromSec, to: toSec })
+              barsRangeCache.set(symbolName, { from: fromSec, to: toSec })
             }
           }
 
@@ -362,7 +378,11 @@ export function getDataFeed({
       onResetCacheNeededCallback,
     ) => {
       wsService.init({})
+      
       console.log('symbolInfo: ', symbolInfo, resolution)
+      if (symbolInfo.name.startsWith('__empty__')) {
+        return
+      }
       const sub = wsListeners.get(subscriberUID)
       if (sub) {
         wsService.off(sub.key, sub.listener)
@@ -385,19 +405,30 @@ export function getDataFeed({
       if (currentChartType === 3) {
         _resolution = '1m'
       }
+      let symbol = getSymbol(symbolInfo.name)
       
-      const key = `candle.${symbolInfo.name}_${_resolution}`
+      const key = `candle.${symbol}_${_resolution}`
+
       const listener = (data: any) => { 
-        const lastBar = lastBarsCache.get(symbolInfo.name)
-        if (data?.c > 0 && (!lastBar || lastBar.time <= data.t * 1000)) {
-          onRealtimeCallback({
-            "time": data.t * 1000,
-            "open": Number(truncate(data.o, 2)),
-            "high": Number(truncate(data.h, 2)),
-            "low": Number(truncate(data.l, 2)),
-            "close": Number(truncate(data.c, 2)),
-            "volume": 0,
-          })
+        const lastBar = lastBarsCache.get(symbol)
+        if (data?.c) {
+          
+          if (
+            currentChartType === 1 // 如果是candle图，则正常执行回调
+            || (marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前
+            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘前状态，且当前分时图是盘前
+            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘前状态，且当前分时图是盘前
+          ) {
+            onRealtimeCallback({
+              "time": data.t * 1000,
+              "open": Number(truncate(data.o, 2)),
+              "high": Number(truncate(data.h, 2)),
+              "low": Number(truncate(data.l, 2)),
+              "close": Number(truncate(data.c, 2)),
+              "volume": 0,
+            })
+          }
+          
         }
       }
       wsListeners.set(subscriberUID, { key, listener })
@@ -407,12 +438,12 @@ export function getDataFeed({
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
-      
       const sub = wsListeners.get(subscriberUID)
       if (sub) {
         wsService.off(sub.key, sub.listener)
         wsListeners.delete(subscriberUID)
       }
+      
     },
   };
 }
