@@ -493,7 +493,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, 2), '$') : '--'}
+        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, item.precision), '$') : '--'}
       />
     ),
   },
@@ -503,7 +503,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, 2), '$') : '--'}
+        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, item.precision), '$') : '--'}
       />
     ),
   },
