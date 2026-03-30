@@ -5,7 +5,7 @@ import { useRouter } from '@/hooks/useRouter'
 import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
 import { useEffect, useState, type ReactNode } from 'react'
-import { formatUp, isLess, parseAmount, textPrefix, toFixed } from '@/utils'
+import { formatUp, isLess, parseAmount, textPrefix, truncate } from '@/utils'
 import type { ApiResponse } from '@/service/client'
 import type { IKycDetail } from '@/service/kyc/types'
 
@@ -86,7 +86,9 @@ function VerifyStatus(props: {
       <LazyImage src={getIconFromType(props.type)} className='w-[120px] h-[90px] pt-5' />
       <div>
         <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.${props.title}`)}</div>
-        <div className='text-base text-[#909090] text-center'>{t(`${langPrefix}.${props.detail}`)}</div>
+        <div className='text-base text-[#909090] text-center'>
+          {t(`${langPrefix}.${props.detail}`)}
+        </div>
       </div>
       <Button
         onClick={() => {
@@ -217,7 +219,6 @@ function HotRwas() {
               key={rwa.symbol}
               className='flex flex-row items-center p-3 bg-[#1C1C1C] rounded-lg'
               onClick={() => {
-               
                 router.push('/trade/' + rwa.symbol)
               }}
             >
@@ -228,7 +229,7 @@ function HotRwas() {
               </div>
               <div className='flex flex-col gap-1 mr-3'>
                 <div className='text-base'>
-                  {rwa.price ? textPrefix(toFixed(rwa.price, rwa.precision), '$') : '--'}
+                  {rwa.price ? textPrefix(truncate(rwa.price, rwa.precision), '$') : '--'}
                 </div>
                 <div className={cn('text-sm text-[#1A85FF]', getUpColor(rwa.change))}>
                   <button className='bg-white/10 px-2 py-[2px] rounded-sm'>
@@ -252,7 +253,7 @@ export function Verifying(props: { refresh: () => Promise<ApiResponse<IKycDetail
     <VerifyStatus
       type='verifying'
       title='verifying'
-      detail= {retryCount > 0 && retryCount < 3 ? 'verifyingWait' : 'verifyingTip'} 
+      detail={retryCount > 0 && retryCount < 3 ? 'verifyingWait' : 'verifyingTip'}
       btnText='m'
       btnOnClick={() => router.push('/markets')}
     />

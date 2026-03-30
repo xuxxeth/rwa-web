@@ -7,7 +7,7 @@ import type { IRwa } from '@/service/base/types'
 // 给 RWA 列表添加价格和涨跌幅
 function useRwaWithPriceAndUp(rwaList: IRwa[]) {
   const [tokenWithUp, setTokenWithUp] = useState<
-    Record<string, { up: string | undefined; price: string | undefined }>
+    Record<string, { up: string | undefined; price: number | undefined }>
   >({})
 
   useEffect(() => {
@@ -15,10 +15,10 @@ function useRwaWithPriceAndUp(rwaList: IRwa[]) {
       const items = data.items
 
       const upMap = items.reduce(
-        (acc: Record<string, { up: string | undefined; price: string | undefined }>, cur) => {
+        (acc: Record<string, { up: string | undefined; price: number | undefined }>, cur) => {
           acc[symbolToLower(cur.S)] = {
             // 盘中价格
-            price: cur.c ? truncate(cur.c, 2) : undefined,
+            price: cur.c,
             // 盘中价格涨跌幅
             up: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
           }

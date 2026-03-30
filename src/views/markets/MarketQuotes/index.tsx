@@ -8,7 +8,6 @@ import {
   advancedSort,
   textPrefix,
   strOrNumToSign,
-  toFixed,
   type Change,
   symbolToLower,
   multiply,
@@ -40,7 +39,7 @@ import { MARKET_STATUS } from '@/config/constants'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
-export function useRwaListWithQuote(rwaList: IRwa[]) {
+export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const rwaListWithQuote = useMemo(() => {
@@ -56,6 +55,7 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
         floatCap: quote?.price
           ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
           : undefined,
+        marketTradeState,
       }
     })
   }, [rwaList, tokenWithQuote])
@@ -66,15 +66,15 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
         (acc, item) => {
           acc[symbolToLower(item.S)] = {
             // 最新价
-            price: truncate(item.p, 2),
+            price: item.p,
             // 盘中价格
-            close: truncate(item.c, 2),
-            // 盘中价格涨跌幅
+            close: item.c,
+            // 盘中收盘价涨跌幅
             closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : '0',
             // 最新价格涨跌幅
             up: item.p && item.c ? calculateUp(item.p, item.c) : '0',
-            dailyHigh: item.h ? truncate(item.h, 2) : '0',
-            dailyLow: item.l ? truncate(item.l, 2) : '0',
+            dailyHigh: item.h,
+            dailyLow: item.l,
           }
           return acc
         },
@@ -123,7 +123,7 @@ export default function MarketQuotes() {
     )
   }, [rwaList, isFavorites, favorites, isFavorite, searchText])
 
-  const marketQuotes = useRwaListWithQuote(newRwaList)
+  const marketQuotes = useRwaListWithQuote(newRwaList, marketTradeState)
 
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
@@ -154,7 +154,6 @@ export default function MarketQuotes() {
               toggleFavorite: (stockId: number) => Promise<boolean>
               toggleEnable: boolean
               isFavorite: (stockId: number) => boolean
-              marketTradeState: number
             }
           >
             lngPrefix='marketQuotes'
@@ -173,7 +172,6 @@ export default function MarketQuotes() {
               toggleFavorite: (stockId: number) => void
               toggleEnable: boolean
               isFavorite: (stockId: number) => boolean
-              marketTradeState: number
             }
           >
             data={paginatedData}
@@ -182,7 +180,6 @@ export default function MarketQuotes() {
               toggleFavorite: favoritesRest.toggleFavorite,
               toggleEnable: favoritesRest.toggleEnable,
               isFavorite,
-              marketTradeState,
             }}
             getKey={(item: IMarketQuote) => item.symbol}
             className='px-6 cursor-pointer hover:bg-white/4'
@@ -315,6 +312,7 @@ function TextCellWithColor(props: { text: string; change: Change; withIcon: bool
     />
   )
 }
+
 const MarketQuotesListConfig = [
   {
     key: 'name',
@@ -360,50 +358,90 @@ const MarketQuotesListConfig = [
   {
     key: 'price',
     sortable: true,
-    render: (item: IMarketQuote, extra: { marketTradeState: number }) => (
-      <div className='flex flex-col gap-1'>
-        {/* 盘中价格 */}
-        <TextCellWithColor
-          text={item.close ? textPrefix(toFixed(item.close, item.precision), '$') : '--'}
-          change={strOrNumToSign(item.closeUp ?? '0')}
-          withIcon={false}
-        />
-        <div className='flex flex-row items-center gap-1'>
-          <TextCell
-            className='text-xs/[15px] font-normal text-gray-400'
-            text={item.price ? textPrefix(toFixed(item.price, item.precision), '$') : '--'}
-          />
-          <MarketTradeStateTag marketTradeState={extra.marketTradeState} />
-        </div>
-      </div>
-    ),
-    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.close, b.close, order),
-  },
-  {
-    key: 'change',
-    sortable: true,
-    render: (item: IMarketQuote, extra: { marketTradeState: number }) => {
-      const change = strOrNumToSign(item.closeUp ?? 0)
+    render: (item: IMarketQuote) => {
+      const priceAndUpToShowList =
+        item.marketTradeState === MARKET_STATUS.OPEN
+          ? [
+              {
+                price: item.price,
+                up: item.up,
+              },
+            ]
+          : [
+              {
+                price: item.close,
+                up: item.closeUp,
+              },
+              {
+                price: item.price,
+                up: item.up,
+              },
+            ]
       return (
         <div className='flex flex-col gap-1'>
-          <TextCellWithColor
-            text={item.closeUp ? formatUp(item.closeUp) : '--'}
-            change={change}
-            withIcon={false}
-          />
-          <div className='flex flex-row items-center gap-1'>
-            <TextCell
-              className='text-xs/[15px] font-normal text-gray-400'
-              text={item.up ? formatUp(item.up) : '--'}
+          {priceAndUpToShowList[0] && (
+            <TextCellWithColor
+              text={
+                priceAndUpToShowList[0].price
+                  ? textPrefix(truncate(priceAndUpToShowList[0].price, item.precision), '$')
+                  : '--'
+              }
+              change={strOrNumToSign(priceAndUpToShowList[0].up ?? '0')}
+              withIcon={false}
             />
-            <MarketTradeStateTag marketTradeState={extra.marketTradeState} />
-          </div>
+          )}
+          {priceAndUpToShowList[1] && (
+            <div className='flex flex-row items-center gap-1'>
+              <TextCell
+                className='text-xs/[15px] font-normal text-gray-400'
+                text={
+                  priceAndUpToShowList[1].price
+                    ? textPrefix(truncate(priceAndUpToShowList[1].price, item.precision), '$')
+                    : '--'
+                }
+              />
+              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
+            </div>
+          )}
         </div>
       )
     },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.closeUp, b.closeUp, order),
+      a.marketTradeState === MARKET_STATUS.OPEN
+        ? advancedSort(a.price, b.price, order)
+        : advancedSort(a.close, b.close, order),
+  },
+  {
+    key: 'change',
+    sortable: true,
+    render: (item: IMarketQuote) => {
+      const upList =
+        item.marketTradeState === MARKET_STATUS.OPEN ? [item.up] : [item.closeUp, item.up]
+      return (
+        <div className='flex flex-col gap-1'>
+          {upList[0] && (
+            <TextCellWithColor
+              text={upList[0] ? formatUp(upList[0]) : '--'}
+              change={strOrNumToSign(upList[0] ?? 0)}
+              withIcon={false}
+            />
+          )}
+          {upList[1] && (
+            <div className='flex flex-row items-center gap-1'>
+              <TextCell
+                className='text-xs/[15px] font-normal text-gray-400'
+                text={upList[1] ? formatUp(upList[1]) : '--'}
+              />
+              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
+            </div>
+          )}
+        </div>
+      )
+    },
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
+      a.marketTradeState === MARKET_STATUS.OPEN
+        ? advancedSort(a.up, b.up, order)
+        : advancedSort(a.closeUp, b.closeUp, order),
   },
   // {
   //   key: 'weekChange',
@@ -455,7 +493,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyHigh ? textPrefix(toFixed(item.dailyHigh), '$') : '--'}
+        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, 2), '$') : '--'}
       />
     ),
   },
@@ -465,7 +503,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyLow ? textPrefix(toFixed(item.dailyLow), '$') : '--'}
+        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, 2), '$') : '--'}
       />
     ),
   },

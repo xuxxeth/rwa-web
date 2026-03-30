@@ -221,20 +221,20 @@ const openOrderTableConfig: ITableConfig<
       <TextCell className='w-[80px] text-xs/4' text={formatTimestamp(item.txTime)} />
     ),
   },
-  {
-    key: 'expiration',
-    sortable: false,
-    render: (item: IOpenOrder) => {
-      if (item.orderType === 1) {
-        return '--'
-      }
-      if (item.tif === 0) {
-        return <TextCellWithTranslation text='assets.order.intraday' />
-      }
+  // {
+  //   key: 'expiration',
+  //   sortable: false,
+  //   render: (item: IOpenOrder) => {
+  //     if (item.orderType === 1) {
+  //       return '--'
+  //     }
+  //     if (item.tif === 0) {
+  //       return <TextCellWithTranslation text='assets.order.intraday' />
+  //     }
 
-      return <TextCell text={readableDuration(item.validDate * Day)} />
-    },
-  },
+  //     return <TextCell text={readableDuration(item.validDate * Day)} />
+  //   },
+  // },
   {
     key: 'status',
     sortable: false,
