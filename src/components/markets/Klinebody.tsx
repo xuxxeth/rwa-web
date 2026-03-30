@@ -49,9 +49,14 @@ const RwaItemPrice = memo(
     
     const pup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.pc ? (realtimeData.c - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.pc])
     const nup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.pc && realtimeData?.p ? (realtimeData.p - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.pc, realtimeData?.p])
+    const aup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.p ? (realtimeData.p - realtimeData.c) / realtimeData.c : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.p])
+    
     const openUp = useMemo(() => {
       return tradingTime?.tradeState === MARKET_STATUS.OPEN ? nup : pup
     }, [tradingTime?.tradeState, pup, nup])
+    const afterUp = useMemo(() => {
+      return tradingTime?.tradeState === MARKET_STATUS.CLOSE ? aup : nup
+    }, [tradingTime?.tradeState, aup, nup])
 
     const currentTime = useCurrentTime()
 
@@ -133,8 +138,8 @@ const RwaItemPrice = memo(
                   )
                   }
                 >
-                  {nup !== 0 && (nup > 0 ? '+' : '-')}
-                  {Math.abs(Number(nup || "0")).toFixed(2)}%
+                  {afterUp !== 0 && (afterUp > 0 ? '+' : '-')}
+                  {Math.abs(Number(afterUp || "0")).toFixed(2)}%
                 </span>
               </div>
             </div>
