@@ -14,11 +14,11 @@ function Markets() {
   const orderDialog = useShowDialog()
   return (
     <>
-      <div className='w-full'>
-        <div className=' bg-[#131416] min-h-[100vh] text-white'>
+      <div className='w-full overflow-x-auto'>
+        <div className=' bg-[#131416] min-h-[100vh] text-white w-max min-w-full'>
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
-          <div className='flex'>
-            <div className='flex-1'>
+          <div className='flex min-w-[1200px]'>
+            <div className='flex-1 min-w-[856px]'>
               <KlineBody from='market' />
             </div>
             <div className='w-[340px] shrink-0 flex'>
