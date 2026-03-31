@@ -15,8 +15,8 @@ function useRwaWithPriceAndUp(rwaList: IRwa[]) {
       const items = data.items
 
       const upMap = items.reduce(
-        (acc: Record<string, { up: string | undefined; price: number | undefined }>, cur) => {
-          acc[symbolToLower(cur.S)] = {
+        (acc: Record<number, { up: string | undefined; price: number | undefined }>, cur) => {
+          acc[cur.s] = {
             // 盘中价格
             price: cur.c,
             // 盘中价格涨跌幅
@@ -38,12 +38,12 @@ function useRwaWithPriceAndUp(rwaList: IRwa[]) {
   }, [])
 
   return rwaList.map(rwa => {
-    const key = symbolToLower(rwa.symbol)
-    const up = tokenWithUp[key]?.up
+    const stockId = rwa.stockId
+    const up = tokenWithUp[stockId]?.up
     const change = strOrNumToSign(up || 0)
     return {
       ...rwa,
-      price: tokenWithUp[key]?.price,
+      price: tokenWithUp[stockId]?.price,
       up,
       change,
     }

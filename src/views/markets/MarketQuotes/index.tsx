@@ -44,7 +44,8 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
 
   const rwaListWithQuote = useMemo(() => {
     return rwaList.map(rwa => {
-      const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+      const stockId = rwa.stockId
+      const quote = tokenWithQuote[stockId]
 
       return {
         ...rwa,
@@ -64,7 +65,7 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
     const listener = (data: ISummaryData) => {
       const obj = data.reduce(
         (acc, item) => {
-          acc[symbolToLower(item.S)] = {
+          acc[item.s] = {
             // 最新价
             price: item.p,
             // 盘中价格
@@ -78,7 +79,7 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
           }
           return acc
         },
-        {} as Record<string, IQuote>
+        {} as Record<number, IQuote>
       )
       if (data.length > 10) {
         setTokenWithQuote(obj)

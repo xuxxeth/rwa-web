@@ -5,13 +5,11 @@ import { useRouter } from '@/hooks/useRouter'
 import { useUSDT, useRwaTokens } from '@/hooks/useTokens'
 import { useTokenBalances, useAccount } from 'ca-common-web'
 import { useEffect, useState, type ReactNode } from 'react'
-import { formatUp, isLess, parseAmount, textPrefix, truncate } from '@/utils'
+import { formatUp, isLess, parseAmount, textPrefix, truncate, getUpColor, cn } from '@/utils'
 import type { ApiResponse } from '@/service/client'
 import type { IKycDetail } from '@/service/kyc/types'
 
-import { symbolToLower, cn, getUpColor } from '@/utils'
 import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
-import { useTradeStore } from '@/stores/tradeStore'
 import { useKycStore } from '@/stores/kycStore'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
@@ -185,26 +183,16 @@ function TradePrepare() {
 }
 
 // 热门列表 Symbol 前缀集合
-const HotRwsSymbolSet = new Set(
-  ['AAPL', 'COIN', 'HOOD', 'TSLA', 'NVDA', 'GOOGL'].map(item => item.toLowerCase())
-)
+const HotStockIds = [1, 2, 3, 4, 5, 7]
 
 function HotRwas() {
   const { t } = useTranslation()
   const rwaList = useRwaTokens()
+
   const router = useRouter()
 
   const displayList = useMemo(() => {
-    const list = rwaList.filter(rwa => {
-      const lowerSymbol = rwa.symbol.toLowerCase()
-      for (const prefix of HotRwsSymbolSet) {
-        if (lowerSymbol.startsWith(prefix)) {
-          return true
-        }
-      }
-      return false
-    })
-    return list
+    return rwaList.filter(rwa => HotStockIds.includes(rwa.stockId))
   }, [rwaList])
 
   const rwaWithPriceAndUp = useRwaWithPriceAndUp(displayList)
