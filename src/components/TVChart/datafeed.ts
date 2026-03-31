@@ -54,12 +54,13 @@ export function tagSession(item: any) {
 }
 
 export function getSymbol(symbolName: string) {
-  let symbol = symbolName
-  if (symbolName.startsWith('__')) {
-    const match = symbolName.match(/__([^_]+?)__/)
-    symbol = match?.[1] || ''
+  if (!symbolName.startsWith('__')) return symbolName
+  // 支持 "__BTC_USDT__123456" 这种带下划线的 symbol 包裹格式
+  const parts = symbolName.split('__')
+  if (parts.length >= 3 && parts[1]) {
+    return parts[1]
   }
-  return symbol
+  return symbolName
 }
 
 const lastBarsCache = new Map<string, Bar>();
@@ -92,6 +93,7 @@ let hasLoadedInitialData = false;
 let subscribeBarOn = ''
 let subscribeBarFn: any = undefined
 const wsListeners = new Map<string, any>()
+const wsSubscriptionVersion = new Map<string, number>()
 
 export type IExtaIBasicDataFeed = IBasicDataFeed & {
   setSessionType: (type: number) => void,
@@ -403,6 +405,8 @@ export function getDataFeed({
         wsService.off(sub.key, sub.listener)
         wsListeners.delete(subscriberUID)
       }
+      const currentVersion = (wsSubscriptionVersion.get(subscriberUID) || 0) + 1
+      wsSubscriptionVersion.set(subscriberUID, currentVersion)
       let _resolution = `${resolution}`
       if (resolution.includes('D') || resolution.includes('W') || resolution.includes('M')) {
         if (!resolution.includes('M')) {
@@ -425,6 +429,10 @@ export function getDataFeed({
       const key = `candle.${symbol}_${_resolution}`
 
       const listener = (data: any) => { 
+        // 防止旧订阅在 off 延迟期间继续回调
+        if (wsSubscriptionVersion.get(subscriberUID) !== currentVersion) {
+          return
+        }
         const lastBar = lastBarsCache.get(symbol)
         if (data?.c) {
           if (
@@ -452,6 +460,7 @@ export function getDataFeed({
     },
     // @ts-ignore
     unsubscribeBars: (subscriberUID) => {
+      wsSubscriptionVersion.set(subscriberUID, (wsSubscriptionVersion.get(subscriberUID) || 0) + 1)
       const sub = wsListeners.get(subscriberUID)
       if (sub) {
         wsService.off(sub.key, sub.listener)

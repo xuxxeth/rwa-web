@@ -41,10 +41,15 @@ export const TVChartContainer = memo(
     const tvWidgetReady = useRef(false)
     const skipIntervalChangeRef = useRef(false)
     const wasAreaModeRef = useRef(false)
+    const tokenSymbolRef = useRef(token.symbol)
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tradingTime = useTradingStartTime()
+
+    useEffect(() => {
+      tokenSymbolRef.current = token.symbol
+    }, [token.symbol])
     
     useEffect(() => {
       let mounted = true;
@@ -162,8 +167,8 @@ export const TVChartContainer = memo(
                 if (tvWidgetRef.current) {
                   const emptySymbol = `__empty__${Date.now()}`
                   tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
-                    const emptySymbol = `__${rwa?.symbol || token.symbol}__${Date.now()}`
-                    tvWidgetRef.current?.setSymbol(emptySymbol, interval as ResolutionString, () => {
+                    const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+                    tvWidgetRef.current?.setSymbol(targetSymbol, interval as ResolutionString, () => {
                       applyCandle()
                     })
                   })
@@ -261,8 +266,8 @@ export const TVChartContainer = memo(
         })
         const resolution = ("1" as ResolutionString)
         chart.resetData?.()
-        const emptySymbol = `__${token.symbol}__${Date.now()}`
-        chart.setSymbol(emptySymbol)
+        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+        chart.setSymbol(targetSymbol)
         chart.setResolution(resolution)
       }
       
