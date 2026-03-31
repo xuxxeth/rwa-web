@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { getDataFeed, tagSession, type IExtaIBasicDataFeed } from "./datafeed";
-import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString } from "@/lib/charting_library/charting_library";
+import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString, type Timezone } from "@/lib/charting_library/charting_library";
 import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import storage from "@/utils/storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SessionLineSelectt, type IItemCode } from "../session-line-select";
 import { useBaseStore } from "@/stores/baseStore";
+import { useTradingStartTime } from "@/hooks/useMarketState";
 
 let initChart: any
 
@@ -43,6 +44,7 @@ export const TVChartContainer = memo(
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
+    const tradingTime = useTradingStartTime()
     
     useEffect(() => {
       let mounted = true;
@@ -62,6 +64,7 @@ export const TVChartContainer = memo(
         if (!dataFeedRef.current) {
           dataFeedRef.current = getDataFeed({ name: rwa?.symbol || token.symbol, token: rwa || token })
         }
+        const systemTimezone = (Intl.DateTimeFormat().resolvedOptions().timeZone || "exchange") as Timezone
         const widgetOptions: ChartingLibraryWidgetOptions = {
           symbol: rwa?.symbol || token.symbol,
           debug: false,
@@ -81,7 +84,7 @@ export const TVChartContainer = memo(
           fullscreen: false,
           autosize: true,
           custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
-          timezone:"Asia/Hong_Kong",
+          timezone: systemTimezone,
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
           studies_overrides: {
@@ -237,6 +240,11 @@ export const TVChartContainer = memo(
     useEffect(() => {
       dataFeedRef.current?.setMarketState(marketTradeState)
     }, [marketTradeState])
+
+    // 更新市场时间
+    useEffect(() => {
+      dataFeedRef.current?.setTradingStartTime(tradingTime?.tradingEndTime || 0)
+    }, [tradingTime?.tradingEndTime])
 
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();

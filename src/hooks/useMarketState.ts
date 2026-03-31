@@ -112,6 +112,8 @@ export function useTradingStartTime() {
     
     return {
       tradeState: marketTradeState,
+      tradingStartTime,
+      tradingEndTime,
       countdown,
       openTime: extractHourMinute(tradingStartTime),
       closeTime: extractHourMinute(tradingEndTime),
