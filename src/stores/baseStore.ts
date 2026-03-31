@@ -13,7 +13,7 @@ import type {
   IStockWithPrice,
   IChain,
 } from '@/service/base/types'
-import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight } from '@/utils'
+import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp } from '@/utils'
 
 const ENABLE_CACHE = false
 // 缓存时间，2小时
@@ -69,9 +69,12 @@ export const useBaseStore = create<BaseStore>()(
             const rwa = rwaList.find(item => checkSymbolEqual(item.symbol, cur.S))
             if (rwa) {
               acc[symbolToLower(cur.S)] = {
+                closePrice: truncate(cur.c || 0, rwa.precision),
                 price: truncate(cur.p || 0, rwa.precision),
-                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
+                closeUp: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
+                up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
+                
               }
             }
             return acc

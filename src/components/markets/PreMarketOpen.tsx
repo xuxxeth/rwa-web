@@ -7,9 +7,11 @@ import { memo, useMemo } from "react"
 
 const PreMarketOpen = memo(
   ({
-    from
+    from,
+    size
   }: {
-    from?: string
+    from?: string,
+    size?: string
   }) => {
     const { t, i18n } = useTranslation()
     const tradingTime = useTradingStartTime()
@@ -67,28 +69,35 @@ const PreMarketOpen = memo(
         from === "lite-trade" ? "h-[50px]" : ""
       )}>
         <img src={stateLabel.i} className="w-[18px]" alt="" />
-        <div className="text-[12px] leading-[14px] shrink-0">{stateLabel.t1} | {stateLabel.t2}</div>
-        <div className={cn(
-          "text-[14px] min-w-[100px]",
-          stateLabel.c ? `text-[${stateLabel.c}]` : ''
-        )}>
-          <div className="flex items-center">
-            <div className="flex items-center font-mono">
-              <div className="text-center">
-                {tradingTime?.countdown?.H}
-              </div>H
-            </div>
-            <div className="px-[4px]">:</div>
-            <div className="flex items-center font-mono">
-              <div className="text-center">{tradingTime?.countdown?.M}</div>M
-            </div>
-            <div className="px-[4px]">:</div>
-            <div className="flex items-center font-mono">
-              <div className="text-center">{tradingTime?.countdown?.S}</div>S
-            </div>
-          </div>
-          
+        <div className="text-[12px] leading-[14px] shrink-0">
+          {stateLabel.t1} {!size && `| ${stateLabel.t2}`} 
         </div>
+        {
+          !size && (
+            <div className={cn(
+              "text-[14px] min-w-[100px]",
+              stateLabel.c ? `text-[${stateLabel.c}]` : ''
+            )}>
+              <div className="flex items-center">
+                <div className="flex items-center font-mono">
+                  <div className="text-center">
+                    {tradingTime?.countdown?.H}
+                  </div>H
+                </div>
+                <div className="px-[4px]">:</div>
+                <div className="flex items-center font-mono">
+                  <div className="text-center">{tradingTime?.countdown?.M}</div>M
+                </div>
+                <div className="px-[4px]">:</div>
+                <div className="flex items-center font-mono">
+                  <div className="text-center">{tradingTime?.countdown?.S}</div>S
+                </div>
+              </div>
+              
+            </div>
+          )
+        }
+        
         
         
       </div>
