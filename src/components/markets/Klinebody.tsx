@@ -101,7 +101,7 @@ const RwaItemPrice = memo(
       <div className=" flex items-center gap-x-5 min-w-[126px] shrink-0">
         
         <div className=" shrink-0">
-          <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel1} {t('v3.t31')} {!timeLabel1 ? currentTime : timeLabel1}</div>
+          <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel1} {t('v3.t31')} {!timeLabel1 ? currentTime.label : timeLabel1}</div>
           <div className={cn(
             "flex items-baseline gap-x-1",
             openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
@@ -125,7 +125,7 @@ const RwaItemPrice = memo(
         {
           tradingTime?.tradeState !== MARKET_STATUS.OPEN && (
             <div className=" shrink-0 min-w-[110px]">
-              <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel2} {t('v3.t31')} {timeLabel2 || currentTime}</div>
+              <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel2} {t('v3.t31')} {timeLabel2 || currentTime.label}</div>
               <div className={cn(
                 " flex items-baseline gap-x-1 text-[14px] text-white mt-[3px]"
               )}>

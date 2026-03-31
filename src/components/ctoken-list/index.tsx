@@ -340,7 +340,7 @@ const CTokenList = memo(
     const marketTradeState = useBaseStore(state => state.marketTradeState)
 
     const tradeStateLabel = useMemo(() => {
-      let stateLabel = t("v3.t21")
+      let stateLabel = t("v3.t25")
       if (marketTradeState) {
         if (marketTradeState === MARKET_STATUS.BEFORE) {
           stateLabel = t("v3.t23")
@@ -349,7 +349,7 @@ const CTokenList = memo(
         } else if (marketTradeState === MARKET_STATUS.AFTER) {
           stateLabel = t("v3.t22")
         } else {
-          stateLabel = t("v3.t21")
+          stateLabel = t("v3.t25")
         }
       }
       console.log('marketTradeState', marketTradeState, stateLabel)

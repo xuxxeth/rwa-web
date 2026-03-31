@@ -84,7 +84,7 @@ export const TVChartContainer = memo(
           fullscreen: false,
           autosize: true,
           custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
-          // timezone: systemTimezone,
+          timezone: "exchange",
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
           studies_overrides: {

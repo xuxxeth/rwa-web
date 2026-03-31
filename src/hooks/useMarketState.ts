@@ -33,24 +33,34 @@ export function useMarketState() {
 }
 
 export function extractHourMinute(timestamp: number) {
-    const date = new Date(timestamp);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const month = date.getMonth(); // 0-11
-    const day = date.getDate();    // 1-31
+  const date = new Date(timestamp);
 
-    const months = [
-      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
-    ];
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+    hour12: false,
+  });
 
-    return {
-      MN: months[month],
-      D: day.toString().padStart(2, '0'),
-      H: hours.toString().padStart(2, '0'),
-      M: minutes.toString().padStart(2, '0'),
-      label: `${months[month]} ${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
-    };
+  const parts = formatter.formatToParts(date);
+
+  const get = (type: string, def: string) =>
+    parts.find(p => p.type === type)?.value ?? def;
+
+  const month = get("month", "Jan").toUpperCase(); // JAN
+  const day = get("day", "01");
+  const hour = get("hour", "00");
+  const minute = get("minute", "00");
+
+  return {
+    MN: month,
+    D: day,
+    H: hour,
+    M: minute,
+    label: `${month} ${day} ${hour}:${minute}`,
+  };
 }
 
 
