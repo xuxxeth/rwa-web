@@ -33,10 +33,15 @@ export type CTokenProps = {
   state?: string
 }
 
-export const CTokenPrice = memo(({ symbol, state }: { symbol: string; state?: string }) => {
+export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string; state?: string; marketOpen?: boolean }) => {
   const tokenPrice = useRwaPrice(symbol);
   const closeUp = useMemo(() => Number(tokenPrice?.closeUp), [tokenPrice?.closeUp])
   const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
+
+  const nup = useMemo(() => {
+    return marketOpen ? up : closeUp
+  }, [closeUp, up, marketOpen])
+
   return (
     <div className="text-[12px]">
       <div className="flex items-center gap-x-1">
@@ -44,27 +49,32 @@ export const CTokenPrice = memo(({ symbol, state }: { symbol: string; state?: st
         <div className=" font-normal flex items-center gap-x-[4px]">
           <span
             className={
-              closeUp === 0 ? 'text-[#A1A1A1]' : closeUp > 0
+              nup === 0 ? 'text-[#A1A1A1]' : nup > 0
                 ? "text-[#50E3C2] text-[12px]"
                 : "text-[rgba(227,80,122,1)] text-[12px]"
             }
           >
-            {closeUp !== 0 && (closeUp > 0 ? '+' : '-')}
-            {Math.abs(Number(tokenPrice?.closeUp || "0"))}%
+            {nup !== 0 && (nup > 0 ? '+' : '-')}
+            {Math.abs(Number( nup || "0"))}%
           </span>
         </div>
       </div>
-      <div className="flex items-center gap-x-1 text-[#9DA3AF]">
-        <span className=" font-medium">${tokenPrice?.closePrice ?? '--'}</span>
-        <div className=" font-normal flex items-center gap-x-[4px]">
-          <span
-          >
-            {up !== 0 && (up > 0 ? '+' : '-')}
-            {Math.abs(Number(tokenPrice?.up || "0"))}%
-          </span>
-        </div>
-        <div className="pl-1">{state}</div>
-      </div>
+      {
+        !marketOpen && (
+          <div className="flex items-center gap-x-1 text-[#9DA3AF]">
+            <span className=" font-medium">${tokenPrice?.closePrice ?? '--'}</span>
+            <div className=" font-normal flex items-center gap-x-[4px]">
+              <span
+              >
+                {up !== 0 && (up > 0 ? '+' : '-')}
+                {Math.abs(Number(tokenPrice?.up || "0"))}%
+              </span>
+            </div>
+            <div className="pl-1">{state}</div>
+          </div>
+        )
+      }
+      
       
     </div>
   );
@@ -89,14 +99,15 @@ export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string;
 
 const CTokenItem = memo(
 
-  ({ token, onClick, toggleEnable, toggleFavorite, isFavorite, account, state }: 
+  ({ token, onClick, toggleEnable, toggleFavorite, isFavorite, account, state, marketOpen }: 
     {
       token: IRwa, 
       toggleEnable: boolean, 
       toggleFavorite: (stockId: number) => void, 
       isFavorite: boolean, 
       onClick?: (token: IRwa) => void, account?: string, 
-      state?: string
+      state?: string,
+      marketOpen?: boolean
     }
   ) => {  
     
@@ -138,7 +149,7 @@ const CTokenItem = memo(
           "w-4/8 flex items-center ",
           account ? "w-3/8 justify-start" : ""
         )}>
-          <CTokenPrice symbol={token.symbol} state={state} />
+          <CTokenPrice symbol={token.symbol} state={state} marketOpen={marketOpen} />
         </div>
         {
           account && <div className="w-2/8 text-right">
@@ -431,7 +442,7 @@ const CTokenList = memo(
           )}>
             {
               sortTokens.map((token, index) => 
-                <CTokenItem state={tradeStateLabel} toggleEnable={toggleEnable} toggleFavorite={toggleFavorite} isFavorite={isFavorite(token.stockId)} account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
+                <CTokenItem marketOpen={marketTradeState === MARKET_STATUS.OPEN} state={tradeStateLabel} toggleEnable={toggleEnable} toggleFavorite={toggleFavorite} isFavorite={isFavorite(token.stockId)} account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
             }
            
             {sortTokens.length <= 0 && <NoDataReason

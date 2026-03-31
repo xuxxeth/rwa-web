@@ -110,7 +110,7 @@ const RwaItemPrice = memo(
           )}>
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
-            )}>${realtimeData.c || '--'}</div>
+            )}>${tradingTime?.tradeState === MARKET_STATUS.OPEN ? realtimeData.p : realtimeData.c || '--'}</div>
             <span
               className={cn(
                 "leading-[100%] font-normal text-[14px]",
