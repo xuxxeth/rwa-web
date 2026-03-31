@@ -132,8 +132,6 @@ function OpenOrder(props: {
   )
 }
 
-const Day = 1 * 60 * 60 * 24
-
 const openOrderTableConfig: ITableConfig<
   IOpenOrder,
   { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
@@ -336,9 +334,10 @@ function CancelOrderButton(props: {
       const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
         setIsOnCooldown(true)
+        // 设置 cooldownTime 为 30s
         cooldownTimerRef.current = setTimeout(() => {
           setIsOnCooldown(false)
-        }, 10 * 1000)
+        }, 30 * 1000)
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message
