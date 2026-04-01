@@ -70,7 +70,7 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
                 {Math.abs(Number(tokenPrice?.up || "0"))}%
               </span>
             </div>
-            <div className="pl-1">{state}</div>
+            <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>
           </div>
         )
       }
@@ -222,7 +222,7 @@ const CTokenList = memo(
     const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const { sort, onSortChange } = useTableSort<SortableField>()
-    
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
 
@@ -251,8 +251,8 @@ const CTokenList = memo(
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
           ...tokenWithPrice[symbolToLower(rwa.symbol)]
         }
-      }).sort((a, b) => Number(b.balance ?? '0') - Number(a.balance ?? '0'))
-    }, [newRwaList, tokenWithBalance, tokenWithPrice])
+      }).sort((a, b) => marketTradeState === MARKET_STATUS.OPEN ? Number(b.up ?? '0') - Number(a.up ?? '0') : Number(b.closeUp ?? '0') - Number(a.closeUp ?? '0'))
+    }, [newRwaList, tokenWithBalance, tokenWithPrice, marketTradeState])
 
     const [searchTerm, setSearchTerm] = useState("")
     
@@ -300,8 +300,8 @@ const CTokenList = memo(
           }
 
           case 'change': {
-            const upA = Number(a.up) || 0
-            const upB = Number(b.up) || 0
+            const upA = marketTradeState === MARKET_STATUS.OPEN ? Number(a.up) : Number(a.closeUp) || 0
+            const upB = marketTradeState === MARKET_STATUS.OPEN ? Number(b.up) : Number(b.closeUp) || 0
             return sort.order === 'asc'
               ? upA - upB
               : upB - upA
@@ -325,7 +325,7 @@ const CTokenList = memo(
             return 0
         }
       })
-    }, [filterTokens, sort])
+    }, [filterTokens, sort, marketTradeState])
 
     // useEffect(() => {
     //   onSortChange('marketCap')
@@ -348,7 +348,6 @@ const CTokenList = memo(
       stableTokenWithPrice(_data)
       updateOriginSummary(_data)
     })
-    const marketTradeState = useBaseStore(state => state.marketTradeState)
 
     const tradeStateLabel = useMemo(() => {
       let stateLabel = t("v3.t25")
@@ -390,7 +389,12 @@ const CTokenList = memo(
           </div>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal px-4">
+          <FilterTabs 
+            onTabChange={tab => {
+              setSelectTab(tab.key)
+            }}
+          />
+          <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2 text-[#9DA3AF]">
             <div className={cn(
               "w-4/8 flex items-center cursor-pointer",
               account ? "w-3/8" : ""
@@ -431,11 +435,7 @@ const CTokenList = memo(
             }
             
           </div>
-          <FilterTabs 
-            onTabChange={tab => {
-              setSelectTab(tab.key)
-            }}
-          />
+          
           <div className={cn(
             "scroll-box h-[65vh] overflow-y-auto mt-2 pr-0",
             from === "StockSelect" ? "h-[50vh]" : ""

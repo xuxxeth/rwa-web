@@ -19,7 +19,7 @@ function LiteTrade() {
 
   return (
     <>
-      <div className="bg-[#1A1B1E] min-h-[calc(100vh-60px)] text-white relative">
+      <div className="bg-[#1A1B1E] min-h-[calc(100vh-60px)] text-white relative pb-[80px]">
         <PositionRwa 
           src="/images/tokens/GOOGL.png"
           className=" top-[1px] right-[50%] w-[70px] h-[70px]"

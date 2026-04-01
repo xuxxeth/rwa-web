@@ -177,10 +177,10 @@ export const StockInfo = memo(
     }, [])
 
     return (
-      <div className="flex text-white pl-4 min-w-[1300px]">
+      <div className="flex text-white pl-4 min-w-[1100px]">
         <StockDialog from={from} />
         <div className={cn(
-          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4 ml-10",
+          " flex items-center gap-x-5 text-white text-[14px] font-normal pr-4 ml-5",
         )}>
           
           <RwaItemPrice from={from} />
@@ -213,7 +213,9 @@ export const StockInfo = memo(
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
           <div className=" shrink-0">
-            <LabelWrap >{t('v3.t30')}</LabelWrap>
+            <div className="text-[12px] font-normal text-[#9DA3AF] flex">
+              {t('v3.t30')}
+            </div>
             <div className="flex items-center gap-x-1 mt-1">
               {shortenAddress(inputToken?.address || '')}
               <CopyButton copyText={inputToken?.address || ''} />
