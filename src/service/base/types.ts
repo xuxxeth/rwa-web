@@ -22,6 +22,7 @@ export interface ITokenWithPrice  {
   "closePrice"?: string , 
   "closeUp"?: string, 
   "up"?: string, 
+  "postUp"?: string, 
   "dailyHigh"?: string,
 }
 
