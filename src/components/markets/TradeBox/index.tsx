@@ -68,7 +68,7 @@ export function TradeBox({
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
-  const isMarketCloseDisabled = marketTradeState === MARKET_STATUS.CLOSE && tradeType === TradeType.MARKET && isTiko
+  const isMarketCloseDisabled = marketTradeState !== MARKET_STATUS.OPEN && tradeType === TradeType.MARKET
   const effectivePrice = useEffectivePrice({
     tradeType,
     action,
