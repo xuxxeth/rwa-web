@@ -15,7 +15,7 @@ function SearchFilter({
 }) {
   const { t } = useTranslation()
   return (
-    <div className='flex flex-row px-6 my-2 gap-2'>
+    <div className='flex flex-row my-2 gap-2'>
       <div
         className={cn(
           'flex flex-row gap-1 text-sm/4.5 p-1 cursor-pointer border border-gray-850 rounded-[8px] font-medium text-gray-400'

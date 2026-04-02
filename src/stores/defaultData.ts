@@ -22,5 +22,9 @@ export const marketStateDefault = {
   "market": "", // us
   "desc": "",
   "tradingDayType": 1, // 0-非交易日，1-全天交易市，2-上半日市，3-下半日市
-  "status": 7
+  "status": 7,
+  "availability": {
+    "trading": 0,
+    "pre_after_trading": 0,
+  }
 }

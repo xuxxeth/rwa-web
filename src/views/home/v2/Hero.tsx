@@ -4,8 +4,14 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { LazyImage } from '@/components/image/LazyImage'
 import { useRwaTokens } from '@/hooks/useTokens'
-import { useTradeStore } from '@/stores/tradeStore'
-import { symbolToLower, textPrefix, formatUp, getUpColor, type Change } from '@/utils/index'
+import {
+  symbolToLower,
+  textPrefix,
+  formatUp,
+  getUpColor,
+  truncate,
+  type Change,
+} from '@/utils/index'
 import type { IRwa } from '@/service/base/types'
 import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
 import { HighlightText } from './ui/HighlightText'
@@ -15,10 +21,11 @@ interface StockData {
   icon: string
   name: string
   symbol: string
-  price: string | undefined
+  price: number | undefined
   up: string | undefined
   color?: string
   change: Change
+  precision: number
 }
 
 // --- Constants ---
@@ -146,7 +153,7 @@ const StockCard: React.FC<{
         </div>
         <div className='flex justify-between items-end'>
           <div className={`text-3xl font-medium ${stock.color} text-gray-900 tracking-tight`}>
-            {stock.price ? textPrefix(stock.price, '$') : ''}
+            {stock.price ? textPrefix(truncate(stock.price, stock.precision), '$') : ''}
           </div>
           <div className={`text-sm font-bold ${stock.color} bg-white/50 px-2 py-1 rounded-lg`}>
             {stock.up ? formatUp(stock.up) : ''}

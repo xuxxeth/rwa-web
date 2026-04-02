@@ -94,23 +94,23 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
       <TextCell text={item.holdings ? formatWithCommas(item.holdings, 2) : '--'} />
     ),
   },
-  {
-    key: 'price',
-    sortable: false,
-    render: (item: IAssetItem) => {
-      const price = item.tokenPrice ?? item.rwaPrice
-      return <TextCell text={price ? textPrefix(toFixed(price, item.precision), '$') : '--'} />
-    },
-  },
-  {
-    key: 'value',
-    sortable: true,
-    render: (item: IAssetItem) => (
-      <TextCell text={item.value ? textPrefix(formatWithCommas(item.value, 2), '$') : '--'} />
-    ),
-    sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
-      advancedSort(a.value ?? '0', b.value ?? '0', order),
-  },
+  // {
+  //   key: 'price',
+  //   sortable: false,
+  //   render: (item: IAssetItem) => {
+  //     const price = item.tokenPrice ?? item.rwaPrice
+  //     return <TextCell text={price ? textPrefix(toFixed(price, item.precision), '$') : '--'} />
+  //   },
+  // },
+  // {
+  //   key: 'value',
+  //   sortable: true,
+  //   render: (item: IAssetItem) => (
+  //     <TextCell text={item.value ? textPrefix(formatWithCommas(item.value, 2), '$') : '--'} />
+  //   ),
+  //   sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
+  //     advancedSort(a.value ?? '0', b.value ?? '0', order),
+  // },
   {
     key: 'actions',
     sortable: false,

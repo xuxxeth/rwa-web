@@ -14,6 +14,7 @@ import {
   TokenFilterItem,
   TxHashCell,
   ReasonCell,
+  SessionTypeCell,
 } from '../Shared'
 import { type IRwa } from '@/service/base/types'
 import { useRwaTokens } from '@/hooks/useTokens'
@@ -154,13 +155,16 @@ function HistoryOrder(props: {
         scrollId={(item: IOrder) => item.orderId}
         filter={filters}
         tableConfig={orderHistoryTableConfig}
-        type="history"
+        type='history'
       />
     </>
   )
 }
 
-const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }> = [
+const orderHistoryTableConfig: ITableConfig<
+  IOrder,
+  { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -176,7 +180,10 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[], onToken
   {
     key: 'token',
     sortable: false,
-    render: (item: IOrder, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
+    render: (
+      item: IOrder,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -253,6 +260,11 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[], onToken
     key: 'status',
     sortable: false,
     render: (item: IOrder) => <OrderStatusCell state={item.state} />,
+  },
+  {
+    key: 'session',
+    sortable: false,
+    render: (item: IOrder) => <SessionTypeCell sessionType={item.sessionType} />,
   },
   {
     key: 'txHash',

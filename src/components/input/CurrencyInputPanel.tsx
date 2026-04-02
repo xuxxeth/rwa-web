@@ -13,6 +13,7 @@ import { useRouter } from "@/hooks/useRouter";
 import { TradeType } from "ca-common-web";
 
 type CurrencyInputPanelProps = {
+  isMarket?: boolean
   tradeType?: TradeType
   action?: string; // buy | sell
   mode?: string; // in | out
@@ -28,7 +29,7 @@ type CurrencyInputPanelProps = {
 }
 
 const CurrencyInputPanel = memo(
-  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, tradeType, onUserInput, handleChangePrice }: CurrencyInputPanelProps) => {
+  ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, tradeType, isMarket, onUserInput, handleChangePrice }: CurrencyInputPanelProps) => {
     const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
@@ -72,7 +73,7 @@ const CurrencyInputPanel = memo(
     return (
       <div className={cn(
         "p-3 rounded-[8px] border border-[#232427] bg-[#131416]",
-        mode === "out" ? "border-[#232427] bg-[#131416]" : "",
+        mode === "out" ? "border-[#232427] bg-[#131416]" : !isMarket ? "border-[#1A1B1E] bg-[#1A1B1E]" : "",
         inputFocus ? "border-[rgba(156,255,58,0.8)]" : ""
       )}>
         <div className={cn(
@@ -101,7 +102,7 @@ const CurrencyInputPanel = memo(
         }
         
         {
-          mode === 'price' && <PriceChangeTab from="lite-trade" tradeType={tradeType} onChange={(priceType) => handleChangePrice && handleChangePrice(priceType)} />
+          mode === 'price' && !isMarket && <PriceChangeTab from="lite-trade" tradeType={tradeType} onChange={(priceType) => handleChangePrice && handleChangePrice(priceType)} />
         }
         
         <DialogController

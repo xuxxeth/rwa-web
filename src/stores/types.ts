@@ -15,7 +15,7 @@ import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 import type { IUserCofnig } from "@/service/risk/types";
 import type { IOrderData, ISummaryData, ISummaryDataItem } from "@/service/webSocket/types";
 import { type IKycDetail, type IKycStatus } from '@/service/kyc/types'
-import type { TradeType } from "@/hooks/useCaCommon"
+import type { SessionType, TradeType } from "@/hooks/useCaCommon"
 
 export interface BaseStore {
   connectInit: boolean,
@@ -72,6 +72,7 @@ export interface TradeStore {
   expires: number;
   activeConvertTab: 'buy' | 'sell';
   tradeType: TradeType;
+  sessionType: SessionType;
   slippage: number;
   isSignatureValid: boolean;
   txStep: number;
@@ -84,6 +85,7 @@ export interface TradeStore {
   updateExpires: (expires: number) => void;
   updateActiveConvertTab: (tab: 'buy' | 'sell') => void;
   updateTradeType: (tradeType: TradeType) => void;
+  updateSessionType: (sessionType: SessionType) => void;
   updateSlippage: (slippage: number) => void;
   setIsSignatureValid: (valid: boolean) => void
   setTxStep: (step: number) => void

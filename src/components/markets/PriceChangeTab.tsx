@@ -109,7 +109,7 @@ const PriceChangeTab = ({
         isMarket={isMarket}
         onClick={() => setAction(prev => prev === 'plus' ? 'minus' : 'plus')} // 优化：使用函数式更新
       >
-        <LazyImage src="/images/v2/icons/swap.png" className="w-[14px] h-[14px]" style={{opacity: isMarket ? 0.4 : 1}} alt="swap" />
+        <img src="/images/v2/icons/swap.png" className="w-[14px] h-[14px]" style={{opacity: isMarket ? 0.4 : 1}} alt="swap" />
       </ChangeItemWrap>
     </div>
   )

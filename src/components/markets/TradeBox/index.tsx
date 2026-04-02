@@ -67,6 +67,7 @@ export function TradeBox({
   const { account, isSameChain } = useActiveWeb3()
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
+  const sessionType = useTradeStore(state => state.sessionType)
   const isMarketCloseDisabled = marketTradeState === MARKET_STATUS.CLOSE && tradeType === TradeType.MARKET && isTiko
   const effectivePrice = useEffectivePrice({
     tradeType,
@@ -148,6 +149,7 @@ export function TradeBox({
     expires,
     action,
     tradeType,
+    sessionType,
     slippage,
     marketInfo,
     riskUserConfig,
@@ -204,7 +206,7 @@ export function TradeBox({
   return (
     <>
       <div className={cn(
-        "mt-2",
+        "mt-3",
         from === 'lite-trade' ? 'mt-0' : ''
       )}>
         <TradeFormUI
@@ -241,6 +243,7 @@ export function TradeBox({
           buttonVariant={buttonVariant}
           action={action}
           tradeType={tradeType}
+          sessionType={sessionType}
           slippage={slippage}
           buying={order.loading}
           disabled={uiState.disabled || isMarketCloseDisabled}

@@ -10,6 +10,7 @@ import {
   TokenFilterItem,
   TextCellWithTranslation,
   TxHashCell,
+  SessionTypeCell,
 } from '../Shared'
 import { type IRwa } from '@/service/base/types'
 import { useRwaTokens } from '@/hooks/useTokens'
@@ -39,7 +40,6 @@ import { useTradeUtils } from '@/hooks/useTrading'
 import { useToast } from '@/hooks/useToast'
 import { OrderTable } from './shared'
 import useDebounce from '@/hooks/useDebounce'
-import { on } from 'events'
 
 const PAGE_LIMIT = 20
 
@@ -132,9 +132,10 @@ function OpenOrder(props: {
   )
 }
 
-const Day = 1 * 60 * 60 * 24
-
-const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
+const openOrderTableConfig: ITableConfig<
+  IOpenOrder,
+  { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -152,7 +153,10 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'token',
     sortable: false,
-    render: (item: IOpenOrder, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
+    render: (
+      item: IOpenOrder,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -215,24 +219,29 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
       <TextCell className='w-[80px] text-xs/4' text={formatTimestamp(item.txTime)} />
     ),
   },
-  {
-    key: 'expiration',
-    sortable: false,
-    render: (item: IOpenOrder) => {
-      if (item.orderType === 1) {
-        return '--'
-      }
-      if (item.tif === 0) {
-        return <TextCellWithTranslation text='assets.order.intraday' />
-      }
+  // {
+  //   key: 'expiration',
+  //   sortable: false,
+  //   render: (item: IOpenOrder) => {
+  //     if (item.orderType === 1) {
+  //       return '--'
+  //     }
+  //     if (item.tif === 0) {
+  //       return <TextCellWithTranslation text='assets.order.intraday' />
+  //     }
 
-      return <TextCell text={readableDuration(item.validDate * Day)} />
-    },
-  },
+  //     return <TextCell text={readableDuration(item.validDate * Day)} />
+  //   },
+  // },
   {
     key: 'status',
     sortable: false,
     render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
+  },
+  {
+    key: 'session',
+    sortable: false,
+    render: (item: IOpenOrder) => <SessionTypeCell sessionType={item.sessionType} />,
   },
   {
     key: 'txHash',
@@ -325,9 +334,10 @@ function CancelOrderButton(props: {
       const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
         setIsOnCooldown(true)
+        // 设置 cooldownTime 为 30s
         cooldownTimerRef.current = setTimeout(() => {
           setIsOnCooldown(false)
-        }, 10 * 1000)
+        }, 30 * 1000)
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message

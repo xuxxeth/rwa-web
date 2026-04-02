@@ -5,7 +5,7 @@ import { LabelWrap } from "@/components/markets/Klinebody"
 import { DEFAULT_SLIPPAGE } from "@/config/constants"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"
-import { TradeType } from "ca-common-web"
+import { SessionType, TradeType } from "ca-common-web"
 import { memo } from "react"
 
 type EstimatedInfoProps = {
@@ -68,7 +68,7 @@ const EstimatedInfo = memo(
             />
           )
         }
-        {
+        {/* {
           tradeType === TradeType.LIMIT && (
             <BetweenText 
               left={t("Expires in")}
@@ -79,12 +79,11 @@ const EstimatedInfo = memo(
                   }}
                 >
                   {t('assets.order.intraday')} 
-                  {/* <LazyImage src="/images/icons/edit.png" className="w-3 h-3 ml-[10px]" /> */}
                 </div>
               }
             />
           )
-        }
+        } */}
         
         <BetweenText 
           left={t('v2.tx.t28')}

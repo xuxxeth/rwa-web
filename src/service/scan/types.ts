@@ -12,6 +12,9 @@ export type Tif = 0 | 1 | 2
 
 export type Reason = 0 | 1 | 2 | 3
 
+// 0 仅盘中 4 盘前+盘后
+export type SessionType = 0 | 4
+
 export interface IOpenOrder {
   id: string
   chainId: number
@@ -31,6 +34,7 @@ export interface IOpenOrder {
   txHash: string
   reason: Reason
   currency: string
+  sessionType: SessionType
 }
 
 export interface IOrder {
@@ -61,6 +65,7 @@ export interface IOrder {
   currency: string
   commission: string
   fee: string
+  sessionType: SessionType
 }
 
 export interface ITrade {
