@@ -133,7 +133,7 @@ export default function MarketQuotes() {
   return (
     <MainLayout>
       <ConentLayout>
-        <div>
+        <div className='mb-20'>
           {/* <MarketTrading align='center' /> */}
           <div className='flex flex-row px-6 items-center'>
             <div className='flex-1'>
@@ -338,7 +338,7 @@ const MarketQuotesListConfig = [
         isFavorite: (stockId: number) => boolean
       }
     ) => (
-      <div className='flex flex-row pr-2 items-center overflow-hidden'>
+      <div className='flex flex-row pr-4 items-center overflow-hidden'>
         <QuoteName
           isFavorite={extra.isFavorite(item.stockId)}
           toggleEnable={extra.toggleEnable}

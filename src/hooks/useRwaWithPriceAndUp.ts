@@ -24,11 +24,11 @@ function useRwaWithPriceAndUp(rwaList: IRwa[]) {
             marketTradeState === MARKET_STATUS.OPEN
               ? {
                   price: cur.p,
-                  up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0',
+                  up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : undefined,
                 }
               : {
                   price: cur.c,
-                  up: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
+                  up: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : undefined,
                 }
           acc[cur.s] = item
           return acc

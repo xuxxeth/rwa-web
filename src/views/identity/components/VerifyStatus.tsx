@@ -221,7 +221,7 @@ function HotRwas() {
                 </div>
                 <div className={cn('text-sm text-[#1A85FF]', getUpColor(rwa.change))}>
                   <button className='bg-white/10 px-2 py-[2px] rounded-sm'>
-                    {formatUp(rwa.up)}
+                    {rwa.up !== undefined ? formatUp(rwa.up) : '--'}
                   </button>
                 </div>
               </div>
