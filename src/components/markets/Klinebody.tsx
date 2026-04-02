@@ -95,11 +95,8 @@ const RwaItemPrice = memo(
       tradingTime
     ])
 
-    if (!realtimeData) return <div className="min-w-[126px]"></div>
-
     return (
       <div className=" flex items-center gap-x-5 min-w-[126px] shrink-0">
-        
         <div className=" shrink-0">
           <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel1} {t('v3.t31')} {!timeLabel1 ? currentTime.label : timeLabel1}</div>
           <div className={cn(
@@ -110,7 +107,7 @@ const RwaItemPrice = memo(
           )}>
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
-            )}>${tradingTime?.tradeState === MARKET_STATUS.OPEN ? realtimeData.p : realtimeData.c || '--'}</div>
+            )}>{tradingTime?.tradeState === MARKET_STATUS.OPEN ? (realtimeData?.p ? '$' + realtimeData?.p : '--') : (realtimeData?.c ? '$' + realtimeData?.c : '--')}</div>
             {
               (Number(realtimeData?.pc) && Number(realtimeData?.c)) ? (
                 <span
@@ -144,7 +141,7 @@ const RwaItemPrice = memo(
                 <div className={cn(
                   "",
                   
-                )}>${realtimeData.p || '--'}</div>
+                )}>{realtimeData?.p ? '$' + realtimeData?.p : '--'}</div>
                 {
                 (Number(realtimeData?.p) && Number(realtimeData?.c)) ? (
                   <span

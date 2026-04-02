@@ -13,6 +13,16 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
     let onKey = ''
     let listener = null
     if (inputToken?.symbol) {
+      // 先将上一个价格置空，避免切换股票时短暂显示上一个股票的价格
+      setRealtimeData({
+        ...inputToken,
+        p: 0, // 最新价
+        o: 0, // 今开价
+        l: 0, // 最低价
+        h: 0, // 最高价
+        c: 0, // 当日收盘价
+        pc: 0, // 昨日收盘价
+      } as any) 
       onKey = `realtime.${inputToken.symbol}`
       listener = (rwa: ISummaryDataItem) => {
         const precision = inputToken?.precision
