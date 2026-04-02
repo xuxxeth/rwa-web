@@ -49,7 +49,7 @@ const RwaItemPrice = memo(
     
     const pup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.pc , 2)) : 0, [realtimeData?.c, realtimeData?.pc])
     const nup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.pc, realtimeData.p, 2)) : 0, [realtimeData?.pc, realtimeData?.p])
-    const aup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.p, 2)) : 0, [realtimeData?.c, realtimeData?.p])
+    const aup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.p, realtimeData.c, 2)) : 0, [realtimeData?.c, realtimeData?.p])
     
     const openUp = useMemo(() => {
       return tradingTime?.tradeState === MARKET_STATUS.OPEN ? aup : pup
