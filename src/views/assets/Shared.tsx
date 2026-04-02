@@ -16,6 +16,7 @@ import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
 import { useNavigate } from 'react-router-dom'
+import TooltipWithIcon from '@/components/icon-tooltip'
 
 export type OrderChanged = {
   orderId: string
@@ -171,13 +172,17 @@ export function TokenCell(props: {
 }) {
   return (
     <div
-      className={'flex flex-row gap-2 font-normal cursor-pointer'}
+      className={'flex flex-row gap-2 font-normal cursor-pointer overflow-hidden'}
       onClick={() => props.onClick?.()}
     >
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
-      <div className='flex flex-col'>
+      <div className='flex flex-col overflow-hidden'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
-        <div className={cn('text-gray-400 text-xs/[15px]', props.nameClassName)}>{props.name}</div>
+        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
+          <div className={cn('text-gray-400 text-xs/[15px] truncate', props.nameClassName)}>
+            {props.name}
+          </div>
+        </TooltipWithIcon>
       </div>
     </div>
   )

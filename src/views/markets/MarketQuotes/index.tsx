@@ -16,6 +16,7 @@ import {
   formatUp,
   calculateUp,
 } from '@/utils'
+import TooltipWithIcon from '@/components/icon-tooltip'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import { TableHeader, TableBody } from '@/components/table-header'
@@ -258,19 +259,26 @@ function QuoteName(props: {
         className={cn('w-4 h-4 mr-3', props.toggleEnable ? 'cursor-pointer' : 'cursor-not-allowed')}
       />
       <LazyImage src={props.logo} className='w-12 h-12 mr-2 rounded-[50%]' />
-      <div className='flex flex-col'>
+      <div className='flex flex-col overflow-hidden'>
         <TextCell text={props.symbol} className='text-base/5 text-white font-normal' />
-        <TextCell text={props.name} className='text-xs/[15px] text-gray-400 font-normal' />
+        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
+          <span className='text-xs/[15px] text-gray-400 font-normal truncate'>{props.name}</span>
+        </TooltipWithIcon>
       </div>
     </>
   )
 }
 
-function TextCell(props: { text: string; className?: string; icon?: string }) {
+function TextCell(props: {
+  text: string
+  className?: string
+  icon?: string
+  textClassName?: string
+}) {
   return (
     <div className={cn('flex flex-row gap-1 items-center', props.className)}>
       {props.icon && <LazyImage className='w-2 h-2' src={props.icon} />}
-      <span>{props.text}</span>
+      <span className={cn(props.textClassName)}>{props.text}</span>
     </div>
   )
 }
@@ -330,7 +338,7 @@ const MarketQuotesListConfig = [
         isFavorite: (stockId: number) => boolean
       }
     ) => (
-      <>
+      <div className='flex flex-row pr-2 items-center overflow-hidden'>
         <QuoteName
           isFavorite={extra.isFavorite(item.stockId)}
           toggleEnable={extra.toggleEnable}
@@ -342,12 +350,12 @@ const MarketQuotesListConfig = [
         />
         {item.state === 1 && (
           <IconWithTooltip
-            triggerClassName='ml-2'
+            triggerClassName='ml-2 shrink-0'
             icon='/images/v2/icons/trade_halt.svg'
             tooltip={'marketQuotes.tH'}
           />
         )}
-      </>
+      </div>
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.name, b.name, order),
