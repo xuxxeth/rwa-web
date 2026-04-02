@@ -63,13 +63,24 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
         !marketOpen && (
           <div className="flex items-center gap-x-1 text-[#9DA3AF]">
             <span className=" font-medium">${tokenPrice?.price ?? '--'}</span>
-            <div className=" font-normal flex items-center gap-x-[4px]">
-              <span
-              >
-                {up !== 0 && (up > 0 ? '+' : '-')}
-                {Math.abs(Number(tokenPrice?.up || "0"))}%
-              </span>
-            </div>
+            {
+              Number(tokenPrice?.price) > 0 ? (
+                <div className=" font-normal flex items-center gap-x-[4px]">
+                  <span
+                  >
+                    {up !== 0 && (up > 0 ? '+' : '-')}
+                    {Math.abs(Number(tokenPrice?.up || "0"))}%
+                  </span>
+                </div>
+              ) : 
+              <div className=" font-normal flex items-center gap-x-[4px]">
+                <span
+                >
+                  --
+                </span>
+              </div>
+            }
+            
             <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>
           </div>
         )

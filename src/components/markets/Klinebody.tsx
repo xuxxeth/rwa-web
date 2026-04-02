@@ -111,15 +111,27 @@ const RwaItemPrice = memo(
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
             )}>${tradingTime?.tradeState === MARKET_STATUS.OPEN ? realtimeData.p : realtimeData.c || '--'}</div>
-            <span
-              className={cn(
-                "leading-[100%] font-normal text-[14px]",
-              )
+            {
+              (Number(realtimeData?.pc) && Number(realtimeData?.c)) ? (
+                <span
+                  className={cn(
+                    "leading-[100%] font-normal text-[14px]",
+                  )
+                  }
+                >
+                  {openUp !== 0 && (openUp > 0 ? '+' : '-')}
+                  {Math.abs(Number(openUp || "0")).toFixed(2)}%
+                </span>
+              ) : <span
+                  className={cn(
+                    "leading-[100%] font-normal text-[14px]",
+                  )
+                  }
+                >
+                  --
+                </span>
               }
-            >
-              {openUp !== 0 && (openUp > 0 ? '+' : '-')}
-              {Math.abs(Number(openUp || "0")).toFixed(2)}%
-            </span>
+            
           </div>
         </div>
         {
@@ -133,15 +145,27 @@ const RwaItemPrice = memo(
                   "",
                   
                 )}>${realtimeData.p || '--'}</div>
-                <span
-                  className={cn(
-                    "",
-                  )
-                  }
-                >
-                  {afterUp !== 0 && (afterUp > 0 ? '+' : '-')}
-                  {Math.abs(Number(afterUp || "0")).toFixed(2)}%
-                </span>
+                {
+                (Number(realtimeData?.p) && Number(realtimeData?.c)) ? (
+                  <span
+                    className={cn(
+                      "",
+                    )
+                    }
+                  >
+                    {afterUp !== 0 && (afterUp > 0 ? '+' : '-')}
+                    {Math.abs(Number(afterUp || "0")).toFixed(2)}%
+                  </span>
+                ) : <span
+                    className={cn(
+                      "leading-[100%] font-normal text-[14px]",
+                    )
+                    }
+                  >
+                    --
+                  </span>
+                }
+                
               </div>
             </div>
           )
