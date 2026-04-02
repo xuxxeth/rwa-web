@@ -71,9 +71,9 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
             // 盘中价格
             close: item.c,
             // 盘中收盘价涨跌幅
-            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : '0',
+            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : undefined,
             // 最新价格涨跌幅
-            up: item.p && item.c ? calculateUp(item.p, item.c) : '0',
+            up: item.p && item.c ? calculateUp(item.p, item.c) : undefined,
             dailyHigh: item.h,
             dailyLow: item.l,
           }
@@ -126,7 +126,7 @@ export default function MarketQuotes() {
 
   const marketQuotes = useRwaListWithQuote(newRwaList, marketTradeState)
 
-  const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
+  const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
 
   return (
@@ -138,7 +138,10 @@ export default function MarketQuotes() {
             <div className='flex-1'>
               <SearchFilter
                 searchText={searchText}
-                onSearchChange={setSearchText}
+                onSearchChange={(newSearch: string) => {
+                  setSearchText(newSearch)
+                  setPage(1)
+                }}
                 isFavorites={isFavorites}
                 onFavoriteChange={setIsFavorites}
               />
@@ -422,7 +425,7 @@ const MarketQuotesListConfig = [
         <div className='flex flex-col gap-1'>
           {upList[0] && (
             <TextCellWithColor
-              text={upList[0] ? formatUp(upList[0]) : '--'}
+              text={upList[0] !== undefined ? formatUp(upList[0]) : '--'}
               change={strOrNumToSign(upList[0] ?? 0)}
               withIcon={false}
             />
@@ -431,7 +434,7 @@ const MarketQuotesListConfig = [
             <div className='flex flex-row items-center gap-1'>
               <TextCell
                 className='text-xs/[15px] font-normal text-gray-400'
-                text={upList[1] ? formatUp(upList[1]) : '--'}
+                text={upList[1] !== undefined ? formatUp(upList[1]) : '--'}
               />
               <MarketTradeStateTag marketTradeState={item.marketTradeState} />
             </div>
