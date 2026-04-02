@@ -107,7 +107,7 @@ const RwaItemPrice = memo(
           )}>
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
-            )}>{tradingTime?.tradeState === MARKET_STATUS.OPEN ? (realtimeData?.p ? '$' + realtimeData?.p : '--') : (realtimeData?.c ? '$' + realtimeData?.c : '--')}</div>
+            )}>{tradingTime?.tradeState === MARKET_STATUS.OPEN ? (realtimeData?.p ? '$' + realtimeData?.p : '0.00') : (realtimeData?.c ? '$' + realtimeData?.c : '0.00')}</div>
             {
               (Number(realtimeData?.pc) && Number(realtimeData?.c)) ? (
                 <span
@@ -121,11 +121,11 @@ const RwaItemPrice = memo(
                 </span>
               ) : <span
                   className={cn(
-                    "leading-[100%] font-normal text-[14px]",
+                    "leading-[100%] font-normal text-[14px] text-[#A1A1A1]",
                   )
                   }
                 >
-                  --
+                  0.00%
                 </span>
               }
             
@@ -141,7 +141,7 @@ const RwaItemPrice = memo(
                 <div className={cn(
                   "",
                   
-                )}>{realtimeData?.p ? '$' + realtimeData?.p : '--'}</div>
+                )}>{realtimeData?.p ? '$' + realtimeData?.p : '0.00'}</div>
                 {
                 (Number(realtimeData?.p) && Number(realtimeData?.c)) ? (
                   <span
@@ -159,7 +159,7 @@ const RwaItemPrice = memo(
                     )
                     }
                   >
-                    --
+                    0.00%
                   </span>
                 }
                 
@@ -207,31 +207,31 @@ export const StockInfo = memo(
           <RwaItemPrice from={from} />
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
-            <div className="mt-1">{stockData?.marketCap || '--'}</div>
+            <div className="mt-1">{stockData?.marketCap || '0.00'}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
-            <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
+            <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '0.00'}</div>
           </div>
           {/* <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
-            <div className="mt-1">{stockData?.peStatic || '--'}</div>
+            <div className="mt-1">{stockData?.peStatic || '0.00'}</div>
           </div> */}
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
-            <div className="mt-1">${ marketTradeState === MARKET_STATUS.BEFORE ? '--' : (realtimeData?.o || '--')}</div>
+            <div className="mt-1">${ marketTradeState === MARKET_STATUS.BEFORE ? '0.00' : (realtimeData?.o || '0.00')}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t191')}>{t('v2.tx.t19')}</LabelWrap>
-            <div className="mt-1">${realtimeData?.pc || '--'}</div>
+            <div className="mt-1">${realtimeData?.pc || '0.00'}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t201')}>{t('v2.tx.t20')}</LabelWrap>
-            <div className="mt-1">${realtimeData?.h || '--'}</div>
+            <div className="mt-1">${realtimeData?.h || '0.00'}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t21')}</LabelWrap>
-            <div className="mt-1">${realtimeData?.l || '--'}</div>
+            <div className="mt-1">${realtimeData?.l || '0.00'}</div>
           </div>
           <div className=" shrink-0">
             <div className="text-[12px] font-normal text-[#9DA3AF] flex">
