@@ -51,10 +51,10 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
         ...rwa,
         ...quote,
         marketCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
+          ? multiply(quote.price, rwa.stockStatistics?.totalShare || 0)
           : undefined,
         floatCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
+          ? multiply(quote.price, rwa.stockStatistics?.circShare || 0)
           : undefined,
         marketTradeState,
       }
