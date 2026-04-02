@@ -126,14 +126,15 @@ const CTokenItem = memo(
               ev.stopPropagation()
               if(!toggleEnable) return
               toggleFavorite(token.stockId)
-            }} src={isFavorite ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 rounded-full", !toggleEnable ? 'cursor-not-allowed' : 'cursor-pointer')} />
+            }} src={isFavorite ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 rounded-full shrink-0", !toggleEnable ? 'cursor-not-allowed' : 'cursor-pointer')} />
           </div>
           <div className="w-8 h-8 shrink-0">
             <LazyImage src={token.icon} className="w-8 h-8 rounded-full" />
           </div>
           <div>
             <div className=" text-[12px] font-medium ">{token.symbol}</div>
-            <div className=" text-[12px] font-normal text-[#9DA3AF]">{token.name}</div>
+            <div className=" text-[12px] font-normal text-[#9DA3AF] max-w-[86px] truncate">{token?.name || '--'}</div>
+            
           </div>
           {
             token.state === 1 && 
