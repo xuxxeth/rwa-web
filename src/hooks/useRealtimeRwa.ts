@@ -10,9 +10,15 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
   const setRealtimeData = useTradeStore(state => state.setRealtimeRwaData)
   const subscribeVersionRef = useRef(0)
   const prevSymbolRef = useRef<string>("")
+  const tokenMetaRef = useRef<{ id?: number; precision?: number }>({})
   const symbol = inputToken?.symbol || ""
-  const tokenId = inputToken?.id
-  const precision = inputToken?.precision
+
+  useEffect(() => {
+    tokenMetaRef.current = {
+      id: inputToken?.id,
+      precision: inputToken?.precision,
+    }
+  }, [inputToken?.id, inputToken?.precision])
   
   useEffect(() => {
     let onKey = ''
@@ -23,7 +29,7 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
       // 仅在 symbol 真变化时置空，避免初始化阶段重复闪烁
       if (prevSymbolRef.current !== symbol) {
         setRealtimeData({
-          s: tokenId,
+          s: tokenMetaRef.current.id,
           S: symbol,
           p: 0,
           o: 0,
@@ -38,10 +44,10 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
       listener = (rwa: ISummaryDataItem) => {
         // 避免 off 延迟导致旧 symbol 的消息回灌
         if (subscribeVersionRef.current !== currentVersion) return
-        const precision = inputToken?.precision || 2
+        const precision = tokenMetaRef.current.precision ?? 2
         const _data = {
           ...rwa,
-          s: tokenId,
+          s: tokenMetaRef.current.id,
           S: symbol,
           p: truncate(rwa.p || 0, precision), // 最新价
           o: truncate(rwa.o || 0, precision), // 今开价
@@ -66,5 +72,5 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
         wsService.off(onKey, listener)
       }
     }
-  }, [symbol, tokenId, precision, setRealtimeData])
+  }, [symbol, setRealtimeData])
 }
