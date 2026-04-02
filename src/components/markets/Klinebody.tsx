@@ -11,7 +11,7 @@ import { useRouter } from "@/hooks/useRouter"
 import { StockDialog } from "./StockDialog"
 import { useStockStore } from "@/stores/stockStore"
 import IconWithTooltip from "../icon-tooltip"
-import { toFixed, truncate } from "@/utils/format"
+import { calculateTruncateUP, toFixed, truncate } from "@/utils/format"
 import { useBaseStore } from "@/stores/baseStore"
 import { shortenAddress } from "@/utils"
 import CopyButton from "../button/copyButton"
@@ -47,14 +47,14 @@ const RwaItemPrice = memo(
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
     const tradingTime = useTradingStartTime()
     
-    const pup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.pc ? (realtimeData.c - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.pc])
-    const nup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.pc && realtimeData?.p ? (realtimeData.p - realtimeData.pc) / realtimeData.pc : 0) * 100, 2)) : 0 ,[realtimeData?.pc, realtimeData?.p])
-    // const bup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.p ? (realtimeData.p - realtimeData.c) / realtimeData.c : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.p])
-    const aup = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.c && realtimeData?.p ? (realtimeData.p - realtimeData.c) / realtimeData.c : 0) * 100, 2)) : 0 ,[realtimeData?.c, realtimeData?.p])
+    const pup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.pc , 2)) : 0, [realtimeData?.c, realtimeData?.pc])
+    const nup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.pc, realtimeData.p, 2)) : 0, [realtimeData?.pc, realtimeData?.p])
+    const aup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.p, 2)) : 0, [realtimeData?.c, realtimeData?.p])
     
     const openUp = useMemo(() => {
-      return tradingTime?.tradeState === MARKET_STATUS.OPEN ? nup : pup
-    }, [tradingTime?.tradeState, pup, nup])
+      return tradingTime?.tradeState === MARKET_STATUS.OPEN ? aup : pup
+    }, [tradingTime?.tradeState, pup, aup])
+    
     const afterUp = useMemo(() => {
       return aup
     }, [aup,])

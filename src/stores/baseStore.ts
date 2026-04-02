@@ -13,7 +13,7 @@ import type {
   IStockWithPrice,
   IChain,
 } from '@/service/base/types'
-import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp } from '@/utils'
+import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP } from '@/utils'
 
 const ENABLE_CACHE = false
 // 缓存时间，2小时
@@ -71,8 +71,10 @@ export const useBaseStore = create<BaseStore>()(
               acc[symbolToLower(cur.S)] = {
                 closePrice: truncate(cur.c || 0, rwa.precision),
                 price: truncate(cur.p || 0, rwa.precision),
-                closeUp: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
-                up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0',
+                // closeUp: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
+                closeUp: cur.c && cur.pc ? calculateTruncateUP(cur.c, cur.pc, rwa.precision) : '0.00',
+                // up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0.00',
+                up: cur.p && cur.c ? calculateTruncateUP(cur.p, cur.c, rwa.precision) : '0.00',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
                 
               }
@@ -99,7 +101,7 @@ export const useBaseStore = create<BaseStore>()(
             if (stock) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur?.p || 0, 2),
-                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
+                up: calculateUp((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
                 cPrice: truncate(cur?.c || 0, 2),
               }
             }
