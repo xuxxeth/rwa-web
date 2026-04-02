@@ -37,17 +37,10 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
   const tokenPrice = useRwaPrice(symbol);
   const closeUp = useMemo(() => Number(tokenPrice?.closeUp), [tokenPrice?.closeUp])
   const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
-  const postUp = useMemo(() => Number(tokenPrice?.postUp), [tokenPrice?.postUp])
-
-  console.log(postUp, closeUp, 1111)
 
   const nup = useMemo(() => {
     return marketOpen ? up : closeUp
-  }, [closeUp, up,  marketOpen])
-
-  const nup2 = useMemo(() => {
-    return marketOpen ? up : postUp
-  }, [postUp, up,  marketOpen])
+  }, [closeUp, up, marketOpen])
 
   return (
     <div className="text-[12px]">
@@ -73,8 +66,8 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
             <div className=" font-normal flex items-center gap-x-[4px]">
               <span
               >
-                {nup2 !== 0 && (nup2 > 0 ? '+' : '-')}
-                {Math.abs(Number(nup2 || "0"))}%
+                {up !== 0 && (up > 0 ? '+' : '-')}
+                {Math.abs(Number(tokenPrice?.up || "0"))}%
               </span>
             </div>
             <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>

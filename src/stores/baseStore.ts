@@ -75,9 +75,7 @@ export const useBaseStore = create<BaseStore>()(
                 closeUp: cur.c && cur.pc ? calculateTruncateUP(cur.c, cur.pc, rwa.precision) : '0.00',
                 // up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0.00',
                 up: cur.p && cur.c ? calculateTruncateUP(cur.p, cur.c, rwa.precision) : '0.00',
-                postUp: cur.p && cur.pc ? calculateTruncateUP(cur.p, cur.pc, rwa.precision) : '0.00',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
-                
               }
             }
             return acc
