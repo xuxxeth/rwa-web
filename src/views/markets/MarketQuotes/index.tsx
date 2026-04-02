@@ -102,8 +102,7 @@ export default function MarketQuotes() {
   const router = useRouter()
 
   const rwaList = useRwaTokens(false)
-  // const marketTradeState = useBaseStore(state => state.marketTradeState)
-  const marketTradeState = MARKET_STATUS.BEFORE;
+  const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   const [isFavorites, setIsFavorites] = useState(false)
 
