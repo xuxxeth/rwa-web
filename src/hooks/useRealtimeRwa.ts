@@ -38,6 +38,7 @@ export function useRealtimeRwa(inputToken: IRwa | null) {
       listener = (rwa: ISummaryDataItem) => {
         // 避免 off 延迟导致旧 symbol 的消息回灌
         if (subscribeVersionRef.current !== currentVersion) return
+        const precision = inputToken?.precision || 2
         const _data = {
           ...rwa,
           s: tokenId,
