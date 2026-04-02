@@ -1,21 +1,55 @@
-import { memo, useEffect, useRef } from "react";
-import { getDataFeed, tagSession } from "./datafeed";
-import { type ChartingLibraryWidgetOptions, type CreateStudyOptions, type IBasicDataFeed, type IChartingLibraryWidget, type ResolutionString } from "@/lib/charting_library/charting_library";
-import { chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { getDataFeed, tagSession, type IExtaIBasicDataFeed } from "./datafeed";
+import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString, type Timezone } from "@/lib/charting_library/charting_library";
+import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
 import storage from "@/utils/storage";
 import { useTranslation } from "@/hooks/useTranslation";
+import { SessionLineSelectt, type IItemCode } from "../session-line-select";
+import { useBaseStore } from "@/stores/baseStore";
+import { useTradingStartTime } from "@/hooks/useMarketState";
 
 let initChart: any
+
+let maIds: EntityId[] = [];
+
+const addOrRemoveMA = async (chart: IChartWidgetApi, chartType: SeriesType) => {
+  // 清理旧的
+  maIds.forEach(id => chart.removeEntity(id));
+  maIds = [];
+
+  if (chartType === 1) {
+    // MA5
+    const ma1Id = await chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" });
+    if (ma1Id) maIds.push(ma1Id)
+    // MA10
+    const ma2Id = await chart.createStudy("Moving Average", false, false, { length: 10 }, { "plot.color.0": "#FF6D01" })
+    if (ma2Id) maIds.push(ma2Id)  
+    // MA30
+    const ma3Id = await chart.createStudy("Moving Average", false, false, { length: 30 }, { "plot.color.0": "rgba(0,128,0,0.5)" })
+    if (ma3Id) maIds.push(ma3Id)   
+  }
+}
 
 export const TVChartContainer = memo(
   ({ token, from }: { token: IRwa, from?: string}) => {
     const chartContainerRef = useRef<HTMLDivElement>(null) as React.MutableRefObject<HTMLInputElement>;
     const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
-    const dataFeedRef = useRef<IBasicDataFeed | null>(null)
+    const dataFeedRef = useRef<IExtaIBasicDataFeed | null>(null)
+    const [tvWidgetShow, setTvWidgetShow] = useState(false)
     const tvWidgetReady = useRef(false)
+    const skipIntervalChangeRef = useRef(false)
+    const wasAreaModeRef = useRef(false)
+    const tokenSymbolRef = useRef(token.symbol)
     const { i18n } = useTranslation()
+    const [chartType, setChartType] = useState(true)
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
+    const tradingTime = useTradingStartTime()
+
+    useEffect(() => {
+      tokenSymbolRef.current = token.symbol
+    }, [token.symbol])
     
     useEffect(() => {
       let mounted = true;
@@ -27,7 +61,7 @@ export const TVChartContainer = memo(
 
       initChart = (rwa?: IRwa) => {
         const elem = chartContainerRef.current;
-        const language = storage.getItem('CA_LANGUAGE') || 'en'
+        const language = storage.getItem(CA_LANGUAGE) || 'en'
         if (!mounted || !elem) {
           initTimer = window.setTimeout(initChart, 100);
           return;
@@ -35,6 +69,7 @@ export const TVChartContainer = memo(
         if (!dataFeedRef.current) {
           dataFeedRef.current = getDataFeed({ name: rwa?.symbol || token.symbol, token: rwa || token })
         }
+        const systemTimezone = (Intl.DateTimeFormat().resolvedOptions().timeZone || "exchange") as Timezone
         const widgetOptions: ChartingLibraryWidgetOptions = {
           symbol: rwa?.symbol || token.symbol,
           debug: false,
@@ -53,24 +88,24 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.4",
-          timezone:"Asia/Hong_Kong",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
+          timezone: "exchange",
           overrides: chartOverrides,
-          interval: "15" as ResolutionString,
+          interval: "1" as ResolutionString,
           studies_overrides: {
             // "volume.volume.color.0": "rgba(255, 0, 0, 0.5)",  // 下跌柱颜色
             // "volume.volume.color.1": "rgba(0, 128, 0, 0.5)",  // 上涨柱颜色
             // "volume.volume.transparency": 30,   
           },
           "favorites": {
-              "intervals": ["5", "15",] as ResolutionString[], // 默认收藏的时间周期
+              "intervals": ["1", "5", "15",] as ResolutionString[], // 默认收藏的时间周期
           },
-         
 
         };
         if (window.TradingView?.widget) {
           tvWidgetRef.current = new window.TradingView.widget(widgetOptions);
           tvWidgetRef.current?.onChartReady(function () {
+            setTvWidgetShow(true)
             tvWidgetReady.current = true
               // const priceScale = tvWidgetRef.current?.activeChart().getPanes()[0].getMainSourcePriceScale();
               // priceScale?.setAutoScale(true)
@@ -80,9 +115,24 @@ export const TVChartContainer = memo(
               "paneProperties.backgroundType": "solid",
               "paneProperties.backgroundGradientStartColor": "#131416",
               "paneProperties.backgroundGradientEndColor": "#131416",
+              "timeScale.rightOffset": 0,
+              "timeScale.fixLeftEdge": true,
+              "timeScale.fixRightEdge": true,
             });
             const chart = tvWidgetRef.current?.activeChart();
             if (chart) {
+              // chart.onDataLoaded().subscribe(null, () => {
+              //   let currentChartType = chart.chartType();
+              //   if (currentChartType === 3) {
+              //     const timeScale = chart.getTimeScale();
+              //     timeScale.setRightOffset(0);
+              //     const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
+              //     const range = dataFeedRef.current?.getBarsRange?.(undefined, resolution)
+              //     if (range?.from && range?.to && range.from < range.to) {
+              //       chart.setVisibleRange(range, { percentRightMargin: 0 })
+              //     }
+              //   }
+              // }, true);
               // 添加成交量指标，暂时不需要
               // chart?.createStudy("Volume", false, false).then((studyId) => {
               //   const panes = chart.getPanes();
@@ -92,19 +142,45 @@ export const TVChartContainer = memo(
               //     volumePane.setHeight(100); // 单位是像素，高度随你调
               //   }
               // });
-              // tvWidgetRef.current?.activeChart().executeActionById("hideLeftToolbar");
               
-              // MA5
-              chart.createStudy("Moving Average", false, false, { length: 5 }, { "plot.color.0": "#429D45" })
-                .then(id => {
-                  
-                });
 
-              // MA10
-              chart.createStudy("Moving Average", false, false, { length: 10 }, { "plot.color.0": "#FF6D01" });
+              // chart.onChartTypeChanged().subscribe(null, (type) => {
+              //   currentChartType = type;
+                
+              // });
 
-              // MA30
-              chart.createStudy("Moving Average", false, false, { length: 30 }, { "plot.color.0": "rgba(0,128,0,0.5)" });
+              chart.onIntervalChanged().subscribe(null, (interval, obj) => {
+                if (skipIntervalChangeRef.current) {
+                  skipIntervalChangeRef.current = false
+                  return
+                }
+                // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
+                setChartType(false)
+                dataFeedRef.current?.setCurrentType(1)
+                chart.setChartType(1)
+                const applyCandle = () => {
+                  addOrRemoveMA(chart, 1)
+                  wasAreaModeRef.current = false
+                  ;(tvWidgetRef.current as any)?.resetCache?.()
+                  chart.resetData()
+                }
+                if (tvWidgetRef.current) {
+                  const emptySymbol = `__empty__${Date.now()}`
+                  tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
+                    const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+                    tvWidgetRef.current?.setSymbol(targetSymbol, interval as ResolutionString, () => {
+                      applyCandle()
+                    })
+                  })
+                  return
+                }
+                
+                // @ts-ignore
+                // dataFeedRef.current?.setSuppressHistory(false)
+                ;(tvWidgetRef.current as any)?.resetCache?.()
+                chart.resetData(); 
+                
+              });
 
               setTimeout(() => {
                 const iframe = chartContainerRef.current.querySelector('iframe') as HTMLIFrameElement;
@@ -117,6 +193,7 @@ export const TVChartContainer = memo(
               // if (panes?.length) {
               //   panes[0].getStudies().forEach((s: any) => s.setVisible(true));
               // }
+              // chart.setChartType(3);
             }
             
           });
@@ -137,26 +214,20 @@ export const TVChartContainer = memo(
       };
     }, []);
 
-        // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
+    // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
     useEffect(() => {
-      if (tvWidgetRef.current && token?.symbol && tvWidgetReady.current ) {
-        tvWidgetRef.current.remove(); // 或 chartRef.current.dispose() 视库而定
-        tvWidgetRef.current = null;
-        dataFeedRef.current = null
-        initChart && initChart(token)
-        // const chart = tvWidgetRef.current?.activeChart();
-        // if (chart) {
-        //   console.log("[TradingView] setSymbol:", token.symbol);
-        //   chart.resetData?.();         // 清除 TradingView 自身缓存
-        //   // ✅ 重新生成 datafeed
-        //   const newFeed = getDataFeed({ name: token.symbol, token })
-        //   dataFeedRef.current = newFeed
-        //   // @ts-ignore
-        //   chart?.setSymbol(token.symbol, "15", () => {
-        //     console.log("symbol updated");
-        //   });
-        // }
-      }
+      if (!tvWidgetRef.current || !token?.symbol || !tvWidgetReady.current) return
+
+      const chart = tvWidgetRef.current.activeChart()
+      if (!chart) return
+
+      // 更新 datafeed 中的 token
+      dataFeedRef.current?.setToken?.(token)
+
+      const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
+      chart.resetData?.()
+      chart.setSymbol(token.symbol)
+      chart.setResolution(resolution)
     }, [token?.symbol])
 
     // ✅ 当语言变化时，重新初始化图表
@@ -170,6 +241,38 @@ export const TVChartContainer = memo(
       }
     }, [i18n.language])
 
+    // 监听市场状态变化，更新dataFeed的市场状态
+    useEffect(() => {
+      dataFeedRef.current?.setMarketState(marketTradeState)
+    }, [marketTradeState])
+
+    // 更新市场时间
+    useEffect(() => {
+      dataFeedRef.current?.setTradingStartTime(tradingTime?.tradingEndTime || 0)
+    }, [tradingTime?.tradingEndTime])
+
+    const handleSessionChange = useCallback((data: IItemCode) => {
+      const chart = tvWidgetRef.current?.activeChart();
+      if (chart) {
+        setChartType(true)
+        wasAreaModeRef.current = true
+        addOrRemoveMA(chart, 3)
+        chart.setChartType(3);
+        dataFeedRef.current?.setCurrentType(3)
+        dataFeedRef.current?.setSessionType(Number(data.code))
+        skipIntervalChangeRef.current = true
+        queueMicrotask(() => {
+          skipIntervalChangeRef.current = false
+        })
+        const resolution = ("1" as ResolutionString)
+        chart.resetData?.()
+        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+        chart.setSymbol(targetSymbol)
+        chart.setResolution(resolution)
+      }
+      
+    }, [token.symbol])
+
     return (
       <div className={cn(
         " relative text-white pr-4",
@@ -177,6 +280,14 @@ export const TVChartContainer = memo(
       )}>
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
         <div className=" absolute w-4 h-1 -right-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
+        {
+          tvWidgetShow && (
+            <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
+              <SessionLineSelectt onChange={handleSessionChange} selected={chartType} />
+            </div>
+          )
+        }
+        
         <div
           className="h-full pl-4"
           ref={chartContainerRef}

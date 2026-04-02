@@ -1,4 +1,5 @@
 import {
+  CA_LANGUAGE,
   CODE_TO_HANDLER,
   CONNECT_ACCOUNT,
   REQUEST_TIMEOUT,
@@ -75,7 +76,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   }
   const chainId =
     localStorage.getItem('CA-Chain-Id') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id)
-  const lng = storage.getItem('CA_LANGUAGE') || 'en'
+  const lng = storage.getItem(CA_LANGUAGE) || 'en'
 
   req.headers.set('CA-Chain-Id', chainId)
   req.headers.set('Accept-Language', lng)

@@ -1,15 +1,11 @@
 import { useI18nLanguage, useTranslation } from '@/hooks/useTranslation'
 import { memo, useEffect, useId, useRef, useState } from 'react'
-import { StatisticsItem } from './StatisticsItem'
 import { cn } from '@/lib/utils'
 import { useTradeStore } from '@/stores/tradeStore'
 import { baseApi } from '@/service/base/api'
 import type { IProfile } from '@/service/base/types'
-import { NumberText } from '../number-text'
 import { TopTen } from './TopTen'
-import { ProfileTitle } from './ProfileTitle'
 import { formatDateToShortEN } from '@/utils/format'
-import { EllipsisText } from '../ellipsis-text'
 
 const Profile = memo(({ from }: { from?: string }) => {
   const { t, i18n } = useTranslation()
@@ -76,7 +72,7 @@ const Profile = memo(({ from }: { from?: string }) => {
             )
           })}
         </div>
-        <div className='mt-2 text-sm/4.5 font-normal'>{profileData?.introduction}</div>
+        <div className='mt-2 text-sm/4.5 font-normal break-words'>{profileData?.introduction}</div>
       </div>
       <div className='p-3 bg-gray-900 rounded-[4px] mt-2'>
         <TopTen topTen={profileData?.topTenShareholders || []} />

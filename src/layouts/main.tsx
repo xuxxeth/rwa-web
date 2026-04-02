@@ -1,12 +1,18 @@
+import { cn } from "@/utils/tw"
 
 export function MainLayout({
-  children
+  children,
+  className
 }: {
-  children: React.ReactNode
+  children: React.ReactNode,
+  className?: string
 }) {
 
   return (
-    <div className=' xl:max-w-[1440px] mx-auto font-normal'>
+    <div className={cn(
+      "xl:max-w-[1440px] mx-auto font-normal",
+      className
+    )}>
       {children}
     </div>
   )

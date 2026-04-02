@@ -532,6 +532,9 @@ export function ConverBody({
       {
         Number(orderValue) > 0 && 
           <EstimatedInfo
+            slippage={3}
+            maxSlippage={'5'}
+            tradeType={TradeType.LIMIT}
             estimatedFee={estimatedFee}
             networkFeeInNative={marketInfo.networkFeeInNative}
             expires={expires}
@@ -551,30 +554,7 @@ export function ConverBody({
           expiresDialog.hide()
         } } />
       </DialogController>
-      <DialogController
-        className="p-0"
-        headerClassName="px-4 pt-4"
-        overlayClassName='z-[49]'
-        title={t('v2.tx.t29')}
-        open={orderDialog.open}
-        openChange={orderDialog.setOpen}
-      > 
-        <OrderConfirm 
-          action={action}
-          orderValue={orderValue}
-          platformFee={platformFee}
-          brokerageFee={brokerageFee}
-          tradingActivityFee={tradingActivityFee}
-          estimatedFee={estimatedFee}
-          feeRate={inputToken?.feeRate ?? ''}
-          networkFeeInNative={marketInfo.networkFeeInNative}
-          onClick={() => {
-            orderDialog.hide()
-            handlePlaceOrder()
-          }}
-        />
-        
-      </DialogController>
+
     </div>
   )
 }

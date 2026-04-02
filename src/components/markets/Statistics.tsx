@@ -1,7 +1,7 @@
 import { useTranslation } from '@/hooks/useTranslation'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { useTradeStore } from '@/stores/tradeStore'
-import { divide, formatLargeNumber, multiply, shortenAddress } from '@/utils'
+import { divide, formatLargeNumber, multiply, shortenAddress, toFixed } from '@/utils'
 import { useChainById } from '@/hooks/useChain'
 import { baseApi } from '@/service/base/api'
 import type { IStatistic } from '@/service/base/types'
@@ -31,13 +31,15 @@ const Statistics = memo(({ from }: { from?: string }) => {
       _data.marketCap = formatLargeNumber(multiply(statisticData.totalShare, rwaPrice.p))
       // 流通市值 = 当前股价 * 流通股本
       _data.circCap = formatLargeNumber(multiply(statisticData.circShare, rwaPrice.p))
-      _data.peTtm = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLtm, unit))
-      )
+      // _data.peTtm = formatLargeNumber(
+      //   divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLtm, unit))
+      // )
+      _data.peTtm = toFixed(divide(rwaPrice.p, statisticData.epsTtm))
       // pe(static) = 总市值/ 上一个完整财年的净利润
-      _data.peStatic = formatLargeNumber(
-        divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLastYear, unit))
-      )
+      // _data.peStatic = formatLargeNumber(
+      //   divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netIncomeLastYear, unit))
+      // )
+      _data.peStatic = toFixed(divide(rwaPrice.p, statisticData.eps))
       // pb = 总市值/净资产
       _data.pb = formatLargeNumber(
         divide(multiply(statisticData.totalShare, rwaPrice.p), multiply(statisticData.netAsset, unit))
@@ -83,7 +85,7 @@ const Statistics = memo(({ from }: { from?: string }) => {
           {
             title: 'pe',
             // value: capData?.peStatic || '',
-            value: capData?.peTtm ? parseFloat(capData.peTtm) < 0 ? t('v2.tx.t42') : capData?.peTtm : '--',
+            value: capData?.peStatic ? parseFloat(capData.peStatic) < 0 ? t('v2.tx.t42') : capData?.peStatic : '--',
             tooltip: 'peH',
           },
           {

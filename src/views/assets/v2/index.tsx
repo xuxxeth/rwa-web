@@ -85,7 +85,13 @@ function MainContent({ chainId, account }: { chainId: number; account: string })
         {activeTab === 'assets' && <Assets chainId={chainId} account={account} />}
         {activeTab === 'order' && (
           <div className='h-full py-4'>
-            <Order chainId={chainId} account={account} showFilter={true} dataMode='pagination' />
+            <Order
+              allowUserFilter={true}
+              chainId={chainId}
+              account={account}
+              showFilter={true}
+              dataMode='pagination'
+            />
           </div>
         )}
       </div>

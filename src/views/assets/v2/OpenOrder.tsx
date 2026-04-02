@@ -10,6 +10,7 @@ import {
   TokenFilterItem,
   TextCellWithTranslation,
   TxHashCell,
+  SessionTypeCell,
 } from '../Shared'
 import { type IRwa } from '@/service/base/types'
 import { useRwaTokens } from '@/hooks/useTokens'
@@ -22,7 +23,16 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { scanApi } from '@/service/scan/api'
 import { TableHeader, type ITableConfig } from '@/components/table-header'
 import { type IOpenOrder } from '@/service/scan/types'
-import { cn, textPrefix, toFixed, formatTimestamp, noop, readableDuration, divide, truncate } from '@/utils'
+import {
+  cn,
+  textPrefix,
+  toFixed,
+  formatTimestamp,
+  noop,
+  readableDuration,
+  divide,
+  truncate,
+} from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useTxToast } from '@/hooks/useTxToast'
 import { useTradeStore } from '@/stores/tradeStore'
@@ -38,23 +48,40 @@ function OpenOrder(props: {
   account?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
+  allowUserFilter: boolean
 }) {
   const rwaTokens = useRwaTokens()
-  const { chainId, account, showFilter, dataMode } = props
+  const { chainId, account, showFilter, dataMode, allowUserFilter } = props
 
   const openOrderFilters = useOrderFilterStore(state => state.openOrderFilters)
   const updateOpenOrderFilters = useOrderFilterStore(state => state.updateOpenOrderFilters)
 
   const filter = useMemo(() => {
+    if (!allowUserFilter) {
+      return { limit: PAGE_LIMIT }
+    }
     const userSelectFilter = generateOpenOrderFilterObj(openOrderFilters)
 
-    return { ...userSelectFilter }
-  }, [openOrderFilters])
+    return { limit: PAGE_LIMIT, ...userSelectFilter }
+  }, [openOrderFilters, allowUserFilter])
 
   return (
     <>
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
+          <DropDownFilter
+            data={openOrderFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateOpenOrderFilters({
+                orderType: reduce(openOrderFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          />
           <DropDownFilter
             data={openOrderFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -99,14 +126,16 @@ function OpenOrder(props: {
         scrollId={(item: IOpenOrder) => item.orderId}
         filter={filter}
         tableConfig={openOrderTableConfig}
+        type={'open'}
       />
     </>
   )
 }
 
-const Day = 1 * 60 * 60 * 24
-
-const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetch: () => void }> = [
+const openOrderTableConfig: ITableConfig<
+  IOpenOrder,
+  { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -124,7 +153,10 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'token',
     sortable: false,
-    render: (item: IOpenOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (
+      item: IOpenOrder,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -132,6 +164,9 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => {
+            onTokenClick?.(rwa!)
+          }}
         />
       )
     },
@@ -140,7 +175,14 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />,
+    render: (item: IOpenOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
+      )
+    },
   },
   {
     key: 'filledAmount',
@@ -158,7 +200,9 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
     key: 'filledValue',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOpenOrder) => <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />,
+    render: (item: IOpenOrder) => (
+      <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />
+    ),
   },
   {
     key: 'filledAvg',
@@ -175,21 +219,29 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
       <TextCell className='w-[80px] text-xs/4' text={formatTimestamp(item.txTime)} />
     ),
   },
-  {
-    key: 'expiration',
-    sortable: false,
-    render: (item: IOpenOrder) => {
-      if (item.tif === 0) {
-        return <TextCellWithTranslation text='assets.order.intraday' />
-      }
+  // {
+  //   key: 'expiration',
+  //   sortable: false,
+  //   render: (item: IOpenOrder) => {
+  //     if (item.orderType === 1) {
+  //       return '--'
+  //     }
+  //     if (item.tif === 0) {
+  //       return <TextCellWithTranslation text='assets.order.intraday' />
+  //     }
 
-      return <TextCell text={readableDuration(item.validDate * Day)} />
-    },
-  },
+  //     return <TextCell text={readableDuration(item.validDate * Day)} />
+  //   },
+  // },
   {
     key: 'status',
     sortable: false,
     render: (item: IOpenOrder) => <OrderStatusCell state={item.state} />,
+  },
+  {
+    key: 'session',
+    sortable: false,
+    render: (item: IOpenOrder) => <SessionTypeCell sessionType={item.sessionType} />,
   },
   {
     key: 'txHash',
@@ -200,14 +252,19 @@ const openOrderTableConfig: ITableConfig<IOpenOrder, { rwaTokens: IRwa[]; refetc
   {
     key: 'action',
     sortable: false,
-    render: (item: IOpenOrder, { refetch }) => (
-      <CancelOrderButton
-        refetch={refetch}
-        className='max-w-[50px] text-ellipsis overflow-hidden'
-        orderId={item.orderId}
-        disabled={item.state === 8}
-      />
-    ),
+    render: (item: IOpenOrder, { refetch }) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <CancelOrderButton
+          refetch={refetch}
+          className='max-w-[50px] text-ellipsis overflow-hidden'
+          orderId={item.orderId}
+          disabled={item.state === 8}
+        />
+      )
+    },
     width: 65,
   },
 ]
@@ -277,9 +334,10 @@ function CancelOrderButton(props: {
       const res = await cancelOrder(orderId, { wait: true, skipSimulate: true })
       if (res.code === 9200) {
         setIsOnCooldown(true)
+        // 设置 cooldownTime 为 30s
         cooldownTimerRef.current = setTimeout(() => {
           setIsOnCooldown(false)
-        }, 10 * 1000)
+        }, 30 * 1000)
       } else {
         // @ts-ignore
         const errorMessage = res.data?.message

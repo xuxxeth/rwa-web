@@ -28,12 +28,13 @@ import { OrderTable } from './shared'
 const PAGE_LIMIT = 20
 
 function TradeHistory(props: {
+  allowUserFilter: boolean
   chainId?: number | null
   account?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
 }) {
-  const { chainId, account, showFilter, dataMode } = props
+  const { chainId, account, showFilter, dataMode, allowUserFilter } = props
   const rwaTokens = useRwaTokens()
 
   const tradeHistoryFilters = useOrderFilterStore(state => state.tradeHistoryFilters)
@@ -47,15 +48,35 @@ function TradeHistory(props: {
   }
 
   const filters = useMemo(() => {
+    if (!allowUserFilter) {
+      return {
+        limit: PAGE_LIMIT,
+        startTime: tradeHistoryFilters.startTime,
+        endTime: tradeHistoryFilters.endTime,
+      }
+    }
     const userSelectFilter = generateTradeHistoryFilterObj(tradeHistoryFilters)
 
     return userSelectFilter
-  }, [tradeHistoryFilters])
+  }, [tradeHistoryFilters, allowUserFilter])
 
   return (
     <>
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
+          {/* <DropDownFilter
+            data={tradeHistoryFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateTradeHistoryFilters({
+                orderType: reduce(tradeHistoryFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          /> */}
           <DropDownFilter
             data={tradeHistoryFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -98,7 +119,7 @@ function TradeHistory(props: {
           />
         </div>
       )}
-      <OrderTable<ITrade, ITradeHistoryFilter>
+      <OrderTable<ITrade, ITradeHistoryFilter & { limit?: number }>
         chainId={chainId}
         dataMode={dataMode}
         PAGE_LIMIT={PAGE_LIMIT}
@@ -107,28 +128,29 @@ function TradeHistory(props: {
         scrollId={(item: ITrade) => item.id}
         filter={filters}
         tableConfig={tradeHistoryTableConfig}
+        type="trade"
       />
     </>
   )
 }
 
-const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch: () => void }> = [
+const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
   {
     key: 'side',
     sortable: false,
     render: (item: ITrade) => <SideCell side={item.side} />,
     width: 60,
   },
-  {
-    key: 'type',
-    sortable: false,
-    render: (item: ITrade) => <OrderTypeCell orderType={item.orderType} />,
-    width: 60,
-  },
+  // {
+  //   key: 'type',
+  //   sortable: false,
+  //   render: (item: ITrade) => <OrderTypeCell orderType={item.orderType} />,
+  //   width: 60,
+  // },
   {
     key: 'token',
     sortable: false,
-    render: (item: ITrade, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (item: ITrade, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -136,6 +158,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => onTokenClick?.(rwa!)}
         />
       )
     },
@@ -150,7 +173,7 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'tradeValue',
     sortable: false,
-    render: (item: ITrade) => <ValueCell value={toFixed(item.amount) } currency={item.currency} />,
+    render: (item: ITrade) => <ValueCell value={toFixed(item.amount)} currency={item.currency} />,
   },
   {
     key: 'avgPrice',

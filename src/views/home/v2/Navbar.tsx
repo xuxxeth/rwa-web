@@ -5,6 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { LazyImage } from '@/components/image/LazyImage'
 import { useRouter } from '@/hooks/useRouter'
 import storage from '@/utils/storage'
+import { CA_LANGUAGE } from '@/config/constants'
 
 export const Navbar: React.FC = () => {
   const router = useRouter()
@@ -14,7 +15,7 @@ export const Navbar: React.FC = () => {
   const language = i18n.language
 
   const changeLanguage = (lng: string) => {
-    storage.setItem('CA_LANGUAGE', lng)
+    storage.setItem(CA_LANGUAGE, lng)
     i18n.changeLanguage(lng)
   }
 

@@ -13,28 +13,35 @@ function generateDefaultEndTime() {
   return Math.floor(setEndOfDay(now).getTime() / 1000)
 }
 
+const defaultOpenOrderFilters: OrderFilterStore['openOrderFilters'] = {
+  stockIds: ['all'],
+  orderType: ['all'],
+  side: ['all'],
+  states: ['all'],
+}
+
+const defaultOrderHistoryFilters: OrderFilterStore['orderHistoryFilters'] = {
+  stockIds: ['all'],
+  orderType: ['all'],
+  side: ['all'],
+  states: ['all'],
+  startTime: generateDefaultStartTime(),
+  endTime: generateDefaultEndTime(),
+}
+
+const defaultTradeHistoryFilters: OrderFilterStore['tradeHistoryFilters'] = {
+  stockIds: ['all'],
+  orderType: ['all'],
+  side: ['all'],
+  states: ['all'],
+  startTime: generateDefaultStartTime(),
+  endTime: generateDefaultEndTime(),
+}
+
 export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
-  openOrderFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-  },
-  orderHistoryFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-    orderType: ['all'],
-    startTime: generateDefaultStartTime(),
-    endTime: generateDefaultEndTime(),
-  },
-  tradeHistoryFilters: {
-    stockIds: ['all'],
-    side: ['all'],
-    states: ['all'],
-    orderType: ['all'],
-    startTime: generateDefaultStartTime(),
-    endTime: generateDefaultEndTime(),
-  },
+  openOrderFilters: defaultOpenOrderFilters,
+  orderHistoryFilters: defaultOrderHistoryFilters,
+  tradeHistoryFilters: defaultTradeHistoryFilters,
 
   updateOpenOrderFilters: (filters: Partial<OrderFilterStore['openOrderFilters']>) =>
     set(state => ({
@@ -48,24 +55,62 @@ export const useOrderFilterStore = create<OrderFilterStore>()(set => ({
     set(state => ({
       tradeHistoryFilters: { ...state.tradeHistoryFilters, ...filters },
     })),
+
+  clearAllFilters: () =>
+    set({
+      openOrderFilters: defaultOpenOrderFilters,
+      orderHistoryFilters: defaultOrderHistoryFilters,
+      tradeHistoryFilters: defaultTradeHistoryFilters,
+    }),
 }))
 
 export interface IOpenOrderFilter {
   stockIds?: string
+  orderType?: string
   side?: string
   after?: string
   before?: string
   limit?: number
 }
 
+function handleSide(side: string[]) {
+  if (side.includes('all') || side.length === 2) {
+    return {}
+  }
+  if (side.length > 0) {
+    return { side: side.join(',') }
+  }
+  return {}
+}
+
+function handleOrderType(orderType: string[]) {
+  if (orderType.includes('all') || orderType.length === 2) {
+    return {}
+  }
+  if (orderType.length > 0) {
+    return { orderType: orderType.join(',') }
+  }
+  return {}
+}
+
+function handleStockIds(stockIds: string[]) {
+  if (stockIds.includes('all')) {
+    return {}
+  }
+  if (stockIds.length > 0) {
+    return { stockIds: stockIds.join(',') }
+  }
+  return {}
+}
+
 export function generateOpenOrderFilterObj(filters: OrderFilterStore['openOrderFilters']) {
   const filterObj: IOpenOrderFilter = {}
-  if (!filters.side.includes('all') && filters.side.length > 0 && filters.side.length < 2) {
-    filterObj.side = filters.side.join(',')
-  }
-  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
-    filterObj.stockIds = filters.stockIds.join(',')
-  }
+  Object.assign(filterObj, handleSide(filters.side))
+
+  Object.assign(filterObj, handleOrderType(filters.orderType))
+
+  Object.assign(filterObj, handleStockIds(filters.stockIds))
+
   return filterObj
 }
 
@@ -81,22 +126,17 @@ export interface IOrderHistoryFilter {
 
 export function generateOrderHistoryFilterObj(filters: OrderFilterStore['orderHistoryFilters']) {
   const filterObj: IOrderHistoryFilter = {}
-  if (!filters.side.includes('all') && filters.side.length > 0 && filters.side.length < 2) {
-    filterObj.side = filters.side.join(',')
-  }
+
+  Object.assign(filterObj, handleSide(filters.side))
+
+  Object.assign(filterObj, handleStockIds(filters.stockIds))
+
+  Object.assign(filterObj, handleOrderType(filters.orderType))
+
   if (!filters.states.includes('all') && filters.states.length > 0) {
     filterObj.states = filters.states.join(',')
   }
-  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
-    filterObj.stockIds = filters.stockIds.join(',')
-  }
-  if (
-    !filters.orderType.includes('all') &&
-    filters.orderType.length > 0 &&
-    filters.orderType.length < 2
-  ) {
-    filterObj.orderType = filters.orderType.join(',')
-  }
+
   if (filters.startTime) {
     filterObj.startTime = filters.startTime
   }
@@ -117,19 +157,13 @@ export interface ITradeHistoryFilter {
 
 export function generateTradeHistoryFilterObj(filters: OrderFilterStore['tradeHistoryFilters']) {
   const filterObj: ITradeHistoryFilter = {}
-  if (!filters.side.includes('all') && filters.side.length > 0 && filters.side.length < 2) {
-    filterObj.side = filters.side.join(',')
-  }
-  if (
-    !filters.orderType.includes('all') &&
-    filters.orderType.length > 0 &&
-    filters.orderType.length < 2
-  ) {
-    filterObj.orderType = filters.orderType.join(',')
-  }
-  if (!filters.stockIds.includes('all') && filters.stockIds.length > 0) {
-    filterObj.stockIds = filters.stockIds.join(',')
-  }
+
+  Object.assign(filterObj, handleSide(filters.side))
+
+  Object.assign(filterObj, handleStockIds(filters.stockIds))
+
+  Object.assign(filterObj, handleOrderType(filters.orderType))
+
   if (filters.startTime) {
     filterObj.startTime = filters.startTime
   }
@@ -142,6 +176,7 @@ export function generateTradeHistoryFilterObj(filters: OrderFilterStore['tradeHi
 interface OrderFilterStore {
   openOrderFilters: {
     stockIds: string[]
+    orderType: string[]
     side: string[]
     states: string[]
   }
@@ -164,4 +199,6 @@ interface OrderFilterStore {
   updateOpenOrderFilters: (filters: Partial<OrderFilterStore['openOrderFilters']>) => void
   updateOrderHistoryFilters: (filters: Partial<OrderFilterStore['orderHistoryFilters']>) => void
   updateTradeHistoryFilters: (filters: Partial<OrderFilterStore['tradeHistoryFilters']>) => void
+
+  clearAllFilters: () => void
 }

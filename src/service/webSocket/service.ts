@@ -278,7 +278,7 @@ class WebSocketService {
   /** 重连后恢复订阅 */
   private resubscribeAll() {
     if (this.subscriptions.size === 0) return
-    console.log('🔁 Resubscribing channels...')
+    console.log('🔁 Resubscribing channels...', this.subscriptions)
     // 批量一次性订阅所有 topic
     this.send({ request: 'sub', args: [...this.subscriptions] })
   }

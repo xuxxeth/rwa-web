@@ -1,8 +1,10 @@
 // hooks/useLimitOrder.ts
 
 import { useState, useCallback } from "react"
+import BigNumber from "bignumber.js"
 import { TradeType, SideType, TifType, SessionType } from "@/hooks/useCaCommon"
-import { parseAmount, truncateUP } from "@/utils"
+import { useBaseStore } from "@/stores/baseStore"
+import { parseAmount } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
 
@@ -13,10 +15,13 @@ interface UseLimitOrderParams {
   placeOrder: PlaceOrderFn
   inputToken?: IRwa | null
   outputToken?: IToken | null
-  limitPrice: string
+  effectivePrice: string
   inputSize: string
   expires: string | number
-  action: "buy" | "sell"
+  action: "buy" | "sell",
+  tradeType: TradeType,
+  sessionType: SessionType,
+  slippage: number,
   marketInfo: {
     networkFeeInNative: string
   }
@@ -35,10 +40,13 @@ export function useLimitOrder({
   placeOrder,
   inputToken,
   outputToken,
-  limitPrice,
+  effectivePrice,
   inputSize,
   expires,
   action,
+  tradeType,
+  sessionType,
+  slippage,
   marketInfo,
   riskUserConfig,
   t,
@@ -50,6 +58,7 @@ export function useLimitOrder({
 }: UseLimitOrderParams) {
 
   const [loading, setLoading] = useState(false)
+  const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   const validateRisk = useCallback(() => {
     if (riskUserConfig?.actions === 0) {
@@ -67,29 +76,53 @@ export function useLimitOrder({
     return true
   }, [riskUserConfig, action, t, toastError])
 
+  const getOrderPrice = useCallback(() => {
+    // if (tradeType === TradeType.MARKET && (!Number.isInteger(slippage) || slippage < 0.1 || slippage > 3)) {
+    //   toastError({ title: "Slippage must be an integer between 1 and 5." })
+    //   return null
+    // }
+
+    const finalPrice = new BigNumber(effectivePrice || 0)
+    if (!finalPrice.isFinite() || finalPrice.lte(0)) {
+      toastError({ title: "Invalid price. Please try again later." })
+      return null
+    }
+    return finalPrice.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed(2)
+  }, [tradeType, slippage, effectivePrice, toastError])
+
   const submit = useCallback(async () => {
+    // if (tradeType === TradeType.MARKET && marketTradeState === MARKET_STATUS.CLOSE) {
+    //   toastError({ title: t("v3.t10") })
+    //   return
+    // }
+
     if (!validateRisk()) return
 
     setLoading(true)
     onStart?.()
 
     try {
+      const orderPrice = getOrderPrice()
+      if (!orderPrice) {
+        return
+      }
+
       const params = {
         stockId: String(inputToken?.stockId),
-        tradeType: TradeType.LIMIT,
+        tradeType: tradeType,
         side: action === 'buy'
           ? SideType.BUYLIMIT
           : SideType.SELL,
         tif: TifType.DAY,
-        sessionType: SessionType.DEFAULT,
+        sessionType: sessionType,
         paymentToken: outputToken?.address || '',
         validDate: String(expires),
         networkFee: '0',
         amount: '0',
-        price: parseAmount(truncateUP(limitPrice, 2)),
+        price: parseAmount(orderPrice),
         size: parseAmount(inputSize)
       }
-
+      console.log('place order params', params)
       const result = await placeOrder(params, {
         value: parseAmount(marketInfo.networkFeeInNative, 18),
         wait: true,
@@ -114,11 +147,16 @@ export function useLimitOrder({
   }, [
     inputToken,
     outputToken,
-    limitPrice,
+    effectivePrice,
     inputSize,
     expires,
     action,
+    tradeType,
+    sessionType,
+    slippage,
+    marketTradeState,
     marketInfo,
+    getOrderPrice,
     validateRisk,
     placeOrder,
     onStart,

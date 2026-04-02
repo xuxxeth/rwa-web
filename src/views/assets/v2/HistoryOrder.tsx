@@ -14,6 +14,7 @@ import {
   TokenFilterItem,
   TxHashCell,
   ReasonCell,
+  SessionTypeCell,
 } from '../Shared'
 import { type IRwa } from '@/service/base/types'
 import { useRwaTokens } from '@/hooks/useTokens'
@@ -32,12 +33,13 @@ import { OrderTable } from './shared'
 const PAGE_LIMIT = 20
 
 function HistoryOrder(props: {
+  allowUserFilter: boolean
   chainId?: number | null
   account?: string
   showFilter?: boolean
   dataMode: 'pagination' | 'scroll'
 }) {
-  const { chainId, account, showFilter, dataMode } = props
+  const { chainId, account, showFilter, dataMode, allowUserFilter } = props
   const rwaTokens = useRwaTokens()
 
   const orderHistoryFilters = useOrderFilterStore(state => state.orderHistoryFilters)
@@ -51,14 +53,34 @@ function HistoryOrder(props: {
   }
 
   const filters = useMemo(() => {
+    if (!allowUserFilter) {
+      return {
+        limit: PAGE_LIMIT,
+        startTime: orderHistoryFilters.startTime,
+        endTime: orderHistoryFilters.endTime,
+      }
+    }
     const userSelectFilter = generateOrderHistoryFilterObj(orderHistoryFilters)
     return userSelectFilter
-  }, [orderHistoryFilters])
+  }, [orderHistoryFilters, allowUserFilter])
 
   return (
     <>
       {showFilter && (
         <div className='flex flex-row gap-4.5 px-4 mb-3'>
+          <DropDownFilter
+            data={orderHistoryFilters.orderType}
+            onDataChange={(reduce: (prev: string[]) => string[]) =>
+              updateOrderHistoryFilters({
+                orderType: reduce(orderHistoryFilters.orderType),
+              })
+            }
+            items={[
+              { key: 'limit', value: '0' },
+              { key: 'market', value: '1' },
+            ]}
+            title={'orderType'}
+          />
           <DropDownFilter
             data={orderHistoryFilters.side}
             onDataChange={(reduce: (prev: string[]) => string[]) =>
@@ -124,7 +146,7 @@ function HistoryOrder(props: {
           />
         </div>
       )}
-      <OrderTable<IOrder, IOrderHistoryFilter>
+      <OrderTable<IOrder, IOrderHistoryFilter & { limit?: number }>
         chainId={chainId}
         dataMode={dataMode}
         account={account}
@@ -133,12 +155,16 @@ function HistoryOrder(props: {
         scrollId={(item: IOrder) => item.orderId}
         filter={filters}
         tableConfig={orderHistoryTableConfig}
+        type='history'
       />
     </>
   )
 }
 
-const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
+const orderHistoryTableConfig: ITableConfig<
+  IOrder,
+  { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -154,7 +180,10 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
   {
     key: 'token',
     sortable: false,
-    render: (item: IOrder, { rwaTokens }: { rwaTokens: IRwa[] }) => {
+    render: (
+      item: IOrder,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell
@@ -162,6 +191,7 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
           nameClassName='text-gray-400 text-xs/[15px]'
           token={rwa?.symbol}
           name={rwa?.name}
+          onClick={() => onTokenClick?.(rwa!)}
         />
       )
     },
@@ -170,7 +200,14 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'orderPrice',
     sortable: false,
     breakOnSpace: false,
-    render: (item: IOrder) => <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />,
+    render: (item: IOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return (
+        <TextCell text={textPrefix(truncate(item.price, Number(item.price) > 1 ? 2 : 4), '$')} />
+      )
+    },
   },
   {
     key: 'filledAmount',
@@ -188,7 +225,9 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'filledValue',
     breakOnSpace: false,
     sortable: false,
-    render: (item: IOrder) => <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />,
+    render: (item: IOrder) => (
+      <ValueCell value={toFixed(item.settledAmount)} currency={item.currency} />
+    ),
   },
   {
     key: 'filledAvg',
@@ -223,6 +262,11 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     render: (item: IOrder) => <OrderStatusCell state={item.state} />,
   },
   {
+    key: 'session',
+    sortable: false,
+    render: (item: IOrder) => <SessionTypeCell sessionType={item.sessionType} />,
+  },
+  {
     key: 'txHash',
     sortable: false,
     width: 125,
@@ -232,7 +276,12 @@ const orderHistoryTableConfig: ITableConfig<IOrder, { rwaTokens: IRwa[] }> = [
     key: 'details',
     sortable: false,
     width: 50,
-    render: (item: IOrder) => <ReasonCell reason={item.reason} />,
+    render: (item: IOrder) => {
+      if (item.orderType === 1) {
+        return '--'
+      }
+      return <ReasonCell reason={item.reason} />
+    },
   },
 ]
 

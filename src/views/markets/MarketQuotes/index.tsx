@@ -1,6 +1,5 @@
 import { MainLayout } from '@/layouts/main'
 import ConentLayout from '@/layouts/content'
-import { MarketTrading } from '@/components/market-trading'
 import { useTranslation } from '@/hooks/useTranslation'
 import { LazyImage } from '@/components/image/LazyImage'
 import { type Order, useTableSort, usePaginationData } from '@/hooks/useTableHelper'
@@ -8,15 +7,14 @@ import {
   cn,
   advancedSort,
   textPrefix,
-  textSuffix,
   strOrNumToSign,
-  toFixed,
   type Change,
   symbolToLower,
   multiply,
   formatLargeNumber,
   fuzzySearch,
   formatUp,
+  calculateUp,
 } from '@/utils'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
@@ -26,7 +24,7 @@ import wsService from '@/service/webSocket/service'
 import { type ISummaryData } from '@/service/webSocket/types'
 import { type IQuote } from '@/service/quote/types'
 import { useEffect, useState, useMemo } from 'react'
-import { truncate, divide, subtract } from '@/utils'
+import { truncate } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import IconWithTooltip from '@/components/icon-tooltip'
 import SearchFilter from './SearchFilter'
@@ -35,29 +33,30 @@ import useFavorites from '@/hooks/useFavorites'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
 import SignatureVerify from '@/components/signature-verify'
 import type { IRwa } from '@/service/base/types'
+import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
+import { useBaseStore } from '@/stores/baseStore'
+import { MARKET_STATUS } from '@/config/constants'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
-export function useRwaListWithQuote(rwaList: IRwa[]) {
+export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const rwaListWithQuote = useMemo(() => {
     return rwaList.map(rwa => {
-      const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
+      const stockId = rwa.stockId
+      const quote = tokenWithQuote[stockId]
 
       return {
         ...rwa,
-        price: quote?.price,
-        up: quote?.up,
-        dailyHigh: quote?.dailyHigh,
-        dailyLow: quote?.dailyLow,
-        weekUp: quote?.weekUp,
+        ...quote,
         marketCap: quote?.price
           ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
           : undefined,
         floatCap: quote?.price
           ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
           : undefined,
+        marketTradeState,
       }
     })
   }, [rwaList, tokenWithQuote])
@@ -66,26 +65,21 @@ export function useRwaListWithQuote(rwaList: IRwa[]) {
     const listener = (data: ISummaryData) => {
       const obj = data.reduce(
         (acc, item) => {
-          acc[symbolToLower(item.S)] = {
-            price: truncate(item.p, 2),
-            // item.p 最新价 itme.pc 昨日收盘价
-            // up = (item.p 最新价/item.pc 昨日收盘价) - 1
-            up:
-              item.p && item.pc
-                ? toFixed(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
-                : '0',
-            dailyHigh: item.h ? truncate(item.h, 2) : '0',
-            dailyLow: item.l ? truncate(item.l, 2) : '0',
-            // 周涨跌幅
-            // weekUp = (item.p 最新价/item.wc 上周收盘价) - 1
-            weekUp:
-              item.p && item.wc
-                ? toFixed(multiply(subtract(divide(item.p, item.wc), 1), 100), 2)
-                : '0',
+          acc[item.s] = {
+            // 最新价
+            price: item.p,
+            // 盘中价格
+            close: item.c,
+            // 盘中收盘价涨跌幅
+            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : '0',
+            // 最新价格涨跌幅
+            up: item.p && item.c ? calculateUp(item.p, item.c) : '0',
+            dailyHigh: item.h,
+            dailyLow: item.l,
           }
           return acc
         },
-        {} as Record<string, IQuote>
+        {} as Record<number, IQuote>
       )
       if (data.length > 10) {
         setTokenWithQuote(obj)
@@ -108,12 +102,11 @@ export default function MarketQuotes() {
   const router = useRouter()
 
   const rwaList = useRwaTokens(false)
+  const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   const [isFavorites, setIsFavorites] = useState(false)
 
   const { favorites, isFavorite, ...favoritesRest } = useFavorites()
-
-  // const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const [searchText, setSearchText] = useState('')
 
@@ -131,63 +124,7 @@ export default function MarketQuotes() {
     )
   }, [rwaList, isFavorites, favorites, isFavorite, searchText])
 
-  const marketQuotes = useRwaListWithQuote(newRwaList)
-
-  // const marketQuotesFiltered: IMarketQuote[] = newRwaList.map(rwa => {
-  //   const quote = tokenWithQuote[symbolToLower(rwa.symbol)]
-
-  //   return {
-  //     ...rwa,
-  //     price: quote?.price,
-  //     up: quote?.up,
-  //     dailyHigh: quote?.dailyHigh,
-  //     dailyLow: quote?.dailyLow,
-  //     weekUp: quote?.weekUp,
-  //     marketCap: quote?.price
-  //       ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
-  //       : undefined,
-  //     floatCap: quote?.price
-  //       ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
-  //       : undefined,
-  //   }
-  // })
-
-  // useEffect(() => {
-  //   const listener = (data: ISummaryData) => {
-  //     const obj = data.reduce(
-  //       (acc, item) => {
-  //         acc[symbolToLower(item.S)] = {
-  //           price: truncate(item.p, 2),
-  //           // item.p 最新价 itme.pc 昨日收盘价
-  //           // up = (最新价 - 昨日收盘价) - 1
-  //           up:
-  //             item.p && item.pc
-  //               ? truncate(multiply(subtract(divide(item.p, item.pc), 1), 100), 2)
-  //               : '0',
-  //           dailyHigh: item.h ? truncate(item.h, 2) : '0',
-  //           dailyLow: item.l ? truncate(item.l, 2) : '0',
-  //           // 周涨跌幅
-  //           // weekUp = (item.p 最新价 - item.wc 上周收盘价) - 1
-  //           weekUp:
-  //             item.p && item.wc
-  //               ? truncate(multiply(subtract(divide(item.p, item.wc), 1), 100), 2)
-  //               : '0',
-  //         }
-  //         return acc
-  //       },
-  //       {} as Record<string, IQuote>
-  //     )
-  //     if (data.length > 10) {
-  //       setTokenWithQuote(obj)
-  //     }
-  //   }
-
-  //   wsService.on('summary', listener)
-
-  //   return () => {
-  //     wsService.off('summary', listener)
-  //   }
-  // }, [])
+  const marketQuotes = useRwaListWithQuote(newRwaList, marketTradeState)
 
   const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
@@ -197,12 +134,20 @@ export default function MarketQuotes() {
       <ConentLayout>
         <div>
           {/* <MarketTrading align='center' /> */}
-          <SearchFilter
-            searchText={searchText}
-            onSearchChange={setSearchText}
-            isFavorites={isFavorites}
-            onFavoriteChange={setIsFavorites}
-          />
+          <div className='flex flex-row px-6 items-center'>
+            <div className='flex-1'>
+              <SearchFilter
+                searchText={searchText}
+                onSearchChange={setSearchText}
+                isFavorites={isFavorites}
+                onFavoriteChange={setIsFavorites}
+              />
+            </div>
+            <div>
+              <PreMarketOpen />
+            </div>
+          </div>
+
           <TableHeader<
             SortableField,
             IMarketQuote,
@@ -215,7 +160,7 @@ export default function MarketQuotes() {
             lngPrefix='marketQuotes'
             config={MarketQuotesListConfig}
             sort={sort}
-            className='px-6'
+            className='px-6 border-t-0'
             onSortChange={onSortChange}
             thClassName={'text-xs/[15px] text-gray-400 font-normal'}
           />
@@ -327,6 +272,23 @@ function TextCell(props: { text: string; className?: string; icon?: string }) {
   )
 }
 
+function MarketTradeStateTag({ marketTradeState }: { marketTradeState: number }) {
+  const { t } = useTranslation()
+  let text = undefined
+  if (marketTradeState === MARKET_STATUS.CLOSE || marketTradeState === MARKET_STATUS.AFTER) {
+    text = t('v3.t13')
+  }
+  if (marketTradeState === MARKET_STATUS.BEFORE) {
+    text = t('v3.t11')
+  }
+  if (!text) return null
+  return (
+    <span className='text-xs/[15px] rounded-[2px] text-gray-400 font-normal bg-opacity-03 px-1 py-[2px]'>
+      {text}
+    </span>
+  )
+}
+
 export function getColorAndIcon(change: Change) {
   switch (change) {
     case 0:
@@ -351,6 +313,7 @@ function TextCellWithColor(props: { text: string; change: Change; withIcon: bool
     />
   )
 }
+
 const MarketQuotesListConfig = [
   {
     key: 'name',
@@ -396,51 +359,111 @@ const MarketQuotesListConfig = [
   {
     key: 'price',
     sortable: true,
-    render: (item: IMarketQuote) => (
-      <TextCellWithColor
-        text={item.price ? textPrefix(toFixed(item.price, item.precision), '$') : '--'}
-        change={strOrNumToSign(item.up ?? '0')}
-        withIcon={false}
-      />
-    ),
+    render: (item: IMarketQuote) => {
+      const priceAndUpToShowList =
+        item.marketTradeState === MARKET_STATUS.OPEN
+          ? [
+              {
+                price: item.price,
+                up: item.up,
+              },
+            ]
+          : [
+              {
+                price: item.close,
+                up: item.closeUp,
+              },
+              {
+                price: item.price,
+                up: item.up,
+              },
+            ]
+      return (
+        <div className='flex flex-col gap-1'>
+          {priceAndUpToShowList[0] && (
+            <TextCellWithColor
+              text={
+                priceAndUpToShowList[0].price
+                  ? textPrefix(truncate(priceAndUpToShowList[0].price, item.precision), '$')
+                  : '--'
+              }
+              change={strOrNumToSign(priceAndUpToShowList[0].up ?? '0')}
+              withIcon={false}
+            />
+          )}
+          {priceAndUpToShowList[1] && (
+            <div className='flex flex-row items-center gap-1'>
+              <TextCell
+                className='text-xs/[15px] font-normal text-gray-400'
+                text={
+                  priceAndUpToShowList[1].price
+                    ? textPrefix(truncate(priceAndUpToShowList[1].price, item.precision), '$')
+                    : '--'
+                }
+              />
+              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
+            </div>
+          )}
+        </div>
+      )
+    },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.price, b.price, order),
+      a.marketTradeState === MARKET_STATUS.OPEN
+        ? advancedSort(a.price, b.price, order)
+        : advancedSort(a.close, b.close, order),
   },
   {
     key: 'change',
     sortable: true,
     render: (item: IMarketQuote) => {
-      const change = strOrNumToSign(item.up ?? 0)
+      const upList =
+        item.marketTradeState === MARKET_STATUS.OPEN ? [item.up] : [item.closeUp, item.up]
       return (
-        <TextCellWithColor
-          text={item.up ? formatUp(item.up) : '--'}
-          change={change}
-          withIcon={false}
-        />
-      )
-    },
-    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),
-  },
-  {
-    key: 'weekChange',
-    sortable: true,
-    render: (item: IMarketQuote) => {
-      const change = strOrNumToSign(item.weekUp ?? 0)
-      return (
-        <TextCellWithColor
-          text={
-            item.weekUp
-              ? textPrefix(textSuffix(item.weekUp, '%', 0), change === 1 ? '+' : '')
-              : '--'
-          }
-          change={change}
-          withIcon={false}
-        />
+        <div className='flex flex-col gap-1'>
+          {upList[0] && (
+            <TextCellWithColor
+              text={upList[0] ? formatUp(upList[0]) : '--'}
+              change={strOrNumToSign(upList[0] ?? 0)}
+              withIcon={false}
+            />
+          )}
+          {upList[1] && (
+            <div className='flex flex-row items-center gap-1'>
+              <TextCell
+                className='text-xs/[15px] font-normal text-gray-400'
+                text={upList[1] ? formatUp(upList[1]) : '--'}
+              />
+              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
+            </div>
+          )}
+        </div>
       )
     },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.weekUp, b.weekUp, order),
+      a.marketTradeState === MARKET_STATUS.OPEN
+        ? advancedSort(a.up, b.up, order)
+        : advancedSort(a.closeUp, b.closeUp, order),
   },
+  // {
+  //   key: 'weekChange',
+  //   sortable: true,
+  //   render: (item: IMarketQuote) => {
+  //     const change = strOrNumToSign(item.weekUp ?? 0)
+  //     return (
+  //       <TextCellWithColor
+  //         text={
+  //           item.weekUp
+  //             ? textPrefix(textSuffix(item.weekUp, '%', 0), change === 1 ? '+' : '')
+  //             : '--'
+  //         }
+  //         change={change}
+  //         withIcon={false}
+  //       />
+  //     )
+  //   },
+  //   sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
+  //     advancedSort(a.weekUp, b.weekUp, order),
+  // },
   {
     key: 'marketCap',
     sortable: true,
@@ -471,7 +494,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyHigh ? textPrefix(toFixed(item.dailyHigh), '$') : '--'}
+        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, item.precision), '$') : '--'}
       />
     ),
   },
@@ -481,7 +504,7 @@ const MarketQuotesListConfig = [
     render: (item: IMarketQuote) => (
       <TextCell
         className='text-sm/4.5 font-normal'
-        text={item.dailyLow ? textPrefix(toFixed(item.dailyLow), '$') : '--'}
+        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, item.precision), '$') : '--'}
       />
     ),
   },

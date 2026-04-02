@@ -15,3 +15,14 @@ export interface ICandlesItem {
   "h": number,    //最高价
   "l": number     //最低价
 }
+
+export interface IMinuteParams {
+  stock: number,
+  sessionType: number,
+  day?: number
+}
+
+export interface IMinuteItem {
+  stockId: number,
+  items: {close: number, startTime: number}[]
+}

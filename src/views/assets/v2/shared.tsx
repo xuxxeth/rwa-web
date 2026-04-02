@@ -9,35 +9,37 @@ import { useRwaTokens } from '@/hooks/useTokens'
 import { noop, cn } from '@/utils'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteOrderOptions } from '@/queries'
-import { ScrollLoadMore, type OrderChanged, checkOrderChangedEqual } from '../Shared'
+import { ScrollLoadMore } from '../Shared'
 import { useWssStore } from '@/stores/wssStore'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
+import { useRouter } from '@/hooks/useRouter'
 
-export function useOrderChanged() {
-  const [orderChanged, _setOrderChanged] = useState<OrderChanged | null>(null)
-  const newOrder = useWssStore(state => state.newOrder)
+// export function useOrderChanged() {
+// const [orderChanged, _setOrderChanged] = useState<OrderChanged | null>(null)
+// const newOrder = useWssStore(state => state.newOrder)
 
-  const setOrderChanged = (orderChanged: OrderChanged | null) => {
-    _setOrderChanged(prev => {
-      if (checkOrderChangedEqual(orderChanged, prev)) {
-        return prev
-      }
-      return orderChanged
-    })
-  }
+// const setOrderChanged = (orderChanged: OrderChanged | null) => {
+//   _setOrderChanged(prev => {
+//     if (checkOrderChangedEqual(orderChanged, prev)) {
+//       return prev
+//     }
+//     return orderChanged
+//   })
+// }
 
-  useEffect(() => {
-    if (newOrder === null) return
-    const newOrderChanged = {
-      orderId: String(newOrder.id),
-      status: newOrder.x,
-      eventTime: newOrder.E,
-    }
-    setOrderChanged(newOrderChanged)
-  }, [newOrder])
+// useEffect(() => {
+//   if (newOrder === null) return
+//   const newOrderChanged = {
+//     orderId: String(newOrder.id),
+//     status: newOrder.x,
+//     eventTime: newOrder.E,
+//     details: newOrder
+//   }
+//   setOrderChanged(newOrderChanged)
+// }, [newOrder])
 
-  return orderChanged
-}
+// return orderChanged
+// }
 
 export function useOrderList<
   T extends { orderId: string; id: string },
@@ -186,15 +188,20 @@ export function OrderTable<
   tableConfig,
   dataMode,
   scrollId,
+  type,
 }: {
   chainId?: number | null
   account?: string
   PAGE_LIMIT: number
   api: (filter: F) => Promise<{ data: T[] }>
   filter: F
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<
+    T,
+    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+  >
   dataMode: 'pagination' | 'scroll'
   scrollId: (item: T) => string
+  type: 'open' | 'history' | 'trade'
 }) {
   if (!chainId || !account) {
     return (
@@ -242,6 +249,7 @@ export function OrderTable<
           tableConfig={tableConfig}
           isSignatureValid={isSignatureValid}
           refreshIsSignatureValid={refreshIsSignatureValid}
+          type={type}
         />
       )}
     </WithTableHeader>
@@ -254,12 +262,19 @@ function WithTableHeader<T extends { orderId: string }>({
   dataMode,
 }: {
   children: React.ReactNode
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<
+    T,
+    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+  >
   dataMode: 'pagination' | 'scroll'
 }) {
   return (
     <>
-      <TableHeader<'', T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableHeader<
+        '',
+        T,
+        { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+      >
         lngPrefix='portfolio.orderTable'
         config={tableConfig}
         sort={null}
@@ -284,16 +299,22 @@ export function OrderContentByScroll<
   isSignatureValid,
   scrollId,
   refreshIsSignatureValid,
+  type,
 }: {
   chainId: number
   account: string
   filter: F
   api: (filter: F) => Promise<{ data: T[] }>
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<
+    T,
+    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+  >
   isSignatureValid: boolean
   refreshIsSignatureValid: (_isValid: boolean) => void
   scrollId: (item: T) => string
+  type: 'open' | 'history' | 'trade'
 }) {
+  const router = useRouter()
   const rwaTokens = useRwaTokens()
 
   const {
@@ -314,15 +335,12 @@ export function OrderContentByScroll<
     })
   )
 
-  const orderChanged = useOrderChanged()
+  const newOrder = useWssStore(state => state.newOrder)
 
   useEffect(() => {
-    if (!isFetchedAfterMount) return
-    if (isLoading) return
-    if (!orderChanged) return
-
+    if (!isFetchedAfterMount || isLoading || !newOrder) return
     refetch()
-  }, [orderChanged, isFetchedAfterMount, isLoading])
+  }, [newOrder, isFetchedAfterMount, isLoading])
 
   const allOrders = data?.pages?.flatMap(page => page.data) || []
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -346,12 +364,17 @@ export function OrderContentByScroll<
     }
   }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
+  const onTokenClick = (rwa: IRwa) => {
+    console.log('rwa', rwa)
+    router.push(`/trade/${rwa.symbol}`)
+  }
+
   return (
     <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }>
         data={allOrders}
         config={tableConfig}
-        extra={{ rwaTokens, refetch }}
+        extra={{ rwaTokens, refetch, onTokenClick }}
         getKey={(item: T) => item.id}
         isLoading={isLoading}
         className={cn('hover:bg-opacity-01 px-4 group')}
@@ -363,6 +386,7 @@ export function OrderContentByScroll<
         data={allOrders}
         isLoading={isLoading}
         loadMoreRef={loadMoreRef}
+        type={type}
       />
     </div>
   )
@@ -386,9 +410,14 @@ export function OrderContentByPagination<
   api: (filter: F) => Promise<{ data: T[] }>
   scrollId: (item: T) => string
   filter: F
-  tableConfig: ITableConfig<T, { rwaTokens: IRwa[]; refetch: () => void }>
+  tableConfig: ITableConfig<
+    T,
+    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+  >
 }) {
+  const router = useRouter()
   const rwaTokens = useRwaTokens()
+  const newOrder = useWssStore(state => state.newOrder)
 
   const {
     data,
@@ -402,13 +431,17 @@ export function OrderContentByPagination<
     isFirstLoadDone,
   } = useOrderList<T, F>(chainId, account, PAGE_LIMIT, scrollId, api, filter)
 
-  const orderChanged = useOrderChanged()
-
   useEffect(() => {
-    if (orderChanged === null) return
+    if (newOrder === null) return
     if (!isFirstLoadDone) return
+    
     fetchFirstPage()
-  }, [orderChanged, isFirstLoadDone])
+  }, [newOrder, isFirstLoadDone])
+
+  const onTokenClick = (rwa: IRwa) => {
+    // router.push(`/trade/${rwa.symbol}`)
+    window.open(`/trade/${rwa.symbol}`, '_blank')
+  }
 
   if (isListEmpty) {
     return <NoRecord />
@@ -416,11 +449,11 @@ export function OrderContentByPagination<
 
   return (
     <>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void }>
+      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }>
         data={data}
         isLoading={isLoading}
         config={tableConfig}
-        extra={{ rwaTokens, refetch: fetchFirstPage }}
+        extra={{ rwaTokens, refetch: fetchFirstPage, onTokenClick }}
         getKey={(item: T) => item.orderId}
         className={cn('hover:bg-opacity-01 px-4 group')}
         tdClassName='h-[56px] text-xs/4'

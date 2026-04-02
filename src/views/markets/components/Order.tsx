@@ -6,13 +6,14 @@ export function OrderInTrade() {
   const chainId = useChainId()
 
   return (
-    <div className=' h-[420px] pt-2 flex flex-col'>
+    <div className='pt-2 flex flex-col max-h-full'>
       <Order
         chainId={chainId}
         account={account}
         showFilter={false}
         tabClassName='mb-2'
         dataMode='scroll'
+        allowUserFilter={false}
       />
     </div>
   )

@@ -9,10 +9,13 @@ import { ConvertAction } from "../ConvertAction"
 import { EstimatedInfo } from "../../../views/lite-trade/components/EstimatedInfo"
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController"
 import { ExpiresSetting } from "../../expires-setting"
+import { TradeType } from "ca-common-web"
+import { SessionTypeSelect } from "@/components/session-type-select"
 
 type TradeFormUIProps = {
   from?: string
   action: "buy" | "sell"
+  tradeType: TradeType
   limitPrice: string
   inputSize: string
   orderValue: string
@@ -30,12 +33,12 @@ type TradeFormUIProps = {
   onPriceChange: (value: string) => void
   onSizeChange: (value: string) => void
   onChangePriceType: (value: number) => void
-  onExpiresChange: (value: number) => void
 }
 
 export function TradeFormUI({
   from,
   action,
+  tradeType,
   limitPrice,
   inputSize,
   orderValue,
@@ -53,27 +56,39 @@ export function TradeFormUI({
   onPriceChange,
   onSizeChange,
   onChangePriceType,
-  onExpiresChange,
 }: TradeFormUIProps) {
   const { t } = useTranslation()
-  const expiresDialog = useShowDialog()
-
+  const isMarket = tradeType === TradeType.MARKET
   return (
     <>
       {from === 'markets' && (
         <>
+          {
+            !isMarket && (
+              <div className="mb-3">
+                <SessionTypeSelect />
+              </div>
+            )
+          }
           <CurrencyInputPanel
+            tradeType={tradeType}
             value={limitPrice}
             from={from}
             mode="price"
-            label={t('v2.tx.t24')}
+            label={ isMarket ? t('v3.price') : t('v2.tx.t24')}
             onUserInput={onPriceChange}
           />
-          <PriceChangeTab onChange={onChangePriceType} />
+          {
+              !isMarket && (
+                <PriceChangeTab onChange={onChangePriceType} tradeType={tradeType} />
+              )
+          }
+          
           <div className="h-3"></div>
           <CurrencyInputPanel
+            tradeType={tradeType}
             value={inputSize}
-            regex="^\d*\.?\d*$"
+            regex={/^(?:|[1-9]\d*)$/}
             from={from}
             type="size"
             label={t('v2.tx.t25')}
@@ -91,7 +106,16 @@ export function TradeFormUI({
 
       {from === 'lite-trade' && (
         <>
+          {
+            !isMarket && (
+              <div className="mb-1">
+                <SessionTypeSelect from="lite-trade" />
+              </div>
+            )
+          }
           <CurrencyInputPanelLite
+            isMarket={isMarket}
+            tradeType={tradeType}
             value={limitPrice}
             from={from}
             mode="price"
@@ -109,7 +133,7 @@ export function TradeFormUI({
           >
             <CurrencyInputPanelLite
               value={inputSize}
-              regex="^\d*\.?\d*$"
+              regex={/^(?:|[1-9]\d*)$/}
               from={from}
               label={action === 'sell' ? t('v2.tx.t26') : t('v2.tx.t27')}
               placeholder={t('Enter an amount')}
@@ -150,21 +174,6 @@ export function TradeFormUI({
         </div>
       )}
 
-
-      
-
-      <DialogController
-        title={t("Expires in")}
-        open={expiresDialog.open}
-        openChange={expiresDialog.setOpen}
-      >
-        <ExpiresSetting
-          onConfirm={(value) => {
-            onExpiresChange(value)
-            expiresDialog.hide()
-          }}
-        />
-      </DialogController>
     </>
   )
 }

@@ -189,6 +189,7 @@ function TradeHistory(props: {
             data={allTrads}
             isLoading={isLoading}
             loadMoreRef={loadMoreRef}
+            type="trade"
           />
         </>
       ) : (

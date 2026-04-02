@@ -6,7 +6,6 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { LazyImage } from "../image/LazyImage";
 import type { IRwa, IToken } from "@/service/base/types";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
-import CopyButton from "../button/copyButton";
 import { DialogController, useShowDialog } from "../dialog/DialogController";
 import { CTokenList } from "../ctoken-list";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -27,12 +26,16 @@ export const StockInfo = memo(
         <div className="ml-2 mr-1 ">
           <div className="flex items-baseline gap-x-1">
             <div className="text-[18px] font-medium text-white">{inputToken?.symbol || '--'}</div>
-            <div className=" text-[12px] font-normal text-[#9DA3AF]">{inputToken?.name || '--'}</div>
           </div>
-          <div className="text-[12px] font-normal text-[#9DA3AF] flex items-center gap-x-1">
+          <IconWithTooltip triggerClassName=" justify-start" tooltip={inputToken?.name ?? ' '}>
+            <div className=" text-[12px] font-normal text-[#9DA3AF] max-w-[60px] truncate">{inputToken?.name || '--'}</div>
+          </IconWithTooltip>
+          
+
+          {/* <div className="text-[12px] font-normal text-[#9DA3AF] flex items-center gap-x-1">
             {shortenAddress(inputToken?.address || '')}
             <CopyButton copyText={inputToken?.address || ''} />
-          </div>
+          </div> */}
         </div>
       </div>
     )

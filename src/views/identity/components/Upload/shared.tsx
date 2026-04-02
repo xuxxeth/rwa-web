@@ -42,7 +42,7 @@ export function Text(props: { text: string; className?: string }) {
   const { t } = useTranslation()
   const { text, className } = props
   return (
-    <div className={cn('text-base text-[rgba(144,144,144,1)]', className)}>
+    <div className={cn('text-sm text-[#9DA3AF]', className)}>
       {t(`${langPrefix}.${text}`)}
     </div>
   )
@@ -143,7 +143,7 @@ export function UploadCardAdd(props: { onClick: () => void; mode?: 'edit' | 'vie
       disabled={props.mode === 'view'}
       onClick={props.onClick}
       className={cn(
-        'w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#5B5B5B] border-dashed',
+        'w-full h-[262px] flex flex-row items-center justify-center rounded-lg border border-[#383A40] border-dashed',
         props.mode === 'view' ? 'cursor-not-allowed disabled' : 'cursor-pointer'
       )}
     >
@@ -276,7 +276,7 @@ export function UploadCard(props: {
       <div
         {...getRootProps({
           className: cn(
-            'dropzone flex-1 border border-[#5B5B5B] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1A1A] relative',
+            'dropzone flex-1 border border-[#383A40] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1B1E] relative text-[#9DA3AF]',
             mode === 'view' ? 'disabled cursor-not-allowed' : 'hover:border-[rgba(26,133,255,1)]',
             isSomethingError ? 'border-[#CA3F64]' : ''
           ),
@@ -288,7 +288,7 @@ export function UploadCard(props: {
         <div className='w-full h-full flex flex-col items-center justify-center gap-4'>
           {isUploading ? (
             <>
-              <CircularProgress className='text-[rgba(26,133,255,1)]' progress={uploadProgress} />
+              <CircularProgress className='text-[#009DFF]' progress={uploadProgress} />
               <div className='flex flex-row gap-2 items-center justify-center'>
                 <SpinLoading className='w-5 h-5' />
                 <Text text='uploading' className='text-sm text-60' />
@@ -328,10 +328,10 @@ export function UploadCard(props: {
             <>
               <LazyImage className='w-4.5 h-4.5' src='/images/icons/identity/upload.png' />
               {['idFront', 'idBack'].includes(fileType) && (
-                <Text text={fileType} className='text-base' />
+                <Text text={fileType} className='text-sm' />
               )}
               <div className='flex flex-row gap-1'>
-                <Text text='clickUpload' className='text-sm text-[rgba(41,98,255,1)]' />
+                <Text text='clickUpload' className='text-sm text-[#009DFF]' />
                 <Text text='dragUpload' className='text-sm' />
               </div>
             </>

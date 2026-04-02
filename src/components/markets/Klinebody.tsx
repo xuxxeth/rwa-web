@@ -1,33 +1,40 @@
 import { SmallButton } from "@/components/button/SmallButton"
 import { TradingChart } from "@/components/TVChart/TradingChart"
 import { useTranslation } from "@/hooks/useTranslation"
-import { memo, useEffect, useMemo, useState } from "react"
+import { memo, use, useEffect, useMemo, useState } from "react"
 import { Statistics } from "./Statistics"
 import { Profile } from "./Profile"
 import { useTradeStore } from "@/stores/tradeStore"
-import { useRwaPrice } from "@/hooks/useTokenBalances"
 import type { IRwa } from "@/service/base/types"
 import { cn } from "@/lib/utils"
 import { useRouter } from "@/hooks/useRouter"
 import { StockDialog } from "./StockDialog"
 import { useStockStore } from "@/stores/stockStore"
-import { PreMarketOpen } from "./PreMarketOpen"
 import IconWithTooltip from "../icon-tooltip"
-import { toFixed, truncate } from "@/utils/format"
-import type { ISummaryDataItem } from "@/service/webSocket/types"
+import { calculateTruncateUP, toFixed, truncate } from "@/utils/format"
 import { useBaseStore } from "@/stores/baseStore"
+import { shortenAddress } from "@/utils"
+import CopyButton from "../button/copyButton"
+import { useTradingStartTime } from "@/hooks/useMarketState"
+import { MARKET_STATUS } from "@/config/constants"
+import { useCurrentTime } from "@/hooks/useCurrentTime"
 
 export const LabelWrap = memo(
-  ({ children, tooltip }: { children: React.ReactNode, tooltip?: string }) => {
+  ({ children, tooltip }: { children: React.ReactNode, tooltip?: string | React.ReactNode }) => {
     if (!tooltip) return (
-      <div className="text-[12px] w-full font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
-        {children}
+      <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
+        <div className=" border-b border-dashed border-[#9DA3AF]">
+          {children}
+        </div>
       </div>
     )
     return (
       <IconWithTooltip tooltip={tooltip}>
-        <div className="text-[12px] w-full font-normal text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer">
-          {children}
+        <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
+          <div className=" border-b border-dashed border-[#9DA3AF]">
+            {children}
+          </div>
+          
         </div>
       </IconWithTooltip>
     )
@@ -35,39 +42,114 @@ export const LabelWrap = memo(
 )
 
 const RwaItemPrice = memo(
-  ({ data, from }: { data: IRwa, from?: string}) => {
+  ({ from }: { from?: string}) => {
+    const { t } = useTranslation()
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
+    const tradingTime = useTradingStartTime()
+    
+    const pup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.pc , 2)) : 0, [realtimeData?.c, realtimeData?.pc])
+    const nup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.pc, realtimeData.p, 2)) : 0, [realtimeData?.pc, realtimeData?.p])
+    const aup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.p, realtimeData.c, 2)) : 0, [realtimeData?.c, realtimeData?.p])
+    
+    const openUp = useMemo(() => {
+      return tradingTime?.tradeState === MARKET_STATUS.OPEN ? aup : pup
+    }, [tradingTime?.tradeState, pup, aup])
+    
+    const afterUp = useMemo(() => {
+      return aup
+    }, [aup,])
 
-    // const up = useMemo(() => Number(rwaPrice?.up), [rwaPrice?.up])
-    const up = useMemo(() => realtimeData ? Number(toFixed((realtimeData?.pc && realtimeData?.p ? realtimeData.p / realtimeData.pc - 1 : 0) * 100, 2)) : 0 ,[realtimeData?.p])
-    const isPro = from === 'pro-trading'
+    const currentTime = useCurrentTime()
 
-    if (!realtimeData) return null
+    const [stateLabel1, setStateLabel1] = useState('')
+    const [stateLabel2, setStateLabel2] = useState('')
+    const [timeLabel1, setTimeLabel1] = useState('')
+    const [timeLabel2, setTimeLabel2] = useState('')
+
+    useEffect(() => {
+      if (tradingTime) {
+        if (tradingTime.tradeState === MARKET_STATUS.BEFORE) {
+          setStateLabel1(t("v3.t21"))
+          setStateLabel2(t("v3.t23"))
+          setTimeLabel1(tradingTime.preCloseTime.label)
+          setTimeLabel2('')
+        } else if (tradingTime.tradeState === MARKET_STATUS.OPEN) {
+          setStateLabel1(t("v3.t24"))
+          setStateLabel2('')
+          setTimeLabel1('')
+          setTimeLabel2('')
+        } else if (tradingTime.tradeState === MARKET_STATUS.AFTER) {
+          setStateLabel1(t("v3.t21"))
+          setStateLabel2(t("v3.t25"))
+          setTimeLabel1(tradingTime.closeTime.label)
+          setTimeLabel2('')
+        } else {
+          setStateLabel1(t("v3.t21"))
+          setStateLabel2(t("v3.t22"))
+          setTimeLabel1(tradingTime.closeTime.label)
+          setTimeLabel2(tradingTime.afterCloseTime.label)
+        }
+      }
+    }, [
+      t,
+      tradingTime
+    ])
+
+    if (!realtimeData) return <div className="min-w-[126px]"></div>
 
     return (
-      <div className={cn(
-        " min-w-[70px]",
-        up === 0 ? 'text-[#A1A1A1]' : up > 0
-              ? "text-[#25A750] text-[12px]"
-              : "text-[#CA3F64] text-[12px]",
-      )}>
-        <div className={cn(
-          "text-[20px] leading-[100%] font-semibold",
-          isPro ? " text-[18px] " : ""
-        )}>${realtimeData.p || '--'}</div>
-        <span
-          className={cn(
-            "leading-[100%] font-normal",
-            isPro ? " text-[14px] " : ""
+      <div className=" flex items-center gap-x-5 min-w-[126px] shrink-0">
+        
+        <div className=" shrink-0">
+          <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel1} {t('v3.t31')} {!timeLabel1 ? currentTime.label : timeLabel1}</div>
+          <div className={cn(
+            "flex items-baseline gap-x-1",
+            openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
+                  ? "text-[#25A750]"
+                  : "text-[#CA3F64] ",
+          )}>
+            <div className={cn(
+              "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
+            )}>${tradingTime?.tradeState === MARKET_STATUS.OPEN ? realtimeData.p : realtimeData.c || '--'}</div>
+            <span
+              className={cn(
+                "leading-[100%] font-normal text-[14px]",
+              )
+              }
+            >
+              {openUp !== 0 && (openUp > 0 ? '+' : '-')}
+              {Math.abs(Number(openUp || "0")).toFixed(2)}%
+            </span>
+          </div>
+        </div>
+        {
+          tradingTime?.tradeState !== MARKET_STATUS.OPEN && (
+            <div className=" shrink-0 min-w-[110px]">
+              <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel2} {t('v3.t31')} {timeLabel2 || currentTime.label}</div>
+              <div className={cn(
+                " flex items-baseline gap-x-1 text-[14px] text-white mt-[3px]"
+              )}>
+                <div className={cn(
+                  "",
+                  
+                )}>${realtimeData.p || '--'}</div>
+                <span
+                  className={cn(
+                    "",
+                  )
+                  }
+                >
+                  {afterUp !== 0 && (afterUp > 0 ? '+' : '-')}
+                  {Math.abs(Number(afterUp || "0")).toFixed(2)}%
+                </span>
+              </div>
+            </div>
           )
-            
-            
-          }
-        >
-          {up !== 0 && (up > 0 ? '+' : '-')}
-          {Math.abs(Number(up || "0"))}%
-        </span>
+        }
+        
       </div>
+      
+      
     )
   }
 )
@@ -75,10 +157,10 @@ const RwaItemPrice = memo(
 export const StockInfo = memo(
   ({ from }: { from?: string }) => {
     const { t } = useTranslation()
-    const router = useRouter()
     const inputToken = useTradeStore(state => state.inputToken)
     const stockData = useStockStore(state => state.stockData)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
 
     const getMarket = useBaseStore(state => state.getMarket)
 
@@ -94,19 +176,14 @@ export const StockInfo = memo(
       }
     }, [])
 
-
-
-
     return (
-      <div className="flex text-white pl-4">
+      <div className="flex text-white pl-4 min-w-[1100px]">
         <StockDialog from={from} />
         <div className={cn(
-          " flex items-center gap-x-10 text-white text-[14px] font-normal pr-4 ml-10",
+          " flex items-center gap-x-5 text-white text-[14px] font-normal pr-4 ml-5",
         )}>
           
-          {
-            inputToken && <RwaItemPrice from={from} data={inputToken} />
-          }
+          <RwaItemPrice from={from} />
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
             <div className="mt-1">{stockData?.marketCap || '--'}</div>
@@ -121,7 +198,7 @@ export const StockInfo = memo(
           </div> */}
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t181')}>{t('v2.tx.t18')}</LabelWrap>
-            <div className="mt-1">${realtimeData?.o || '--'}</div>
+            <div className="mt-1">${ marketTradeState === MARKET_STATUS.BEFORE ? '--' : (realtimeData?.o || '--')}</div>
           </div>
           <div className=" shrink-0">
             <LabelWrap tooltip={t('v2.tx.t191')}>{t('v2.tx.t19')}</LabelWrap>
@@ -135,12 +212,15 @@ export const StockInfo = memo(
             <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t21')}</LabelWrap>
             <div className="mt-1">${realtimeData?.l || '--'}</div>
           </div>
-          {
-            from !== 'pro-trading' && 
-              <SmallButton onClick={() => {
-                router.push('/trade')
-              }} >{t('Enter Pro Trading')}</SmallButton>
-          }
+          <div className=" shrink-0">
+            <div className="text-[12px] font-normal text-[#9DA3AF] flex">
+              {t('v3.t30')}
+            </div>
+            <div className="flex items-center gap-x-1 mt-1">
+              {shortenAddress(inputToken?.address || '')}
+              <CopyButton copyText={inputToken?.address || ''} />
+            </div>
+          </div>
         </div>
         
         

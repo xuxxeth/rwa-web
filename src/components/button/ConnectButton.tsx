@@ -95,6 +95,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const [hoverOpen, setHoverOpen] = useState(false)
 
   const isManualConnect = useRef(false)
+  const isMobile = useMemo(() => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent), [])
 
   const networkText = useMemo(() => chains.map(c => c.displayName).join(' / '), [chains])
 
@@ -219,7 +220,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setIsWalletConnecting(true)
     setStatus(WalletStatus.CONNECTING)
 
-    if (wallet.detected) {
+    if (wallet.detected || isMobile) {
       if (!wallet.provider) {
         setIsWalletConnecting(false)
         return
@@ -380,7 +381,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
-        topFixed
         open={showConnect}
         openChange={open => {
           setShowConnect(open)

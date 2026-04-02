@@ -1,7 +1,7 @@
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useTableSort, type Order } from '@/hooks/useTableHelper'
 import { type IAssetItem } from '../assetsList'
-import RwaStateButton from '@/components/button/RwaStateButton'
+import RwaStateButton, { BuyButton } from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
@@ -107,11 +107,14 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     key: 'price',
     sortable: true,
     render: (item: IAssetItem) => {
-      const price = item.tokenPrice ?? item.rwaPrice
-      return <TextCell text={price ? textPrefix(truncate(price, item.precision), '$') : '--'} />
+      return (
+        <TextCell
+          text={item.price ? textPrefix(truncate(item.price, item.precision), '$') : '--'}
+        />
+      )
     },
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
-      advancedSort(a.tokenPrice ?? a.rwaPrice ?? '0', b.tokenPrice ?? b.rwaPrice ?? '0', order),
+      advancedSort(a.price ?? '0', b.price ?? '0', order),
   },
   {
     key: 'holdings',
@@ -120,10 +123,14 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
       <div className='flex flex-col'>
         {item.holdings || item.value ? (
           <>
-            <TextCell text={item.holdings ? formatWithCommas(item.holdings, 2) : '--'} />
+            <TextCell
+              text={item.holdings ? formatWithCommas(truncate(item.holdings, 2), 2) : '--'}
+            />
             <TextCell
               className='text-gray-400'
-              text={item.value ? textPrefix(formatWithCommas(item.value, 2), '$') : '--'}
+              text={
+                item.value ? textPrefix(formatWithCommas(truncate(item.value, 2), 2), '$') : '--'
+              }
             />
           </>
         ) : (
@@ -139,7 +146,8 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     sortable: false,
     render: (item: IAssetItem, { rwaList }) => {
       const rwa = rwaList.find(rwa => rwa.symbol === item.symbol)
-      return !rwa ? '--' : <RwaStateButton rwa={rwa} />
+      // return !rwa ? '--' : <RwaStateButton rwa={rwa} />
+      return !rwa ? '--' : <BuyButton rwa={rwa} />
     },
   },
 ]

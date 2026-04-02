@@ -4,6 +4,7 @@ export const CONNECTOR_TYPE = 'CONNECTOR_TYPE'
 export const WALLET_UUID = 'WALLET_UUID'
 export const LATEST_WALLET_UUID = 'LATEST_WALLET_UUID'
 export const CONNECT_ACCOUNT = 'CONNECT_ACCOUNT'
+export const CA_LANGUAGE = 'CA_LANGUAGE'
 
 export const REQUEST_TIMEOUT = 60000
 
@@ -87,9 +88,15 @@ export const chartOverrides = {
   "scalesProperties.textColor": "#9494A8",
   "scalesProperties.lineColor": "#111114",
   "scalesProperties.fontSize": 12,
-  "scalesProperties.showSymbolLabels": true,
+  "scalesProperties.showSymbolLabels": false,
+  "scalesProperties.showSeriesLastValue": false,
   "priceScaleProperties.autoScale": true,
+  "mainSeriesProperties.style": 3, // 3 = area
+  "mainSeriesProperties.areaStyle.color1": "rgba(37, 167, 80, 0.42)", // 上
+  "mainSeriesProperties.areaStyle.color2": "rgba(37, 167, 80, 0)",   // 下
+  "mainSeriesProperties.areaStyle.linecolor": "#25A750",             // 线
   priceScaleSelectionStrategyName: 'right',
+  // "paneProperties.rightMargin": 0,
   ...chartStyleOverrides,
 }
 
@@ -118,7 +125,7 @@ export const disabledFeatures: ChartingLibraryFeatureset[] = [
   // 'timeframes_toolbar',
   'use_localstorage_for_settings',  // 不从本地加载模板
   'study_templates',  
-
+  "header_chart_type",
   
 ]
 export const enabledFeatures: ChartingLibraryFeatureset[] = [
@@ -135,3 +142,6 @@ export const  DISCORD_URL = 'https://discord.com/invite/J34YYjTh'
 export const  X_URL = 'https://x.com/CyberAlpha_x'
 export const  TG_URL = 'https://t.me/+SI2ZHu3_QDdlY2Zl'
 export const  GITBOOK_URL = 'https://cyberalpha.gitbook.io/cyberalpha-docs'
+
+// 推荐滑点
+export const DEFAULT_SLIPPAGE = 0.5

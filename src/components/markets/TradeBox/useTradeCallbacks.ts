@@ -4,12 +4,14 @@ interface UseTradeCallbacksParams {
   onPriceInput: (value: string) => void
   updateInputSize: (value: string) => void
   updateExpires: (value: number) => void
+  updateSlippage: (value: number) => void
 }
 
 export function useTradeCallbacks({
   onPriceInput,
   updateInputSize,
   updateExpires,
+  updateSlippage
 }: UseTradeCallbacksParams) {
   const handlePriceChange = useCallback((value: string) => {
     onPriceInput(value)
@@ -23,9 +25,14 @@ export function useTradeCallbacks({
     updateExpires(value)
   }, [updateExpires])
 
+  const handleSlippageChange = useCallback((value: number) => {
+    updateSlippage(value)
+  }, [updateSlippage])
+
   return {
     handlePriceChange,
     handleSizeChange,
     handleExpiresChange,
+    handleSlippageChange
   }
 }

@@ -168,7 +168,6 @@ function Identity({ account }: { account: string }) {
     const { overallStatus, riskLevel, status, verifyType } = kycDetail
 
     return [
-      
       // 已过期/即将过期
       {
         match: () =>
@@ -230,7 +229,8 @@ function Identity({ account }: { account: string }) {
         match: () =>
           (overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
             verifyType === KYC_VERIFY_TYPE.OCR &&
-            status === KYC_STATUS.VERIFYING) ||
+            // 认证中或人工审核中都显示 认证中状态， 因为人工审核中也是在审核这个 OCR 结果
+            (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW)) ||
           // 认证后，子流程需要重新提交收入证明材料
           (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW),
         render: () => <Verifying refresh={refresh} />,
@@ -359,12 +359,12 @@ function Identity({ account }: { account: string }) {
 
 function MainContentWrapper(props: { children: ReactNode }) {
   return (
-    <>
-      <MainLayout>
+    <div className=' min-h-screen bg-[#0E0E0E]'>
+      <MainLayout className="pb-11">
         <IdentityLayout>{props.children}</IdentityLayout>
       </MainLayout>
-      <XFooter />
-    </>
+      {/* <XFooter /> */}
+    </div>
   )
 }
 

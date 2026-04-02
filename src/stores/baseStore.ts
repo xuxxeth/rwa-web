@@ -13,7 +13,7 @@ import type {
   IStockWithPrice,
   IChain,
 } from '@/service/base/types'
-import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight } from '@/utils'
+import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP } from '@/utils'
 
 const ENABLE_CACHE = false
 // 缓存时间，2小时
@@ -69,8 +69,12 @@ export const useBaseStore = create<BaseStore>()(
             const rwa = rwaList.find(item => checkSymbolEqual(item.symbol, cur.S))
             if (rwa) {
               acc[symbolToLower(cur.S)] = {
+                closePrice: truncate(cur.c || 0, rwa.precision),
                 price: truncate(cur.p || 0, rwa.precision),
-                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
+                // closeUp: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
+                closeUp: cur.c && cur.pc ? calculateTruncateUP(cur.c, cur.pc, rwa.precision) : '0.00',
+                // up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0.00',
+                up: cur.p && cur.c ? calculateTruncateUP(cur.p, cur.c, rwa.precision) : '0.00',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
               }
             }
@@ -96,7 +100,7 @@ export const useBaseStore = create<BaseStore>()(
             if (stock) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur?.p || 0, 2),
-                up: truncate((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
+                up: calculateUp((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
                 cPrice: truncate(cur?.c || 0, 2),
               }
             }
@@ -152,9 +156,22 @@ export const useBaseStore = create<BaseStore>()(
         if (res && res.code === RESPONSE_CODE.SUCCESS) {
           const _data = res.data || {}
           let marketState = MARKET_STATUS.CLOSE
-          if ((_data.tradingDayType === 4 || _data.tradingDayType === 5) && _data.status === 3) {
-            marketState = MARKET_STATUS.OPEN
+          if ((_data.tradingDayType === 4 || _data.tradingDayType === 5))  {
+            // 盘中
+            if (_data.status === 3) {
+              marketState = MARKET_STATUS.OPEN
+            }
+            // 盘前
+            if (_data.status === 2) { 
+              marketState = MARKET_STATUS.BEFORE
+            }
+            // 盘后
+            if (_data.status === 6) { 
+              marketState = MARKET_STATUS.AFTER
+            }
           }
+          
+          // marketState = MARKET_STATUS.AFTER
           set({ marketState: _data, marketTradeState: marketState })
         }
         return res
@@ -182,6 +199,12 @@ export const useBaseStore = create<BaseStore>()(
           lastChainId: chainId,
           lastInitTime: Date.now(),
         }))
+      },
+      refreshByLanguage: async () => {
+        const chainId = get().lastChainId
+        if (chainId) {
+          await get().getBaseRwas(chainId)
+        }
       },
       updateRwasPrice: (priceList: IRwaPrice[]) => {
         const rwaList = get().rwaList.map(rwa => {

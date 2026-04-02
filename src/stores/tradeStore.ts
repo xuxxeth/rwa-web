@@ -4,6 +4,8 @@ import type { TradeStore } from './types'
 
 import type { IRwa, IToken } from '@/service/base/types'
 import type { ISummaryDataItem } from '@/service/webSocket/types';
+import { SessionType, TradeType } from 'ca-common-web';
+import { DEFAULT_SLIPPAGE } from '@/config/constants';
 
 export const useTradeStore = create<TradeStore>()(
   persist(
@@ -15,6 +17,9 @@ export const useTradeStore = create<TradeStore>()(
       inputSize: '',
       expires: 7,
       activeConvertTab: 'buy' as const,
+      tradeType: TradeType.MARKET,
+      sessionType: SessionType.PRE_MARKET_AND_AFTER_HOURS,
+      slippage: DEFAULT_SLIPPAGE,
       isSignatureValid: false,
       txStep: 0,
       txError: '',
@@ -36,6 +41,15 @@ export const useTradeStore = create<TradeStore>()(
       },
       updateActiveConvertTab: (tab: 'buy' | 'sell') => {
         set({activeConvertTab: tab})
+      },
+      updateTradeType: (tradeType: TradeType) => {
+        set({tradeType})
+      },
+      updateSessionType: (sessionType: SessionType) => {
+        set({sessionType})
+      },
+      updateSlippage: (slippage: number) => {
+        set({slippage})
       },
       setIsSignatureValid: (valid: boolean) => {
         set({isSignatureValid: valid})

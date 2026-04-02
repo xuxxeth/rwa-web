@@ -40,7 +40,7 @@ const IDExpired = memo(
     const idCardBack = watch('idCardBack')
     const idCard = watch('idCard')
     const passport = watch('passport')
-    const type = useMemo(() => userInfo?.idInfo.type ?? 0, [userInfo])
+    const type = useMemo(() => userInfo?.idInfo.type ?? 1, [userInfo])
     
     const [submiting, setSubmiting] = useState(false)
     
@@ -133,16 +133,18 @@ const IDExpired = memo(
           {/* 上传证件 */}
           <Upload
             step={pendingStep.step}
-            type={type === 1 ? 'passport' : 'identity'}
+            // type={type === 1 ? 'passport' : 'identity'}
+            type={'passport'}
             keys={type === 1 ? passport : [idCardFront || '', idCardBack || '', idCard || '']}
             onChanged={keys => {
-              if (type === 1) {
-                setValue('passport', keys as string)
-              } else {
-                setValue('idCardFront', keys[0])
-                setValue('idCardBack', keys[1])
-                setValue('idCard', keys[2])
-              }
+              setValue('passport', keys as string)
+              // if (type === 1) {
+              //   setValue('passport', keys as string)
+              // } else {
+              //   setValue('idCardFront', keys[0])
+              //   setValue('idCardBack', keys[1])
+              //   setValue('idCard', keys[2])
+              // }
             }}
           />
         </SectionBox>  

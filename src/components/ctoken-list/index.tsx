@@ -19,6 +19,8 @@ import SignatureVerify from '@/components/signature-verify'
 import IconWithTooltip from "../icon-tooltip";
 import { useWssStore } from "@/stores/wssStore";
 import { useWssOn } from "@/hooks/useWssOn";
+import { PreMarketOpen } from "../markets/PreMarketOpen";
+import { MARKET_STATUS } from "@/config/constants";
 
 export type CTokenProps = {
   stock: string,
@@ -31,32 +33,49 @@ export type CTokenProps = {
   state?: string
 }
 
-export const CTokenPrice = memo(({ symbol }: { symbol: string;}) => {
+export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string; state?: string; marketOpen?: boolean }) => {
   const tokenPrice = useRwaPrice(symbol);
+  const closeUp = useMemo(() => Number(tokenPrice?.closeUp), [tokenPrice?.closeUp])
   const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
+
+  const nup = useMemo(() => {
+    return marketOpen ? up : closeUp
+  }, [closeUp, up, marketOpen])
+
   return (
     <div className="text-[12px]">
-      <span className=" font-medium">${tokenPrice?.price ?? '--'}</span>
-      <div className=" font-normal flex items-center gap-x-[4px]">
-        {/* {
-          up !== 0 &&
-            <img
-              src={up > 0 ? "/images/convert/price_up.png" : "/images/convert/price_down.png"}
-              className="w-[6px]"
-            />
-        } */}
-        
-        <span
-          className={
-            up === 0 ? 'text-[#A1A1A1]' : up > 0
-              ? "text-[#50E3C2] text-[12px]"
-              : "text-[rgba(227,80,122,1)] text-[12px]"
-          }
-        >
-          {up !== 0 && (up > 0 ? '+' : '-')}
-          {Math.abs(Number(tokenPrice?.up || "0"))}%
-        </span>
+      <div className="flex items-center gap-x-1">
+        <span className=" font-medium">${tokenPrice?.closePrice ?? '--'}</span>
+        <div className=" font-normal flex items-center gap-x-[4px]">
+          <span
+            className={
+              nup === 0 ? 'text-[#A1A1A1]' : nup > 0
+                ? "text-[#50E3C2] text-[12px]"
+                : "text-[rgba(227,80,122,1)] text-[12px]"
+            }
+          >
+            {nup !== 0 && (nup > 0 ? '+' : '-')}
+            {Math.abs(Number( nup || "0")) || '0.00'}%
+          </span>
+        </div>
       </div>
+      {
+        !marketOpen && (
+          <div className="flex items-center gap-x-1 text-[#9DA3AF]">
+            <span className=" font-medium">${tokenPrice?.price ?? '--'}</span>
+            <div className=" font-normal flex items-center gap-x-[4px]">
+              <span
+              >
+                {up !== 0 && (up > 0 ? '+' : '-')}
+                {Math.abs(Number(tokenPrice?.up || "0"))}%
+              </span>
+            </div>
+            <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>
+          </div>
+        )
+      }
+      
+      
     </div>
   );
 });
@@ -80,37 +99,17 @@ export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string;
 
 const CTokenItem = memo(
 
-  ({ token, onClick, toggleEnable, toggleFavorite, isFavorite, account }: {token: IRwa, toggleEnable: boolean, toggleFavorite: (stockId: number) => void, isFavorite: boolean, onClick?: (token: IRwa) => void, account?: string}) => {  
-    const { t } = useTranslation()
-    const marketInfo = useMemo(() => {
-      const state = token.state
-      let _icon = ''
-      let _info = ''
-      if (state === 0) {
-        _icon = '/images/icons/market/market_open.png'
-        _info = t("Open")
-      }
-      // if (state === 1) {
-      //   _icon = '/images/icons/market/market_pre.png'
-      //   _info = t("Pre-Market")
-      // }
-      // if (state === 2) {
-      //   _icon = '/images/icons/market/market_after.png'
-      //   _info = t("After Hours")
-      // }
-      // if (state === 3) {
-      //   _icon = '/images/icons/market/market_close.png'
-      //   _info = t("Market Closed")
-      // }
-      if (state === 1) {
-        _icon = '/images/icons/market/market_lock.png'
-        _info = t("Trading Halt")
-      }
-      return {
-        icon: _icon,
-        info: _info
-      }
-    }, [token])
+  ({ token, onClick, toggleEnable, toggleFavorite, isFavorite, account, state, marketOpen }: 
+    {
+      token: IRwa, 
+      toggleEnable: boolean, 
+      toggleFavorite: (stockId: number) => void, 
+      isFavorite: boolean, 
+      onClick?: (token: IRwa) => void, account?: string, 
+      state?: string,
+      marketOpen?: boolean
+    }
+  ) => {  
     
     return (
       <div className="h-[48px] flex items-center justify-between mt-2 cursor-pointer hover:bg-[#232427] px-4 pr-2 relative group"
@@ -119,8 +118,8 @@ const CTokenItem = memo(
         }}
       >
         <div className={cn(
-          "flex items-center gap-x-2 w-5/8 shrink-0",
-          account ? "w-4/8" : ""
+          "flex items-center gap-x-1 w-5/8 shrink-0",
+          account ? "w-3/8" : ""
         )}>
           <div>
             <LazyImage onClick={(ev) => {
@@ -147,10 +146,10 @@ const CTokenItem = memo(
           }
         </div>
         <div className={cn(
-          "w-3/8 flex items-center ",
-          account ? "w-2/8 justify-start" : ""
+          "w-4/8 flex items-center ",
+          account ? "w-3/8 justify-start" : ""
         )}>
-          <CTokenPrice symbol={token.symbol} />
+          <CTokenPrice symbol={token.symbol} state={state} marketOpen={marketOpen} />
         </div>
         {
           account && <div className="w-2/8 text-right">
@@ -196,21 +195,25 @@ const FilterTabs = memo(({ onTabChange }: { onTabChange?: (tab: TabItemProps) =>
   const [currentTab, setCurrentTab] = useState<string>(filteredTabs[0].key)
 
   return (
-    <div className="flex items-center gap-x-2 px-4 my-2">
-      {
-        filteredTabs.map((tab, index) => (
-          <FilterTabItem 
-            key={index}
-            label={tab.label}
-            active={currentTab === tab.key}
-            onClick={() => {
-              setCurrentTab(tab.key)
-              onTabChange && onTabChange(tab)
-            }}
-          />
-        ))
-      }
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-x-2 px-4 my-2">
+        {
+          filteredTabs.map((tab, index) => (
+            <FilterTabItem 
+              key={index}
+              label={tab.label}
+              active={currentTab === tab.key}
+              onClick={() => {
+                setCurrentTab(tab.key)
+                onTabChange && onTabChange(tab)
+              }}
+            />
+          ))
+        }
+      </div>
+      <PreMarketOpen size="sm" />
     </div>
+    
   )
 })
 
@@ -219,7 +222,7 @@ const CTokenList = memo(
     const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const { sort, onSortChange } = useTableSort<SortableField>()
-    
+    const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
     const tokenWithPrice = useBaseStore(state => state.tokenWithPrice)
 
@@ -248,8 +251,8 @@ const CTokenList = memo(
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
           ...tokenWithPrice[symbolToLower(rwa.symbol)]
         }
-      }).sort((a, b) => Number(b.balance ?? '0') - Number(a.balance ?? '0'))
-    }, [newRwaList, tokenWithBalance, tokenWithPrice])
+      }).sort((a, b) => marketTradeState === MARKET_STATUS.OPEN ? Number(b.up ?? '0') - Number(a.up ?? '0') : Number(b.closeUp ?? '0') - Number(a.closeUp ?? '0'))
+    }, [newRwaList, tokenWithBalance, tokenWithPrice, marketTradeState])
 
     const [searchTerm, setSearchTerm] = useState("")
     
@@ -297,8 +300,8 @@ const CTokenList = memo(
           }
 
           case 'change': {
-            const upA = Number(a.up) || 0
-            const upB = Number(b.up) || 0
+            const upA = marketTradeState === MARKET_STATUS.OPEN ? Number(a.up) : Number(a.closeUp) || 0
+            const upB = marketTradeState === MARKET_STATUS.OPEN ? Number(b.up) : Number(b.closeUp) || 0
             return sort.order === 'asc'
               ? upA - upB
               : upB - upA
@@ -322,7 +325,7 @@ const CTokenList = memo(
             return 0
         }
       })
-    }, [filterTokens, sort])
+    }, [filterTokens, sort, marketTradeState])
 
     // useEffect(() => {
     //   onSortChange('marketCap')
@@ -346,6 +349,27 @@ const CTokenList = memo(
       updateOriginSummary(_data)
     })
 
+    const tradeStateLabel = useMemo(() => {
+      let stateLabel = t("v3.t25")
+      if (marketTradeState) {
+        if (marketTradeState === MARKET_STATUS.BEFORE) {
+          stateLabel = t("v3.t23")
+        } else if (marketTradeState === MARKET_STATUS.OPEN) {
+          stateLabel = t("v3.t24")
+        } else if (marketTradeState === MARKET_STATUS.AFTER) {
+          stateLabel = t("v3.t22")
+        } else {
+          stateLabel = t("v3.t25")
+        }
+      }
+      console.log('marketTradeState', marketTradeState, stateLabel)
+      return stateLabel
+    }, [
+      t,
+      marketTradeState
+    ])
+    
+
     return (
       <div className="min-w-[443px] border-t border-[#232427] relative">
         <div className=" absolute w-2 top-0 -right-1 h-[1px] bg-[#232427]"></div>
@@ -365,10 +389,15 @@ const CTokenList = memo(
           </div>
         </div>
         <div className="mt-2">
-          <div className=" flex items-center justify-between text-[12px] font-normal px-4">
+          <FilterTabs 
+            onTabChange={tab => {
+              setSelectTab(tab.key)
+            }}
+          />
+          <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2 text-[#9DA3AF]">
             <div className={cn(
-              "w-5/8 flex items-center cursor-pointer",
-              account ? "w-4/8" : ""
+              "w-4/8 flex items-center cursor-pointer",
+              account ? "w-3/8" : ""
             )}
               onClick={() => {
                 onSortChange('name')
@@ -381,7 +410,7 @@ const CTokenList = memo(
             </div>
             <div className={cn(
               "flex items-center w-3/8 cursor-pointer",
-              account ? "w-2/8 justify-start" : ""
+              account ? "w-3/8 justify-start" : ""
             )}
               onClick={() => {
                 onSortChange('change')
@@ -406,17 +435,14 @@ const CTokenList = memo(
             }
             
           </div>
-          <FilterTabs 
-            onTabChange={tab => {
-              setSelectTab(tab.key)
-            }}
-          />
+          
           <div className={cn(
             "scroll-box h-[65vh] overflow-y-auto mt-2 pr-0",
             from === "StockSelect" ? "h-[50vh]" : ""
           )}>
             {
-              sortTokens.map((token, index) => <CTokenItem toggleEnable={toggleEnable} toggleFavorite={toggleFavorite} isFavorite={isFavorite(token.stockId)} account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
+              sortTokens.map((token, index) => 
+                <CTokenItem marketOpen={marketTradeState === MARKET_STATUS.OPEN} state={tradeStateLabel} toggleEnable={toggleEnable} toggleFavorite={toggleFavorite} isFavorite={isFavorite(token.stockId)} account={account} key={`${_id}-${index}`} token={token} onClick={onClick} />)
             }
            
             {sortTokens.length <= 0 && <NoDataReason
@@ -472,3 +498,4 @@ function NoDataReason(props: {
 }
 
 export { CTokenList }
+

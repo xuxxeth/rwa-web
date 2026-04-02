@@ -64,7 +64,7 @@ const Select = memo(
         <SelectTrigger 
           open={open}
           className={cn(
-            "px-4 py-0 h-[56px] shadow-none flex items-center justify-between rounded-[8px] bg-[rgba(255,255,255,0.08)] border border-solid border-[rgba(255,255,255,0)]",
+            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] bg-[#1A1B1E] border border-solid border-[rgba(255,255,255,0)]",
             className,
             open ? 'border-[rgba(156,255,58,0.5)]' : ''
           )}
@@ -72,16 +72,16 @@ const Select = memo(
         >
           <div className="flex items-center gap-2 w-[70px] text-white">
             {currentItem ? (
-              <span className=" font-normal md:text-[16px]">{currentItem?.label}</span>
+              <span className=" font-normal md:text-[14px]">{currentItem?.label}</span>
             ) : (
-              <span className="text-[16px] text-5 text-[rgba(255,255,255,0.3)]">{placeholder ?? ''}</span>
+              <span className="text-[14px] text-5 text-[rgba(255,255,255,0.3)]">{placeholder ?? ''}</span>
             )}
           </div>
         </SelectTrigger>
         <SelectContent className="">
           {data.map(item => (
-            <SelectItem key={item.value} value={item.value}>
-              <div className="flex items-center justify-between gap-2 text-white text-[16px] w-full">
+            <SelectItem key={item.value} value={item.value} className="h-[34px]">
+              <div className="flex items-center justify-between gap-2 text-white text-[14px] w-full">
                 <span>{item.label}</span>
                 {
                   item.value === curretnValue && <img src="/images/icons/item_selected.png" className="w-[12px]" alt="" />

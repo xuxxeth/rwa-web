@@ -136,8 +136,14 @@ export function formatUp(up: string | undefined) {
   return `${textPrefix(textSuffix(up, '%'), change === 1 ? '+' : '')}`
 }
 
-export function calculateUp(price: number, pc: number) {
-  return truncate(multiply(subtract(divide(price, pc), 1), 100), 2)
+export function calculateUp(price1: number, price2: number) {
+  return toFixed(multiply(subtract(divide(price1, price2), 1), 100), 2)
+}
+
+export function calculateTruncateUP(price1: number, price2: number, precision = 2) {
+  const subR = subtract(divide(price1, price2), 1)
+  if (Number(subR) === 0) return '0.00'
+  return truncate(multiply(subtract(divide(price1, price2), 1), 100), precision)
 }
 
 export function getUpColor(change: Change) {

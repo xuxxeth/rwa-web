@@ -14,7 +14,8 @@ import { textSuffix, toFixed, sum } from '@/utils'
 import type { IOrder, OrderType, RiskType } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
-import NoRecord from '@/components/no-record'
+import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
+import { useNavigate } from 'react-router-dom'
 
 export type OrderChanged = {
   orderId: string
@@ -47,18 +48,23 @@ export function TradingFees(props: { currency: string; commission: string; fee: 
   const { t } = useTranslation()
   const tooltip = (
     <div className='flex flex-col gap-1'>
-      <div className='text-xs/[15px] text-gray-300'>
-        {t('portfolio.orderTable.bf')}{' '}
-        <span className='ml-9'>
-          {commission} {currency}
-        </span>
-      </div>
-      <div className='text-xs/[15px] text-gray-300'>
-        {t('portfolio.orderTable.pf')}{' '}
-        <span className='ml-9'>
-          {fee} {currency}
-        </span>
-      </div>
+      {[
+        {
+          title: 'bf',
+          value: commission,
+        },
+        {
+          title: 'pf',
+          value: fee,
+        },
+      ].map(({ value, title }) => (
+        <div className='text-xs/[15px] text-gray-300 flex flex-row justify-between'>
+          {t(`portfolio.orderTable.${title}`)}
+          <span className='ml-9'>
+            {value} {currency}
+          </span>
+        </div>
+      ))}
     </div>
   )
   return (
@@ -116,6 +122,7 @@ export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
     4: '4',
     5: '5',
     6: '6',
+    7: '7',
   }
 
   const key = reasonMap[reason]
@@ -160,9 +167,13 @@ export function TokenCell(props: {
   name: string | undefined
   tokenClassName?: string
   nameClassName?: string
+  onClick?: () => void
 }) {
   return (
-    <div className={'flex flex-row gap-2 font-normal'}>
+    <div
+      className={'flex flex-row gap-2 font-normal cursor-pointer'}
+      onClick={() => props.onClick?.()}
+    >
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
@@ -232,6 +243,17 @@ export function OrderStatusCell(props: { state: number }) {
   )
 }
 
+export function SessionTypeCell({ sessionType }: { sessionType: number }) {
+  switch (sessionType) {
+    case 0:
+      return <TextCellWithTranslation text='portfolio.rthOnly' />
+    case 4:
+      return <TextCellWithTranslation text='portfolio.preAfter' />
+    default:
+      return null
+  }
+}
+
 export function DropDownFilter(props: {
   data: string[]
   onDataChange: (reduce: (prev: string[]) => string[]) => void
@@ -269,7 +291,7 @@ export function DropDownFilter(props: {
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger
             className={cn(
-              'cursor-pointer w-[211px] h-8 flex items-center px-3 py-2 border border-gray-850 rounded-[8px] outline-none focus:outline-none focus:ring-0',
+              'cursor-pointer w-[211px] max-[1440px]:w-[190px] h-8 flex items-center px-3 py-2 border border-gray-850 rounded-[8px] outline-none focus:outline-none focus:ring-0',
               open ? 'border-[rgba(156,255,58,0.8)]' : ''
             )}
           >
@@ -297,7 +319,7 @@ export function DropDownFilter(props: {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className='w-[211px] bg-gray-900 border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
+            className='w-[211px] max-[1440px]:w-[190px] bg-gray-900 border-none py-0 px-0 cursor-pointer [&>div]:focus:bg-[rgba(19,24,35,1)]'
             align='end'
           >
             <div>
@@ -373,24 +395,53 @@ export function ScrollLoadMore<TData>(props: {
   data: TData[]
   isLoading: boolean
   loadMoreRef: RefObject<HTMLDivElement | null>
+  type: 'open' | 'history' | 'trade'
 }) {
   const { t } = useTranslation()
-  const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef } = props
+  const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef, type } = props
+  const navigate = useNavigate()
+
+  function renderNoMoreData(showIcon: boolean) {
+    return type === 'open' ? (
+      <NoRecord />
+    ) : (
+      <NoRecordAndSeeMore
+        showIcon={showIcon}
+        moreLang='portfolio.seeMore'
+        onClick={() => {
+          navigate(`/order?type=${type}`)
+        }}
+      />
+    )
+  }
+
+  function renderViewMore(showIcon: boolean) {
+    if (type === 'open') {
+      return null
+    }
+    return (
+      <NoRecordAndSeeMore
+        showIcon={showIcon}
+        moreLang='portfolio.seeMore'
+        onClick={() => {
+          navigate(`/order?type=${type}`)
+        }}
+      />
+    )
+  }
+
   return (
     <>
       <div ref={loadMoreRef} className='py-1 text-xs/[15px] text-gray-400 text-center'>
-        {
-          isFetchingNextPage ? (
-            <div>{t('assets.loading')}...</div>
-          ) : hasNextPage ? (
-            <div>{t('assets.scrollToLoadMore')}</div>
-          ) : data.length > 0 ? null : null // <div>{t('assets.noMoreData')}</div>
-        }
+        {isFetchingNextPage ? (
+          <div>{t('assets.loading')}...</div>
+        ) : hasNextPage ? (
+          <div>{t('assets.scrollToLoadMore')}</div>
+        ) : data.length > 0 ? (
+          renderViewMore(false)
+        ) : null}
       </div>
-      {/* {isLoading && data.length === 0 && (
-        <div className='py-1 text-center text-gray-400'>{t('assets.loading')}...</div>
-      )} */}
-      {!isLoading && data.length === 0 && <NoRecord />}
+      {!isLoading && data.length === 0 && renderNoMoreData(true)}
     </>
   )
 }

@@ -73,7 +73,7 @@ const EmploymentSelect = memo(
       >
         {
           mode === 'view' &&
-          <div className="text-[16px] font-normal text-[#909090] mb-2 flex items-center">
+          <div className="text-[14px] font-normal text-[#909090] mb-2 flex items-center">
             {label || ''}
             <div className="ml-4 flex items-center gap-x-1 cursor-pointer"
               onClick={() => {
@@ -89,11 +89,11 @@ const EmploymentSelect = memo(
           mode === 'view' && !canEdit ? 
           <>
             
-            <div className="border-[#1D1D1D] border rounded-[6px] px-4 py-0 h-[44px] flex items-center text-white">
+            <div className="border-[#1D1D1D] border rounded-[4px] px-3 py-0 h-[38px] flex items-center text-white">
               {currentCode ? (
-                <span className=" font-normal md:text-[16px]">{currentItem.label}</span>
+                <span className=" font-normal md:text-[14px]">{currentItem.label}</span>
               ) : (
-                <span className="md:text-[1.04vw] text-5">{''}</span>
+                <span className="md:text-[14px] text-5">{''}</span>
               )}
             </div> 
           </>
@@ -101,16 +101,16 @@ const EmploymentSelect = memo(
           <SelectTrigger 
             open={open}
             className={cn(
-              "px-4 py-0 h-[44px] shadow-none flex items-center justify-between rounded-[8px] bg-[rgba(255,255,255,0.08)] border border-solid border-[rgba(255,255,255,0)]",
+              "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] bg-[#1A1B1E] border border-solid border-[rgba(255,255,255,0)]",
               className,
               open ? 'border-[#ffffff]' : ''
             )}
           >
             <div className="flex items-center gap-2 w-[70px] text-white">
               {currentCode ? (
-                <span className=" font-normal md:text-[16px]">{currentItem.label}</span>
+                <span className=" font-normal md:text-[14px]">{currentItem.label}</span>
               ) : (
-                <span className="md:text-[1.04vw] text-5">{''}</span>
+                <span className="md:text-[14px] text-5">{''}</span>
               )}
             </div>
           </SelectTrigger>
@@ -119,8 +119,8 @@ const EmploymentSelect = memo(
         
         <SelectContent className="">
           {dataList.map(id => (
-            <SelectItem key={id.code} value={id.code}>
-              <div className="flex items-center justify-between w-full gap-2 text-white text-[16px]">
+            <SelectItem key={id.code} value={id.code} className="h-[34px]">
+              <div className="flex items-center justify-between w-full gap-2 text-white text-[14px]">
                 <div className=" flex items-center  gap-x-2">
                   <span>{id.label}</span>
                 </div>
