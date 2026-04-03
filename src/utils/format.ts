@@ -131,13 +131,17 @@ export function formatStockPrice(value: number | string): string {
 }
 
 export function formatUp(up: string | undefined) {
+  if (up === undefined) return '--'
   const change = strOrNumToSign(up || 0)
-  if (up === undefined) return ''
   return `${textPrefix(textSuffix(up, '%'), change === 1 ? '+' : '')}`
 }
 
 export function calculateUp(price1: number, price2: number) {
-  return toFixed(multiply(subtract(divide(price1, price2), 1), 100), 2)
+  const res = toFixed(multiply(subtract(divide(price1, price2), 1), 100), 2)
+  if (res === '-0.00') {
+    return '0.00'
+  }
+  return res
 }
 
 export function calculateTruncateUP(price1: number, price2: number, precision = 2) {
