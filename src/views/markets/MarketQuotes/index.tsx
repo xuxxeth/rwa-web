@@ -144,7 +144,10 @@ export default function MarketQuotes() {
                   setPage(1)
                 }}
                 isFavorites={isFavorites}
-                onFavoriteChange={setIsFavorites}
+                onFavoriteChange={newIsFavorites => {
+                  setPage(1)
+                  setIsFavorites(newIsFavorites)
+                }}
               />
             </div>
             <div>
