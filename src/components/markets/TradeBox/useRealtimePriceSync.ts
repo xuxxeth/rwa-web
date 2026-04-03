@@ -8,7 +8,7 @@ import type { IRwa, ITokenWithPrice } from "@/service/base/types"
 interface UseRealtimePriceSyncParams {
   inputToken?: IRwa | null
   rwaPrice?: Record<string, any> | null
-  realtimeData?: { p?: string | number } | null
+  realtimeData?: { S?: string; p?: string | number } | null
   tradeType: TradeType
   limitPrice: string
   updateLimitPrice: (price: string) => void
@@ -23,7 +23,7 @@ export function useRealtimePriceSync({
   updateLimitPrice,
 }: UseRealtimePriceSyncParams) {
   const initPrice = useRef(false)
-  const preToken = useRef<IRwa | null>(null)
+  const prevSymbolRef = useRef<string>("")
   const limitPriceRef = useRef(limitPrice)
   const [inputTokenPrice, setInputTokenPrice] = useState<ITokenWithPrice | null>(null)
 
@@ -38,40 +38,34 @@ export function useRealtimePriceSync({
   }, [updateLimitPrice])
 
   useEffect(() => {
-    if (!rwaPrice || !realtimeData) return
-
-    if (tradeType === TradeType.MARKET) {
-      initPrice.current = true
-      setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p ?? 0) })
-      return
+    const currentSymbol = inputToken?.symbol || ""
+    if (!currentSymbol) return
+    if (prevSymbolRef.current !== currentSymbol) {
+      prevSymbolRef.current = currentSymbol
+      initPrice.current = false
+      setInputTokenPrice(null)
+      limitPriceRef.current = ''
+      updateLimitPrice('')
     }
-
-    if (!initPrice.current) {
-      initPrice.current = true
-      setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p ?? 0) })
-    }
-  }, [rwaPrice, realtimeData, tradeType])
+  }, [inputToken?.symbol, updateLimitPrice])
 
   useEffect(() => {
-    if (inputToken && realtimeData && preToken.current?.symbol !== inputToken.symbol) {
-      preToken.current = inputToken
-      if (rwaPrice) {
-        setInputTokenPrice({ ...rwaPrice, price: String(realtimeData.p ?? 0) })
-      }
+    if (!inputToken?.symbol || !realtimeData) return
+    if (realtimeData.S && realtimeData.S !== inputToken.symbol) return
+    if (!Number(realtimeData.p ?? 0)) return
+
+    if (tradeType === TradeType.MARKET || !initPrice.current) {
+      initPrice.current = true
+      setInputTokenPrice({ ...(rwaPrice ?? {}), price: String(realtimeData.p ?? 0) } as ITokenWithPrice)
     }
-  }, [inputToken, rwaPrice, realtimeData])
+  }, [inputToken?.symbol, rwaPrice, realtimeData, tradeType])
 
   useEffect(() => {
     if (inputTokenPrice) {
+      if (!Number(inputTokenPrice.price ?? 0)) return
       safeUpdateLimitPrice(truncateUP(inputTokenPrice.price ?? '0', 2))
     }
   }, [inputTokenPrice, safeUpdateLimitPrice])
-
-  useEffect(() => {
-    if (inputToken?.symbol && initPrice.current) {
-      initPrice.current = false
-    }
-  }, [inputToken])
 
   const handlePriceInput = useCallback((value: string) => {
     safeUpdateLimitPrice(value)

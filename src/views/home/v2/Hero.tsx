@@ -156,7 +156,7 @@ const StockCard: React.FC<{
             {stock.price ? textPrefix(truncate(stock.price, stock.precision), '$') : ''}
           </div>
           <div className={`text-sm font-bold ${stock.color} bg-white/50 px-2 py-1 rounded-lg`}>
-            {stock.up ? formatUp(stock.up) : ''}
+            {stock.up !== undefined ? formatUp(stock.up) : ''}
           </div>
         </div>
         <div

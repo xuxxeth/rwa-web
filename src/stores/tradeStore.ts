@@ -18,7 +18,7 @@ export const useTradeStore = create<TradeStore>()(
       expires: 7,
       activeConvertTab: 'buy' as const,
       tradeType: TradeType.MARKET,
-      sessionType: SessionType.PRE_MARKET_AND_AFTER_HOURS,
+      sessionType: SessionType.DEFAULT,
       slippage: DEFAULT_SLIPPAGE,
       isSignatureValid: false,
       txStep: 0,

@@ -45,7 +45,7 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
   return (
     <div className="text-[12px]">
       <div className="flex items-center gap-x-1">
-        <span className=" font-medium">${tokenPrice?.closePrice ?? '--'}</span>
+        <span className=" font-medium">{tokenPrice?.closePrice ? ('$' + tokenPrice?.closePrice) : '--'}</span>
         <div className=" font-normal flex items-center gap-x-[4px]">
           <span
             className={
@@ -62,14 +62,25 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
       {
         !marketOpen && (
           <div className="flex items-center gap-x-1 text-[#9DA3AF]">
-            <span className=" font-medium">${tokenPrice?.price ?? '--'}</span>
-            <div className=" font-normal flex items-center gap-x-[4px]">
-              <span
-              >
-                {up !== 0 && (up > 0 ? '+' : '-')}
-                {Math.abs(Number(tokenPrice?.up || "0"))}%
-              </span>
-            </div>
+            <span className=" font-medium">{tokenPrice?.price ? ('$' + tokenPrice?.price) : '--'}</span>
+            {
+              Number(tokenPrice?.price) > 0 ? (
+                <div className=" font-normal flex items-center gap-x-[4px]">
+                  <span
+                  >
+                    {up !== 0 && (up > 0 ? '+' : '-')}
+                    {Math.abs(Number(tokenPrice?.up || "0"))}%
+                  </span>
+                </div>
+              ) : 
+              <div className=" font-normal flex items-center gap-x-[4px]">
+                <span
+                >
+                  --
+                </span>
+              </div>
+            }
+            
             <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>
           </div>
         )
@@ -126,14 +137,15 @@ const CTokenItem = memo(
               ev.stopPropagation()
               if(!toggleEnable) return
               toggleFavorite(token.stockId)
-            }} src={isFavorite ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 rounded-full", !toggleEnable ? 'cursor-not-allowed' : 'cursor-pointer')} />
+            }} src={isFavorite ? "/images/v2/icons/collected.png" : "/images/v2/icons/collect.png"} className={cn("w-4 h-4 rounded-full shrink-0", !toggleEnable ? 'cursor-not-allowed' : 'cursor-pointer')} />
           </div>
           <div className="w-8 h-8 shrink-0">
             <LazyImage src={token.icon} className="w-8 h-8 rounded-full" />
           </div>
           <div>
             <div className=" text-[12px] font-medium ">{token.symbol}</div>
-            <div className=" text-[12px] font-normal text-[#9DA3AF]">{token.name}</div>
+            <div className=" text-[12px] font-normal text-[#9DA3AF] max-w-[86px] truncate">{token?.name || '--'}</div>
+            
           </div>
           {
             token.state === 1 && 

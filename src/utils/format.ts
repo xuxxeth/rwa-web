@@ -141,6 +141,7 @@ export function calculateUp(price1: number, price2: number) {
 }
 
 export function calculateTruncateUP(price1: number, price2: number, precision = 2) {
+  if (price1 === 0 || price2 === 0) return '0.00'
   const subR = subtract(divide(price1, price2), 1)
   if (Number(subR) === 0) return '0.00'
   return truncate(multiply(subtract(divide(price1, price2), 1), 100), precision)

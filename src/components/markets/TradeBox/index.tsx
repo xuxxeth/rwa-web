@@ -68,7 +68,7 @@ export function TradeBox({
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
-  const isMarketCloseDisabled = marketTradeState === MARKET_STATUS.CLOSE && tradeType === TradeType.MARKET && isTiko
+  const isMarketCloseDisabled = marketTradeState !== MARKET_STATUS.OPEN && tradeType === TradeType.MARKET
   const effectivePrice = useEffectivePrice({
     tradeType,
     action,
@@ -93,11 +93,18 @@ export function TradeBox({
 
   useEffect(() => {
     if (tradeType !== TradeType.MARKET) return
-    const initialPrice = truncateUP(String(inputTokenPrice?.price ?? realtimeData?.p ?? 0), 2)
+    const hasMatchedRealtime =
+      !!inputToken?.symbol &&
+      !!realtimeData &&
+      (!realtimeData.S || realtimeData.S === inputToken.symbol) &&
+      Number(realtimeData.p ?? 0) > 0
+    const sourcePrice = inputTokenPrice?.price ?? (hasMatchedRealtime ? realtimeData?.p : undefined)
+    if (!Number(sourcePrice ?? 0)) return
+    const initialPrice = truncateUP(String(sourcePrice), 2)
     if (initialPrice !== limitPrice) {
       updateLimitPrice(initialPrice)
     }
-  }, [tradeType, inputTokenPrice?.price, realtimeData?.p, limitPrice, updateLimitPrice])
+  }, [tradeType, inputTokenPrice?.price, realtimeData?.p, realtimeData?.S, inputToken?.symbol, limitPrice, updateLimitPrice])
 
   useEffect(() => {
     updateInputSize('')

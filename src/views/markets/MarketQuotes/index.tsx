@@ -16,6 +16,7 @@ import {
   formatUp,
   calculateUp,
 } from '@/utils'
+import TooltipWithIcon from '@/components/icon-tooltip'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import { TableHeader, TableBody } from '@/components/table-header'
@@ -51,10 +52,10 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
         ...rwa,
         ...quote,
         marketCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics.totalShare || 0)
+          ? multiply(quote.price, rwa.stockStatistics?.totalShare || 0)
           : undefined,
         floatCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics.circShare || 0)
+          ? multiply(quote.price, rwa.stockStatistics?.circShare || 0)
           : undefined,
         marketTradeState,
       }
@@ -71,9 +72,9 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
             // 盘中价格
             close: item.c,
             // 盘中收盘价涨跌幅
-            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : '0',
+            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : undefined,
             // 最新价格涨跌幅
-            up: item.p && item.c ? calculateUp(item.p, item.c) : '0',
+            up: item.p && item.c ? calculateUp(item.p, item.c) : undefined,
             dailyHigh: item.h,
             dailyLow: item.l,
           }
@@ -126,19 +127,22 @@ export default function MarketQuotes() {
 
   const marketQuotes = useRwaListWithQuote(newRwaList, marketTradeState)
 
-  const { paginatedData, totalPage, currentPage, onPrevClick, onNextClick } =
+  const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
 
   return (
     <MainLayout>
       <ConentLayout>
-        <div>
+        <div className='mb-20'>
           {/* <MarketTrading align='center' /> */}
           <div className='flex flex-row px-6 items-center'>
             <div className='flex-1'>
               <SearchFilter
                 searchText={searchText}
-                onSearchChange={setSearchText}
+                onSearchChange={(newSearch: string) => {
+                  setSearchText(newSearch)
+                  setPage(1)
+                }}
                 isFavorites={isFavorites}
                 onFavoriteChange={setIsFavorites}
               />
@@ -255,19 +259,26 @@ function QuoteName(props: {
         className={cn('w-4 h-4 mr-3', props.toggleEnable ? 'cursor-pointer' : 'cursor-not-allowed')}
       />
       <LazyImage src={props.logo} className='w-12 h-12 mr-2 rounded-[50%]' />
-      <div className='flex flex-col'>
+      <div className='flex flex-col overflow-hidden'>
         <TextCell text={props.symbol} className='text-base/5 text-white font-normal' />
-        <TextCell text={props.name} className='text-xs/[15px] text-gray-400 font-normal' />
+        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
+          <span className='text-xs/[15px] text-gray-400 font-normal truncate'>{props.name}</span>
+        </TooltipWithIcon>
       </div>
     </>
   )
 }
 
-function TextCell(props: { text: string; className?: string; icon?: string }) {
+function TextCell(props: {
+  text: string
+  className?: string
+  icon?: string
+  textClassName?: string
+}) {
   return (
     <div className={cn('flex flex-row gap-1 items-center', props.className)}>
       {props.icon && <LazyImage className='w-2 h-2' src={props.icon} />}
-      <span>{props.text}</span>
+      <span className={cn(props.textClassName)}>{props.text}</span>
     </div>
   )
 }
@@ -327,7 +338,7 @@ const MarketQuotesListConfig = [
         isFavorite: (stockId: number) => boolean
       }
     ) => (
-      <>
+      <div className='flex flex-row pr-6 items-center overflow-hidden'>
         <QuoteName
           isFavorite={extra.isFavorite(item.stockId)}
           toggleEnable={extra.toggleEnable}
@@ -339,12 +350,12 @@ const MarketQuotesListConfig = [
         />
         {item.state === 1 && (
           <IconWithTooltip
-            triggerClassName='ml-2'
+            triggerClassName='ml-2 shrink-0'
             icon='/images/v2/icons/trade_halt.svg'
             tooltip={'marketQuotes.tH'}
           />
         )}
-      </>
+      </div>
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.name, b.name, order),
@@ -417,13 +428,15 @@ const MarketQuotesListConfig = [
     sortable: true,
     render: (item: IMarketQuote) => {
       const upList =
-        item.marketTradeState === MARKET_STATUS.OPEN ? [item.up] : [item.closeUp, item.up]
+        item.marketTradeState === MARKET_STATUS.OPEN
+          ? [{ up: item.up }]
+          : [{ up: item.closeUp }, { up: item.up }]
       return (
         <div className='flex flex-col gap-1'>
           {upList[0] && (
             <TextCellWithColor
-              text={upList[0] ? formatUp(upList[0]) : '--'}
-              change={strOrNumToSign(upList[0] ?? 0)}
+              text={upList[0].up !== undefined ? formatUp(upList[0].up) : '--'}
+              change={strOrNumToSign(upList[0].up ?? 0)}
               withIcon={false}
             />
           )}
@@ -431,7 +444,7 @@ const MarketQuotesListConfig = [
             <div className='flex flex-row items-center gap-1'>
               <TextCell
                 className='text-xs/[15px] font-normal text-gray-400'
-                text={upList[1] ? formatUp(upList[1]) : '--'}
+                text={upList[1].up !== undefined ? formatUp(upList[1].up) : '--'}
               />
               <MarketTradeStateTag marketTradeState={item.marketTradeState} />
             </div>
