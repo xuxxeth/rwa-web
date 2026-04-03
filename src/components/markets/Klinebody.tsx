@@ -114,7 +114,7 @@ const RwaItemPrice = memo(
                   className={cn(
                     "leading-[100%] font-normal text-[14px]",
                   )
-                  }
+                }
                 >
                   {openUp !== 0 && (openUp > 0 ? '+' : '-')}
                   {Math.abs(Number(openUp || "0")).toFixed(2)}%
@@ -136,7 +136,7 @@ const RwaItemPrice = memo(
             <div className=" shrink-0 min-w-[110px]">
               <div className="text-[12px] font-normal text-[#9DA3AF]">{stateLabel2} {t('v3.t31')} {timeLabel2 || currentTime.label}</div>
               <div className={cn(
-                " flex items-baseline gap-x-1 text-[14px] text-white mt-[3px]"
+                " flex items-baseline gap-x-2 text-[14px] text-white mt-[3px]"
               )}>
                 <div className={cn(
                   "",
