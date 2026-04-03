@@ -338,7 +338,7 @@ const MarketQuotesListConfig = [
         isFavorite: (stockId: number) => boolean
       }
     ) => (
-      <div className='flex flex-row pr-4 items-center overflow-hidden'>
+      <div className='flex flex-row pr-6 items-center overflow-hidden'>
         <QuoteName
           isFavorite={extra.isFavorite(item.stockId)}
           toggleEnable={extra.toggleEnable}
@@ -428,13 +428,15 @@ const MarketQuotesListConfig = [
     sortable: true,
     render: (item: IMarketQuote) => {
       const upList =
-        item.marketTradeState === MARKET_STATUS.OPEN ? [item.up] : [item.closeUp, item.up]
+        item.marketTradeState === MARKET_STATUS.OPEN
+          ? [{ up: item.up }]
+          : [{ up: item.closeUp }, { up: item.up }]
       return (
         <div className='flex flex-col gap-1'>
           {upList[0] && (
             <TextCellWithColor
-              text={upList[0] !== undefined ? formatUp(upList[0]) : '--'}
-              change={strOrNumToSign(upList[0] ?? 0)}
+              text={upList[0].up !== undefined ? formatUp(upList[0].up) : '--'}
+              change={strOrNumToSign(upList[0].up ?? 0)}
               withIcon={false}
             />
           )}
@@ -442,7 +444,7 @@ const MarketQuotesListConfig = [
             <div className='flex flex-row items-center gap-1'>
               <TextCell
                 className='text-xs/[15px] font-normal text-gray-400'
-                text={upList[1] !== undefined ? formatUp(upList[1]) : '--'}
+                text={upList[1].up !== undefined ? formatUp(upList[1].up) : '--'}
               />
               <MarketTradeStateTag marketTradeState={item.marketTradeState} />
             </div>
