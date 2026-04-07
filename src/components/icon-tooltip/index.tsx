@@ -13,6 +13,7 @@ interface IconWithTooltipProps {
   iconOrTextClassName?: string
   tooltipClassName?: string
   open?: boolean
+  side?: 'top' | 'right' | 'bottom' | 'left'
   onOpenChange?: (open: boolean) => void
 }
 
@@ -25,6 +26,7 @@ function IconWithTooltip({
   iconOrTextClassName,
   tooltipClassName,
   open,
+  side = 'top',
   onOpenChange,
 }: IconWithTooltipProps) {
   const { t } = useTranslation()
@@ -54,6 +56,7 @@ function IconWithTooltip({
           </div>
         </TooltipTrigger>
         <TooltipContent
+          side={side}
           className={cn(
             'px-4 py-2 rounded-[8px] bg-gray-700 text-white font-normal text-xs duration-0 animate-none max-w-[250px]',
             tooltipClassName
