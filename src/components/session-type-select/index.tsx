@@ -11,6 +11,7 @@ import IconWithTooltip from "../icon-tooltip";
 import { useBaseStore } from "@/stores/baseStore";
 import { MARKET_STATUS } from "@/config/constants";
 import { useTradingStartTime } from "@/hooks/useMarketState";
+import { useSupportRegular } from "@/hooks/useSupportRegular";
 
 export type ISessionTypeItem = {
   code: string,
@@ -35,17 +36,24 @@ const SessionTypeSelect = memo(
     from
   }: SessionTypeSelectProps) => {
     const { t } = useTranslation()
+    const { isSupportRegular } = useSupportRegular()
+    const inputToken = useTradeStore(state => state.inputToken)
     const tradingTime = useTradingStartTime()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const updateSessionType = useTradeStore(state => state.updateSessionType)
     const [typeItem, setTypeItem] = useState<{code: SessionType, label: string}>({code: SessionType.DEFAULT, label: t('v3.t16')})
+
+    const isRegular = useMemo(() => {
+      return isSupportRegular(inputToken?.symbol || '') && (tradingTime?.tradeState === MARKET_STATUS.BEFORE || tradingTime?.tradeState === MARKET_STATUS.AFTER)
+    }, [inputToken, tradingTime])
 
     const sessionTypeList = useMemo(() => {
       return [
         {
           code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
           label: t('v3.t17'),
-          timeLabel: tradingTime ? `${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} (${t('v3.t31')}) + ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M} (${t('v3.t31')})` : '--:--'
+          timeLabel: tradingTime ? `${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} (${t('v3.t31')}) + ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M} (${t('v3.t31')})` : '--:--',
+          disabled: isRegular
         },
         {
           code: SessionType.DEFAULT,
@@ -53,14 +61,21 @@ const SessionTypeSelect = memo(
           timeLabel: tradingTime ? `${tradingTime.openTime.H}:${tradingTime.openTime.M} ~  ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} (${t('v3.t31')})` : '--:--'
         }
       ]
-    }, [t, tradingTime])
+    }, [t, tradingTime, isRegular])
 
     const isOpenOrClose = marketTradeState === MARKET_STATUS.OPEN || marketTradeState === MARKET_STATUS.CLOSE
 
     useEffect(() => {
       // - 盘前/盘后时段，两个选项都支持选，默认为盘前+盘后（Extended Hour）
       // - 盘中/闭市时段，组件禁选，固定为盘中
-      if (marketTradeState === MARKET_STATUS.CLOSE || marketTradeState === MARKET_STATUS.OPEN) {
+      if (isRegular) {
+        setTypeItem({
+          code: SessionType.DEFAULT,
+          label: t('v3.t16'),
+        })
+        updateSessionType(SessionType.DEFAULT)
+      }
+      else if (marketTradeState === MARKET_STATUS.CLOSE || marketTradeState === MARKET_STATUS.OPEN) {
         setTypeItem({
           code: SessionType.DEFAULT,
           label: t('v3.t16'),
@@ -73,7 +88,7 @@ const SessionTypeSelect = memo(
         })
         updateSessionType(SessionType.PRE_MARKET_AND_AFTER_HOURS)
       }
-    }, [marketTradeState, t])
+    }, [marketTradeState, isRegular, t])
     
     const [open, setOpen] = useState(false)
 
@@ -88,7 +103,7 @@ const SessionTypeSelect = memo(
         onValueChange={(code) => {
           if (code) {
             const session = sessionTypeList.find(s => String(s.code) === code)
-            if (session) {
+            if (session && !session.disabled) {
               setTypeItem(session)
               updateSessionType(session.code)
             }
@@ -139,7 +154,10 @@ const SessionTypeSelect = memo(
                 {sessionTypeList.map(session => (
                   <SelectItem key={session.code} value={String(session.code)} className="my-1">
                     <div className="w-full">
-                      <div className="flex items-center justify-between w-full text-white text-[12px]">
+                      <div className={cn(
+                        "flex items-center justify-between w-full text-white text-[12px]",
+                        session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
+                      )}>
                         <span>{session.label}</span>
                         <div className="w-11"></div>
                         <div className=" flex items-center">

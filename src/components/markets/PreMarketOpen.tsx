@@ -66,7 +66,7 @@ const PreMarketOpen = memo(
     return (
       <div className={cn(
         "px-3 flex items-center gap-x-2 gap-y-1 flex-wrap content-center bg-[#131416]",
-        from === "lite-trade" ? "h-[50px]" : ""
+        from === "lite-trade" ? "h-[50px] bg-[rgba(0,0,0,0)]" : ""
       )}>
         <img src={stateLabel.i} className="w-[18px]" alt="" />
         <div className="text-[12px] leading-[14px] shrink-0">

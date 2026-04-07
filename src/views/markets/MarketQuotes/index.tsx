@@ -361,7 +361,7 @@ const MarketQuotesListConfig = [
       </div>
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      advancedSort(a.name, b.name, order),
+      advancedSort(a.symbol, b.symbol, order),
   },
   // {
   //   key: 'token',
