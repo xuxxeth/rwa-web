@@ -203,6 +203,8 @@ export function OrderTable<
   scrollId: (item: T) => string
   type: 'open' | 'history' | 'trade'
 }) {
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+
   if (!chainId || !account) {
     return (
       <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
@@ -210,8 +212,6 @@ export function OrderTable<
       </WithTableHeader>
     )
   }
-
-  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
   if (!isSignatureValid) {
     return (
@@ -434,7 +434,7 @@ export function OrderContentByPagination<
   useEffect(() => {
     if (newOrder === null) return
     if (!isFirstLoadDone) return
-    
+
     fetchFirstPage()
   }, [newOrder, isFirstLoadDone])
 
@@ -454,7 +454,7 @@ export function OrderContentByPagination<
         isLoading={isLoading}
         config={tableConfig}
         extra={{ rwaTokens, refetch: fetchFirstPage, onTokenClick }}
-        getKey={(item: T) => item.orderId}
+        getKey={(item: T) => scrollId(item)}
         className={cn('hover:bg-opacity-01 px-4 group')}
         tdClassName='h-[56px] text-xs/4'
       />
