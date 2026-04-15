@@ -298,6 +298,10 @@
     "Identity_verification": "Identity verification",
     "continue": "Continue",
     "upload": {
+      "orientation1": "Correct Orientation ",
+      "orientation2": "Incorrect",
+      "uploadReq1": "Upload Guidelines",
+      "uploadReq2": "To ensure successful verification, your passport image must be uploaded in the correct orientation. The image must be horizontal, with your portrait photo on the left side.",
       "uploadId": "Upload ID Document",
       "uploadAddr": "Upload Proof of Address",
       "idFront": "Upload Front Side (Photo Page)",

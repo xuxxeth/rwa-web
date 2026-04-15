@@ -291,6 +291,10 @@
     "Identity_verification": "身份驗證",
     "continue": "繼續",
     "upload": {
+       "orientation1": "正确方向",
+      "orientation2": "错误方向",
+      "uploadReq1": "上传图片说明",
+      "uploadReq2": "为了确保验证成功，请确保上传的护照照片方向正确：照片应为横向，且您的个人头像需位于左侧。",
       "uploadId": "上傳證件",
       "uploadAddr": "上傳地址證明",
       "idFront": "上傳人像頁",
