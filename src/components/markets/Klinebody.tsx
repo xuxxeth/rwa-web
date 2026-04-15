@@ -11,7 +11,7 @@ import { useRouter } from "@/hooks/useRouter"
 import { StockDialog } from "./StockDialog"
 import { useStockStore } from "@/stores/stockStore"
 import IconWithTooltip from "../icon-tooltip"
-import { calculateTruncateUP, toFixed, truncate } from "@/utils/format"
+import { calculateTruncateUP, calculateUp, toFixed, truncate } from "@/utils/format"
 import { useBaseStore } from "@/stores/baseStore"
 import { shortenAddress } from "@/utils"
 import CopyButton from "../button/copyButton"
@@ -47,9 +47,9 @@ const RwaItemPrice = memo(
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
     const tradingTime = useTradingStartTime()
     
-    const pup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.c, realtimeData.pc , 2)) : 0, [realtimeData?.c, realtimeData?.pc])
-    const nup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.pc, realtimeData.p, 2)) : 0, [realtimeData?.pc, realtimeData?.p])
-    const aup = useMemo(() => realtimeData ? Number(calculateTruncateUP(realtimeData.p, realtimeData.c, 2)) : 0, [realtimeData?.c, realtimeData?.p])
+    const pup = useMemo(() => realtimeData ? Number(calculateUp(realtimeData.c, realtimeData.pc)) : 0, [realtimeData?.c, realtimeData?.pc])
+    const nup = useMemo(() => realtimeData ? Number(calculateUp(realtimeData.pc, realtimeData.p)) : 0, [realtimeData?.pc, realtimeData?.p])
+    const aup = useMemo(() => realtimeData ? Number(calculateUp(realtimeData.p, realtimeData.c)) : 0, [realtimeData?.c, realtimeData?.p])
     
     const openUp = useMemo(() => {
       return tradingTime?.tradeState === MARKET_STATUS.OPEN ? aup : pup

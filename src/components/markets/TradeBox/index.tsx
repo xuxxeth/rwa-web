@@ -27,9 +27,7 @@ import { EstimatedInfo } from "@/views/lite-trade/components/EstimatedInfo";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTradeStore } from "@/stores/tradeStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
-import { ExpiresSetting } from "@/components/expires-setting";
 import { Slippage } from "@/components/slippage";
-import { isTiko } from "@/service/client";
 
 type TradeBoxProps = {
   action?: string
