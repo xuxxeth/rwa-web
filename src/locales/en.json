@@ -105,7 +105,7 @@
     "name": "Name",
     "token": "Token",
     "price": "Price",
-    "change": "Change(%)",
+    "change": "24h Change(%)",
     "weekChange": "Weekly Change(%)",
     "buy": "Buy",
     "marketCap": "Market Cap",

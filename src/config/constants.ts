@@ -30,6 +30,7 @@ export const MARKET_STATUS = {
   BEFORE: 1,
   OPEN: 2,
   AFTER: 3,
+  OVERNIGHT: 4,
 }
 
 export const RISK_STATUS = {

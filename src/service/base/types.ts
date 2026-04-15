@@ -29,6 +29,12 @@ export interface ITokenWithPrice  {
 // 0-正常，1-禁止买卖, 2-下架
 export type IRwaState = 0 | 1 | 2
 
+// 1 REGULAR
+// 2 PRE_MARKET
+// 4 AFTER_MARKET
+// 8 OVERNIGHT
+export type ISessionMask = 1 | 2 | 4 | 8
+
 export interface IStockWithPrice {
   "price"?: string , 
   "up"?: string, 
@@ -79,6 +85,7 @@ export interface IRwa {
   "tokens": string[],
   "precision": number,
   "state": IRwaState,
+  "sessionMask": number
   "weight": number,
   "stockStatistics": {
     "totalShare": number,

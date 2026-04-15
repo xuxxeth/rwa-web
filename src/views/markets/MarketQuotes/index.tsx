@@ -1,22 +1,17 @@
 import { MainLayout } from '@/layouts/main'
 import ConentLayout from '@/layouts/content'
 import { useTranslation } from '@/hooks/useTranslation'
-import { LazyImage } from '@/components/image/LazyImage'
 import { type Order, useTableSort, usePaginationData } from '@/hooks/useTableHelper'
 import {
-  cn,
   advancedSort,
   textPrefix,
   strOrNumToSign,
-  type Change,
-  symbolToLower,
   multiply,
   formatLargeNumber,
   fuzzySearch,
   formatUp,
   calculateUp,
 } from '@/utils'
-import TooltipWithIcon from '@/components/icon-tooltip'
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import { TableHeader, TableBody } from '@/components/table-header'
@@ -29,18 +24,22 @@ import { truncate } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import IconWithTooltip from '@/components/icon-tooltip'
 import SearchFilter from './SearchFilter'
-import NoRecord from '@/components/no-record'
 import useFavorites from '@/hooks/useFavorites'
-import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
-import SignatureVerify from '@/components/signature-verify'
 import type { IRwa } from '@/service/base/types'
 import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
+import {
+  NoDataReason,
+  TextCellWithColor,
+  TextCell,
+  QuoteName,
+  TradeState,
+  SessionType,
+} from './shared'
 import { useBaseStore } from '@/stores/baseStore'
-import { MARKET_STATUS } from '@/config/constants'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
-export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
+export function useRwaListWithQuote(rwaList: IRwa[]) {
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const rwaListWithQuote = useMemo(() => {
@@ -57,7 +56,6 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
         floatCap: quote?.price
           ? multiply(quote.price, rwa.stockStatistics?.circShare || 0)
           : undefined,
-        marketTradeState,
       }
     })
   }, [rwaList, tokenWithQuote])
@@ -69,12 +67,8 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
           acc[item.s] = {
             // 最新价
             price: item.p,
-            // 盘中价格
-            close: item.c,
-            // 盘中收盘价涨跌幅
-            closeUp: item.c && item.pc ? calculateUp(item.c, item.pc) : undefined,
-            // 最新价格涨跌幅
-            up: item.p && item.c ? calculateUp(item.p, item.c) : undefined,
+            // 24 小时价格涨跌幅, o 今开价(24小时开始价格)
+            up: item.p && item.o ? calculateUp(item.p, item.o) : undefined,
             dailyHigh: item.h,
             dailyLow: item.l,
           }
@@ -97,13 +91,21 @@ export function useRwaListWithQuote(rwaList: IRwa[], marketTradeState: number) {
   return rwaListWithQuote
 }
 
+interface ITableExtra {
+  toggleFavorite: (stockId: number) => void
+  toggleEnable: boolean
+  isFavorite: (stockId: number) => boolean
+  marketTradeState: number
+}
+
 export default function MarketQuotes() {
   const { t } = useTranslation()
   const { sort, onSortChange } = useTableSort<SortableField>()
   const router = useRouter()
 
-  const rwaList = useRwaTokens(false)
   const marketTradeState = useBaseStore(state => state.marketTradeState)
+
+  const rwaList = useRwaTokens(false)
 
   const [isFavorites, setIsFavorites] = useState(false)
 
@@ -125,10 +127,16 @@ export default function MarketQuotes() {
     )
   }, [rwaList, isFavorites, favorites, isFavorite, searchText])
 
-  const marketQuotes = useRwaListWithQuote(newRwaList, marketTradeState)
+  const marketQuotes = useRwaListWithQuote(newRwaList)
 
   const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
+
+  useEffect(() => {
+    if (paginatedData.length === 0 && currentPage >= 1) {
+      setPage(currentPage - 1)
+    }
+  }, [isFavorite, paginatedData.length, currentPage])
 
   return (
     <MainLayout>
@@ -155,15 +163,7 @@ export default function MarketQuotes() {
             </div>
           </div>
 
-          <TableHeader<
-            SortableField,
-            IMarketQuote,
-            {
-              toggleFavorite: (stockId: number) => Promise<boolean>
-              toggleEnable: boolean
-              isFavorite: (stockId: number) => boolean
-            }
-          >
+          <TableHeader<SortableField, IMarketQuote, ITableExtra>
             lngPrefix='marketQuotes'
             config={MarketQuotesListConfig}
             sort={sort}
@@ -174,20 +174,14 @@ export default function MarketQuotes() {
           {paginatedData.length === 0 && (
             <NoDataReason isFavorites={isFavorites} {...favoritesRest} />
           )}
-          <TableBody<
-            IMarketQuote,
-            {
-              toggleFavorite: (stockId: number) => void
-              toggleEnable: boolean
-              isFavorite: (stockId: number) => boolean
-            }
-          >
+          <TableBody<IMarketQuote, ITableExtra>
             data={paginatedData}
             config={MarketQuotesListConfig}
             extra={{
               toggleFavorite: favoritesRest.toggleFavorite,
               toggleEnable: favoritesRest.toggleEnable,
               isFavorite,
+              marketTradeState,
             }}
             getKey={(item: IMarketQuote) => item.symbol}
             className='px-6 cursor-pointer hover:bg-white/4'
@@ -216,131 +210,12 @@ export default function MarketQuotes() {
   )
 }
 
-function NoDataReason(props: {
-  isFavorites: boolean
-  account?: string
-  chainId: number | null
-  isSignatureValid: boolean
-  isWalletConnecting: boolean
-  refreshIsSignatureValid: () => void
-}) {
-  if (!props.isFavorites) {
-    return <NoRecord />
-  }
-  if (!props.account && props.isWalletConnecting) return null
-  if (!props.account) return <WalletNotConnectedSmallVersion />
-  if (!props.isSignatureValid)
-    return (
-      <SignatureVerify
-        desc='signatureVerifyDescTop'
-        subDesc='signatureVerifyDescBottom'
-        className='mt-9'
-        refreshIsSignatureValid={props.refreshIsSignatureValid}
-      />
-    )
-  return <NoRecord />
-}
-
-function QuoteName(props: {
-  isFavorite: boolean
-  toggleEnable: boolean
-  toggleFavorite: (stockId: number) => void
-  logo: string
-  symbol: string
-  name: string
-  stockId: number
-}) {
-  return (
-    <>
-      <LazyImage
-        onClick={ev => {
-          ev.stopPropagation()
-          if (!props.toggleEnable) return
-          props.toggleFavorite(props.stockId)
-        }}
-        src={props.isFavorite ? '/images/v2/icons/collected.png' : '/images/v2/icons/collect.png'}
-        className={cn('w-4 h-4 mr-3', props.toggleEnable ? 'cursor-pointer' : 'cursor-not-allowed')}
-      />
-      <LazyImage src={props.logo} className='w-12 h-12 mr-2 rounded-[50%]' />
-      <div className='flex flex-col overflow-hidden'>
-        <TextCell text={props.symbol} className='text-base/5 text-white font-normal' />
-        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
-          <span className='text-xs/[15px] text-gray-400 font-normal truncate'>{props.name}</span>
-        </TooltipWithIcon>
-      </div>
-    </>
-  )
-}
-
-function TextCell(props: {
-  text: string
-  className?: string
-  icon?: string
-  textClassName?: string
-}) {
-  return (
-    <div className={cn('flex flex-row gap-1 items-center', props.className)}>
-      {props.icon && <LazyImage className='w-2 h-2' src={props.icon} />}
-      <span className={cn(props.textClassName)}>{props.text}</span>
-    </div>
-  )
-}
-
-function MarketTradeStateTag({ marketTradeState }: { marketTradeState: number }) {
-  const { t } = useTranslation()
-  let text = undefined
-  if (marketTradeState === MARKET_STATUS.CLOSE || marketTradeState === MARKET_STATUS.AFTER) {
-    text = t('v3.t13')
-  }
-  if (marketTradeState === MARKET_STATUS.BEFORE) {
-    text = t('v3.t11')
-  }
-  if (!text) return null
-  return (
-    <span className='text-xs/[15px] rounded-[2px] text-gray-400 font-normal bg-opacity-03 px-1 py-[2px]'>
-      {text}
-    </span>
-  )
-}
-
-export function getColorAndIcon(change: Change) {
-  switch (change) {
-    case 0:
-      return { color: 'text-gray-400', icon: '' }
-    case 1:
-      return { color: 'text-green-50', icon: '/images/convert/price_up.png' }
-    case -1:
-      return { color: 'text-red-50', icon: '/images/convert/price_down.png' }
-    default:
-      return { color: 'text-gray-400', icon: '' }
-  }
-}
-
-function TextCellWithColor(props: { text: string; change: Change; withIcon: boolean }) {
-  const { icon, color } = getColorAndIcon(props.change)
-
-  return (
-    <TextCell
-      className={cn('text-sm/4.5 font-normal', color)}
-      text={props.text}
-      icon={props.withIcon ? icon : ''}
-    />
-  )
-}
-
 const MarketQuotesListConfig = [
   {
     key: 'name',
     sortable: true,
-    width: 246,
-    render: (
-      item: IMarketQuote,
-      extra: {
-        toggleFavorite: (stockId: number) => void
-        toggleEnable: boolean
-        isFavorite: (stockId: number) => boolean
-      }
-    ) => (
+    width: 280,
+    render: (item: IMarketQuote, extra: ITableExtra) => (
       <div className='flex flex-row pr-6 items-center overflow-hidden'>
         <QuoteName
           isFavorite={extra.isFavorite(item.stockId)}
@@ -351,13 +226,8 @@ const MarketQuotesListConfig = [
           symbol={item.symbol}
           name={item.name}
         />
-        {item.state === 1 && (
-          <IconWithTooltip
-            triggerClassName='ml-2 shrink-0'
-            icon='/images/v2/icons/trade_halt.svg'
-            tooltip={'marketQuotes.tH'}
-          />
-        )}
+        <TradeState state={item.state} />
+        <SessionType sessionMask={item.sessionMask} />
       </div>
     ),
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
@@ -374,91 +244,30 @@ const MarketQuotesListConfig = [
     key: 'price',
     sortable: true,
     render: (item: IMarketQuote) => {
-      const priceAndUpToShowList =
-        item.marketTradeState === MARKET_STATUS.OPEN
-          ? [
-              {
-                price: item.price,
-                up: item.up,
-              },
-            ]
-          : [
-              {
-                price: item.close,
-                up: item.closeUp,
-              },
-              {
-                price: item.price,
-                up: item.up,
-              },
-            ]
       return (
-        <div className='flex flex-col gap-1'>
-          {priceAndUpToShowList[0] && (
-            <TextCellWithColor
-              text={
-                priceAndUpToShowList[0].price
-                  ? textPrefix(truncate(priceAndUpToShowList[0].price, item.precision), '$')
-                  : '--'
-              }
-              change={strOrNumToSign(priceAndUpToShowList[0].up ?? '0')}
-              withIcon={false}
-            />
-          )}
-          {priceAndUpToShowList[1] && (
-            <div className='flex flex-row items-center gap-1'>
-              <TextCell
-                className='text-xs/[15px] font-normal text-gray-400'
-                text={
-                  priceAndUpToShowList[1].price
-                    ? textPrefix(truncate(priceAndUpToShowList[1].price, item.precision), '$')
-                    : '--'
-                }
-              />
-              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
-            </div>
-          )}
-        </div>
+        <TextCellWithColor
+          text={item.price ? textPrefix(truncate(item.price, item.precision), '$') : '--'}
+          change={strOrNumToSign(item.up ?? '0')}
+          withIcon={false}
+        />
       )
     },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      a.marketTradeState === MARKET_STATUS.OPEN
-        ? advancedSort(a.price, b.price, order)
-        : advancedSort(a.close, b.close, order),
+      advancedSort(a.price, b.price, order),
   },
   {
     key: 'change',
     sortable: true,
     render: (item: IMarketQuote) => {
-      const upList =
-        item.marketTradeState === MARKET_STATUS.OPEN
-          ? [{ up: item.up }]
-          : [{ up: item.closeUp }, { up: item.up }]
       return (
-        <div className='flex flex-col gap-1'>
-          {upList[0] && (
-            <TextCellWithColor
-              text={upList[0].up !== undefined ? formatUp(upList[0].up) : '--'}
-              change={strOrNumToSign(upList[0].up ?? 0)}
-              withIcon={false}
-            />
-          )}
-          {upList[1] && (
-            <div className='flex flex-row items-center gap-1'>
-              <TextCell
-                className='text-xs/[15px] font-normal text-gray-400'
-                text={upList[1].up !== undefined ? formatUp(upList[1].up) : '--'}
-              />
-              <MarketTradeStateTag marketTradeState={item.marketTradeState} />
-            </div>
-          )}
-        </div>
+        <TextCellWithColor
+          text={item.up !== undefined ? formatUp(item.up) : '--'}
+          change={strOrNumToSign(item.up ?? 0)}
+          withIcon={false}
+        />
       )
     },
-    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-      a.marketTradeState === MARKET_STATUS.OPEN
-        ? advancedSort(a.up, b.up, order)
-        : advancedSort(a.closeUp, b.closeUp, order),
+    sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),
   },
   // {
   //   key: 'weekChange',
