@@ -128,6 +128,45 @@ export const Footer: React.FC = () => {
             >
               {t('footer.docs')}
             </a>
+            {/* Audit Report Dropdown */}
+            <div className='relative group'>
+              <span className='text-gray-400 hover:text-[#9CFF3A] transition-colors text-xs md:text-sm cursor-pointer flex items-center gap-1'>
+                {t('footer.auditReport')}
+                <svg
+                  className='w-3 h-3 transition-transform group-hover:rotate-180'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M19 9l-7 7-7-7'
+                  />
+                </svg>
+              </span>
+              <div className='absolute bottom-full right-0 mb-2 w-max bg-[#1A1A1A] border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50'>
+                <div className='py-2 flex flex-col'>
+                  <a
+                    href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Cyberalpha+Protocol+Phase2+-+SlowMist+Audit+Report.pdf'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='px-4 py-2 text-xs md:text-sm text-gray-400 hover:text-[#9CFF3A] hover:bg-white/5 transition-colors whitespace-nowrap'
+                  >
+                    {t('footer.auditSlowMist')}
+                  </a>
+                  <a
+                    href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Tiko+Digital+IT+Audit+Report+2026+v1.0.pdf'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='px-4 py-2 text-xs md:text-sm text-gray-400 hover:text-[#9CFF3A] hover:bg-white/5 transition-colors whitespace-nowrap'
+                  >
+                    {t('footer.auditTyler')}
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
