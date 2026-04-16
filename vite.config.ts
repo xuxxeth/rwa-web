@@ -12,12 +12,27 @@ import { viteMockServe } from 'vite-plugin-mock'
 // @ts-ignore
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
+  const mobileSite = env.VITE_MOBILE_SITE || 'https://h5-test.cyberalpha.cc/'
 
   // 图片压缩开关：设置为 false 可关闭压缩
   // const enableImageCompression = true
 
   return {
     plugins: [
+      {
+        name: 'mobile-site-html-replace',
+        transformIndexHtml() {
+          return {
+            tags: [
+              {
+                tag: 'script',
+                injectTo: 'head-prepend',
+                children: `window.__MOBILE_SITE__ = ${JSON.stringify(mobileSite)};`,
+              },
+            ],
+          }
+        },
+      },
       react(),
       tailwindcss(),
       viteCompression(),
