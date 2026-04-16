@@ -144,6 +144,9 @@
   "footer": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "docs": "Docs"
+    "docs": "Docs",
+    "auditReport": "Audit Report",
+    "auditSlowMist": "Audit Report by SlowMist",
+    "auditTyler": "Audit Report by Tyler"
   }
 }

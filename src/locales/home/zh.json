@@ -144,6 +144,9 @@
   "footer": {
     "privacy": "隱私政策",
     "terms": "服務條款",
-    "docs": "文档"
+    "docs": "文档",
+    "auditReport": "審計報告",
+    "auditSlowMist": "SlowMist 審計報告",
+    "auditTyler": "Tylers 審計報告"
   }
 }
