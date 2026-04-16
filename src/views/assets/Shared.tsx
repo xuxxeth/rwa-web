@@ -17,6 +17,8 @@ import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
 import { useNavigate } from 'react-router-dom'
 import TooltipWithIcon from '@/components/icon-tooltip'
+import { useBaseStore } from '@/stores/baseStore'
+import { extractHourMinute } from '@/hooks/useMarketState'
 
 export type OrderChanged = {
   orderId: string
@@ -249,11 +251,58 @@ export function OrderStatusCell(props: { state: number }) {
 }
 
 export function SessionTypeCell({ sessionType }: { sessionType: number }) {
+  const { tradingStartTime, tradingEndTime, preMarketMinutes, afterMarketMinutes } = useBaseStore(
+    state => state.marketInfo
+  )
+  const { t } = useTranslation()
+
+  const getDuration = (timestamp1: number, timestamp2: number) => {
+    const start = extractHourMinute(timestamp1)
+    const end = extractHourMinute(timestamp2)
+    if (start && start?.H && end && end?.H) {
+      return `${start.H}:${start.M} ~ ${end.H}:${end.M}`
+    }
+    return '--'
+  }
+
   switch (sessionType) {
     case 0:
-      return <TextCellWithTranslation text='portfolio.rthOnly' />
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t19', {
+                duration: getDuration(tradingStartTime, tradingEndTime) + ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.rthOnly'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
+    case 3:
+      return <TextCellWithTranslation text='portfolio.overnight' />
+    case 1:
+    case 2:
     case 4:
-      return <TextCellWithTranslation text='portfolio.preAfter' />
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t20', {
+                duration:
+                  getDuration(tradingStartTime - preMarketMinutes * 60 * 1000, tradingStartTime) +
+                  ` (${t('v3.t31')})` +
+                  ' + ' +
+                  getDuration(tradingEndTime, tradingEndTime + afterMarketMinutes * 60 * 1000) +
+                  ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.preAfter'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
     default:
       return null
   }

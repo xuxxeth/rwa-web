@@ -269,26 +269,26 @@ const MarketQuotesListConfig = [
     },
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) => advancedSort(a.up, b.up, order),
   },
-  // {
-  //   key: 'weekChange',
-  //   sortable: true,
-  //   render: (item: IMarketQuote) => {
-  //     const change = strOrNumToSign(item.weekUp ?? 0)
-  //     return (
-  //       <TextCellWithColor
-  //         text={
-  //           item.weekUp
-  //             ? textPrefix(textSuffix(item.weekUp, '%', 0), change === 1 ? '+' : '')
-  //             : '--'
-  //         }
-  //         change={change}
-  //         withIcon={false}
-  //       />
-  //     )
-  //   },
-  //   sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
-  //     advancedSort(a.weekUp, b.weekUp, order),
-  // },
+  {
+    key: 'dailyHigh',
+    sortable: false,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, item.precision), '$') : '--'}
+      />
+    ),
+  },
+  {
+    key: 'dailyLow',
+    sortable: false,
+    render: (item: IMarketQuote) => (
+      <TextCell
+        className='text-sm/4.5 font-normal'
+        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, item.precision), '$') : '--'}
+      />
+    ),
+  },
   {
     key: 'marketCap',
     sortable: true,
@@ -313,29 +313,4 @@ const MarketQuotesListConfig = [
     sorter: (a: IMarketQuote, b: IMarketQuote) => (order: Order) =>
       advancedSort(a.floatCap, b.floatCap, order),
   },
-  {
-    key: 'dailyHigh',
-    sortable: false,
-    render: (item: IMarketQuote) => (
-      <TextCell
-        className='text-sm/4.5 font-normal'
-        text={item.dailyHigh ? textPrefix(truncate(item.dailyHigh, item.precision), '$') : '--'}
-      />
-    ),
-  },
-  {
-    key: 'dailyLow',
-    sortable: false,
-    render: (item: IMarketQuote) => (
-      <TextCell
-        className='text-sm/4.5 font-normal'
-        text={item.dailyLow ? textPrefix(truncate(item.dailyLow, item.precision), '$') : '--'}
-      />
-    ),
-  },
-  // {
-  //   key: 'quickBuy',
-  //   sortable: false,
-  //   render: (item: IMarketQuote) => <RwaStateButton rwa={item} className='text-base/[19px]' />,
-  // },
 ]

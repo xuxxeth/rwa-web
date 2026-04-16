@@ -28,6 +28,7 @@ export function SessionType({ sessionMask }: { sessionMask: number }) {
   const afterMarket = 1 << 2
   const overnight = 1 << 3
 
+  const { t } = useTranslation()
   const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   switch (marketTradeState) {
@@ -37,7 +38,9 @@ export function SessionType({ sessionMask }: { sessionMask: number }) {
           <IconWithTooltip
             triggerClassName='ml-2 shrink-0'
             icon='/images/v2/icons/session1.svg'
-            tooltip={'marketQuotes.tH'}
+            tooltip={
+              <span>{t('marketQuotes.noPreOrPost', { session: t('marketQuotes.preMarket') })}</span>
+            }
           />
         )
       }
@@ -48,7 +51,11 @@ export function SessionType({ sessionMask }: { sessionMask: number }) {
           <IconWithTooltip
             triggerClassName='ml-2 shrink-0'
             icon='/images/v2/icons/session1.svg'
-            tooltip={'marketQuotes.tH'}
+            tooltip={
+              <span>
+                {t('marketQuotes.noPreOrPost', { session: t('marketQuotes.afterMarket') })}
+              </span>
+            }
           />
         )
       }
@@ -59,7 +66,7 @@ export function SessionType({ sessionMask }: { sessionMask: number }) {
           <IconWithTooltip
             triggerClassName='ml-2 shrink-0'
             icon='/images/v2/icons/session2.svg'
-            tooltip={'marketQuotes.tH'}
+            tooltip={<span>{t('marketQuotes.overnight')}</span>}
           />
         )
       }

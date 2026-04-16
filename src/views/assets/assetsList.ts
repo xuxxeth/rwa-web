@@ -123,6 +123,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     address: rwa.address,
     icon: rwa.icon,
     rwaState: rwa.state,
+    sessionMask: rwa.sessionMask,
     weight: rwa.weight,
     precision: rwa.precision,
   }
@@ -139,6 +140,7 @@ export interface IAssetItem {
   price?: number
   value?: string
   rwaState?: number
+  sessionMask?: number
   icon?: string
   address: string
   weight?: number

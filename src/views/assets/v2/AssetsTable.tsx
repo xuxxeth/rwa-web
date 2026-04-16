@@ -1,19 +1,18 @@
 import { TableHeader, TableBody } from '@/components/table-header'
 import { useTableSort, type Order } from '@/hooks/useTableHelper'
 import { type IAssetItem } from '../assetsList'
-import RwaStateButton, { BuyButton } from '@/components/button/RwaStateButton'
+import { BuyButton } from '@/components/button/RwaStateButton'
 import Pagination from '@/components/pagination'
 import { usePaginationData } from '@/hooks/useTableHelper'
 import { advancedSort } from '@/utils/sort'
 import { TextCell, TokenCell } from '../Shared'
-import { textPrefix, toFixed, formatWithCommas, truncate } from '@/utils/format'
+import { textPrefix, formatWithCommas, truncate } from '@/utils/format'
 import type { IRwa } from '@/service/base/types'
 import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
-import { symbolToLower } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import { useCallback } from 'react'
-import IconWithTooltip from '@/components/icon-tooltip'
+import { SessionType, TradeState } from '@/views/markets/MarketQuotes/shared'
 
 type SortableField = 'value'
 
@@ -91,13 +90,8 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => (
       <>
         <TokenCell icon={item.icon} token={item.symbol} name={item.name} />
-        {item.rwaState === 1 && (
-          <IconWithTooltip
-            triggerClassName='ml-2'
-            icon='/images/v2/icons/trade_halt.svg'
-            tooltip='portfolio.tH'
-          />
-        )}
+        {item.rwaState !== undefined && <TradeState state={item.rwaState} />}
+        {item.sessionMask !== undefined && <SessionType sessionMask={item.sessionMask} />}
       </>
     ),
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
