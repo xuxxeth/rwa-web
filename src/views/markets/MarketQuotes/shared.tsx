@@ -18,6 +18,14 @@ export function TradeState({ state }: { state: number }) {
           tooltip={'marketQuotes.tH'}
         />
       )
+    case 3:
+      return (
+        <IconWithTooltip
+          triggerClassName='ml-2 shrink-0'
+          icon='/images/v2/icons/sell-only.svg'
+          tooltip={'marketQuotes.buyForbidden'}
+        />
+      )
     default:
       return null
   }

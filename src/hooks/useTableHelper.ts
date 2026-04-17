@@ -13,12 +13,12 @@ export function useTableSort<SortableField extends string>() {
   const onSortChange = useCallback<(filed: SortableField) => void>(field => {
     setSort((prev: Sort | null) => {
       if (prev === null || prev.field !== field) {
-        return { field, order: 'asc' }
-      }
-      if (prev.order === 'asc') {
         return { field, order: 'desc' }
       }
       if (prev.order === 'desc') {
+        return { field, order: 'asc' }
+      }
+      if (prev.order === 'asc') {
         return null
       }
       return null
