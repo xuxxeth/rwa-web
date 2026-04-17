@@ -130,8 +130,15 @@ export default function MarketQuotes() {
 
   const marketQuotes = useRwaListWithQuote(newRwaList)
 
+  const defaultSorter = (item1: IMarketQuote, item2: IMarketQuote) => {
+    if (item1.weight === item2.weight) {
+      return advancedSort(item1.symbol, item2.symbol, 'asc')
+    }
+    return advancedSort(item1.weight, item2.weight, 'desc')
+  }
+
   const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
-    usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort)
+    usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
 
   useEffect(() => {
     if (paginatedData.length === 0 && currentPage >= 1) {

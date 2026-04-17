@@ -65,8 +65,9 @@ export function SessionType({ sessionMask }: { sessionMask: number }) {
         return (
           <IconWithTooltip
             triggerClassName='ml-2 shrink-0'
+            tooltipClassName='max-w-[260px]'
             icon='/images/v2/icons/session2.svg'
-            tooltip={<span>{t('marketQuotes.overnight')}</span>}
+            tooltip={<span>{t('marketQuotes.noOvernight')}</span>}
           />
         )
       }
