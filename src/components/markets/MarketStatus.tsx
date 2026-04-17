@@ -77,16 +77,20 @@ const MarketStatus = memo(
           i: '/images/v2/icons/night.png'
         }
       }
-      return {
-        t1: t("v3.t14"),
-        t2: t("marketQuotes.mkHover", {
-            session: t("v3.t14"),
-            etTime: '--',
-            orderType: t('v3.t16')
-          }),
-        c: '#C7CCD6',
-        i: '/images/v2/icons/close_market.png'
+      if (tradingTime?.tradeState === MARKET_STATUS.CLOSE) {
+        return {
+          t1: t("v3.t14"),
+          t2: t("marketQuotes.mkHover", {
+              session: t("v3.t14"),
+              etTime: '--',
+              orderType: t('v3.t16')
+            }),
+          c: '#C7CCD6',
+          i: '/images/v2/icons/close_market.png'
+        }
       }
+      return null
+      
     }, [t, i18n, tradingTime])
 
     const tokenLabel = useMemo(() => {
@@ -109,7 +113,7 @@ const MarketStatus = memo(
       if (inputToken?.state === RWA_STATUS.SELL) {
         return {
           t1: t("marketQuotes.buyForbidden"),
-          t2: t("marketQuotes.buyForbidden"),
+          t2: t("marketQuotes.thHover"),
           c: '#CA3F64',
           i: '/images/v2/icons/sell.png'
         }
@@ -129,11 +133,11 @@ const MarketStatus = memo(
           <div className={cn(
             "px-2 flex items-center gap-x-1 bg-[#232427] h-[24px] rounded-[24px]",
             from === "lite-trade" ? "h-[50px] bg-[rgba(0,0,0,0)]" : "",
-            tokenLabel ? "px-0 w-[24px] justify-center" : ""
+            tokenLabel && from === 'trade' ? "px-0 w-[24px] justify-center" : ""
           )}>
             <img src={stateLabel.i} className="w-[12px]" alt="" />
             {
-              !tokenLabel && (
+              (!tokenLabel || from !== 'trade') && (
                 <div className="text-[12px] leading-[14px] shrink-0"
                   style={{ color: stateLabel.c, }}
                 >
@@ -146,11 +150,11 @@ const MarketStatus = memo(
           </div>
         </IconWithTooltip>
         {
-          tokenLabel && (
+          tokenLabel && from === 'trade' && (
             <IconWithTooltip tooltip={tokenLabel.t2}>
               <div className={cn(
                 "px-2 flex items-center gap-x-1 bg-[#232427] h-[24px] rounded-[24px]",
-                from === "lite-trade" ? "h-[50px] bg-[rgba(0,0,0,0)]" : ""
+                
               )}>
                 <img src={tokenLabel.i} className="w-[12px]" alt="" />
                 <div className="text-[12px] leading-[14px] shrink-0"

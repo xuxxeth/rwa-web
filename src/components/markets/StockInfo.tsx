@@ -132,7 +132,6 @@ export const StockInfo = memo(
     const inputToken = useTradeStore(state => state.inputToken)
     const stockData = useStockStore(state => state.stockData)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
-    const marketTradeState = useBaseStore(state => state.marketTradeState)
     const [showMore, setShowMore] = useState(false)
     const showMoreRef = useRef<HTMLDivElement>(null)
 
@@ -312,7 +311,7 @@ export const StockInfo = memo(
           </div>
         </div>
         
-        <MarketStatus />
+        <MarketStatus from="trade" />
         
       </div>
     )

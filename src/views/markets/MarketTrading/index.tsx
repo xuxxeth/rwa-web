@@ -8,6 +8,7 @@ import { DialogController, useShowDialog } from '@/components/dialog/DialogContr
 import { OrderList } from '@/components/markets/OrderList'
 import { TradeTypeSwitch } from './TradeTypeSwitch'
 import { TradeTopTip } from '@/components/markets/TradeTopTip'
+import { RwaSessionStatus } from '@/components/markets/RwaSessionStatus'
 
 function Markets() {
   const { t } = useTranslation()
@@ -24,13 +25,8 @@ function Markets() {
             <div className='w-[340px] shrink-0 flex bg-[#131416]'>
               <div className='w-[4px] bg-[#1A1B1E] h-full shrink-0'>&nbsp;</div>
               <div className='w-full relative bg-[#1A1B1E]'>
-                <div className='min-h-[34px] flex items-center w-full py-3 bg-[#131416]'>
-                  {/* <PreMarketOpen /> */}
-                  {/* <SupportOnlyRegular /> */}
-                  <TradeTopTip />
-                </div>
+                <RwaSessionStatus />
                 
-                <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
                 <BoxCard className='min-h-[370px] rounded-[4px] p-4 bg-[#131416]'>
                   <ConvertTabs from='markets' />
                   <div className=' mt-3 '>

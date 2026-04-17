@@ -774,6 +774,8 @@
     "t31": "ET",
     "t32": "Current asset does not support Pre-market/Post-market trading.",
     "t33": "Currently is {{session}} session. {{session}} trading is not supported by the selected asset. You can wait for the market open or place your order by [RTH Only] option.",
-    "t34": "Overnight-Market"
+    "t34": "Overnight-Market",
+    "t35": "The market is closing. You can place order in [RTH Only] option.",
+    "t36": "Currently is {Over-Night} session. {Over-Night} trading is not supported by the selected asset. You can place order in [RTH Only] option."
   }
 }

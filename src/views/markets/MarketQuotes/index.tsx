@@ -36,6 +36,7 @@ import {
   SessionType,
 } from './shared'
 import { useBaseStore } from '@/stores/baseStore'
+import { MarketStatus } from '@/components/markets/MarketStatus'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -159,7 +160,7 @@ export default function MarketQuotes() {
               />
             </div>
             <div>
-              <PreMarketOpen />
+              <MarketStatus />
             </div>
           </div>
 

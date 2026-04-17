@@ -257,7 +257,7 @@ const CTokenList = memo(
 
 
     const rwaListWithBalance = useMemo(() => {
-      return newRwaList.map(rwa => {
+      return newRwaList.filter(rwa => rwa.state !== 2).map(rwa => {
         return {
           ...rwa,
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
