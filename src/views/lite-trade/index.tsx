@@ -8,7 +8,7 @@ import { lazy, useEffect, useState } from "react";
 import { MarketTrading } from "@/components/market-trading";
 import { ConvertTabs } from "../../components/markets/ConvertTabs";
 import { KlineSwitch } from "../../components/markets/KlineSwitch";
-import { KlineBody } from "../../components/markets/Klinebody";
+import { KlineBody } from "../../components/markets/StockInfo";
 import { useRequestSignature, useSignatureValidStatus } from "@/hooks/useSignature";
 import { useWssOn } from "@/hooks/useWssOn";
 import { useBaseStore } from "@/stores/baseStore";

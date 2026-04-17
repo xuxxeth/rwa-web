@@ -6,9 +6,7 @@ import { FAQ } from '@/components/markets/FAQ'
 import { KlineBody } from '../components/Klinebody'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { OrderList } from '@/components/markets/OrderList'
-import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
 import { TradeTypeSwitch } from './TradeTypeSwitch'
-import { SupportOnlyRegular } from '@/components/markets/SupportOnlyRegular'
 import { TradeTopTip } from '@/components/markets/TradeTopTip'
 
 function Markets() {
@@ -25,8 +23,8 @@ function Markets() {
             </div>
             <div className='w-[340px] shrink-0 flex bg-[#131416]'>
               <div className='w-[4px] bg-[#1A1B1E] h-full shrink-0'>&nbsp;</div>
-              <div className='w-full'>
-                <div className='min-h-[34px] flex items-center w-full py-3'>
+              <div className='w-full relative bg-[#1A1B1E]'>
+                <div className='min-h-[34px] flex items-center w-full py-3 bg-[#131416]'>
                   {/* <PreMarketOpen /> */}
                   {/* <SupportOnlyRegular /> */}
                   <TradeTopTip />

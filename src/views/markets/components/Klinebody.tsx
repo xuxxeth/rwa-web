@@ -1,11 +1,10 @@
-import { StockInfo } from "@/components/markets/Klinebody"
+import { StockInfo } from "@/components/markets/StockInfo"
 import { TradingChart } from "@/components/TVChart/TradingChart"
 import { useTranslation } from "@/hooks/useTranslation"
 import { cn } from "@/utils/tw"
 import { lazy, memo, useState, Suspense } from "react"
 
 const OrderInTrade = lazy(() => import("./Order"));
-const LazyStatistics = lazy(() => import("@/components/markets/Statistics").then(m => ({ default: m.Statistics })))
 const LazyProfile = lazy(() => import("@/components/markets/Profile").then(m => ({ default: m.Profile })))
 const LazyFinancials = lazy(() => import("@/components/markets/Financials").then(m => ({ default: m.Financials })))
 
@@ -55,7 +54,7 @@ const KlineBody = memo(
         </div>
 
         <div hidden={activeTab !== 'com'} className="px-4 mb-2">
-          <LazyStatistics from={from} />
+          {/* <LazyStatistics from={from} /> */}
           <LazyProfile from={from} />
           <LazyFinancials />
         </div>

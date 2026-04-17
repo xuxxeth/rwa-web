@@ -231,3 +231,31 @@ export async function mergeTwoImageFromUrls(url1: string, url2: string): Promise
     loadBlobImage(url2, image2)
   })
 }
+
+export function numberToBinaryArray(num: number, options: { length?: number; highBitFirst?: boolean } = {}) {
+  const {
+    length = 4,           // 指定位数（可选）
+    highBitFirst = true, // 是否高位在前（默认 true）
+  } = options;
+
+  if (typeof num !== "number" || num < 0) {
+    return [0, 0, 0, 0].slice(0, length) // 返回全0数组，长度根据参数调整
+  }
+
+  // 转二进制字符串
+  let binary = num.toString(2);
+
+  // 补位（如果指定长度）
+  if (length) {
+    binary = binary.padStart(length, "0");
+  }
+
+  let arr = binary.split("").map(Number);
+
+  // 是否需要反转（低位在前）
+  if (!highBitFirst) {
+    arr = arr.reverse();
+  }
+
+  return arr;
+}

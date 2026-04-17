@@ -112,7 +112,7 @@ export function getDataFeed({
 }: any): IExtaIBasicDataFeed {
   let currentToken = token
   let currentChartType = 3;
-  let sessionType = 2
+  let sessionType = 0
   let initialLoadComplete = false;
   let marketState = -1; // 市场状态
   let tradingStartTime = 0; // 交易开始时间

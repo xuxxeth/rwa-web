@@ -13,7 +13,7 @@ import type {
   IStockWithPrice,
   IChain,
 } from '@/service/base/types'
-import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP } from '@/utils'
+import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP, numberToBinaryArray } from '@/utils'
 
 const ENABLE_CACHE = false
 // 缓存时间，2小时
@@ -100,7 +100,7 @@ export const useBaseStore = create<BaseStore>()(
             if (stock) {
               acc[symbolToLower(cur.S)] = {
                 price: truncate(cur?.p || 0, 2),
-                up: calculateUp((cur?.pc && cur?.p ? cur.p / cur.pc - 1 : 0) * 100, 2),
+                up: calculateUp((cur?.p && cur?.o ? cur.p / cur.o - 1 : 0) * 100, 2),
                 cPrice: truncate(cur?.c || 0, 2),
               }
             }
@@ -132,7 +132,12 @@ export const useBaseStore = create<BaseStore>()(
       getBaseRwas: async (chainId?: number) => {
         const res = await baseApi.getBaseRwas(chainId)
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          set({ rwaList: res.data || [] })
+          const rwaList = (res.data || []).map(rwa => ({
+            ...rwa,
+            is24H: rwa.sessionMask === 15,
+            sessionMaskList: rwa.sessionMask ? numberToBinaryArray(rwa.sessionMask) : [],
+          }))
+          set({ rwaList: rwaList })
         }
         return res
       },
@@ -168,6 +173,10 @@ export const useBaseStore = create<BaseStore>()(
             // 盘后
             if (_data.status === 6) { 
               marketState = MARKET_STATUS.AFTER
+            }
+            // 夜盘
+            if (_data.status === 12) { 
+              marketState = MARKET_STATUS.OVERNIGHT
             }
           }
           

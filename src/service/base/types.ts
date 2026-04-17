@@ -90,7 +90,9 @@ export interface IRwa {
   "stockStatistics": {
     "totalShare": number,
     "circShare": number
-  }
+  },
+  "sessionMaskList"?: number[],
+  "is24H"?: boolean,
 }
 
 export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice
@@ -113,6 +115,9 @@ export interface IMarket {
   "timeInForce": number,
   "validDate": number,
   "slippage": string, // 默认滑点容忍度
+  "nightTradingEndTime": number,
+  "nightTradingStartTime": number
+
 }
 // 券商状态信息
 /**

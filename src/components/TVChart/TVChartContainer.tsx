@@ -44,12 +44,49 @@ export const TVChartContainer = memo(
     const tokenSymbolRef = useRef(token.symbol)
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
+    const chartTypeRef = useRef(chartType)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tradingTime = useTradingStartTime()
+
+    const syncAreaModeClass = useCallback((enabled: boolean) => {
+      const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement | null
+      const body = iframe?.contentDocument?.body || iframe?.contentWindow?.document?.body
+      if (!body) return
+
+      body.classList.toggle('tv-area-mode', enabled)
+    }, [])
+
+    const switchToCandle = useCallback((interval: ResolutionString = "1" as ResolutionString) => {
+      const chart = tvWidgetRef.current?.activeChart()
+      if (!chart || !tvWidgetRef.current) return
+
+      setChartType(false)
+      dataFeedRef.current?.setCurrentType(1)
+      chart.setChartType(1)
+
+      const applyCandle = () => {
+        addOrRemoveMA(chart, 1)
+        wasAreaModeRef.current = false
+        ;(tvWidgetRef.current as any)?.resetCache?.()
+        chart.resetData()
+      }
+
+      const emptySymbol = `__empty__${Date.now()}`
+      tvWidgetRef.current.setSymbol(emptySymbol, interval, () => {
+        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+        tvWidgetRef.current?.setSymbol(targetSymbol, interval, () => {
+          applyCandle()
+        })
+      })
+    }, [])
 
     useEffect(() => {
       tokenSymbolRef.current = token.symbol
     }, [token.symbol])
+
+    useEffect(() => {
+      chartTypeRef.current = chartType
+    }, [chartType])
     
     useEffect(() => {
       let mounted = true;
@@ -155,32 +192,10 @@ export const TVChartContainer = memo(
                   return
                 }
                 // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
-                setChartType(false)
-                dataFeedRef.current?.setCurrentType(1)
-                chart.setChartType(1)
-                const applyCandle = () => {
-                  addOrRemoveMA(chart, 1)
-                  wasAreaModeRef.current = false
-                  ;(tvWidgetRef.current as any)?.resetCache?.()
-                  chart.resetData()
-                }
-                if (tvWidgetRef.current) {
-                  const emptySymbol = `__empty__${Date.now()}`
-                  tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
-                    const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
-                    tvWidgetRef.current?.setSymbol(targetSymbol, interval as ResolutionString, () => {
-                      applyCandle()
-                    })
-                  })
-                  return
-                }
-                
-                // @ts-ignore
-                // dataFeedRef.current?.setSuppressHistory(false)
-                ;(tvWidgetRef.current as any)?.resetCache?.()
-                chart.resetData(); 
-                
+                switchToCandle(interval as ResolutionString)
               });
+
+              syncAreaModeClass(chartTypeRef.current)
 
               setTimeout(() => {
                 const iframe = chartContainerRef.current.querySelector('iframe') as HTMLIFrameElement;
@@ -241,6 +256,11 @@ export const TVChartContainer = memo(
       }
     }, [i18n.language])
 
+    useEffect(() => {
+      if (!tvWidgetReady.current) return
+      syncAreaModeClass(chartType)
+    }, [chartType, syncAreaModeClass])
+
     // 监听市场状态变化，更新dataFeed的市场状态
     useEffect(() => {
       dataFeedRef.current?.setMarketState(marketTradeState)
@@ -284,6 +304,16 @@ export const TVChartContainer = memo(
           tvWidgetShow && (
             <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
               <SessionLineSelectt onChange={handleSessionChange} selected={chartType} />
+              {
+                chartType && (
+                  <button
+                    type="button"
+                    className="h-[32px] w-[42px] bg-[rgba(0,0,0,0)]"
+                    onClick={() => switchToCandle("1" as ResolutionString)}
+                  />
+                )
+              }
+              
             </div>
           )
         }
