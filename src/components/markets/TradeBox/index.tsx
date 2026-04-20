@@ -66,6 +66,7 @@ export function TradeBox({
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
+  
   const isMarketCloseDisabled = marketTradeState !== MARKET_STATUS.OPEN && tradeType === TradeType.MARKET
   const effectivePrice = useEffectivePrice({
     tradeType,
@@ -179,6 +180,8 @@ export function TradeBox({
     action,
     inputTokenBalance,
     outputTokenBalance,
+    effectivePrice,
+    inputTokenPrice: inputTokenPrice?.price,
     t,
     language: i18n.language,
   })

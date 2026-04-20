@@ -1,6 +1,7 @@
 // hooks/useLimitOrderUIState.ts
 
 import { useMemo } from "react"
+import BigNumber from "bignumber.js"
 import { isGreater, isLess } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
@@ -27,6 +28,9 @@ export interface UseLimitOrderUIStateParams {
 
   inputTokenBalance?: TokenBalance | null
   outputTokenBalance?: TokenBalance | null
+
+  effectivePrice: string
+  inputTokenPrice?: string
 
   t: TFunction
   language: string
@@ -60,9 +64,23 @@ export function useLimitOrderUIState({
   action,
   inputTokenBalance,
   outputTokenBalance,
+  effectivePrice,
+  inputTokenPrice,
   t,
   language,
 }: UseLimitOrderUIStateParams): UseLimitOrderUIStateResult {
+  const isOrderPriceDeviation = useMemo(() => {
+    const referencePrice = new BigNumber(inputTokenPrice || 0)
+    const targetPrice = new BigNumber(effectivePrice || 0)
+
+    if (!referencePrice.isFinite() || referencePrice.lte(0)) return false
+    if (!targetPrice.isFinite() || targetPrice.lte(0)) return false
+
+    const upperBound = referencePrice.multipliedBy(1.2)
+    const lowerBound = referencePrice.multipliedBy(0.8)
+
+    return targetPrice.gte(upperBound) || targetPrice.lte(lowerBound)
+  }, [effectivePrice, inputTokenPrice])
 
   /**
    * 是否低于最小金额
@@ -108,6 +126,7 @@ export function useLimitOrderUIState({
   const disabled = useMemo(() => {
     return (
       Number(orderValue) <= 0 ||
+      isOrderPriceDeviation ||
       isMin ||
       isMax ||
       isBuyInsufficient ||
@@ -118,6 +137,7 @@ export function useLimitOrderUIState({
     orderValue,
     isMin,
     isMax,
+    isOrderPriceDeviation,
     isBuyInsufficient,
     isSellInsufficient,
     inputToken,
@@ -131,6 +151,10 @@ export function useLimitOrderUIState({
     if (Number(orderValue) <= 0) return t("Enter an amount")
 
     if (inputToken?.state === 1) return t("tradingHalt")
+
+    if (isOrderPriceDeviation) {
+      return t("v3.t37")
+    }
 
     if (isMin)
       return t("amountMin", {
@@ -175,6 +199,7 @@ export function useLimitOrderUIState({
     action,
     t,
     language,
+    isOrderPriceDeviation,
   ])
 
   return {

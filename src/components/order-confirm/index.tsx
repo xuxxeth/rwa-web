@@ -108,7 +108,7 @@ const OrderConfirm = memo(
           />
           <BetweenText 
             left={t('v3.t18')}
-            right={ sessionType === SessionType.PRE_MARKET_AND_AFTER_HOURS ? t('v3.t17') : t('v3.t16')}
+            right={ sessionType === SessionType.OVERNIGHT ? t('v3.t171') : sessionType === SessionType.PRE_MARKET_AND_AFTER_HOURS ? t('v3.t17') : t('v3.t16')}
           />
           {
             !isMarketOrder && (
