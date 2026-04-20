@@ -8,6 +8,8 @@
     <script>
       const VITE_MOBILE_SITE = window.__MOBILE_SITE__ || ''
       const MOBILE_MAX_SIZE = 800
+      const NO_MOBILE_REDIRECT_PATHS = ['/kyc/liveness-complete']
+
 
       function isMobile() {
         return (
@@ -19,7 +21,13 @@
         )
       }
 
+      function shouldSkipMobileRedirect() {
+        const pathname = window.location.pathname || ''
+        return NO_MOBILE_REDIRECT_PATHS.some(path => pathname.startsWith(path))
+      }
+
       function redirectMobileSite() {
+        if (shouldSkipMobileRedirect()) return
         if (isMobile() && VITE_MOBILE_SITE ) {
           window.location.replace(VITE_MOBILE_SITE)
         }
