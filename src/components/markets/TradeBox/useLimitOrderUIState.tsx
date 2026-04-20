@@ -69,6 +69,7 @@ export function useLimitOrderUIState({
   t,
   language,
 }: UseLimitOrderUIStateParams): UseLimitOrderUIStateResult {
+  // 订单价格偏离度, 超过+20%则提示用户确认价格
   const isOrderPriceDeviation = useMemo(() => {
     const referencePrice = new BigNumber(inputTokenPrice || 0)
     const targetPrice = new BigNumber(effectivePrice || 0)

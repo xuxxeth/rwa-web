@@ -305,21 +305,10 @@ export function getDataFeed({
             }
             return;
           }
-          // 如果没有sessionCache，则接口请求
-          // getSession
-          if (sessionCache.length <= 0) {
-            const sessionRes = await klineApi.getSession(sessionType)
-            if (sessionRes.code === RESPONSE_CODE.SUCCESS) {
-              sessionCache.push(...sessionRes.data)
-            }
-            console.log('sessionCache: ', sessionCache)
-          }
+          
           const fetchPromise = (async () => {
-            const session = sessionCache.find(s => s.stockId === currentToken.stockId && s.sessionType === sessionType)
-            if (!session) {
-              return []
-            }
-            const res = await klineApi.getMinute({stock: currentToken.stockId, beginTime: session.beginTime, endTime: session.endTime})
+            
+            const res = await klineApi.getMinute({ stock: currentToken.stockId, sessionType })
             const _data = res?.data?.items || []
             let bars = _data
               .sort((a, b) => a.startTime - b.startTime)
