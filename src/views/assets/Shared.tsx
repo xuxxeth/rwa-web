@@ -251,9 +251,14 @@ export function OrderStatusCell(props: { state: number }) {
 }
 
 export function SessionTypeCell({ sessionType }: { sessionType: number }) {
-  const { tradingStartTime, tradingEndTime, preMarketMinutes, afterMarketMinutes } = useBaseStore(
-    state => state.marketInfo
-  )
+  const {
+    tradingStartTime,
+    tradingEndTime,
+    preMarketMinutes,
+    afterMarketMinutes,
+    nightTradingStartTime,
+    nightTradingEndTime,
+  } = useBaseStore(state => state.marketInfo)
   const { t } = useTranslation()
 
   const getDuration = (timestamp1: number, timestamp2: number) => {
@@ -281,7 +286,20 @@ export function SessionTypeCell({ sessionType }: { sessionType: number }) {
         />
       )
     case 3:
-      return <TextCellWithTranslation text='portfolio.overnight' />
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t201', {
+                duration:
+                  getDuration(nightTradingStartTime, nightTradingEndTime) + ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.overnight'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
     case 1:
     case 2:
     case 4:
