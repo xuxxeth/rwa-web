@@ -27,7 +27,7 @@ const RwaSessionStatus = memo(
         <>
           <div className={cn(
             "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
-            from === "lite-trade" ? "px-0 py-0" : " "
+            from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2)] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0">
@@ -49,7 +49,7 @@ const RwaSessionStatus = memo(
         <>
           <div className={cn(
             "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
-            from === "lite-trade" ? "px-0 py-0" : " "
+            from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2))] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
@@ -69,7 +69,7 @@ const RwaSessionStatus = memo(
         <>
           <div className={cn(
             "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
-            from === "lite-trade" ? "px-0 py-0" : " "
+            from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(168,85,247,0.1)] border border-[rgba(168,85,247,0.2)] text-[#A855F7] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">

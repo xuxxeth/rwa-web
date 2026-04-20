@@ -181,7 +181,7 @@ export function TradeBox({
     inputTokenBalance,
     outputTokenBalance,
     effectivePrice,
-    inputTokenPrice: inputTokenPrice?.price,
+    realtimePrice: realtimeData?.p ? String(realtimeData.p) : '',
     t,
     language: i18n.language,
   })

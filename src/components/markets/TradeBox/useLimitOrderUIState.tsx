@@ -31,7 +31,7 @@ export interface UseLimitOrderUIStateParams {
   outputTokenBalance?: TokenBalance | null
 
   effectivePrice: string
-  inputTokenPrice?: string
+  realtimePrice?: string
 
   t: TFunction
   language: string
@@ -66,13 +66,13 @@ export function useLimitOrderUIState({
   inputTokenBalance,
   outputTokenBalance,
   effectivePrice,
-  inputTokenPrice,
+  realtimePrice,
   t,
   language,
 }: UseLimitOrderUIStateParams): UseLimitOrderUIStateResult {
   // 订单价格偏离度, 超过+20%则提示用户确认价格
   const isOrderPriceDeviation = useMemo(() => {
-    const referencePrice = new BigNumber(inputTokenPrice || 0)
+    const referencePrice = new BigNumber(realtimePrice || 0)
     const targetPrice = new BigNumber(effectivePrice || 0)
 
     if (!referencePrice.isFinite() || referencePrice.lte(0)) return false
@@ -82,7 +82,7 @@ export function useLimitOrderUIState({
     const lowerBound = referencePrice.multipliedBy(0.8)
 
     return targetPrice.gte(upperBound) || targetPrice.lte(lowerBound)
-  }, [effectivePrice, inputTokenPrice])
+  }, [effectivePrice, realtimePrice])
 
   /**
    * 是否低于最小金额

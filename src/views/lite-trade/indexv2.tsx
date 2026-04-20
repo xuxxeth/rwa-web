@@ -54,7 +54,7 @@ function LiteTrade() {
 
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
                 <RwaSessionStatus from="lite-trade" />
-                <div className="my-3">
+                <div className="mb-3">
                   <TradeTypeSwitch />
                 </div>
                 <TradeBox from="lite-trade" />
