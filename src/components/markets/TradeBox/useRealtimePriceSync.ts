@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import BigNumber from "bignumber.js"
-import { truncateUP } from "@/utils"
+import { truncate, truncateUP } from "@/utils"
 import { useRealtimeRwa } from "@/hooks/useRealtimeRwa"
 import { TradeType } from "@/hooks/useCaCommon"
 import type { IRwa, ITokenWithPrice } from "@/service/base/types"
@@ -63,7 +63,7 @@ export function useRealtimePriceSync({
   useEffect(() => {
     if (inputTokenPrice) {
       if (!Number(inputTokenPrice.price ?? 0)) return
-      safeUpdateLimitPrice(truncateUP(inputTokenPrice.price ?? '0', 2))
+      safeUpdateLimitPrice(truncate(inputTokenPrice.price ?? '0', 2))
     }
   }, [inputTokenPrice, safeUpdateLimitPrice])
 
@@ -88,10 +88,10 @@ export function useRealtimePriceSync({
       return
     }
 
-    if (value === 0 && inputTokenPrice) {
-      safeUpdateLimitPrice(truncateUP(inputTokenPrice.price ?? '0', 2))
+    if (value === 0 && Number(realtimeData?.p ?? 0) > 0) {
+      safeUpdateLimitPrice(truncate(String(realtimeData?.p ?? 0), 2))
     }
-  }, [inputTokenPrice, safeUpdateLimitPrice])
+  }, [inputTokenPrice, realtimeData?.p, safeUpdateLimitPrice])
 
   useRealtimeRwa(inputToken ?? null)
 

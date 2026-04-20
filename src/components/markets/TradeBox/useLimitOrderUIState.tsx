@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js"
 import { isGreater, isLess } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
+import { RWA_STATUS } from "@/config/constants"
 
 /**
  * 余额结构
@@ -122,6 +123,13 @@ export function useLimitOrderUIState({
   }, [inputSize, inputTokenBalance, action])
 
   /**
+   * 当前token仅支付卖出，
+   */
+  const isSellOnly = useMemo(() => {
+    return inputToken?.state === RWA_STATUS.SELL && action === "buy"
+  }, [inputToken, action])
+
+  /**
    * 按钮是否禁用
    */
   const disabled = useMemo(() => {
@@ -132,7 +140,7 @@ export function useLimitOrderUIState({
       isMax ||
       isBuyInsufficient ||
       isSellInsufficient ||
-      inputToken?.state === 1
+      isSellOnly
     )
   }, [
     orderValue,
@@ -141,7 +149,7 @@ export function useLimitOrderUIState({
     isOrderPriceDeviation,
     isBuyInsufficient,
     isSellInsufficient,
-    inputToken,
+    isSellOnly,
   ])
 
   /**

@@ -6,6 +6,7 @@ import { memo, useMemo } from "react"
 import { useBaseStore } from "@/stores/baseStore"
 import { LazyImage } from "../image/LazyImage"
 import { useNotSupportSession } from "@/hooks/useNotSupportSession"
+import { cn } from "@/lib/utils"
 
 const RwaSessionStatus = memo(
   ({
@@ -24,7 +25,10 @@ const RwaSessionStatus = memo(
     if (marketTradeState === MARKET_STATUS.CLOSE) {
       return (
         <>
-          <div className="min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]">
+          <div className={cn(
+            "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
+            from === "lite-trade" ? "px-0 py-0" : " "
+          )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2)] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0">
                 <LazyImage src="/images/v2/icons/close2.png" className="w-[18px] h-[18px]" />
@@ -43,7 +47,10 @@ const RwaSessionStatus = memo(
     if (notSupportBeforeOrAfter.notSupport) {
       return (
         <>
-          <div className="min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]">
+          <div className={cn(
+            "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
+            from === "lite-trade" ? "px-0 py-0" : " "
+          )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2))] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
                 <LazyImage src="/images/v2/icons/stop1.png" className="w-full h-full" />
@@ -60,7 +67,10 @@ const RwaSessionStatus = memo(
     if (notSupportOvernight.notSupport) {
       return (
         <>
-          <div className="min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]">
+          <div className={cn(
+            "min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]",
+            from === "lite-trade" ? "px-0 py-0" : " "
+          )}>
             <div className="w-full bg-[rgba(168,85,247,0.1)] border border-[rgba(168,85,247,0.2)] text-[#A855F7] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
                 <LazyImage src="/images/v2/icons/stop2.png" className="w-full h-full" />

@@ -49,11 +49,12 @@ function LiteTrade() {
           <div className="flex gap-x-[14px]">
             <div className="w-[420px]">
               <div className="mb-2">
-                <MarketStatus />
+                <MarketStatus from="trade" />
               </div>
 
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
-                <div className="mb-3">
+                <RwaSessionStatus from="lite-trade" />
+                <div className="my-3">
                   <TradeTypeSwitch />
                 </div>
                 <TradeBox from="lite-trade" />

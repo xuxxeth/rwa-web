@@ -153,7 +153,7 @@ const SessionTypeSelect = memo(
           className={cn(
             "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer bg-[#1A1B1E] ",
             className,
-            from === 'lite-trade' ? ' bg-[#1A1B1E]  ' : ' border border-solid border-[rgba(35,36,39,1)]',
+            from === 'lite-trade' ? ' bg-[#1A1B1E] border-none ' : ' border border-solid border-[rgba(35,36,39,1)]',
           )}
         >
           <div className={cn(
