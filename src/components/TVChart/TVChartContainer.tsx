@@ -125,7 +125,7 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.6",
           timezone: "exchange",
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
