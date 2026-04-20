@@ -221,7 +221,9 @@
         "4": "Potential Wash Trade",
         "5": "Order Price Deviation",
         "6": "User ID not exist",
-        "7": "Unsupported price precision"
+        "7": "Unsupported price precision",
+        "8": "Not supported session",
+        "9": "Exceed slippage"
       }
     }
   },
