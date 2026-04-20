@@ -22,7 +22,7 @@ export function TradeState({ state }: { state: number }) {
       return (
         <IconWithTooltip
           triggerClassName='ml-2 shrink-0'
-          icon='/images/v2/icons/sell-only.svg'
+          icon='/images/v2/icons/only-sell.svg'
           tooltip={'marketQuotes.buyForbidden'}
         />
       )
