@@ -1,6 +1,4 @@
-import { MARKET_STATUS } from "@/config/constants";
 import { useBaseStore } from "@/stores/baseStore";
-import { ta } from "date-fns/locale";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export function useMarketState() {
@@ -32,11 +30,20 @@ export function useMarketState() {
 
 }
 
-export function extractHourMinute(timestamp: number) {
+export function extractHourMinuteLocal(timestamp: number) {
+  const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  return extractHourMinute(timestamp, localTZ)
+}
+
+export function extractHourMinute(
+  timestamp: number,
+  timeZone = "America/New_York" // 默认 ET
+) {
   const date = new Date(timestamp);
 
   const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
+    timeZone,
     hour: "2-digit",
     minute: "2-digit",
     day: "2-digit",
@@ -49,7 +56,7 @@ export function extractHourMinute(timestamp: number) {
   const get = (type: string, def: string) =>
     parts.find(p => p.type === type)?.value ?? def;
 
-  const month = get("month", "Jan").toUpperCase(); // JAN
+  const month = get("month", "Jan").toUpperCase();
   const day = get("day", "01");
   const hour = get("hour", "00");
   const minute = get("minute", "00");
@@ -131,7 +138,14 @@ export function useTradingStartTime() {
       afterCloseTime: extractHourMinute(tradingEndTime + afterMarketMinutes * 60 * 1000),
       preCloseTime: extractHourMinute(tradingEndTime - 24 * 60 * 60 * 1000),
       nightTradingStartTime: extractHourMinute(nightTradingStartTime),
-      nightTradingEndTime: extractHourMinute(nightTradingEndTime)
+      nightTradingEndTime: extractHourMinute(nightTradingEndTime),
+      openTimeLocal: extractHourMinuteLocal(tradingStartTime),
+      closeTimeLocal: extractHourMinuteLocal(tradingEndTime),
+      preOpenTimeLocal: extractHourMinuteLocal(tradingStartTime - preMarketMinutes * 60 * 1000),
+      afterCloseTimeLocal: extractHourMinuteLocal(tradingEndTime + afterMarketMinutes * 60 * 1000),
+      preCloseTimeLocal: extractHourMinuteLocal(tradingEndTime - 24 * 60 * 60 * 1000),
+      nightTradingStartTimeLocal: extractHourMinuteLocal(nightTradingStartTime),
+      nightTradingEndTimeLocal: extractHourMinuteLocal(nightTradingEndTime)
     }
   }, [tradingStartTime, tradingEndTime, countdown, marketTradeState])
 }

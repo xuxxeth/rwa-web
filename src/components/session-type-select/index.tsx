@@ -44,30 +44,76 @@ const SessionTypeSelect = memo(
     const [typeItem, setTypeItem] = useState<{code: SessionType, label: string}>({code: SessionType.DEFAULT, label: t('v3.t16')})
 
     const isRegular = useMemo(() => {
-      return isSupportRegular(inputToken?.symbol || '') && (tradingTime?.tradeState === MARKET_STATUS.BEFORE || tradingTime?.tradeState === MARKET_STATUS.AFTER)
+      return isSupportRegular(inputToken?.symbol || '') && (tradingTime?.tradeState === MARKET_STATUS.BEFORE || tradingTime?.tradeState === MARKET_STATUS.AFTER || tradingTime?.tradeState === MARKET_STATUS.OVERNIGHT)
     }, [inputToken, tradingTime])
+
+    const notSupportBeforeOrAfter = useMemo(() => {
+      if (!inputToken) {
+        return {
+          notSupport: false,
+          session: ''
+        }
+      }
+      if ((inputToken.sessionMaskList?.[1] === 0 && marketTradeState === MARKET_STATUS.AFTER) || 
+        (inputToken.sessionMaskList?.[2] === 0 && marketTradeState === MARKET_STATUS.BEFORE)) {
+        return {
+          notSupport: true,
+          session: ''
+        }
+      }
+      return {
+        notSupport: false,
+        session: ''
+      }
+    }, [inputToken, t])
+
+    const notSupportOvernight = useMemo(() => {
+      if (!inputToken) {
+        return {
+          notSupport: false,
+          session: ''
+        }
+      }
+      if (inputToken.sessionMaskList?.[0] === 0 && marketTradeState === MARKET_STATUS.OVERNIGHT) {
+        return {
+          notSupport: true,
+          session: ''
+        }
+      }
+      return {
+        notSupport: false,
+        session: ''
+      }
+    }, [inputToken, marketTradeState])
 
     const sessionTypeList = useMemo(() => {
       return [
         {
           code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
           label: t('v3.t17'),
-          timeLabel: tradingTime ? `${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} (${t('v3.t31')}) + ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M} (${t('v3.t31')})` : '--:--',
-          disabled: isRegular
+          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} + ${t('v3.t31')}: ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M}` : '--:--',
+          timeLabelLocal: tradingTime ? `${tradingTime.preOpenTimeLocal.H}:${tradingTime.preOpenTimeLocal.M} ~ ${tradingTime.openTimeLocal.H}:${tradingTime.openTimeLocal.M} + ${tradingTime.closeTimeLocal.H}:${tradingTime.closeTimeLocal.M} ~ ${tradingTime.afterCloseTimeLocal.H}:${tradingTime.afterCloseTimeLocal.M}` : '--:--',
+          disabled: isRegular || tradingTime?.tradeState === MARKET_STATUS.OVERNIGHT || tradingTime?.tradeState === MARKET_STATUS.OPEN || tradingTime?.tradeState === MARKET_STATUS.CLOSE || notSupportBeforeOrAfter.notSupport, // 盘前盘后时间段，在夜盘、盘中和闭市状态下不可选
         },
         {
           code: SessionType.DEFAULT,
           label: t('v3.t16'),
-          timeLabel: tradingTime ? `${tradingTime.openTime.H}:${tradingTime.openTime.M} ~  ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} (${t('v3.t31')})` : '--:--'
+          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.openTime.H}:${tradingTime.openTime.M} ~ ${tradingTime.closeTime.H}:${tradingTime.closeTime.M}` : '--:--',
+          timeLabelLocal: tradingTime ? `${tradingTime.openTimeLocal.H}:${tradingTime.openTimeLocal.M} ~ ${tradingTime.closeTimeLocal.H}:${tradingTime.closeTimeLocal.M}` : '--:--'
+        },
+        {
+          code: SessionType.OVERNIGHT,
+          label: t('marketQuotes.overnight'),
+          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.nightTradingStartTime.H}:${tradingTime.nightTradingStartTime.M} ~ ${tradingTime.nightTradingEndTime.H}:${tradingTime.nightTradingEndTime.M}` : '--:--',
+          timeLabelLocal: tradingTime ? `${tradingTime.nightTradingStartTimeLocal.H}:${tradingTime.nightTradingStartTimeLocal.M} ~ ${tradingTime.nightTradingEndTimeLocal.H}:${tradingTime.nightTradingEndTimeLocal.M}` : '--:--',
+          // 夜盘时间段，仅在夜盘状态下可选
+          disabled: tradingTime?.tradeState !== MARKET_STATUS.OVERNIGHT || notSupportOvernight.notSupport
         }
       ]
-    }, [t, tradingTime, isRegular])
-
-    const isOpenOrClose = marketTradeState === MARKET_STATUS.OPEN || marketTradeState === MARKET_STATUS.CLOSE
+    }, [t, tradingTime, isRegular, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
 
     useEffect(() => {
-      // - 盘前/盘后时段，两个选项都支持选，默认为盘前+盘后（Extended Hour）
-      // - 盘中/闭市时段，组件禁选，固定为盘中
+      // 盘前盘后，只支持盘中交易的股票，在盘前盘后和夜盘状态，默认显示盘中
       if (isRegular) {
         setTypeItem({
           code: SessionType.DEFAULT,
@@ -75,20 +121,49 @@ const SessionTypeSelect = memo(
         })
         updateSessionType(SessionType.DEFAULT)
       }
+      // 闭闹和盘中
       else if (marketTradeState === MARKET_STATUS.CLOSE || marketTradeState === MARKET_STATUS.OPEN) {
         setTypeItem({
           code: SessionType.DEFAULT,
           label: t('v3.t16'),
         })
         updateSessionType(SessionType.DEFAULT)
-      } else {
-        setTypeItem({
-          code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
-          label: t('v3.t17'),
-        })
-        updateSessionType(SessionType.PRE_MARKET_AND_AFTER_HOURS)
       }
-    }, [marketTradeState, isRegular, t])
+      // 夜盘
+      else if (marketTradeState === MARKET_STATUS.OVERNIGHT) {
+        // 如果当前是夜盘时间，但不支持夜盘交易，则默认选中仅盘中
+        if (notSupportOvernight.notSupport) {
+          setTypeItem({
+            code: SessionType.DEFAULT,
+            label: t('v3.t16'),
+          })
+          updateSessionType(SessionType.DEFAULT)
+        } else {
+            setTypeItem({
+            code: SessionType.OVERNIGHT,
+            label: t('marketQuotes.overnight'),
+          })
+          updateSessionType(SessionType.OVERNIGHT)
+        }
+        
+      } else {
+        // 如果不支持盘前或盘后单，则默认选中仅盘中
+        if (notSupportBeforeOrAfter.notSupport) {
+          setTypeItem({
+            code: SessionType.DEFAULT,
+            label: t('v3.t16'),
+          })
+          updateSessionType(SessionType.DEFAULT)
+        }  else {
+          // 其他情况默认选中盘前盘后 
+          setTypeItem({
+            code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
+            label: t('v3.t17'),
+          })
+          updateSessionType(SessionType.PRE_MARKET_AND_AFTER_HOURS)
+        }
+      }
+    }, [marketTradeState, isRegular, t, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport, updateSessionType])
     
     const [open, setOpen] = useState(false)
 
@@ -96,9 +171,7 @@ const SessionTypeSelect = memo(
       <Select 
         value={String(typeItem.code)} 
         onOpenChange={open => {
-          if (!isOpenOrClose) {
-            setOpen(open)
-          }
+          setOpen(open)
         }}
         onValueChange={(code) => {
           if (code) {
@@ -112,13 +185,11 @@ const SessionTypeSelect = memo(
         }}
       >
         <SelectTrigger 
-          hideArrow={isOpenOrClose}
           open={open}
           className={cn(
             "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer bg-[#1A1B1E] ",
             className,
             from === 'lite-trade' ? ' bg-[#1A1B1E]  ' : ' border border-solid border-[rgba(35,36,39,1)]',
-            isOpenOrClose ? 'border-[#232427]' : 'border-[#1A1B1E]',
           )}
         >
           <div className={cn(
@@ -135,6 +206,10 @@ const SessionTypeSelect = memo(
                   <span className=" font-semibold">{t('v3.t17') ?? ' '}：</span>
                   <span> {t('v3.t20', {duration: sessionTypeList[0]?.timeLabel})}</span>
                 </div>
+                <div className="mt-2">
+                  <span className=" font-semibold">{t('portfolio.overnight') ?? ' '}：</span>
+                  <span> {t('v3.t201', {duration: sessionTypeList[2]?.timeLabel})}</span>
+                </div>
               </div>
             )}>
               <div className="text-[#9DA3AF] border-b border-dashed border-[#9DA3AF] cursor-pointer text-[14px]">{t('v3.t18') ?? ' '}</div>
@@ -148,36 +223,35 @@ const SessionTypeSelect = memo(
             
           </div>
         </SelectTrigger>
-        {
-            !isOpenOrClose && (
-              <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
-                {sessionTypeList.map(session => (
-                  <SelectItem key={session.code} value={String(session.code)} className="my-1">
-                    <div className="w-full">
-                      <div className={cn(
-                        "flex items-center justify-between w-full text-white text-[12px]",
-                        session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
-                      )}>
-                        <span>{session.label}</span>
-                        <div className="w-11"></div>
-                        <div className=" flex items-center">
-                          <span className="text-[#9DA3AF] text-[12px]">{session.timeLabel}</span>
-                          <div className="w-4 h-4 ml-2">
-                            {
-                              String(session.code) === String(typeItem.code) && (<img src="/images/v2/icons/selected.png" className="w-4 h-4" alt="" />)
-                            }
-                          </div>
-                          
-                        </div>
+        <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
+          {sessionTypeList.map(session => (
+            <SelectItem key={session.code} value={String(session.code)} className="my-1">
+              <IconWithTooltip triggerClassName="w-full" tooltip={session.disabled ? t('v3.t202', { duration1: session.timeLabel, duration2: session.timeLabelLocal }) : undefined} >
+                <div className="w-full">
+                  <div className={cn(
+                    "flex items-center justify-between w-full text-white text-[12px]",
+                    session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
+                  )}>
+                    <span>{session.label}</span>
+                    <div className="w-11"></div>
+                    <div className=" flex items-center">
+                      <span className="text-[#9DA3AF] text-[12px]">{session.timeLabel}</span>
+                      <div className="w-4 h-4 ml-2">
+                        {
+                          String(session.code) === String(typeItem.code) && (<img src="/images/v2/icons/selected.png" className="w-4 h-4" alt="" />)
+                        }
                       </div>
                       
                     </div>
-                    
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            )
-        }
+                  </div>
+                  
+                </div>
+              </IconWithTooltip>
+              
+              
+            </SelectItem>
+          ))}
+        </SelectContent>
         
       </Select>
     )

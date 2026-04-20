@@ -15,29 +15,46 @@ const RwaSessionStatus = memo(
     size?: string
   }) => {
     const { t, i18n } = useTranslation()
-    const tradingTime = useTradingStartTime()
     const inputToken = useTradeStore((state) => state.inputToken)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
 
     const notSupportBeforeOrAfter = useMemo(() => {
       if (!inputToken) {
-        return false
+        return {
+          notSupport: false,
+          session: ''
+        }
       }
       if ((inputToken.sessionMaskList?.[1] === 0 && marketTradeState === MARKET_STATUS.AFTER) || 
         (inputToken.sessionMaskList?.[2] === 0 && marketTradeState === MARKET_STATUS.BEFORE)) {
-        return true
+        return {
+          notSupport: true,
+          session: marketTradeState === MARKET_STATUS.AFTER ? t("v3.t29") : t("v3.t27")
+        }
       }
-      return false
-    }, [inputToken])
+      return {
+        notSupport: false,
+        session: ''
+      }
+    }, [inputToken, t])
 
     const notSupportOvernight = useMemo(() => {
       if (!inputToken) {
-        return false
+        return {
+          notSupport: false,
+          session: ''
+        }
       }
       if (inputToken.sessionMaskList?.[0] === 0 && marketTradeState === MARKET_STATUS.OVERNIGHT) {
-        return true
+        return {
+          notSupport: true,
+          session: t("marketQuotes.overnight")
+        }
       }
-      return false
+      return {
+        notSupport: false,
+        session: ''
+      }
     }, [inputToken, marketTradeState])
 
     // 闭市状态下，
@@ -60,22 +77,38 @@ const RwaSessionStatus = memo(
     }
 
     // 不支持盘前盘后交易
-    if (notSupportOvernight || notSupportBeforeOrAfter) {
+    if (notSupportBeforeOrAfter.notSupport) {
       return (
         <>
           <div className="min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]">
-            <div className="w-full bg-[rgba(168,85,247,0.1)] border border-[rgba(168,85,247,0.2)] text-[#A855F7] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
-              <div className="w-[18px] h-[18px] shrink-0">
-                <LazyImage src="/images/v2/icons/overnight.png" className="w-[18px] h-[18px]" />
+            <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2))] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
+              <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
+                <LazyImage src="/images/v2/icons/stop1.png" className="w-full h-full" />
               </div>
-              <span>{t("v3.t36")}</span>
+              <span>{t("v3.t36", { session: notSupportBeforeOrAfter.session })}</span>
             </div>
           </div>
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
         </>
         
       )
-    
+    }
+    // 不支持夜盘交易
+    if (notSupportOvernight.notSupport) {
+      return (
+        <>
+          <div className="min-h-[34px] flex items-center w-full py-3 px-4 bg-[#131416]">
+            <div className="w-full bg-[rgba(168,85,247,0.1)] border border-[rgba(168,85,247,0.2)] text-[#A855F7] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
+              <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
+                <LazyImage src="/images/v2/icons/stop2.png" className="w-full h-full" />
+              </div>
+              <span>{t("v3.t36", { session: notSupportOvernight.session })}</span>
+            </div>
+          </div>
+          <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
+        </>
+        
+      )
     }
     return null;  
     

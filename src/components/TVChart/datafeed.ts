@@ -11,6 +11,7 @@ import { klineApi } from "@/service/kline/api";
 import { MARKET_STATUS, RESPONSE_CODE } from "@/config/constants";
 import wsService from "@/service/webSocket/service";
 import { truncate } from "@/utils/format";
+import type { ISession } from "@/service/kline/types";
 
 // 图表类型	值
 // Bars	0
@@ -67,6 +68,7 @@ const lastBarsCache = new Map<string, Bar>();
 const barsRangeCache = new Map<string, { from: number; to: number }>();
 const minuteResultCache = new Map<string, { bars: any[]; ts: number }>();
 const minuteInFlight = new Map<string, Promise<any[]>>();
+const sessionCache: ISession[] = [];
 const MINUTE_CACHE_TTL = 3000;
 const _minPrice: Number = 0;
 const _maxPrice: Number = 0;
@@ -303,9 +305,21 @@ export function getDataFeed({
             }
             return;
           }
-
+          // 如果没有sessionCache，则接口请求
+          // getSession
+          if (sessionCache.length <= 0) {
+            const sessionRes = await klineApi.getSession(sessionType)
+            if (sessionRes.code === RESPONSE_CODE.SUCCESS) {
+              sessionCache.push(...sessionRes.data)
+            }
+            console.log('sessionCache: ', sessionCache)
+          }
           const fetchPromise = (async () => {
-            const res = await klineApi.getMinute({stock: currentToken.stockId, sessionType: sessionType, day})
+            const session = sessionCache.find(s => s.stockId === currentToken.stockId && s.sessionType === sessionType)
+            if (!session) {
+              return []
+            }
+            const res = await klineApi.getMinute({stock: currentToken.stockId, beginTime: session.beginTime, endTime: session.endTime})
             const _data = res?.data?.items || []
             let bars = _data
               .sort((a, b) => a.startTime - b.startTime)

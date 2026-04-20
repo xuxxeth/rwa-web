@@ -8,7 +8,7 @@ interface IconWithTooltipProps {
   icon?: string
   text?: string
   children?: React.ReactNode
-  tooltip: React.ReactNode | string
+  tooltip?: React.ReactNode | string
   triggerClassName?: string
   iconOrTextClassName?: string
   tooltipClassName?: string
@@ -46,7 +46,9 @@ function IconWithTooltip({
       </>
     )
   }
-
+  if (!tooltip) {
+    return renderTrigger()
+  }
   return (
     <TooltipProvider>
       <Tooltip delayDuration={0} open={open} onOpenChange={onOpenChange}>
