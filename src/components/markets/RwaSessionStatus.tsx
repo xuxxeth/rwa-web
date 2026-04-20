@@ -5,6 +5,7 @@ import { useTradeStore } from "@/stores/tradeStore"
 import { memo, useMemo } from "react"
 import { useBaseStore } from "@/stores/baseStore"
 import { LazyImage } from "../image/LazyImage"
+import { useNotSupportSession } from "@/hooks/useNotSupportSession"
 
 const RwaSessionStatus = memo(
   ({
@@ -17,45 +18,7 @@ const RwaSessionStatus = memo(
     const { t, i18n } = useTranslation()
     const inputToken = useTradeStore((state) => state.inputToken)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
-
-    const notSupportBeforeOrAfter = useMemo(() => {
-      if (!inputToken) {
-        return {
-          notSupport: false,
-          session: ''
-        }
-      }
-      if ((inputToken.sessionMaskList?.[1] === 0 && marketTradeState === MARKET_STATUS.AFTER) || 
-        (inputToken.sessionMaskList?.[2] === 0 && marketTradeState === MARKET_STATUS.BEFORE)) {
-        return {
-          notSupport: true,
-          session: marketTradeState === MARKET_STATUS.AFTER ? t("v3.t29") : t("v3.t27")
-        }
-      }
-      return {
-        notSupport: false,
-        session: ''
-      }
-    }, [inputToken, t])
-
-    const notSupportOvernight = useMemo(() => {
-      if (!inputToken) {
-        return {
-          notSupport: false,
-          session: ''
-        }
-      }
-      if (inputToken.sessionMaskList?.[0] === 0 && marketTradeState === MARKET_STATUS.OVERNIGHT) {
-        return {
-          notSupport: true,
-          session: t("marketQuotes.overnight")
-        }
-      }
-      return {
-        notSupport: false,
-        session: ''
-      }
-    }, [inputToken, marketTradeState])
+    const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, inputToken)
 
     // 闭市状态下，
     if (marketTradeState === MARKET_STATUS.CLOSE) {

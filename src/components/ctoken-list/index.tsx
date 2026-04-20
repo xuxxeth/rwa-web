@@ -6,7 +6,6 @@ import type { IRwa } from "@/service/base/types";
 import { formatTokenAmountWithCommas } from "@/utils/format";
 import { multiply, symbolToLower } from "@/utils";
 import { useBaseStore } from "@/stores/baseStore";
-import { useRwaPrice, useTokenBalance } from "@/hooks/useTokenBalances";
 import { SortButton } from "../sort-button-svg";
 import { useTableSort } from "@/hooks/useTableHelper";
 import { cn } from "@/lib/utils";
@@ -16,11 +15,11 @@ import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { WalletNotConnectedSmallVersion } from "../wallet-not-connected";
 import useFavorites from "@/hooks/useFavorites";
 import SignatureVerify from '@/components/signature-verify'
-import IconWithTooltip from "../icon-tooltip";
 import { useWssStore } from "@/stores/wssStore";
 import { useWssOn } from "@/hooks/useWssOn";
-import { PreMarketOpen } from "../markets/PreMarketOpen";
 import { MARKET_STATUS } from "@/config/constants";
+import { MarketStatus } from "../markets/MarketStatus";
+import { SessionType, TradeState } from "@/views/markets/MarketQuotes/shared";
 
 export type CTokenProps = {
   stock: string,
@@ -33,19 +32,13 @@ export type CTokenProps = {
   state?: string
 }
 
-export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string; state?: string; marketOpen?: boolean }) => {
-  const tokenPrice = useRwaPrice(symbol);
-  const closeUp = useMemo(() => Number(tokenPrice?.closeUp), [tokenPrice?.closeUp])
-  const up = useMemo(() => Number(tokenPrice?.up), [tokenPrice?.up])
-
-  const nup = useMemo(() => {
-    return marketOpen ? up : closeUp
-  }, [closeUp, up, marketOpen])
+export const CTokenPrice = memo(({ token }: { token: IRwa }) => {
+  const nup = useMemo(() => Number(token?.up), [token?.up])
 
   return (
     <div className="text-[12px]">
-      <div className="flex items-center gap-x-1">
-        <span className=" font-medium">{tokenPrice?.closePrice ? ('$' + tokenPrice?.closePrice) : '--'}</span>
+      <div className="">
+        <span className=" font-medium">{token?.price ? ('$' + token?.price) : '--'}</span>
         <div className=" font-normal flex items-center gap-x-[4px]">
           <span
             className={
@@ -59,50 +52,20 @@ export const CTokenPrice = memo(({ symbol, state, marketOpen }: { symbol: string
           </span>
         </div>
       </div>
-      {
-        !marketOpen && (
-          <div className="flex items-center gap-x-1 text-[#9DA3AF]">
-            <span className=" font-medium">{tokenPrice?.price ? ('$' + tokenPrice?.price) : '--'}</span>
-            {
-              Number(tokenPrice?.price) > 0 ? (
-                <div className=" font-normal flex items-center gap-x-[4px]">
-                  <span
-                  >
-                    {up !== 0 && (up > 0 ? '+' : '-')}
-                    {Math.abs(Number(tokenPrice?.up || "0"))}%
-                  </span>
-                </div>
-              ) : 
-              <div className=" font-normal flex items-center gap-x-[4px]">
-                <span
-                >
-                  --
-                </span>
-              </div>
-            }
-            
-            <div className="pl-1 bg-[rgba(255,255,255,0.03)] h-[17px] flex items-center px-1 text-[10px]">{state}</div>
-          </div>
-        )
-      }
       
       
     </div>
   );
 });
-export const CTokenBalance = memo(({ symbol, pricePrecision }: { symbol: string; pricePrecision: number }) => {
-  const tokenBalance = useTokenBalance(symbol)?.balance ?? "0";
-  const tokenPrice = useRwaPrice(symbol)?.price ?? "0";
-
-  const total = multiply(tokenBalance, tokenPrice);
+export const CTokenBalance = memo(({ token }: { token: IRwa }) => {
 
   return (
     <div className="text-right text-[12px]">
       <div className=" font-medium leading-[24px]">
-        {formatTokenAmountWithCommas(tokenBalance)}
+        {formatTokenAmountWithCommas(token.balance ?? '0', token.precision)}
       </div>
       <div className=" font-normal text-[#9DA3AF]">
-        ≈ ${formatTokenAmountWithCommas(total, pricePrecision)}
+        ≈ ${formatTokenAmountWithCommas(token.balanceValue ?? '0', token.precision)}
       </div>
     </div>
   );
@@ -130,9 +93,9 @@ const CTokenItem = memo(
       >
         <div className={cn(
           "flex items-center gap-x-1 w-5/8 shrink-0",
-          account ? "w-3/8" : ""
+          account ? "w-4/8" : ""
         )}>
-          <div>
+          <div className=" shrink-0">
             <LazyImage onClick={(ev) => {
               ev.stopPropagation()
               if(!toggleEnable) return
@@ -147,25 +110,20 @@ const CTokenItem = memo(
             <div className=" text-[12px] font-normal text-[#9DA3AF] max-w-[86px] truncate">{token?.name || '--'}</div>
             
           </div>
-          {
-            token.state === 1 && 
-              // <LazyImage src="/images/v2/icons/trade_halt.svg" className="w-[24px]" />
-              <IconWithTooltip
-                triggerClassName=''
-                icon='/images/v2/icons/trade_halt.svg'
-                tooltip='portfolio.tH'
-              />
-          }
+          <div className="flex items-center">
+            <TradeState state={token.state} />
+            <SessionType sessionMask={token.sessionMask} />
+          </div>
         </div>
         <div className={cn(
           "w-4/8 flex items-center ",
-          account ? "w-3/8 justify-start" : ""
+          account ? "w-2/8 justify-start" : ""
         )}>
-          <CTokenPrice symbol={token.symbol} state={state} marketOpen={marketOpen} />
+          <CTokenPrice token={token} />
         </div>
         {
           account && <div className="w-2/8 text-right">
-            <CTokenBalance symbol={token.symbol} pricePrecision={token.precision} />
+            <CTokenBalance token={token} />
           </div>
         }
         
@@ -223,7 +181,9 @@ const FilterTabs = memo(({ onTabChange }: { onTabChange?: (tab: TabItemProps) =>
           ))
         }
       </div>
-      <PreMarketOpen size="sm" />
+      <div className="pr-2">
+        <MarketStatus />
+      </div>
     </div>
     
   )
@@ -258,17 +218,17 @@ const CTokenList = memo(
 
     const rwaListWithBalance = useMemo(() => {
       return newRwaList.filter(rwa => rwa.state !== 2).map(rwa => {
-        return {
+        const newRwa = {
           ...rwa,
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
-          ...tokenWithPrice[symbolToLower(rwa.symbol)]
+          ...tokenWithPrice[symbolToLower(rwa.symbol)],
         }
-      }).sort((a, b) => marketTradeState === MARKET_STATUS.OPEN ? Number(b.up ?? '0') - Number(a.up ?? '0') : Number(b.closeUp ?? '0') - Number(a.closeUp ?? '0'))
+        newRwa.balanceValue = multiply(newRwa?.balance ?? '0', tokenWithPrice[symbolToLower(rwa.symbol)]?.price ?? '0')
+        return newRwa
+      }).sort((a, b) => Number(b.balanceValue) - Number(a.balanceValue))
     }, [newRwaList, tokenWithBalance, tokenWithPrice, marketTradeState])
 
     const [searchTerm, setSearchTerm] = useState("")
-    
-    const [filterHolding, setFilterHolding] = useState(false)
     
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
@@ -312,8 +272,8 @@ const CTokenList = memo(
           }
 
           case 'change': {
-            const upA = marketTradeState === MARKET_STATUS.OPEN ? Number(a.up) : Number(a.closeUp) || 0
-            const upB = marketTradeState === MARKET_STATUS.OPEN ? Number(b.up) : Number(b.closeUp) || 0
+            const upA = Number(a.up) || 0
+            const upB = Number(b.up) || 0
             return sort.order === 'asc'
               ? upA - upB
               : upB - upA
@@ -374,7 +334,6 @@ const CTokenList = memo(
           stateLabel = t("v3.t25")
         }
       }
-      console.log('marketTradeState', marketTradeState, stateLabel)
       return stateLabel
     }, [
       t,
@@ -409,7 +368,7 @@ const CTokenList = memo(
           <div className=" flex items-center justify-between text-[12px] font-normal px-4 pr-2 text-[#9DA3AF]">
             <div className={cn(
               "w-4/8 flex items-center cursor-pointer",
-              account ? "w-3/8" : ""
+              account ? "w-4/8" : ""
             )}
               onClick={() => {
                 onSortChange('name')
@@ -422,7 +381,7 @@ const CTokenList = memo(
             </div>
             <div className={cn(
               "flex items-center w-3/8 cursor-pointer",
-              account ? "w-3/8 justify-start" : ""
+              account ? "w-2/8 justify-start" : ""
             )}
               onClick={() => {
                 onSortChange('change')

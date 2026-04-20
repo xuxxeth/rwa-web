@@ -24,6 +24,7 @@ export interface ITokenWithPrice  {
   "up"?: string, 
   "postUp"?: string, 
   "dailyHigh"?: string,
+  "upValue"?: string
 }
 
 // 0-正常，1-禁止买卖, 2-下架
@@ -93,6 +94,12 @@ export interface IRwa {
   },
   "sessionMaskList"?: number[],
   "is24H"?: boolean,
+  "balanceValue"?: string,
+  "balance"?: string,
+  "origin"?: string,
+  "up"?: string,
+  "upValue"?: string,
+  "price"?: string | number,
 }
 
 export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice

@@ -12,6 +12,7 @@ import { useBaseStore } from "@/stores/baseStore";
 import { MARKET_STATUS } from "@/config/constants";
 import { useTradingStartTime } from "@/hooks/useMarketState";
 import { useSupportRegular } from "@/hooks/useSupportRegular";
+import { useNotSupportSession } from "@/hooks/useNotSupportSession";
 
 export type ISessionTypeItem = {
   code: string,
@@ -47,44 +48,7 @@ const SessionTypeSelect = memo(
       return isSupportRegular(inputToken?.symbol || '') && (tradingTime?.tradeState === MARKET_STATUS.BEFORE || tradingTime?.tradeState === MARKET_STATUS.AFTER || tradingTime?.tradeState === MARKET_STATUS.OVERNIGHT)
     }, [inputToken, tradingTime])
 
-    const notSupportBeforeOrAfter = useMemo(() => {
-      if (!inputToken) {
-        return {
-          notSupport: false,
-          session: ''
-        }
-      }
-      if ((inputToken.sessionMaskList?.[1] === 0 && marketTradeState === MARKET_STATUS.AFTER) || 
-        (inputToken.sessionMaskList?.[2] === 0 && marketTradeState === MARKET_STATUS.BEFORE)) {
-        return {
-          notSupport: true,
-          session: ''
-        }
-      }
-      return {
-        notSupport: false,
-        session: ''
-      }
-    }, [inputToken, t])
-
-    const notSupportOvernight = useMemo(() => {
-      if (!inputToken) {
-        return {
-          notSupport: false,
-          session: ''
-        }
-      }
-      if (inputToken.sessionMaskList?.[0] === 0 && marketTradeState === MARKET_STATUS.OVERNIGHT) {
-        return {
-          notSupport: true,
-          session: ''
-        }
-      }
-      return {
-        notSupport: false,
-        session: ''
-      }
-    }, [inputToken, marketTradeState])
+    const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, inputToken)
 
     const sessionTypeList = useMemo(() => {
       return [

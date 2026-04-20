@@ -71,10 +71,8 @@ export const useBaseStore = create<BaseStore>()(
               acc[symbolToLower(cur.S)] = {
                 closePrice: truncate(cur.c || 0, rwa.precision),
                 price: truncate(cur.p || 0, rwa.precision),
-                // closeUp: cur.c && cur.pc ? calculateUp(cur.c, cur.pc) : '0',
-                closeUp: cur.c && cur.pc ? calculateTruncateUP(cur.c, cur.pc, rwa.precision) : '0.00',
-                // up: cur.p && cur.c ? calculateUp(cur.p, cur.c) : '0.00',
-                up: cur.p && cur.c ? calculateTruncateUP(cur.p, cur.c, rwa.precision) : '0.00',
+                upValue: truncate(subtract(cur.p ?? '0', (cur.o ?? '0')), 2),
+                up: cur.p && cur.o ? calculateUp(cur.p, cur.o) : '0.00',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
               }
             }
