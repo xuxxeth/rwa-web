@@ -7,13 +7,14 @@ import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import type { IKycDetail } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
-import { retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
+import { retryRefresh, useResetRetryCount, SectionBox, SectionTitle } from "./BaseInfo"
 import {
   Text,
 } from './Upload/shared'
 import type { ApiResponse } from "@/service/client"
 import { usePendingStep } from "@/hooks/usePendingStep"
 import { WarningInfo } from "./WarningInfo"
+import { useKycStore } from '@/stores/kycStore'
 
 interface FormData {
   incomeCertifications?: string[]
@@ -30,6 +31,7 @@ const Risk3Info = memo(
   }) => {
     const { t } = useTranslation()
     const pendingStep = usePendingStep()
+    const updateRetryCount = useKycStore(state => state.updateRetryCount)
     const { toastSuccess, toastError  } = useToast()
     const { handleSubmit, watch, setValue, clear, formState: { errors } } = usePersistentForm<FormData>('kycBaseInfo', {
       incomeCertifications: []
@@ -56,6 +58,7 @@ const Risk3Info = memo(
       setSubmiting(true)
       const res = await kycApi.submitKyc(params)
       if (res?.code === RESPONSE_CODE.SUCCESS) {
+        updateRetryCount(0)
         if (refresh) {
           const detailRes = await retryRefresh(refresh)
           setSubmiting(false)
@@ -74,6 +77,8 @@ const Risk3Info = memo(
      }
       
     }
+
+    useResetRetryCount()
 
     return (
 

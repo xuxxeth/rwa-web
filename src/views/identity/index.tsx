@@ -92,6 +92,7 @@ function Identity({ account }: { account: string }) {
   const kycDetailInit = useRef(false)
   const retryCount = useRef(0)
   const updateRetryCount = useKycStore(state => state.updateRetryCount)
+  const addRetryCount = useKycStore(state => state.addRetryCount)
 
   const resetRetry = () => {
     setIsRetry(prev => (prev === true ? false : prev))
@@ -102,9 +103,9 @@ function Identity({ account }: { account: string }) {
       if (init) {
         retryCount.current = 1
       } 
-      if (!init) {
-        updateRetryCount(retryCount.current)
-      }
+      // if (!init) {
+      //   updateRetryCount(retryCount.current)
+      // }
       const res = await kycApi.getKycDetail()
       if (res?.data) {
         if (pendingStepRef.current) {
@@ -121,10 +122,10 @@ function Identity({ account }: { account: string }) {
       }
       kycDetailInit.current = true
       setKycDetail(res?.data || {})
-      if (!init) {
-        retryCount.current = retryCount.current + 1
-        updateRetryCount(retryCount.current)
-      }
+      // if (!init) {
+      //   retryCount.current = retryCount.current + 1
+      //   updateRetryCount(retryCount.current)
+      // }
       return res
     } catch (error) {
       kycDetailInit.current = true
@@ -135,6 +136,10 @@ function Identity({ account }: { account: string }) {
           applyStatus: KYC_OVERALL_STATUS.VERIFYING,
         },
         message: null,
+      }
+    } finally {
+      if (!init) {
+        addRetryCount()
       }
     }
   }

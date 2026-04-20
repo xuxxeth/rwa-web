@@ -65,5 +65,8 @@ export const useKycStore = create<KycStore>((set, get) => ({
   },
   updateRetryCount: (count: number) => {
     set({retryCount: count})
+  },
+  addRetryCount: () => {
+    set({retryCount: get().retryCount + 1})
   }
 }))

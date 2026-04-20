@@ -6,7 +6,7 @@ import { Upload } from "./Upload"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import { RESPONSE_CODE } from "@/config/constants"
-import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
+import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle, useResetRetryCount } from "./BaseInfo"
 import { LazyImage } from "@/components/image/LazyImage"
 import { KycInput } from "@/components/input/KycInput"
 import { KycTextarea } from "@/components/input/KycTextarea"
@@ -108,6 +108,8 @@ const ExtraInfo = memo(
       }
       
     }
+
+    useResetRetryCount()
 
     const handlePlus = async (action: string, index: number) => {
 

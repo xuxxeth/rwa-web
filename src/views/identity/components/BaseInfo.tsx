@@ -25,14 +25,23 @@ import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
 import { parseISO } from 'date-fns'
+import { useKycStore } from '@/stores/kycStore'
 import {
   Text,
 } from './Upload/shared'
 
+export function useResetRetryCount() {
+  const updateRetryCount = useKycStore(state => state.updateRetryCount)
+  
+  useEffect(() => {
+    updateRetryCount(0)
+  }, [updateRetryCount])
+}
+
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
-  maxRetries = 3,
-  interval = 5000
+  maxRetries = 5,
+  interval = 3000
 ): Promise<any> {
   let attempt = 1
   return new Promise(resolve => {
@@ -370,6 +379,8 @@ const BaseInfo = memo(
 
     // 组件卸载时重置重试状态，使用防抖避免 StrictMode 下的重复执行
     useDebouncedUnmount(onResetRetry)
+
+    useResetRetryCount()
 
     return (
       <>

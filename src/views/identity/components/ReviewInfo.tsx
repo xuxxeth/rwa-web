@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import type { IKycDetail, IKycSubmitData } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
-import { ErrorBox, FormItemBox, FormItemLabel, InputBox, retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
+import { ErrorBox, FormItemBox, FormItemLabel, InputBox, retryRefresh, useResetRetryCount, SectionBox, SectionTitle } from "./BaseInfo"
 import { EditInput } from "@/components/input/EditInput"
 import { EmploymentSelect } from "@/components/employment-select"
 import type { ApiResponse } from "@/service/client"
@@ -109,6 +109,8 @@ const ReviewInfo = memo(
       }
       
     }
+
+    useResetRetryCount()
 
     useEffect(() => {
       if (userInfo && userInfo.basicInfo.firstName) {
