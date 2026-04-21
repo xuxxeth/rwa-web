@@ -25,9 +25,14 @@ export function useTableSort<SortableField extends string>() {
     })
   }, [])
 
+  const cancelSort = useCallback(() => {
+    setSort(null)
+  }, [])
+
   return {
     sort,
     onSortChange,
+    cancelSort
   }
 }
 

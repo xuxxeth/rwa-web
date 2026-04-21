@@ -19,7 +19,7 @@ import { useRwaTokens } from '@/hooks/useTokens'
 import wsService from '@/service/webSocket/service'
 import { type ISummaryData } from '@/service/webSocket/types'
 import { type IQuote } from '@/service/quote/types'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { truncate } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
 import IconWithTooltip from '@/components/icon-tooltip'
@@ -101,7 +101,7 @@ interface ITableExtra {
 
 export default function MarketQuotes() {
   const { t } = useTranslation()
-  const { sort, onSortChange } = useTableSort<SortableField>()
+  const { sort, onSortChange, cancelSort } = useTableSort<SortableField>()
   const router = useRouter()
 
   const marketTradeState = useBaseStore(state => state.marketTradeState)
@@ -119,7 +119,8 @@ export default function MarketQuotes() {
   const newRwaList = useMemo(() => {
     let rwaListFiltered = rwaList
     if (isFavorites) {
-      rwaListFiltered = favorites
+      rwaListFiltered = [...favorites]
+        .reverse()
         .map(stockId => rwaMap.get(stockId))
         .filter(rwa => rwa !== undefined)
     }
@@ -130,16 +131,21 @@ export default function MarketQuotes() {
 
   const marketQuotes = useRwaListWithQuote(newRwaList)
 
-  const defaultSorter = (item1: IMarketQuote, item2: IMarketQuote) => {
+  const defaultMarketSorter = useCallback((item1: IMarketQuote, item2: IMarketQuote) => {
     if (item1.weight === item2.weight) {
       return advancedSort(item1.symbol, item2.symbol, 'asc')
     }
     return advancedSort(item1.weight, item2.weight, 'desc')
-  }
+  }, [])
+
+  const defaultSorter = useMemo(
+    () => (isFavorites ? undefined : defaultMarketSorter),
+    [isFavorites, defaultMarketSorter]
+  )
 
   const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
     // @ts-ignore
-    usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
+    usePaginationData<IMarketQuote>(8, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
 
   useEffect(() => {
     if (paginatedData.length === 0 && currentPage >= 1) {
@@ -163,6 +169,7 @@ export default function MarketQuotes() {
                 isFavorites={isFavorites}
                 onFavoriteChange={newIsFavorites => {
                   setPage(1)
+                  cancelSort()
                   setIsFavorites(newIsFavorites)
                 }}
               />
