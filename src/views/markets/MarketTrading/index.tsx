@@ -16,10 +16,10 @@ function Markets() {
   return (
     <>
       <div className='w-full overflow-x-auto'>
-        <div className=' bg-[#131416] min-h-[100vh] text-white w-[1160px] min-w-full'>
+        <div className=' bg-[#131416] min-h-[100vh] text-white '>
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
-          <div className='flex min-w-[1200px]'>
-            <div className='flex-1 min-w-[856px]'>
+          <div className='flex'>
+            <div className='flex-1 min-w-[1100px]'>
               <KlineBody from='market' />
             </div>
             <div className='w-[340px] shrink-0 flex bg-[#131416]'>

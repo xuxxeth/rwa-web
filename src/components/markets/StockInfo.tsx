@@ -197,7 +197,7 @@ export const StockInfo = memo(
     }, [inputToken?.stockId])
 
     return (
-      <div className="flex justify-between text-white px-4 min-w-[1100px]">
+      <div className="flex justify-between text-white px-4 ">
         <div className="flex items-center gap-x-8">
           <StockDialog from={from} />
           <div className={cn(

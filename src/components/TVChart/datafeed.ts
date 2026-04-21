@@ -162,10 +162,10 @@ export function getDataFeed({
         name: ticker,
         description: ticker,
         type: "stock",
-        // session: "24x7",
+        session: "24x7",
         // timezone: "Asia/Hong_Kong",
         // session: "0930-1601",
-        session: '0400-2000',
+        // session: '0400-2000',
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 100,  // 小数点后2位精度
@@ -441,8 +441,9 @@ export function getDataFeed({
           if (
             (currentChartType === 1 && marketState === MARKET_STATUS.OPEN) // 如果是candle图，则正常执行回调
             || (marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前
-            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘前状态，且当前分时图是盘前
-            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘前状态，且当前分时图是盘前
+            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘中状态，且当前分时图是全部分时和盘中分时
+            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘后状态，且当前分时图是盘后和全部分时
+            || (marketState === MARKET_STATUS.OVERNIGHT && (sessionType === 0 || sessionType === 5)) // 夜盘状态，且当前分时图是夜盘和全部分时
           ) {
             onRealtimeCallback({
               "time": data.t * 1000,

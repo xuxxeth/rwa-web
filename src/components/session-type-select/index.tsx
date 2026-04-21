@@ -189,7 +189,10 @@ const SessionTypeSelect = memo(
         </SelectTrigger>
         <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
           {sessionTypeList.map(session => (
-            <SelectItem key={session.code} value={String(session.code)} className="my-1">
+            <SelectItem key={session.code} value={String(session.code)} className={cn(
+              "my-1 cursor-pointer",
+              session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
+            )}>
               <IconWithTooltip triggerClassName="w-full" tooltip={session.disabled ? t('v3.t202', { duration1: session.timeLabel, duration2: session.timeLabelLocal }) : undefined} >
                 <div className="w-full">
                   <div className={cn(
