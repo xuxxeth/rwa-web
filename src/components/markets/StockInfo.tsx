@@ -41,75 +41,89 @@ export const LabelWrap = memo(
 
 const RwaItemPrice = memo(
   ({ is24H }: { is24H?: boolean}) => {
+    const { t } = useTranslation()
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
     const upValue = useMemo(() => realtimeData ? Number(truncate(subtract(realtimeData.p ?? '0', (realtimeData.o ?? '0')), 2)) : 0, [realtimeData?.o, realtimeData?.p])
     const openUp = useMemo(() => realtimeData ? Number(calculateUp(realtimeData.p, realtimeData.o)) : 0, [realtimeData?.o, realtimeData?.p])
 
     return (
-      <div className="min-w-[130px] shrink-0">
-        <div className={cn(
-          "",
-          openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
-                ? "text-[#25A750]"
-                : "text-[#CA3F64] ",
-        )}>
-          <div className={cn(
-            "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
-          )}>
-            {realtimeData?.p ? '$' + realtimeData?.p : '0.00'}
+      <div className="min-w-[130px] shrink-0 flex items-center gap-x-5">
+        <div className=" relative -top-[1px]">
+          <div className="text-[12px] font-normal text-[#9DA3AF] flex">
+            {t('portfolio.price')}
           </div>
-          <div className="flex items-center gap-x-1">
-            {
-              (Number(realtimeData?.p) && Number(realtimeData?.o)) ? (
-                <span
-                  className={cn(
-                    "leading-[100%] font-normal text-[14px]",
-                  )
-                }
-                >
-                  {upValue !== 0 && (upValue > 0 ? '+' : '-')}
-                  {Math.abs(Number(upValue || "0")).toFixed(2)}
-                </span>
-              ) : <span
-                  className={cn(
-                    "leading-[100%] font-normal text-[14px] text-[#A1A1A1]",
-                  )
-                  }
-                >
-                  0.00
-                </span>
-            }
-            {
-              (Number(realtimeData?.p) && Number(realtimeData?.o)) ? (
-                <>
+          <div className={cn(
+            "",
+            openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
+                  ? "text-[#25A750]"
+                  : "text-[#CA3F64] ",
+          )}>
+            <div className={cn(
+              "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
+            )}>
+              {realtimeData?.p ? '$' + realtimeData?.p : '0.00'}
+            </div>
+          
+          </div>
+        </div>
+        <div className="">
+          <LabelWrap tooltip={t('v3.t381')}>{t('v3.t38')}</LabelWrap>
+          <div className={cn(
+            "",
+            openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
+                  ? "text-[#25A750]"
+                  : "text-[#CA3F64] ",
+          )}>
+            
+            <div className="flex items-center gap-x-1 mt-[4px]">
+              {
+                (Number(realtimeData?.p) && Number(realtimeData?.o)) ? (
                   <span
                     className={cn(
                       "leading-[100%] font-normal text-[14px]",
                     )
                   }
                   >
-                    ({openUp !== 0 && (openUp > 0 ? '+' : '-')}
-                    {Math.abs(Number(openUp || "0")).toFixed(2)}%)
+                    {upValue !== 0 && (upValue > 0 ? '+' : '-')}
+                    {Math.abs(Number(upValue || "0")).toFixed(2)}
                   </span>
-                  {
-                    is24H && (
-                      <div className="h-[17px] px-1 flex items-center text-[#9DA3AF] text-[10px] bg-[rgba(255,255,255,0.04)]">24H</div>
+                ) : <span
+                    className={cn(
+                      "leading-[100%] font-normal text-[14px] text-[#A1A1A1]",
                     )
+                    }
+                  >
+                    0.00
+                  </span>
+              }
+              {
+                (Number(realtimeData?.p) && Number(realtimeData?.o)) ? (
+                  <>
+                    <span
+                      className={cn(
+                        "leading-[100%] font-normal text-[14px]",
+                      )
+                    }
+                    >
+                      ({openUp !== 0 && (openUp > 0 ? '+' : '-')}
+                      {Math.abs(Number(openUp || "0")).toFixed(2)}%)
+                    </span>
+                   
+                  </>
+                
+              ) : <span
+                  className={cn(
+                    "leading-[100%] font-normal text-[14px] text-[#A1A1A1]",
+                  )
                   }
-                </>
-              
-            ) : <span
-                className={cn(
-                  "leading-[100%] font-normal text-[14px] text-[#A1A1A1]",
-                )
-                }
-              >
-                (0.00%)
-              </span>
-            }
-          </div>
+                >
+                  (0.00%)
+                </span>
+              }
+            </div>
+            
           
-        
+          </div>
         </div>
         
       </div>

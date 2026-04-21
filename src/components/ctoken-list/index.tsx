@@ -212,7 +212,7 @@ const CTokenList = memo(
     const newRwaList = useMemo(() => {
       if(selectTab === 'all') return rwaList
 
-      return favorites.map(favorite => rwaMap.get(favorite)).filter(rwa => rwa !== undefined)
+      return [...favorites].reverse().map(favorite => rwaMap.get(favorite)).filter(rwa => rwa !== undefined)
     }, [rwaList, favorites, selectTab])
 
 
