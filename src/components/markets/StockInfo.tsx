@@ -61,7 +61,7 @@ const RwaItemPrice = memo(
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
             )}>
-              {realtimeData?.p ? '$' + realtimeData?.p : '0.00'}
+              {realtimeData?.p ? '$' + realtimeData?.p : '--'}
             </div>
           
           </div>
@@ -93,7 +93,7 @@ const RwaItemPrice = memo(
                     )
                     }
                   >
-                    0.00
+                    --
                   </span>
               }
               {
@@ -117,7 +117,7 @@ const RwaItemPrice = memo(
                   )
                   }
                 >
-                  (0.00%)
+                  (--)
                 </span>
               }
             </div>
@@ -222,24 +222,24 @@ export const StockInfo = memo(
 
             <div className=" shrink-0">
               <LabelWrap tooltip={t('v2.tx.t201')}>{t('v2.tx.t45')}</LabelWrap>
-              <div className="mt-1">${realtimeData?.h || '0.00'}</div>
+              <div className="mt-1">{realtimeData?.h ? '$' + realtimeData?.h : '--'}</div>
             </div>
             <div className=" shrink-0">
               <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t46')}</LabelWrap>
-              <div className="mt-1">${realtimeData?.l || '0.00'}</div>
+              <div className="mt-1">{ realtimeData?.l ? '$' + realtimeData?.l : '--'}</div>
             </div>
             <div className=" shrink-0">
               <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
-              <div className="mt-1">{stockData?.marketCap || '0.00'}</div>
+              <div className="mt-1">{stockData?.marketCap || '--'}</div>
             </div>
             <div className=" shrink-0">
               <LabelWrap tooltip={t('companyProfile.floatCapH')}>{t('companyProfile.floatCap')}</LabelWrap>
-              <div className="mt-1">{stockData?.circCap || '0.00'}</div>
+              <div className="mt-1">{stockData?.circCap || '--'}</div>
             </div>
             <div ref={showMoreRef} className=" shrink-0 flex items-center gap-x-4 relative">
               <div>
                 <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
-                <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '0.00'}</div>
+                <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
               </div>
               <div className={cn(
                 " cursor-pointer ",

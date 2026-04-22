@@ -227,14 +227,14 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       // area 模式下仅首次加载，后续拖拽/缩放不再请求
-      if (currentChartType === 3 && !firstDataRequest) {
+      if (currentChartType === 3 && !firstDataRequest && sessionType !== 0) {
         onHistoryCallback([], { noData: true })
         return
       }
       
       // 如果是Kline
       try {
-        if (currentChartType !== 3) {
+        if (currentChartType !== 3 || sessionType === 0) {
           // if (resolution === '1' && !tradingStartTime) {
           //   onHistoryCallback([], { noData: false })
           //   return

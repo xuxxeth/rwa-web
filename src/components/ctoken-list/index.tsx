@@ -20,6 +20,7 @@ import { useWssOn } from "@/hooks/useWssOn";
 import { MARKET_STATUS } from "@/config/constants";
 import { MarketStatus } from "../markets/MarketStatus";
 import { SessionType, TradeState } from "@/views/markets/MarketQuotes/shared";
+import { se } from "date-fns/locale";
 
 export type CTokenProps = {
   stock: string,
@@ -217,7 +218,8 @@ const CTokenList = memo(
 
 
     const rwaListWithBalance = useMemo(() => {
-      return newRwaList.filter(rwa => rwa.state !== 2).map(rwa => {
+      
+      const rwaListWithBalanceList = newRwaList.filter(rwa => rwa.state !== 2).map(rwa => {
         const newRwa = {
           ...rwa,
           ...tokenWithBalance[symbolToLower(rwa.symbol)],
@@ -225,7 +227,10 @@ const CTokenList = memo(
         }
         newRwa.balanceValue = multiply(newRwa?.balance ?? '0', tokenWithPrice[symbolToLower(rwa.symbol)]?.price ?? '0')
         return newRwa
-      }).sort((a, b) => Number(b.balanceValue) - Number(a.balanceValue))
+      })
+
+      return selectTab === 'stared' ? rwaListWithBalanceList : rwaListWithBalanceList.sort((a, b) => Number(b.balanceValue) - Number(a.balanceValue))
+
     }, [newRwaList, tokenWithBalance, tokenWithPrice, marketTradeState])
 
     const [searchTerm, setSearchTerm] = useState("")

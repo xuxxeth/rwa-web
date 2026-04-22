@@ -130,6 +130,12 @@ export function useLimitOrderUIState({
   }, [inputToken, action])
 
   /**
+   * 交易暂停
+    */
+  const isTradingHalt = useMemo(() => {
+    return inputToken?.state === RWA_STATUS.HALT
+  }, [inputToken])
+  /**
    * 按钮是否禁用
    */
   const disabled = useMemo(() => {
@@ -140,7 +146,8 @@ export function useLimitOrderUIState({
       isMax ||
       isBuyInsufficient ||
       isSellInsufficient ||
-      isSellOnly
+      isSellOnly ||
+      isTradingHalt
     )
   }, [
     orderValue,
@@ -150,6 +157,7 @@ export function useLimitOrderUIState({
     isBuyInsufficient,
     isSellInsufficient,
     isSellOnly,
+    isTradingHalt
   ])
 
   /**
