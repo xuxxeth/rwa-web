@@ -22,12 +22,12 @@ export type SessionLineSelecttProps = {
 const SessionLineSelectt = memo(
   ({
     defaultValue,
-    value, 
     onChange, 
     className,
     selected
   }: SessionLineSelecttProps) => {
     const { t, i18n } = useTranslation()
+    const [value, setValue] = useState<string | undefined>('0')
     const dataList = useMemo(() => {
       return [
         { code: '0', label: t('v3.t26')},
@@ -53,9 +53,16 @@ const SessionLineSelectt = memo(
         const _id = dataList.find(id => id.code === defaultValue)
         if (_id) {
           setCurrentItem(_id)
+          setValue(_id.code)
         }
       }
     }, [defaultValue, i18n.language]) 
+
+    useEffect(() => {
+      if (!selected) {
+        setValue(undefined)
+      }
+    }, [selected])
 
     return (
       <Select 
@@ -64,11 +71,13 @@ const SessionLineSelectt = memo(
           setOpen(open)
         }}
         onValueChange={(code) => {
+          console.log('code', code)
           if (code) {
             setCurrentCode(code)
             const _id = dataList.find(id => id.code === code)
             if (_id) {
               setCurrentItem(_id)
+              setValue(_id.code)
               onChange && onChange(_id)
             }
           }
@@ -105,7 +114,7 @@ const SessionLineSelectt = memo(
                 </div>
                 <span
                   className="ml-auto data-[state=checked]:block hidden text-[#9CFF3A]"
-                  data-state={id.code === currentCode ? 'checked' : ''}
+                  data-state={id.code === currentCode && value !== undefined ? 'checked' : ''}
                 >
                   <Check className="h-4 w-4 text-white" />
                 </span>

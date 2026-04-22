@@ -10,6 +10,7 @@ interface KycInputProps extends React.ComponentProps<"input"> {
 const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
   ({ className, type, error, value, regex, ...props }, ref) => {
     const inputRegex = RegExp(regex || ".*")
+    const controlledValue = value ?? ""
 
     const handleBeforeInput = (e: React.InputEvent<HTMLInputElement>) => {
       if (!regex) {
@@ -74,7 +75,7 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
         ref={ref}
         pattern={regex}
         {...props}
-        {...(value !== undefined ? { value } : {})}
+        value={controlledValue}
         onBeforeInput={handleBeforeInput}
         onPaste={handlePaste}
         onChange={e => {

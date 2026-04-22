@@ -198,7 +198,7 @@ export const TVChartContainer = memo(
               syncAreaModeClass(chartTypeRef.current)
 
               setTimeout(() => {
-                const iframe = chartContainerRef.current.querySelector('iframe') as HTMLIFrameElement;
+                const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement;
                 const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
                 const toggler = innerDoc?.querySelector('.toggler-l31H9iuA') as HTMLDivElement ;
                 toggler?.click()

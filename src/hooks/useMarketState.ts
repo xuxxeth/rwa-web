@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 export function useMarketState() {
   const getMarketState = useBaseStore(state => state.getMarketState)
 
+
+  // @ts-ignore
   const marketTimer = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function useTradingStartTime() {
   const { tradingStartTime, tradingEndTime, preMarketMinutes, afterMarketMinutes, nightTradingStartTime, nightTradingEndTime } = useBaseStore(state => state.marketInfo)
 
   const [countdown, setCountdown] = useState({H: '00', M: '00', S: '00'});
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   // useEffect(() => {
   //   const updateCountdown = () => {
@@ -147,5 +149,5 @@ export function useTradingStartTime() {
       nightTradingStartTimeLocal: extractHourMinuteLocal(nightTradingStartTime),
       nightTradingEndTimeLocal: extractHourMinuteLocal(nightTradingEndTime)
     }
-  }, [tradingStartTime, tradingEndTime, countdown, marketTradeState])
+  }, [tradingStartTime, tradingEndTime, countdown, marketTradeState, nightTradingStartTime, nightTradingEndTime])
 }
