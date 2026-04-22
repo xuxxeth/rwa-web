@@ -160,7 +160,7 @@ const SessionTypeSelect = memo(
             "flex items-center gap-2 justify-between text-white font-normal text-[14px] w-full",
           )}>
             
-            <IconWithTooltip tooltip={(
+            <IconWithTooltip side="left" tooltip={(
               <div className="">
                 <div>
                   <span className=" font-semibold">{t('v3.t16') ?? ' '}：</span>
@@ -190,11 +190,11 @@ const SessionTypeSelect = memo(
         <SelectContent align="end" className=" border-[#41464F] bg-[#1A1B1E] px-0 min-w-[232px]">
           {sessionTypeList.map(session => (
             <SelectItem key={session.code} value={String(session.code)} className={cn(
-              "my-1 cursor-pointer",
+              "my-1 cursor-pointer px-0",
               session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
             )}>
-              <IconWithTooltip triggerClassName="w-full" tooltip={session.disabled ? t('v3.t202', { duration1: session.timeLabel, duration2: session.timeLabelLocal }) : undefined} >
-                <div className="w-full">
+              <IconWithTooltip side="left" tooltipClassName=" pr-8" triggerClassName="w-full" tooltip={session.disabled ? t('v3.t202', { duration1: session.timeLabel, duration2: session.timeLabelLocal }) : undefined} >
+                <div className="w-full px-3">
                   <div className={cn(
                     "flex items-center justify-between w-full text-white text-[12px]",
                     session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',

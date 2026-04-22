@@ -156,7 +156,7 @@ const MarketStatus = memo(
                 "px-2 flex items-center gap-x-1 bg-[#232427] h-[24px] rounded-[24px]",
                 
               )}>
-                <img src={tokenLabel.i} className="w-[12px]" alt="" />
+                <img src={tokenLabel.i} className="w-[15px]" alt="" />
                 <div className="text-[12px] leading-[14px] shrink-0"
                   style={{ color: tokenLabel.c, }}
                 >

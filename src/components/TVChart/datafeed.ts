@@ -239,7 +239,7 @@ export function getDataFeed({
           //   onHistoryCallback([], { noData: false })
           //   return
           // }
-          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
+          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: Math.min(countBack, 500) })
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });

@@ -287,7 +287,6 @@ export const StockInfo = memo(
                           <IconWithTooltip
                             tooltip={t(`companyProfile.${tooltip}`)}
                             triggerClassName='inline-flex justify-start'
-                            tooltipClassName='px-2 py-1'
                           >
                             <div className='text-gray-400 border-b border-b-gray-400 border-dashed text-[12px]'>
                               {t(`companyProfile.${title}`)}
