@@ -55,20 +55,20 @@ const SessionTypeSelect = memo(
         {
           code: SessionType.PRE_MARKET_AND_AFTER_HOURS,
           label: t('v3.t17'),
-          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} + ${t('v3.t31')}: ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M}` : '--:--',
+          timeLabel: tradingTime ? `${t('v3.t31')} ${tradingTime.preOpenTime.H}:${tradingTime.preOpenTime.M} ~ ${tradingTime.openTime.H}:${tradingTime.openTime.M} + ${t('v3.t31')} ${tradingTime.closeTime.H}:${tradingTime.closeTime.M} ~ ${tradingTime.afterCloseTime.H}:${tradingTime.afterCloseTime.M}` : '--:--',
           timeLabelLocal: tradingTime ? `${tradingTime.preOpenTimeLocal.H}:${tradingTime.preOpenTimeLocal.M} ~ ${tradingTime.openTimeLocal.H}:${tradingTime.openTimeLocal.M} + ${tradingTime.closeTimeLocal.H}:${tradingTime.closeTimeLocal.M} ~ ${tradingTime.afterCloseTimeLocal.H}:${tradingTime.afterCloseTimeLocal.M}` : '--:--',
           disabled: isRegular || tradingTime?.tradeState === MARKET_STATUS.OVERNIGHT || tradingTime?.tradeState === MARKET_STATUS.OPEN || tradingTime?.tradeState === MARKET_STATUS.CLOSE || notSupportBeforeOrAfter.notSupport, // 盘前盘后时间段，在夜盘、盘中和闭市状态下不可选
         },
         {
           code: SessionType.DEFAULT,
           label: t('v3.t16'),
-          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.openTime.H}:${tradingTime.openTime.M} ~ ${tradingTime.closeTime.H}:${tradingTime.closeTime.M}` : '--:--',
+          timeLabel: tradingTime ? `${t('v3.t31')} ${tradingTime.openTime.H}:${tradingTime.openTime.M} ~ ${tradingTime.closeTime.H}:${tradingTime.closeTime.M}` : '--:--',
           timeLabelLocal: tradingTime ? `${tradingTime.openTimeLocal.H}:${tradingTime.openTimeLocal.M} ~ ${tradingTime.closeTimeLocal.H}:${tradingTime.closeTimeLocal.M}` : '--:--'
         },
         {
           code: SessionType.OVERNIGHT,
-          label: t('marketQuotes.overnight'),
-          timeLabel: tradingTime ? `${t('v3.t31')}: ${tradingTime.nightTradingStartTime.H}:${tradingTime.nightTradingStartTime.M} ~ ${tradingTime.nightTradingEndTime.H}:${tradingTime.nightTradingEndTime.M}` : '--:--',
+          label: t('v3.t171'),
+          timeLabel: tradingTime ? `${t('v3.t31')} ${tradingTime.nightTradingStartTime.H}:${tradingTime.nightTradingStartTime.M} ~ ${tradingTime.nightTradingEndTime.H}:${tradingTime.nightTradingEndTime.M}` : '--:--',
           timeLabelLocal: tradingTime ? `${tradingTime.nightTradingStartTimeLocal.H}:${tradingTime.nightTradingStartTimeLocal.M} ~ ${tradingTime.nightTradingEndTimeLocal.H}:${tradingTime.nightTradingEndTimeLocal.M}` : '--:--',
           // 夜盘时间段，仅在夜盘状态下可选
           disabled: tradingTime?.tradeState !== MARKET_STATUS.OVERNIGHT || notSupportOvernight.notSupport
@@ -105,7 +105,7 @@ const SessionTypeSelect = memo(
         } else {
             setTypeItem({
             code: SessionType.OVERNIGHT,
-            label: t('marketQuotes.overnight'),
+            label: t('v3.t171'),
           })
           updateSessionType(SessionType.OVERNIGHT)
         }
@@ -193,7 +193,16 @@ const SessionTypeSelect = memo(
               "my-1 cursor-pointer px-0",
               session.disabled ? 'cursor-not-allowed text-[#737A87]' : 'cursor-pointer',
             )}>
-              <IconWithTooltip side="left" tooltipClassName=" pr-8" triggerClassName="w-full" tooltip={session.disabled ? t('v3.t202', { duration1: session.timeLabel, duration2: session.timeLabelLocal }) : undefined} >
+              <IconWithTooltip side="left" tooltipClassName=" pr-8" triggerClassName="w-full" 
+                tooltip={session.disabled ? (<>
+                  <div className="text-[12px]">
+                    <span>{t('v3.t203') + ' '}</span>
+                    <span className="text-[#9DA3AF]">{session.timeLabel}</span> 
+                    {session.code === SessionType.PRE_MARKET_AND_AFTER_HOURS ? <br /> : null}
+                    （<span className="text-[#9DA3AF]">{t('v3.t204') + ' ' + session.timeLabelLocal}</span>）
+                    <span>{t('v3.t205')}</span>
+                  </div>
+                </>) : undefined} >
                 <div className="w-full px-3">
                   <div className={cn(
                     "flex items-center justify-between w-full text-white text-[12px]",

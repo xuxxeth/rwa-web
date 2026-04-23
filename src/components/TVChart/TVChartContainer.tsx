@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { getDataFeed, tagSession, type IExtaIBasicDataFeed } from "./datafeed";
 import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString, type Timezone } from "@/lib/charting_library/charting_library";
-import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
+import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures, MARKET_STATUS } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
 import storage from "@/utils/storage";
@@ -45,10 +45,12 @@ export const TVChartContainer = memo(
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
     const chartTypeRef = useRef(chartType)
+    const marketStateRef = useRef(MARKET_STATUS.DEFAULT)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tradingTime = useTradingStartTime()
 
     const syncAreaModeClass = useCallback((enabled: boolean) => {
+      console.log('syncAreaModeClass', enabled)
       const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement | null
       const body = iframe?.contentDocument?.body || iframe?.contentWindow?.document?.body
       if (!body) return
@@ -196,7 +198,7 @@ export const TVChartContainer = memo(
               });
 
               syncAreaModeClass(chartTypeRef.current)
-
+              dataFeedRef.current?.setMarketState(marketStateRef.current)
               setTimeout(() => {
                 const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement;
                 const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -252,7 +254,9 @@ export const TVChartContainer = memo(
         tvWidgetRef.current = null;
         dataFeedRef.current = null
         tvWidgetReady.current = false
+        chartTypeRef.current = true
         initChart && initChart(token)
+        
       }
     }, [i18n.language])
 
@@ -264,6 +268,7 @@ export const TVChartContainer = memo(
     // 监听市场状态变化，更新dataFeed的市场状态
     useEffect(() => {
       dataFeedRef.current?.setMarketState(marketTradeState)
+      marketStateRef.current = marketTradeState
     }, [marketTradeState])
 
     // 更新市场时间

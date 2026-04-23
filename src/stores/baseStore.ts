@@ -133,7 +133,7 @@ export const useBaseStore = create<BaseStore>()(
           const rwaList = (res.data || []).map(rwa => ({
             ...rwa,
             is24H: rwa.sessionMask === 15,
-            sessionMaskList: rwa.sessionMask ? numberToBinaryArray(rwa.sessionMask) : [],
+            sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),
           }))
           set({ rwaList: rwaList })
         }

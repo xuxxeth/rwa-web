@@ -238,7 +238,7 @@ export function numberToBinaryArray(num: number, options: { length?: number; hig
     highBitFirst = true, // 是否高位在前（默认 true）
   } = options;
 
-  if (typeof num !== "number" || num < 0) {
+  if (typeof num !== "number" || num <= 0) {
     return [0, 0, 0, 0].slice(0, length) // 返回全0数组，长度根据参数调整
   }
 

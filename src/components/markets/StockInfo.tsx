@@ -46,6 +46,19 @@ const RwaItemPrice = memo(
     const upValue = useMemo(() => realtimeData ? Number(truncate(subtract(realtimeData.p ?? '0', (realtimeData.o ?? '0')), 2)) : 0, [realtimeData?.o, realtimeData?.p])
     const openUp = useMemo(() => realtimeData ? Number(calculateUp(realtimeData.p, realtimeData.o)) : 0, [realtimeData?.o, realtimeData?.p])
 
+    const priceWidth = useMemo(() => {
+      if (!realtimeData?.p) return 70
+      const length = String(realtimeData.p).length + 1
+      return Math.max(70, length * 10 + 6)
+    }, [realtimeData?.p])
+
+    const upWidth = useMemo(() => {
+      if (!realtimeData?.p || !realtimeData?.o) return 70
+      const upStr = `${Math.abs(upValue).toFixed(2)}${Math.abs(openUp).toFixed(2)}`
+      const length = upStr.length + 1
+      return Math.max(70, length * 10)
+    }, [realtimeData?.p, realtimeData?.o, upValue, openUp])
+
     return (
       <div className="min-w-[130px] shrink-0 flex items-center gap-x-5">
         <div className=" relative -top-[1px]">
@@ -53,11 +66,13 @@ const RwaItemPrice = memo(
             {t('portfolio.price')}
           </div>
           <div className={cn(
-            "",
-            openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
-                  ? "text-[#25A750]"
-                  : "text-[#CA3F64] ",
-          )}>
+              "",
+              openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
+                    ? "text-[#25A750]"
+                    : "text-[#CA3F64] ",
+            )}
+            style={{ width: priceWidth + 'px' }}
+          >
             <div className={cn(
               "text-[18px] leading-[100%] font-semibold mt-1 min-w-[70px]",
             )}>
@@ -69,11 +84,13 @@ const RwaItemPrice = memo(
         <div className="">
           <LabelWrap tooltip={t('v3.t381')}>{t('v3.t38')}</LabelWrap>
           <div className={cn(
-            "",
-            openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
-                  ? "text-[#25A750]"
-                  : "text-[#CA3F64] ",
-          )}>
+              "",
+              openUp === 0 ? 'text-[#A1A1A1]' : openUp > 0
+                    ? "text-[#25A750]"
+                    : "text-[#CA3F64] ",
+            )}
+            style={{ width: upWidth + 'px' }}
+          >
             
             <div className="flex items-center gap-x-1 mt-[4px]">
               {
@@ -210,6 +227,13 @@ export const StockInfo = memo(
       }
     }, [inputToken?.stockId])
 
+    const marketCapWidth = useMemo(() => {
+      if (!stockData?.marketCap) return 30
+      const marketCap = stockData.marketCap
+      const length = String(marketCap).length - 1
+      return Math.max(30, length * 10 - 6)
+    }, [stockData?.marketCap, rwaPrice?.p])
+
     return (
       <div className="flex justify-between text-white px-4 ">
         <div className="flex items-center gap-x-8">
@@ -230,7 +254,7 @@ export const StockInfo = memo(
             </div>
             <div className=" shrink-0">
               <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
-              <div className="mt-1">{stockData?.marketCap || '--'}</div>
+              <div className="mt-1" style={{width: marketCapWidth + 'px'}}>{stockData?.marketCap || '--'}</div>
             </div>
             <div className=" shrink-0">
               <LabelWrap tooltip={t('companyProfile.floatCapH')}>{t('companyProfile.floatCap')}</LabelWrap>

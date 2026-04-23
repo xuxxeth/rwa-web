@@ -17,6 +17,7 @@ export type SessionLineSelecttProps = {
   onChange?: (code: IItemCode) => void;
   className?: string
   selected?: boolean
+  language?: string
 }
 // 0-全部,1-盘前;2-盘中;3-盘后;5-夜盘
 const SessionLineSelectt = memo(
@@ -24,10 +25,11 @@ const SessionLineSelectt = memo(
     defaultValue,
     onChange, 
     className,
-    selected
+    selected,
+    language
   }: SessionLineSelecttProps) => {
     const { t, i18n } = useTranslation()
-    const [value, setValue] = useState<string | undefined>('0')
+    const [value, setValue] = useState<string>('0')
     const dataList = useMemo(() => {
       return [
         { code: '0', label: t('v3.t26')},
@@ -39,7 +41,6 @@ const SessionLineSelectt = memo(
       ]
     }, [t]) 
     const [currentCode, setCurrentCode] = useState(dataList[0].code)
-    const [currentItem, setCurrentItem] = useState(dataList[0])
     const [open, setOpen] = useState(false)
 
     const currentLabel = useMemo(() => {
@@ -48,19 +49,13 @@ const SessionLineSelectt = memo(
     }, [dataList, currentCode])
 
     useEffect(() => {
-      if (defaultValue) {
-        setCurrentCode(defaultValue)
-        const _id = dataList.find(id => id.code === defaultValue)
-        if (_id) {
-          setCurrentItem(_id)
-          setValue(_id.code)
-        }
-      }
-    }, [defaultValue, i18n.language]) 
+      setValue('')
+      setCurrentCode(dataList[0].code) 
+    }, [i18n.language]) 
 
     useEffect(() => {
       if (!selected) {
-        setValue(undefined)
+        setValue('')
       }
     }, [selected])
 
@@ -76,7 +71,6 @@ const SessionLineSelectt = memo(
             setCurrentCode(code)
             const _id = dataList.find(id => id.code === code)
             if (_id) {
-              setCurrentItem(_id)
               setValue(_id.code)
               onChange && onChange(_id)
             }
@@ -114,7 +108,7 @@ const SessionLineSelectt = memo(
                 </div>
                 <span
                   className="ml-auto data-[state=checked]:block hidden text-[#9CFF3A]"
-                  data-state={id.code === currentCode && value !== undefined ? 'checked' : ''}
+                  data-state={id.code === currentCode && selected ? 'checked' : ''}
                 >
                   <Check className="h-4 w-4 text-white" />
                 </span>

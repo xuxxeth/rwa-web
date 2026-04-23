@@ -20,7 +20,7 @@ const RwaSessionStatus = memo(
     const inputToken = useTradeStore((state) => state.inputToken)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, inputToken)
-
+    
     // 闭市状态下，
     if (marketTradeState === MARKET_STATUS.CLOSE) {
       return (

@@ -766,6 +766,9 @@
     "t20": "Orders executed during {{duration}}. Orders can only be placed during pre/post-market sessions. Unfilled orders expire when the post-market closes.",
     "t201": "Orders executed during {{duration}}. Orders can only be placed during overnight sessions. Unfilled orders expire when Over-Night Session Closed",
     "t202": "Current order type only supports orders placing between {{duration1}} (Local time: {{duration2}})",
+    "t203": "Current order type only supports orders placing between",
+    "t204": "Local time",
+    "t205": " ",
     "t21": "Closed",
     "t22": "Post",
     "t23": "Pre",
@@ -781,7 +784,7 @@
     "t33": "Currently is {{session}} session. {{session}} trading is not supported by the selected asset. You can wait for the market open or place your order by [RTH Only] option.",
     "t34": "Overnight-Market",
     "t35": "The market is closing. You can place order in [RTH Only] option.",
-    "t36": "Currently is {{session}} session. {{session}} trading is not supported by the selected asset. You can place order in [RTH Only] option.",
+    "t36": "{{session}} trading is not supported by the selected asset. You can place order in [RTH Only] option.",
     "t37": "High Price Gap",
     "t38": "24h Change",
     "t381": "24h Change: The change in price over the past 24 hours. Change = (Current Price - Price 24 Hours Ago) / Price 24 Hours Ago * 100%"
