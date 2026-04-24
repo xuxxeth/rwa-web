@@ -23,7 +23,7 @@ export const useTradeStore = create<TradeStore>()(
       isSignatureValid: false,
       txStep: 0,
       txError: '',
-      txSuccess: {type: '', msg: '', tx: ''},
+      txSuccess: {type: '', msg: '', tx: '', id: 0},
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})
       },

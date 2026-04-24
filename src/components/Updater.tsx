@@ -3,8 +3,7 @@ import { useRouter } from "@/hooks/useRouter";
 import { useToast } from "@/hooks/useToast";
 import { useGetTokenBalances } from "@/hooks/useTokenBalances";
 import { useTranslation } from "@/hooks/useTranslation";
-import { getCurrentToastId } from "@/hooks/useTxToast";
-import { useBaseStore } from "@/stores/baseStore";
+import { getCurrentToastId, useTxToast } from "@/hooks/useTxToast";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useWssStore } from "@/stores/wssStore";
 import storage from "@/utils/storage";
@@ -26,6 +25,7 @@ const Updater = memo(
     // });
     const router = useRouter()
     const { toastSuccess, toastError } = useToast()
+    const { dismissTxToast } = useTxToast()
     const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const newOrder = useWssStore(state => state.newOrder)
@@ -127,9 +127,10 @@ const Updater = memo(
       }
       const toastId = getCurrentToastId()
       console.log("new order info", toastId, message)
-      if (toastId && newOrder.x !== "CANCELLED") {
+      if (toastId && newOrder.x === "NEW") {
         setTxSuccess("success", message, newOrder.hx)
       } else if (!NO_SHOW_PATH.includes(router.location.pathname)) {
+        dismissTxToast()
         if (isFailed) {
           toastError({ title: message, tx: newOrder.hx })
         } else {
@@ -138,7 +139,7 @@ const Updater = memo(
         
       }
       refreshTokenBalanceByStockIdWithRetry(newOrder.si)
-    }, [newOrder, refreshTokenBalanceByStockIdWithRetry, t, router.location.pathname, setTxSuccess, toastSuccess, toastError])
+    }, [newOrder, refreshTokenBalanceByStockIdWithRetry, t, router.location.pathname, setTxSuccess, toastSuccess, toastError, dismissTxToast])
 
     useEffect(() => {
       return () => {

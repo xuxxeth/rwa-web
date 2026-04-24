@@ -7,7 +7,7 @@ import { MARKET_STATUS } from "@/config/constants";
 import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useTrading } from "@/hooks/useTrading";
-import { useTxToast } from "@/hooks/useTxToast";
+import { setHx2ToastId, useTxToast } from "@/hooks/useTxToast";
 import { useCalcFee } from "@/hooks/useCalcFee";
 import { cn } from "@/lib/utils";
 import { TradeFormUI } from "./TradeFormUI";
@@ -162,7 +162,8 @@ export function TradeBox({
     t,
     toastError,
     onStart: handleStartStep,
-    onSuccess: () => {
+    onSuccess: (result) => {
+      setHx2ToastId(result?.data?.transactionHash || '')
       freshTokenBalances()
       updateInputSize('')
     },

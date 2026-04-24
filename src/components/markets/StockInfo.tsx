@@ -16,6 +16,7 @@ import { LazyImage } from "../image/LazyImage"
 import { baseApi } from "@/service/base/api"
 import { useClickOutside } from "@/hooks/useClickOutside"
 import { MarketStatus } from "./MarketStatus"
+import { useTailwindBreakpoints } from "@/hooks/useBreakpoints"
 
 export const LabelWrap = memo(
   ({ children, tooltip }: { children: React.ReactNode, tooltip?: string | React.ReactNode }) => {
@@ -153,6 +154,7 @@ const RwaItemPrice = memo(
 export const StockInfo = memo(
   ({ from }: { from?: string }) => {
     const { t } = useTranslation()
+    const { isXl } = useTailwindBreakpoints()
     const inputToken = useTradeStore(state => state.inputToken)
     const stockData = useStockStore(state => state.stockData)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
@@ -235,7 +237,7 @@ export const StockInfo = memo(
     }, [stockData?.marketCap, rwaPrice?.p])
 
     return (
-      <div className="flex justify-between text-white px-4 ">
+      <div className="flex justify-between text-white px-4 min-w-[890px]">
         <div className="flex items-center gap-x-8">
           <StockDialog from={from} />
           <div className={cn(
@@ -252,16 +254,16 @@ export const StockInfo = memo(
               <LabelWrap tooltip={t('v2.tx.t211')}>{t('v2.tx.t46')}</LabelWrap>
               <div className="mt-1">{ realtimeData?.l ? '$' + realtimeData?.l : '--'}</div>
             </div>
-            <div className=" shrink-0">
+            <div className=" shrink-0 hidden xl:block">
               <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
               <div className="mt-1" style={{width: marketCapWidth + 'px'}}>{stockData?.marketCap || '--'}</div>
             </div>
-            <div className=" shrink-0">
+            <div className=" shrink-0 hidden xl:block">
               <LabelWrap tooltip={t('companyProfile.floatCapH')}>{t('companyProfile.floatCap')}</LabelWrap>
               <div className="mt-1">{stockData?.circCap || '--'}</div>
             </div>
             <div ref={showMoreRef} className=" shrink-0 flex items-center gap-x-4 relative">
-              <div>
+              <div className=" hidden xl:block">
                 <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
                 <div className="mt-1">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
               </div>
@@ -281,7 +283,21 @@ export const StockInfo = memo(
               </div>
               {
                 showMore && (
-                  <div className=" absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 flex items-center gap-x-8 w-[390px]">
+                  <div className=" absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 w-[390px] grid grid-cols-4 gap-x-8"
+                    style={{height: isXl ? 80 : 140}}
+                  >
+                      <div className=" shrink-0 xl:hidden">
+                        <LabelWrap tooltip={t('v2.tx.t161')}>{t('v2.tx.t16')}</LabelWrap>
+                        <div className="mt-2" style={{width: marketCapWidth + 'px'}}>{stockData?.marketCap || '--'}</div>
+                      </div>
+                      <div className=" shrink-0 xl:hidden">
+                        <LabelWrap tooltip={t('companyProfile.floatCapH')}>{t('companyProfile.floatCap')}</LabelWrap>
+                        <div className="mt-2">{stockData?.circCap || '--'}</div>
+                      </div>
+                      <div className=" shrink-0 xl:hidden">
+                        <LabelWrap tooltip={t('v2.tx.t171')}>{t('v2.tx.t17')}</LabelWrap>
+                        <div className="mt-2">{stockData?.peTtm ? parseFloat(stockData.peTtm) < 0 ? t('v2.tx.t42') : stockData?.peTtm : '--'}</div>
+                      </div>
                     {[
                       {
                         title: 'tso',

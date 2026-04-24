@@ -128,7 +128,7 @@ const MarketStatus = memo(
     }
 
     return (
-      <div className=" flex items-center gap-x-2">
+      <div className=" flex items-center gap-x-2 shrink-0">
         <IconWithTooltip tooltip={stateLabel.t2}>
           <div className={cn(
             "px-2 flex items-center gap-x-1 bg-[#232427] h-[24px] rounded-[24px]",
