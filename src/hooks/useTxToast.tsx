@@ -1,150 +1,182 @@
 'use client'
-import { LazyImage } from '@/components/image/LazyImage'
+import React, { useMemo } from 'react'
 import { useTradeStore } from '@/stores/tradeStore'
 import { cn } from '@/utils/tw'
-import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from './useTranslation'
 import { openScanUrl } from '@/utils/scan'
-
+import CloseX from '@/components/icons/set/CloseX'
+import OpenOutline from '@/components/icons/set/OpenOutline'
+import StepWallet from '@/components/icons/set/StepWallet'
+import StepSign from '@/components/icons/set/StepSign'
+import StepChain from '@/components/icons/set/StepChain'
+import StepCheckCircle from '@/components/icons/set/StepCheckCircle'
 
 interface CustomToastOptions {
-  action: string, // place | cancel,
+  action: string // place | cancel
   approveed?: boolean
-  duration?: number,
+  duration?: number
   onClick?: () => void
 }
+
 interface ToastItemProps {
   t: string | number
-  action: string, // place | cancel,
-  approveed?: boolean,
+  action: string // place | cancel
+  approveed?: boolean
   onClick?: () => void
 }
 
+interface StepDef {
+  step: number
+  label: string
+  labelIng: string
+  icon: React.ComponentType<{ size: number; color?: string }>
+}
 
-export function ToastItem({
-  t,
-  action,
-  approveed,
-  onClick
-}: ToastItemProps) {
+type StepState = 'done' | 'active' | 'pending' | 'error'
+
+const iconColorMap: Record<StepState, string> = {
+  active: '#FFB800',
+  done: '#2EE4A7',
+  error: '#F63C6B',
+  pending: '#737A87',
+}
+
+function StepIcon({
+  state,
+  icon: IconComponent,
+}: {
+  state: StepState
+  icon: React.ComponentType<{ size: number; color?: string }>
+}) {
+  const borderClass: Record<StepState, string> = {
+    active: 'step-border-active',
+    done: 'border border-green-100',
+    error: 'border border-red-100',
+    pending: 'border border-gray-500',
+  }
+
+  return (
+    <div className={cn('flex h-[34px] w-[34px] items-center justify-center rounded-[8px]', borderClass[state])}>
+      {state === 'done' ? (
+        <StepCheckCircle size={14} color={iconColorMap.done} />
+      ) : (
+        <IconComponent size={14} color={iconColorMap[state]} />
+      )}
+    </div>
+  )
+}
+
+export function TxToastItem({ t, action, approveed, onClick }: ToastItemProps) {
   const { t: $t } = useTranslation()
-  
-  const buyStepsList = [
-    {step: 0, icon: '/images/v2/icons/wallet.png', label: $t('v2.tx.t1'), labelIng: $t('v2.tx.t2'), },
-    {step: 1, icon: '/images/v2/icons/sign.png', label: $t('v2.tx.t5'), labelIng: $t('v2.tx.t6'), },
-    {step: 2, icon: '/images/v2/icons/trade.png', label: $t('v2.tx.t71'), labelIng: $t('v2.tx.t71'), },
+
+  const buyStepsList: StepDef[] = [
+    { step: 0, label: $t('v2.tx.t1'), labelIng: $t('v2.tx.t2'), icon: StepWallet },
+    { step: 1, label: $t('v2.tx.t5'), labelIng: $t('v2.tx.t6'), icon: StepSign },
+    { step: 2, label: $t('v2.tx.t71'), labelIng: $t('v2.tx.t71'), icon: StepChain },
   ]
-  const sellStepsList = [
-    {step: 1, icon: '/images/v2/icons/sign.png', label: $t('v2.tx.t5'), labelIng: $t('v2.tx.t6'), },
-    {step: 2, icon: '/images/v2/icons/cancel.png', label: $t('v2.tx.t71'), labelIng: $t('v2.tx.t71'), },
+  const sellStepsList: StepDef[] = [
+    { step: 1, label: $t('v2.tx.t5'), labelIng: $t('v2.tx.t6'), icon: StepSign },
+    { step: 2, label: $t('v2.tx.t71'), labelIng: $t('v2.tx.t71'), icon: StepChain },
   ]
 
-  const stepsList = action === 'place' ? (approveed ? buyStepsList.slice(1) : buyStepsList) : sellStepsList
+  const stepsList =
+    action === 'place' ? (approveed ? buyStepsList.slice(1) : buyStepsList) : sellStepsList
 
-  const txStep = useTradeStore(state => state.txStep)
-  const currentStep = useMemo(() => {
-    return stepsList.find(step => step.step === txStep)
-  }, [txStep, stepsList])
+  const txStep = useTradeStore((s) => s.txStep)
+  const currentStep = useMemo(
+    () => stepsList.find((s) => s.step === txStep),
+    [txStep, stepsList],
+  )
 
-  const txError = useTradeStore(state => state.txError)
-  const txSucess = useTradeStore(state => state.txSuccess)
+  const txError = useTradeStore((s) => s.txError)
+  const txSuccess = useTradeStore((s) => s.txSuccess)
 
   const successMsg = useMemo(() => {
     if (txStep > 2 && !txError) return action === 'place' ? $t('v2.tx.t72') : $t('v2.tx.t73')
-  }, [txStep, action, txError, txSucess, $t])
+  }, [txStep, action, txError, $t])
+
+  const descText = txSuccess.msg
+    ? txSuccess.msg
+    : txError
+      ? txError
+      : successMsg
+        ? successMsg
+        : (currentStep?.labelIng ?? '')
 
   return (
-    <div
-      className="relative flex items-center justify-between gap-x-11
-                 rounded-[8px] bg-[#282A2F] px-5 py-3 text-white overflow-hidden"
+    <div className='w-[335px] overflow-hidden rounded-[8px]'>
+      <div className='flex items-center justify-between gap-2 border border-gray-750 bg-gray-800 px-3 py-1.5 rounded-t-[8px]'>
+        <span className='text-[12px] font-medium leading-[1.25em] text-white'>
+          {$t('v2.tx.txInProgress')}
+        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            toast.dismiss(t)
+            onClick?.()
+          }}
         >
-      {/* 左侧内容 */}
-      <div className=' flex-1 w-[316px]'>
-        <div className="w-full flex items-center justify-between">
-          {
-            stepsList.map((step, index) => {
-              return (
-                <div key={step.step} className='flex items-center justify-between'>
-                  <div className=' relative p-[3px] w-6 h-6 bg-[#232427] rounded-full'
-                    
-                  >
-                    
-                    {
-                      txStep === step.step && !txError && <LazyImage src='/images/v2/icons/circle.png' className="w-6 h-6 animate-spin absolute left-0 top-0" /> 
-                    }
-                    
-                    <LazyImage src={txStep > step.step ? "/images/v2/icons/success.png" : txError && txStep === step.step ? '/images/v2/icons/tx_error.png' : step.icon} className="w-full h-full " /> 
-                  </div>
-                  
-                  {
-                    index < stepsList.length - 1 && 
-                    <div className="px-3 flex-1 ">
-                      <div className="flex items-center relative">
-                        <LazyImage src={stepsList.length > 2 ? '/images/v2/icons/step_trail.png' : '/images/v2/icons/step_trail2.png'} className='w-full' />
-                        <div className='h-full w-full absolute left-0 top-0 flex items-center'>
-                          <div className={cn(
-                            'bg-[#2EE4A7] h-[2px] w-0 transition-all duration-300',
-                            txStep > step.step ? 'w-full' : ''
-                          )}></div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  }
-                  
-                </div>
-              )
-            })
-          }
-          
-          
-        </div>
-        <div className="flex items-center flex-1 w-[316px] justify-between">
-        {
-          stepsList.map((step, index) => {
-            return (
-              <div key={step.step} className={cn(
-                'text-[#9DA3AF] text-[11px] text-center flex-1 leading-[12px]',
-                txStep > step.step ? 'text-[#2EE4A7]' : '',
-                index === 0 ? 'text-left ' : index === stepsList.length -1 ? 'text-right ' : '',
-                stepsList.length > 2 ? 'max-w-[90px]' : ''
-              )}>
-                { step.label }
-              </div>
-            )
-          })
-        }
-        </div>
-        <div className='border-t border-[#383A40] pt-[6px] text-[12px] font-normal mt-[8px]'>
-          {txSucess.msg ? txSucess.msg : txError ? txError : successMsg ? successMsg : currentStep?.labelIng ?? '' }
-          {
-            txSucess.tx && 
-              <span className=' inline-flex items-center text-[#009DFF] cursor-pointer'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  openScanUrl(txSucess.tx)
-                }}
-              >{$t('v2.tx.t0')} <img src="/images/v2/icons/link-active.png" className='w-[14px] h-[14px] ml-1' alt="" /> </span>
-          }
-          
-        </div>
-      </div>
-      
-
-      {/* 右侧按钮 */} 
-      <div className="flex items-center gap-3 shrink-0">
-        <button onClick={(e) => {
-          e.stopPropagation()
-          e.preventDefault()
-          toast.dismiss(t)
-          onClick?.()
-        }}>
-          <LazyImage src="/images/v2/icons/close.png" className="w-4 h-4" />
+          <CloseX size={16} color='#FFFFFF' />
         </button>
       </div>
-      
+
+      <div className='relative flex flex-col gap-2 border border-t-0 border-gray-750 bg-gray-850 p-3 rounded-b-[8px]'>
+        <div className='flex w-full items-start justify-between gap-2'>
+          {stepsList.map((step, index) => {
+            const state: StepState =
+              txStep > step.step
+                ? 'done'
+                : txStep === step.step
+                  ? txError ? 'error' : 'active'
+                  : 'pending'
+
+            return (
+              <React.Fragment key={step.step}>
+                <div className='flex flex-col items-center gap-2'>
+                  <StepIcon state={state} icon={step.icon} />
+                  <span
+                    className={cn(
+                      'text-[12px] font-medium leading-[1.25em]',
+                      txStep >= step.step ? 'text-white' : 'text-gray-400',
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {index < stepsList.length - 1 && (
+                  <div className='mt-[16px] h-[1px] flex-1'>
+                    <div
+                      className={cn(
+                        'h-full w-full transition-colors duration-300',
+                        txStep > step.step ? 'bg-green-100' : 'bg-gray-500',
+                      )}
+                    />
+                  </div>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </div>
+
+        <div className='flex items-center justify-between border-t border-gray-750 pt-2 text-[12px] font-normal'>
+          <span className='text-gray-300'>{descText}</span>
+          {txSuccess.tx && (
+            <button
+              className='inline-flex items-center gap-1 text-[12px] font-medium text-blue-50'
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                openScanUrl(txSuccess.tx)
+              }}
+            >
+              {$t('v2.tx.t0')}
+              <OpenOutline size={14} color='#009DFF' />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -160,34 +192,26 @@ export function setCurrentToastId(id?: string | number) {
 }
 
 export function useTxToast() {
-  
   function toastFun({ duration, action, approveed, onClick }: CustomToastOptions) {
-    
-    toast.custom((t) => {
-      setCurrentToastId(t)
-      return (
-        <ToastItem
-          t={t}
-          action={action}
-          approveed={approveed}
-          onClick={onClick}
-        />
-      )
-    }, { duration: duration || 120000 })
+    toast.custom(
+      (t) => {
+        setCurrentToastId(t)
+        return <TxToastItem t={t} action={action} approveed={approveed} onClick={onClick} />
+      },
+      { duration: duration || 120000 },
+    )
   }
-
 
   function toastTxSteps(data: CustomToastOptions) {
-    toastFun({...data })
+    toastFun({ ...data })
   }
+
   function dismissTxToast() {
     if (getCurrentToastId()) {
       toast.dismiss(getCurrentToastId())
       setCurrentToastId(undefined)
-
     }
   }
-  
 
   return { toastTxSteps, dismissTxToast }
 }

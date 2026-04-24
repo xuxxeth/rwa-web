@@ -118,6 +118,9 @@ export function getDataFeed({
   let initialLoadComplete = false;
   let marketState = -1; // 市场状态
   let tradingStartTime = 0; // 交易开始时间
+
+  let preLastBarTime = 0
+
   return {
     setTradingStartTime: (time) => {
       tradingStartTime = time
@@ -231,6 +234,10 @@ export function getDataFeed({
         onHistoryCallback([], { noData: true })
         return
       }
+
+      if (firstDataRequest) {
+        preLastBarTime = 0
+      }
       
       // 如果是Kline
       try {
@@ -240,7 +247,7 @@ export function getDataFeed({
           //   return
           // }
           const _limit = firstDataRequest ? (Math.floor(Math.random() * 201) + 300) : (Math.floor(Math.random() * 201) + 200)
-          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: _limit })
+          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: preLastBarTime || to, limit: _limit })
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });
@@ -259,6 +266,7 @@ export function getDataFeed({
               "volume": bar.volume ?? 0,
             }
           })
+          preLastBarTime = Math.ceil(bars[0]?.time / 1000) || preLastBarTime
           // if (resolution === '1') {
           //   bars = bars.filter((bar: any) => bar.time < endTime)
           // }

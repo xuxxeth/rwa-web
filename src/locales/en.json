@@ -722,6 +722,7 @@
       "t42": "Loss",
       "t43": "Time until opening ",
       "t44": "Markets Closed — Orders will be queued and executed in the next trading session.",
+      "txInProgress": "Transaction in progress",
       "t45": "24h High",
       "t46": "24h Low"
     },
