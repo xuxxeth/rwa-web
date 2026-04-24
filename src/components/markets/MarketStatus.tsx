@@ -115,7 +115,7 @@ const MarketStatus = memo(
           t1: t("marketQuotes.buyForbidden"),
           t2: t("marketQuotes.thHover"),
           c: '#CA3F64',
-          i: '/images/v2/icons/sell.png'
+          i: '/images/v2/icons/sell2.png'
         }
       }
 
@@ -141,7 +141,7 @@ const MarketStatus = memo(
                 <div className="text-[12px] leading-[14px] shrink-0"
                   style={{ color: stateLabel.c, }}
                 >
-                  {stateLabel.t1}
+                  {stateLabel.t1 + t('v3.t39')}
                 </div>
               )
             }

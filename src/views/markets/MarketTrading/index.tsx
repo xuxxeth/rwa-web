@@ -27,7 +27,7 @@ function Markets() {
               <div className='w-full relative bg-[#1A1B1E]'>
                 <RwaSessionStatus />
                 
-                <BoxCard className='min-h-[370px] rounded-[4px] p-4 bg-[#131416]'>
+                <BoxCard className='min-h-[370px] rounded-[4px] p-4 py-3 bg-[#131416]'>
                   <ConvertTabs from='markets' />
                   <div className=' mt-3 '>
                     <TradeTypeSwitch />

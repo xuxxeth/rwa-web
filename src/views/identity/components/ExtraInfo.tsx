@@ -6,7 +6,7 @@ import { Upload } from "./Upload"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import { RESPONSE_CODE } from "@/config/constants"
-import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle, useResetRetryCount } from "./BaseInfo"
+import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle, useResetRetryCount, handleFormEnterKeyDown } from "./BaseInfo"
 import { LazyImage } from "@/components/image/LazyImage"
 import { KycInput } from "@/components/input/KycInput"
 import { KycTextarea } from "@/components/input/KycTextarea"
@@ -64,7 +64,7 @@ const ExtraInfo = memo(
     const errorList = findEmptyItemIndices(extraList) || []
 
     const [submiting, setSubmiting] = useState(false)
-    
+
     const onSubmit = async (data: FormData) => {
       if (errorList.length > 0) {
         toastError({title: t('kyc.t60')})
@@ -116,7 +116,11 @@ const ExtraInfo = memo(
     }
 
     return (
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        onKeyDown={handleFormEnterKeyDown}
+        className="w-full mt-2"
+      >
         
         {/* <SectionBox className="pb-5"> */}
           <SectionTitle>{t('kyc.t25')}</SectionTitle>

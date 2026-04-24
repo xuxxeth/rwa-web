@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, type ReactNode, useRef } from 'react'
 import { MainLayout } from '@/layouts/main'
-import { XFooter } from '@/components/footer'
 import { BaseInfo } from './components/BaseInfo'
 import { IdentityLayout } from './components/IdentityLayout'
 import { kycApi } from '@/service/kyc/api'

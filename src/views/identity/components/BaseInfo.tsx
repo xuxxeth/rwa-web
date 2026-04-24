@@ -86,6 +86,18 @@ export const SectionBox = ({
 export const FormItemBox = ({ children }: { children: React.ReactNode }) => {
   return <div className='my-5'>{children}</div>
 }
+
+export const handleFormEnterKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+  if (e.key !== 'Enter') return
+
+  const target = e.target
+  if (target instanceof HTMLElement && target.tagName === 'TEXTAREA') {
+    return
+  }
+
+  e.preventDefault()
+}
+
 export const FormItemLabel = ({
   children,
   title,
