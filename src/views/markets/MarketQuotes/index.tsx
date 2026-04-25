@@ -145,7 +145,7 @@ export default function MarketQuotes() {
 
   const { paginatedData, totalPage, currentPage, setPage, onPrevClick, onNextClick } =
     // @ts-ignore
-    usePaginationData<IMarketQuote>(8, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
+    usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
 
   useEffect(() => {
     if (paginatedData.length === 0 && currentPage >= 1) {

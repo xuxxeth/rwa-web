@@ -44,8 +44,8 @@ export function Text(props: { text: string; className?: string }) {
   return <div className={cn('text-sm text-[#9DA3AF]', className)}>{t(`${langPrefix}.${text}`)}</div>
 }
 
-// 2M
-const MAX_FILE_SIZE = 1024 * 1024 * 2
+// 8M
+const MAX_FILE_SIZE = 1024 * 1024 * 8
 
 export class LivenessCheckError extends Error {
   constructor(message: string | null) {
