@@ -127,7 +127,7 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.6",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.8",
           timezone: "exchange",
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
@@ -204,6 +204,46 @@ export const TVChartContainer = memo(
                 const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
                 const toggler = innerDoc?.querySelector('.toggler-l31H9iuA') as HTMLDivElement ;
                 toggler?.click()
+
+                // if (iframe) {
+                //   const handle = () => {
+                //     console.log("iframe ready ✅");
+
+                //     const doc = iframe.contentDocument;
+                //     if (!doc) return;
+
+                //     const observer = new MutationObserver((mutations) => {
+                //       for (const m of mutations) {
+                //         console.log(m.addedNodes)
+                //         m.addedNodes.forEach((node) => {
+                //           if (!(node instanceof HTMLElement)) return;
+
+                //           const isTooltip =
+                //             node.getAttribute("role") === "tooltip" ||
+                //             node.className?.toString().includes("tooltip");
+
+                //           if (isTooltip) {
+                //             node.remove();
+                //           }
+                //         });
+                //       }
+                //     });
+
+                //     observer.observe(doc.body, {
+                //       childList: true,
+                //       subtree: true,
+                //     });
+                //   };
+
+                //   // ✅ 情况1：已经加载完
+                //   if (iframe.contentDocument?.readyState === "complete") {
+                //     handle();
+                //   } else {
+                //     // ✅ 情况2：还没加载
+                //     iframe.addEventListener("load", handle);
+                //   }
+                // }
+
               }, 300)
               // 隐藏图例（防止出现 "MA5 close" 等）
               // const panes = chart.getPanes?.();

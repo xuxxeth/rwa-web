@@ -154,7 +154,7 @@ const RwaItemPrice = memo(
 export const StockInfo = memo(
   ({ from }: { from?: string }) => {
     const { t } = useTranslation()
-    const { isXl } = useTailwindBreakpoints()
+    const { isLg, isXl } = useTailwindBreakpoints()
     const inputToken = useTradeStore(state => state.inputToken)
     const stockData = useStockStore(state => state.stockData)
     const realtimeData = useTradeStore(state => state.realtimeRwaData)
@@ -238,10 +238,10 @@ export const StockInfo = memo(
 
     return (
       <div className="flex justify-between text-white px-4 min-w-[890px]">
-        <div className="flex items-center gap-x-8">
+        <div className="flex items-center gap-x-6">
           <StockDialog from={from} />
           <div className={cn(
-            " flex items-center gap-x-8 text-white text-[14px] font-normal pr-4 relative",
+            " flex items-center gap-x-6 text-white text-[14px] font-normal pr-4 relative",
           )}>
             
             <RwaItemPrice is24H={inputToken?.is24H} />
@@ -283,7 +283,7 @@ export const StockInfo = memo(
               </div>
               {
                 showMore && (
-                  <div className=" absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 w-[390px] grid grid-cols-4 gap-x-8"
+                  <div className=" absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 w-[420px] grid grid-cols-4 gap-x-5"
                     style={{height: isXl ? 80 : 140}}
                   >
                       <div className=" shrink-0 xl:hidden">
