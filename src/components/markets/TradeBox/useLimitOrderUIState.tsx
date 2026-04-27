@@ -164,10 +164,10 @@ export function useLimitOrderUIState({
    * 按钮文案
    */
   const buttonText = useMemo(() => {
+    if (inputToken?.state === 1) return t("tradingHalt")
+    if (inputToken?.state === RWA_STATUS.SELL && action === "buy") return t("marketQuotes.buyForbidden")
     if (Number(limitPrice) <= 0) return t("Enter Limit Price")
     if (Number(orderValue) <= 0) return t("Enter an amount")
-
-    if (inputToken?.state === 1) return t("tradingHalt")
 
     if (isOrderPriceDeviation) {
       return t("v3.t37")

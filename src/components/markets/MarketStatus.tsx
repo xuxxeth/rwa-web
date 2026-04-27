@@ -134,7 +134,7 @@ const MarketStatus = memo(
             from === "lite-trade" ? "h-[50px] bg-[rgba(0,0,0,0)]" : "",
             tokenLabel && from === 'trade' ? "px-0 w-[24px] justify-center" : ""
           )}>
-            <img src={stateLabel.i} className="w-[12px]" alt="" />
+            <img src={stateLabel.i} className="w-[14px] h-[14px]" alt="" />
             {
               (!tokenLabel || from !== 'trade') && (
                 <div className="text-[12px] leading-[14px] shrink-0"
