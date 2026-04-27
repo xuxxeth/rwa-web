@@ -397,7 +397,11 @@ const BaseInfo = memo(
     return (
       <>
         {rejectReason && <WarningInfo text={rejectReason} />}
-        <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
+        <form 
+          onKeyDown={handleFormEnterKeyDown}
+          onSubmit={handleSubmit(onSubmit)} 
+        
+          className='w-full mt-2'>
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
             <div className=' grid grid-cols-4 font-normal gap-x-6'>

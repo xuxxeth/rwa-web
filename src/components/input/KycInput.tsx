@@ -81,6 +81,7 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
         onChange={e => {
           props.onChange && props.onChange(e)
         }}
+        onInvalid={(e) => e.preventDefault()}
       />
     )
   }

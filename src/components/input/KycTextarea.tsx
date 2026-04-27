@@ -19,6 +19,7 @@ const KycTextarea = React.forwardRef<
       )}
       ref={ref}
       {...props}
+      onInvalid={(e) => e.preventDefault()}
     />
   )
 })
