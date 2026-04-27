@@ -54,7 +54,7 @@ export async function retryRefresh(
         });
         return resolve(result)
       }
-      if (attempt < maxRetries) {
+      if (attempt <= maxRetries) {
         setTimeout(() => {
           attempt += 1
           query()

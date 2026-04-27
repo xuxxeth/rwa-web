@@ -88,7 +88,7 @@ const FAQ = memo(() => {
   }, [i18n.language])
 
   return (
-    <div className='px-4 text-gray-400 font-medium'>
+    <div className='px-4 text-gray-400 font-medium bg-gray-950'>
       <div className='text-base/5 pt-8 border-t border-t-gray-850'>{t('FAQ')}</div>
       <div className='flex flex-col text-xs/[15px]'>
         {/* {faqList.map(faq => (
