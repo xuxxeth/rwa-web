@@ -16,7 +16,7 @@ function Markets() {
   return (
     <>
       <div className='w-full'>
-        <div className=' bg-[#131416] min-h-[100vh] text-white '>
+        <div className=' bg-[#1A1B1E] min-h-[100vh] text-white '>
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
           <div className='flex'>
             <div className='flex-1'>
@@ -27,7 +27,7 @@ function Markets() {
               <div className='w-full relative bg-[#1A1B1E]'>
                 <RwaSessionStatus />
                 
-                <BoxCard className='min-h-[370px] rounded-[4px] p-4 py-3 bg-[#131416]'>
+                <BoxCard className='min-h-[370px] rounded-l-[4px] p-4 bg-[#131416]'>
                   <ConvertTabs from='markets' />
                   <div className=' mt-3 '>
                     <TradeTypeSwitch />

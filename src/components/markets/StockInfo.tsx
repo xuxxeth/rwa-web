@@ -22,7 +22,7 @@ export const LabelWrap = memo(
   ({ children, tooltip }: { children: React.ReactNode, tooltip?: string | React.ReactNode }) => {
     if (!tooltip) return (
       <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
-        <div className=" border-b border-dashed border-[#9DA3AF]">
+        <div className=" border-b border-dashed border-[#9DA3AF] whitespace-nowrap">
           {children}
         </div>
       </div>
@@ -30,7 +30,7 @@ export const LabelWrap = memo(
     return (
       <IconWithTooltip tooltip={tooltip}>
         <div className="text-[12px] w-full font-normal text-[#9DA3AF] cursor-pointer flex">
-          <div className=" border-b border-dashed border-[#9DA3AF]">
+          <div className=" border-b border-dashed border-[#9DA3AF] whitespace-nowrap">
             {children}
           </div>
           
@@ -237,7 +237,7 @@ export const StockInfo = memo(
     }, [stockData?.marketCap, rwaPrice?.p])
 
     return (
-      <div className="flex justify-between text-white px-4 min-w-[890px]">
+      <div className="flex justify-between text-white px-4 min-w-[890px] rounded-r-[4px] bg-[#131416]">
         <div className="flex items-center gap-x-6">
           <StockDialog from={from} />
           <div className={cn(
@@ -283,7 +283,10 @@ export const StockInfo = memo(
               </div>
               {
                 showMore && (
-                  <div className=" absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 w-[420px] grid grid-cols-4 gap-x-5"
+                  <div className={cn(
+                    " absolute z-50 top-[108%] right-0 bg-[#282A2F] rounded-[4px] p-4 gap-x-6",
+                    !isXl ? "w-[440px] grid grid-cols-4 gap-y-4" : "flex items-center"
+                  )}
                     style={{height: isXl ? 80 : 140}}
                   >
                       <div className=" shrink-0 xl:hidden">
@@ -328,7 +331,7 @@ export const StockInfo = memo(
                             tooltip={t(`companyProfile.${tooltip}`)}
                             triggerClassName='inline-flex justify-start'
                           >
-                            <div className='text-gray-400 border-b border-b-gray-400 border-dashed text-[12px]'>
+                            <div className='text-gray-400 border-b border-b-gray-400 border-dashed text-[12px] whitespace-nowrap'>
                               {t(`companyProfile.${title}`)}
                             </div>
                           </IconWithTooltip>

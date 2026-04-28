@@ -26,7 +26,7 @@ const RwaSessionStatus = memo(
       return (
         <>
           <div className={cn(
-            "min-h-[34px] flex items-center w-full pt-3 px-4 bg-[#131416]",
+            "min-h-[34px] flex items-center w-full pt-4 px-4 bg-[#131416]",
             from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2)] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
@@ -47,7 +47,7 @@ const RwaSessionStatus = memo(
       return (
         <>
           <div className={cn(
-            "min-h-[34px] flex items-center w-full pt-3 px-4 bg-[#131416]",
+            "min-h-[34px] flex items-center w-full pt-4 px-4 bg-[#131416]",
             from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(243,161,63,0.1)] border border-[rgba(243,161,63,0.2))] text-[#FFB219] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
@@ -66,7 +66,7 @@ const RwaSessionStatus = memo(
       return (
         <>
           <div className={cn(
-            "min-h-[34px] flex items-center w-full pt-3 px-4 bg-[#131416]",
+            "min-h-[34px] flex items-center w-full pt-4 px-4 bg-[#131416]",
             from === "lite-trade" ? "px-0 py-0 mb-3" : " "
           )}>
             <div className="w-full bg-[rgba(168,85,247,0.1)] border border-[rgba(168,85,247,0.2)] text-[#A855F7] px-3 py-2 text-[12px] font-normal rounded-[4px] flex  gap-x-[6px]">
@@ -80,7 +80,7 @@ const RwaSessionStatus = memo(
         
       )
     }
-    return from === "lite-trade" ? null : <div className="h-1"></div>;  
+    return null;  
     
   }
 )

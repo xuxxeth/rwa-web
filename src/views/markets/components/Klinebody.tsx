@@ -16,7 +16,7 @@ const KlineBody = memo(
       <div className="w-full h-full">
         <StockInfo from="pro-trading" />
         <div className="h-1 bg-[#1A1B1E]"></div>
-        <div className="py-2">
+        <div className="py-2 rounded-tr-[4px] bg-[#131416]">
           <div
             className={cn(
               'gap-1 flex-0 mx-4 p-1 rounded-[8px] inline-flex flex-row items-center border border-[#232427]',
@@ -45,7 +45,7 @@ const KlineBody = memo(
             })}
           </div>
         </div>
-        <div hidden={activeTab !== 'kline'} className="w-full relative" style={{ height: 'calc(100% - 115px)'}}>
+        <div hidden={activeTab !== 'kline'} className="w-full relative bg-[#131416]" style={{ height: 'calc(100% - 115px)'}}>
           <TradingChart from={from} mode="tv" />
           <div className="h-1 bg-[#1A1B1E]"></div>
           <div className="absolute w-full" style={{ height: 'calc(100% - 504px)' }}>
