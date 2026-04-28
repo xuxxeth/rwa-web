@@ -340,7 +340,7 @@ export const TVChartContainer = memo(
 
     return (
       <div className={cn(
-        " relative text-white pr-4 rounded-r-[4px]",
+        " relative text-white pr-4 rounded-r-[4px] bg-[#131416]",
         from === 'market' ? "h-[500px]" : "h-[300px]"
       )}>
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
