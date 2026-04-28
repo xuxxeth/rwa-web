@@ -37,7 +37,7 @@ const MarketStatus = memo(
             orderType: t("v3.t17") + ', ' + t('v3.t16')
           }),
           c: '#FFB219',
-          i: '/images/v2/icons/pre.png'
+          i: '/images/v2/icons/pre2.png'
         }
       }
       if (tradingTime?.tradeState === MARKET_STATUS.OPEN) {
