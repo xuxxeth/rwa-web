@@ -153,7 +153,7 @@ const StockCard: React.FC<{
         </div>
         <div className='flex justify-between items-end'>
           <div className={`text-3xl font-medium ${stock.color} text-gray-900 tracking-tight`}>
-            {stock.price ? textPrefix(truncate(stock.price, stock.precision), '$') : ''}
+            {stock.price ? textPrefix(truncate(stock.price, stock.precision), '$') : '--'}
           </div>
           <div className={`text-sm font-bold ${stock.color} bg-white/50 px-2 py-1 rounded-lg`}>
             {stock.up !== undefined ? formatUp(stock.up) : '--'}

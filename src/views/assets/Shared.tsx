@@ -127,7 +127,7 @@ export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
     6: '6',
     7: '7',
     8: '8',
-    9: '9'
+    9: '9',
   }
 
   const key = reasonMap[reason]
