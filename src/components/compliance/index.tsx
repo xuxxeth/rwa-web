@@ -62,6 +62,14 @@ const Compliance = () => {
     }
   }, [account, isSignatureValid])
 
+  useEffect(() => {
+    if(!show) {
+      unlock()
+    } else {
+      lock()
+    }
+  }, [show])
+
   return (
     <>
       {show && (
