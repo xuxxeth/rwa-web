@@ -118,7 +118,7 @@ export default defineConfig(({ mode }) => {
       minify: 'terser', // 使用terser压缩
       terserOptions: {
         compress: {
-          drop_console: mode === 'test' ? false : false, // 移除 console.log
+          drop_console: mode === 'test' ? false : true, // 移除 console.log
           drop_debugger: mode === 'test' ? false : true, // 移除 debugger
         },
       },
