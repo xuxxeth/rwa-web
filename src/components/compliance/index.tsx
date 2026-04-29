@@ -22,9 +22,9 @@ const Compliance = () => {
   const [loading, setLoading] = useState(false)
 
   const getAgreementsAccepted = async () => {
-    setLoading(true)
+    // setLoading(true)
     const res = await kycApi.getAgreementsAccepted()
-    setLoading(false)
+    // setLoading(false)
     if (res && res.data && !res.data.privacy) {
       setShow(true)
       lock()
@@ -57,6 +57,8 @@ const Compliance = () => {
   useEffect(() => {
     if (account && isSignatureValid) {
       getAgreementsAccepted()
+    } else {
+      setShow(false)
     }
   }, [account, isSignatureValid])
 
