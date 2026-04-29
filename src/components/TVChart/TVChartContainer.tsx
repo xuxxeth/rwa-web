@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { getDataFeed, tagSession, type IExtaIBasicDataFeed } from "./datafeed";
 import { type SeriesType, type ChartingLibraryWidgetOptions, type CreateStudyOptions, type EntityId, type IBasicDataFeed, type IChartingLibraryWidget, type IChartWidgetApi, type ResolutionString, type Timezone } from "@/lib/charting_library/charting_library";
-import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures } from "@/config/constants";
+import { CA_LANGUAGE, chartOverrides, disabledFeatures, enabledFeatures, MARKET_STATUS } from "@/config/constants";
 import type { IRwa, IToken } from "@/service/base/types";
 import { cn } from "@/lib/utils";
 import storage from "@/utils/storage";
@@ -44,12 +44,51 @@ export const TVChartContainer = memo(
     const tokenSymbolRef = useRef(token.symbol)
     const { i18n } = useTranslation()
     const [chartType, setChartType] = useState(true)
+    const chartTypeRef = useRef(chartType)
+    const marketStateRef = useRef(MARKET_STATUS.DEFAULT)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tradingTime = useTradingStartTime()
+
+    const syncAreaModeClass = useCallback((enabled: boolean) => {
+      console.log('syncAreaModeClass', enabled)
+      const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement | null
+      const body = iframe?.contentDocument?.body || iframe?.contentWindow?.document?.body
+      if (!body) return
+
+      body.classList.toggle('tv-area-mode', enabled)
+    }, [])
+
+    const switchToCandle = useCallback((interval: ResolutionString = "1" as ResolutionString) => {
+      const chart = tvWidgetRef.current?.activeChart()
+      if (!chart || !tvWidgetRef.current) return
+
+      setChartType(false)
+      dataFeedRef.current?.setCurrentType(1)
+      chart.setChartType(1)
+
+      const applyCandle = () => {
+        addOrRemoveMA(chart, 1)
+        wasAreaModeRef.current = false
+        ;(tvWidgetRef.current as any)?.resetCache?.()
+        chart.resetData()
+      }
+
+      const emptySymbol = `__empty__${Date.now()}`
+      tvWidgetRef.current.setSymbol(emptySymbol, interval, () => {
+        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+        tvWidgetRef.current?.setSymbol(targetSymbol, interval, () => {
+          applyCandle()
+        })
+      })
+    }, [])
 
     useEffect(() => {
       tokenSymbolRef.current = token.symbol
     }, [token.symbol])
+
+    useEffect(() => {
+      chartTypeRef.current = chartType
+    }, [chartType])
     
     useEffect(() => {
       let mounted = true;
@@ -88,7 +127,7 @@ export const TVChartContainer = memo(
           user_id: "public_user_id",
           fullscreen: false,
           autosize: true,
-          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.5",
+          custom_css_url: "/libraries/charting_library/tradingview-chart.css?_t=0.1.8",
           timezone: "exchange",
           overrides: chartOverrides,
           interval: "1" as ResolutionString,
@@ -155,38 +194,56 @@ export const TVChartContainer = memo(
                   return
                 }
                 // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
-                setChartType(false)
-                dataFeedRef.current?.setCurrentType(1)
-                chart.setChartType(1)
-                const applyCandle = () => {
-                  addOrRemoveMA(chart, 1)
-                  wasAreaModeRef.current = false
-                  ;(tvWidgetRef.current as any)?.resetCache?.()
-                  chart.resetData()
-                }
-                if (tvWidgetRef.current) {
-                  const emptySymbol = `__empty__${Date.now()}`
-                  tvWidgetRef.current.setSymbol(emptySymbol, interval as ResolutionString, () => {
-                    const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
-                    tvWidgetRef.current?.setSymbol(targetSymbol, interval as ResolutionString, () => {
-                      applyCandle()
-                    })
-                  })
-                  return
-                }
-                
-                // @ts-ignore
-                // dataFeedRef.current?.setSuppressHistory(false)
-                ;(tvWidgetRef.current as any)?.resetCache?.()
-                chart.resetData(); 
-                
+                switchToCandle(interval as ResolutionString)
               });
 
+              syncAreaModeClass(chartTypeRef.current)
+              dataFeedRef.current?.setMarketState(marketStateRef.current)
               setTimeout(() => {
-                const iframe = chartContainerRef.current.querySelector('iframe') as HTMLIFrameElement;
+                const iframe = chartContainerRef.current?.querySelector('iframe') as HTMLIFrameElement;
                 const innerDoc = iframe.contentDocument || iframe.contentWindow?.document;
                 const toggler = innerDoc?.querySelector('.toggler-l31H9iuA') as HTMLDivElement ;
                 toggler?.click()
+
+                // if (iframe) {
+                //   const handle = () => {
+                //     console.log("iframe ready ✅");
+
+                //     const doc = iframe.contentDocument;
+                //     if (!doc) return;
+
+                //     const observer = new MutationObserver((mutations) => {
+                //       for (const m of mutations) {
+                //         console.log(m.addedNodes)
+                //         m.addedNodes.forEach((node) => {
+                //           if (!(node instanceof HTMLElement)) return;
+
+                //           const isTooltip =
+                //             node.getAttribute("role") === "tooltip" ||
+                //             node.className?.toString().includes("tooltip");
+
+                //           if (isTooltip) {
+                //             node.remove();
+                //           }
+                //         });
+                //       }
+                //     });
+
+                //     observer.observe(doc.body, {
+                //       childList: true,
+                //       subtree: true,
+                //     });
+                //   };
+
+                //   // ✅ 情况1：已经加载完
+                //   if (iframe.contentDocument?.readyState === "complete") {
+                //     handle();
+                //   } else {
+                //     // ✅ 情况2：还没加载
+                //     iframe.addEventListener("load", handle);
+                //   }
+                // }
+
               }, 300)
               // 隐藏图例（防止出现 "MA5 close" 等）
               // const panes = chart.getPanes?.();
@@ -237,13 +294,21 @@ export const TVChartContainer = memo(
         tvWidgetRef.current = null;
         dataFeedRef.current = null
         tvWidgetReady.current = false
+        chartTypeRef.current = true
         initChart && initChart(token)
+        
       }
     }, [i18n.language])
+
+    useEffect(() => {
+      if (!tvWidgetReady.current) return
+      syncAreaModeClass(chartType)
+    }, [chartType, syncAreaModeClass])
 
     // 监听市场状态变化，更新dataFeed的市场状态
     useEffect(() => {
       dataFeedRef.current?.setMarketState(marketTradeState)
+      marketStateRef.current = marketTradeState
     }, [marketTradeState])
 
     // 更新市场时间
@@ -275,7 +340,7 @@ export const TVChartContainer = memo(
 
     return (
       <div className={cn(
-        " relative text-white pr-4",
+        " relative text-white pr-4 rounded-r-[4px] bg-[#131416]",
         from === 'market' ? "h-[500px]" : "h-[300px]"
       )}>
         <div className=" absolute w-4 h-1 -left-0 top-[38px] bg-[#1A1B1E] z-30">&nbsp;</div>
@@ -284,6 +349,16 @@ export const TVChartContainer = memo(
           tvWidgetShow && (
             <div className=" absolute left-4 top-[0px] h-[38px] flex items-center">
               <SessionLineSelectt onChange={handleSessionChange} selected={chartType} />
+              {
+                chartType && (
+                  <button
+                    type="button"
+                    className="h-[32px] w-[42px] bg-[rgba(0,0,0,0)]"
+                    onClick={() => switchToCandle("1" as ResolutionString)}
+                  />
+                )
+              }
+              
             </div>
           )
         }

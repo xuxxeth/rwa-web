@@ -325,7 +325,7 @@ const RiskControlAssets = memo(
                     key={item.token}
                   >
                     <span>{item.symbol}</span>
-                    <span>{truncate(item.quantity, 2)}</span>
+                    <span>{formatWithCommas(truncate(item.quantity, 2), 2)}</span>
                   </div>
                 )
               })}

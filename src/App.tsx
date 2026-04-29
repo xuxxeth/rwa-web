@@ -16,7 +16,6 @@ import { Menus } from './components/menu'
 import { useRiskUserConfig } from './hooks/useRiskStatus'
 import { Updater } from './components/Updater'
 import { useRouter } from './hooks/useRouter'
-import { HomeMenus } from './components/menu/HomeMenus'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import { createPortal } from 'react-dom'
 

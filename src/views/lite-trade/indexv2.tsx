@@ -10,6 +10,9 @@ import { PositionRwa } from "./components/PositionRwa";
 import { openUrl } from "@/utils/scan";
 import { PreMarketOpen } from "@/components/markets/PreMarketOpen";
 import { TradeTypeSwitch } from "../markets/MarketTrading/TradeTypeSwitch";
+import { TradeTopTip } from "@/components/markets/TradeTopTip";
+import { RwaSessionStatus } from "@/components/markets/RwaSessionStatus";
+import { MarketStatus } from "@/components/markets/MarketStatus";
 
 function LiteTrade() {
   const { account } = useActiveWeb3()
@@ -45,18 +48,23 @@ function LiteTrade() {
           <LiteTradeInfo />
           <div className="flex gap-x-[14px]">
             <div className="w-[420px]">
+              <div className="mb-2">
+                <MarketStatus from="trade" />
+              </div>
+
               <BoxCard className="rounded-[16px] bg-[#131416] relative">
+                <RwaSessionStatus from="lite-trade" />
                 <div className="mb-3">
                   <TradeTypeSwitch />
                 </div>
                 <TradeBox from="lite-trade" />
               </BoxCard>
-              <div className="border border-[#232427] rounded-[16px] px-3 py-2 mt-2">
+              {/* <div className="border border-[#232427] rounded-[16px] px-3 py-2 mt-2">
                 <PreMarketOpen from="lite-trade" />
-              </div>
+              </div> */}
 
             </div>
-            <button disabled={signing} className=" bg-[#131416] w-9 h-9 rounded-full overflow-hidden cursor-pointer flex items-center justify-center"
+            <button disabled={signing} className=" bg-[#131416] w-9 h-9 rounded-full overflow-hidden cursor-pointer flex items-center justify-center mt-8"
               onClick={async (e) => {
                 e.stopPropagation()
                 e.preventDefault()

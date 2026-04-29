@@ -1,14 +1,14 @@
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useRouter } from "@/hooks/useRouter";
 import { useToast } from "@/hooks/useToast";
+import { useGetTokenBalances } from "@/hooks/useTokenBalances";
 import { useTranslation } from "@/hooks/useTranslation";
-import { getCurrentToastId } from "@/hooks/useTxToast";
-import { useBaseStore } from "@/stores/baseStore";
+import { getCurrentToastId, useTxToast } from "@/hooks/useTxToast";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useWssStore } from "@/stores/wssStore";
 import storage from "@/utils/storage";
 import { KYC_UPLOAD_STORAGE_KEY } from "@/views/identity/components/Upload/shared";
-import { lazy, memo, useEffect, useRef } from "react";
+import { lazy, memo, useCallback, useEffect, useRef } from "react";
 const KycState = lazy(() => import("@/components/kyc-state"));
 const Compliance = lazy(() => import("@/components/compliance"));
 
@@ -25,12 +25,44 @@ const Updater = memo(
     // });
     const router = useRouter()
     const { toastSuccess, toastError } = useToast()
+    const { dismissTxToast } = useTxToast()
     const { t } = useTranslation()
     const { account } = useActiveWeb3()
     const newOrder = useWssStore(state => state.newOrder)
     const setTxSuccess = useTradeStore(state => state.setTxSuccess)
-    const freshTokenBalances = useBaseStore(state => state.freshTokenBalances)
+    const { getTokensDataByStockId } = useGetTokenBalances()
     const lastHandledOrderKeyRef = useRef("")
+    const tokenBalanceRetryTimeoutRef = useRef<number | null>(null)
+    const tokenBalanceRetryRunIdRef = useRef(0)
+
+    const clearTokenBalanceRetryTimers = useCallback(() => {
+      if (tokenBalanceRetryTimeoutRef.current != null) {
+        window.clearTimeout(tokenBalanceRetryTimeoutRef.current)
+        tokenBalanceRetryTimeoutRef.current = null
+      }
+      tokenBalanceRetryRunIdRef.current += 1
+    }, [])
+
+    const refreshTokenBalanceByStockIdWithRetry = useCallback((stockId?: number) => {
+      if (!stockId) return
+      clearTokenBalanceRetryTimers()
+      const runId = tokenBalanceRetryRunIdRef.current
+      const runSerial = async () => {
+        for (let i = 0; i < 3; i += 1) {
+          if (tokenBalanceRetryRunIdRef.current !== runId) return
+          await getTokensDataByStockId([stockId])
+          if (i < 2) {
+            await new Promise<void>((resolve) => {
+              tokenBalanceRetryTimeoutRef.current = window.setTimeout(() => {
+                tokenBalanceRetryTimeoutRef.current = null
+                resolve()
+              }, 3000)
+            })
+          }
+        }
+      }
+      void runSerial()
+    }, [clearTokenBalanceRetryTimers, getTokensDataByStockId])
 
     useEffect(() => {
       if (!newOrder || (newOrder.x !== "NEW" && newOrder.x !== "CANCELLED" && newOrder.x !== "FILLED" && newOrder.x !== "PARTIALLY_FILLED")) {
@@ -95,9 +127,10 @@ const Updater = memo(
       }
       const toastId = getCurrentToastId()
       console.log("new order info", toastId, message)
-      if (toastId && newOrder.x !== "CANCELLED") {
+      if (toastId && newOrder.x === "NEW") {
         setTxSuccess("success", message, newOrder.hx)
       } else if (!NO_SHOW_PATH.includes(router.location.pathname)) {
+        dismissTxToast()
         if (isFailed) {
           toastError({ title: message, tx: newOrder.hx })
         } else {
@@ -105,8 +138,14 @@ const Updater = memo(
         }
         
       }
-      freshTokenBalances()
-    }, [newOrder, freshTokenBalances, t, router.location.pathname, setTxSuccess, toastSuccess])
+      refreshTokenBalanceByStockIdWithRetry(newOrder.si)
+    }, [newOrder, refreshTokenBalanceByStockIdWithRetry, t, router.location.pathname, setTxSuccess, toastSuccess, toastError, dismissTxToast])
+
+    useEffect(() => {
+      return () => {
+        clearTokenBalanceRetryTimers()
+      }
+    }, [clearTokenBalanceRetryTimers])
 
     const preAccount = useRef<string | undefined>(undefined)
     useEffect(() => {

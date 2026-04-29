@@ -6,30 +6,28 @@ import { FAQ } from '@/components/markets/FAQ'
 import { KlineBody } from '../components/Klinebody'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { OrderList } from '@/components/markets/OrderList'
-import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
 import { TradeTypeSwitch } from './TradeTypeSwitch'
+import { TradeTopTip } from '@/components/markets/TradeTopTip'
+import { RwaSessionStatus } from '@/components/markets/RwaSessionStatus'
 
 function Markets() {
   const { t } = useTranslation()
   const orderDialog = useShowDialog()
   return (
     <>
-      <div className='w-full overflow-x-auto'>
-        <div className=' bg-[#131416] min-h-[100vh] text-white w-[1160px] min-w-full'>
+      <div className='w-full'>
+        <div className=' bg-[#1A1B1E] min-h-[100vh] text-white '>
           <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
-          <div className='flex min-w-[1200px]'>
-            <div className='flex-1 min-w-[856px]'>
+          <div className='flex'>
+            <div className='flex-1'>
               <KlineBody from='market' />
             </div>
-            <div className='w-[340px] shrink-0 flex bg-[#131416]'>
+            <div className='w-[340px] shrink-0 flex '>
               <div className='w-[4px] bg-[#1A1B1E] h-full shrink-0'>&nbsp;</div>
-              <div className='w-full'>
-                <div className='min-h-[34px] flex items-center w-full py-3'>
-                  <PreMarketOpen />
-                </div>
+              <div className='w-full relative bg-[#1A1B1E]'>
+                <RwaSessionStatus />
                 
-                <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
-                <BoxCard className='min-h-[370px] rounded-[4px] p-4 bg-[#131416]'>
+                <BoxCard className='min-h-[370px] rounded-l-[4px] px-4 pt-4 pb-8 bg-[#131416]'>
                   <ConvertTabs from='markets' />
                   <div className=' mt-3 '>
                     <TradeTypeSwitch />

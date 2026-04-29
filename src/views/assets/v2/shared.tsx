@@ -63,9 +63,9 @@ export function useOrderList<
   const [isFirstLoadDone, setIsFirstLoadDone] = useState(false)
 
   // 如果是第一页的话，把 prev 设置为 disabled
-  const fetchFirstPage = async () => {
+  const fetchFirstPage = async (isAutoRefresh?: boolean) => {
     try {
-      setIsLoading(true)
+      setIsLoading(!isAutoRefresh)
       setIsPrevEnabled(false)
       setIsNextEnabled(false)
       const res = await api({ ...filter, limit: PAGE_LIMIT })
@@ -203,6 +203,8 @@ export function OrderTable<
   scrollId: (item: T) => string
   type: 'open' | 'history' | 'trade'
 }) {
+  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+
   if (!chainId || !account) {
     return (
       <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
@@ -210,8 +212,6 @@ export function OrderTable<
       </WithTableHeader>
     )
   }
-
-  const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
 
   if (!isSignatureValid) {
     return (
@@ -335,12 +335,8 @@ export function OrderContentByScroll<
     })
   )
 
-  const newOrder = useWssStore(state => state.newOrder)
-
-  useEffect(() => {
-    if (!isFetchedAfterMount || isLoading || !newOrder) return
-    refetch()
-  }, [newOrder, isFetchedAfterMount, isLoading])
+  const isRefetchEnable = isFetchedAfterMount && !isLoading
+  useOrderChangedV2((isAutoRefresh) => refetch(), isRefetchEnable)
 
   const allOrders = data?.pages?.flatMap(page => page.data) || []
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -392,6 +388,47 @@ export function OrderContentByScroll<
   )
 }
 
+export function useOrderChangedV2(refetch: (isAutoRefresh?: boolean) => Promise<any>, isRefetchEnable: boolean) {
+  const newOrder = useWssStore(state => state.newOrder)
+  const preNewOrder = useRef(newOrder)
+
+  const refetchTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([])
+  const lastOrderChangedEventTimeRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      refetchTimersRef.current.forEach(clearTimeout)
+      refetchTimersRef.current = []
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isRefetchEnable) return
+    if (!newOrder) return
+    if (newOrder === preNewOrder.current) return
+
+    const rawEventTime = newOrder.E
+    const parsedTs = Number(rawEventTime)
+    const ts = Number.isFinite(parsedTs) && parsedTs > 0 ? parsedTs : Date.now()
+
+    if (ts === lastOrderChangedEventTimeRef.current) return
+    lastOrderChangedEventTimeRef.current = ts
+
+    refetchTimersRef.current.forEach(clearTimeout)
+    refetchTimersRef.current = []
+
+    const delays = [200, 600, 1500, 2800]
+
+    delays.forEach((delay, index) => {
+      refetchTimersRef.current.push(
+        setTimeout(() => {
+          refetch(true)
+        }, delay)
+      )
+    })
+  }, [newOrder, isRefetchEnable, refetch])
+}
+
 export function OrderContentByPagination<
   T extends { orderId: string; id: string },
   F extends { after?: string; before?: string },
@@ -415,9 +452,7 @@ export function OrderContentByPagination<
     { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
   >
 }) {
-  const router = useRouter()
   const rwaTokens = useRwaTokens()
-  const newOrder = useWssStore(state => state.newOrder)
 
   const {
     data,
@@ -431,12 +466,15 @@ export function OrderContentByPagination<
     isFirstLoadDone,
   } = useOrderList<T, F>(chainId, account, PAGE_LIMIT, scrollId, api, filter)
 
-  useEffect(() => {
-    if (newOrder === null) return
-    if (!isFirstLoadDone) return
-    
-    fetchFirstPage()
-  }, [newOrder, isFirstLoadDone])
+  // useEffect(() => {
+  //   if (newOrder === null) return
+  //   if (!isFirstLoadDone) return
+
+  //   fetchFirstPage()
+  // }, [newOrder, isFirstLoadDone])
+
+  const isRefetchEnable = isFirstLoadDone
+  useOrderChangedV2(fetchFirstPage, isRefetchEnable)
 
   const onTokenClick = (rwa: IRwa) => {
     // router.push(`/trade/${rwa.symbol}`)
@@ -454,7 +492,7 @@ export function OrderContentByPagination<
         isLoading={isLoading}
         config={tableConfig}
         extra={{ rwaTokens, refetch: fetchFirstPage, onTokenClick }}
-        getKey={(item: T) => item.orderId}
+        getKey={(item: T) => scrollId(item)}
         className={cn('hover:bg-opacity-01 px-4 group')}
         tdClassName='h-[56px] text-xs/4'
       />

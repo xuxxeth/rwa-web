@@ -51,7 +51,7 @@ export function TableBody<T, Extra>(props: {
               return (
                 <div
                   key={key}
-                  className={cn('flex flex-row items-center h-20', tdClassName)}
+                  className={cn('flex flex-row items-center h-20 overflow-hidden', tdClassName)}
                   style={style}
                 >
                   {render(item, extra)}
@@ -88,7 +88,7 @@ export function TableHeader<SortableField extends string, Item, Extra>({
   return (
     <div
       className={cn(
-        'flex flex-row h-12 px-3 border-t border-b border-white/10 shrink-0',
+        'flex flex-row h-12 px-3 border-t border-b border-white/10 shrink-0 overflow-hidden',
         className
       )}
     >

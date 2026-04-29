@@ -25,14 +25,23 @@ import { WarningInfo } from './WarningInfo'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import useDebouncedUnmount from '@/hooks/useDebouncedUnmount'
 import { parseISO } from 'date-fns'
+import { useKycStore } from '@/stores/kycStore'
 import {
   Text,
 } from './Upload/shared'
 
+export function useResetRetryCount() {
+  const updateRetryCount = useKycStore(state => state.updateRetryCount)
+  
+  useEffect(() => {
+    updateRetryCount(0)
+  }, [updateRetryCount])
+}
+
 export async function retryRefresh(
   refresh: () => Promise<ApiResponse<IKycDetail>>,
-  maxRetries = 3,
-  interval = 5000
+  maxRetries = 5,
+  interval = 3000
 ): Promise<any> {
   let attempt = 1
   return new Promise(resolve => {
@@ -45,7 +54,7 @@ export async function retryRefresh(
         });
         return resolve(result)
       }
-      if (attempt < maxRetries) {
+      if (attempt <= maxRetries) {
         setTimeout(() => {
           attempt += 1
           query()
@@ -77,6 +86,18 @@ export const SectionBox = ({
 export const FormItemBox = ({ children }: { children: React.ReactNode }) => {
   return <div className='my-5'>{children}</div>
 }
+
+export const handleFormEnterKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+  if (e.key !== 'Enter') return
+
+  const target = e.target
+  if (target instanceof HTMLElement && target.tagName === 'TEXTAREA') {
+    return
+  }
+
+  e.preventDefault()
+}
+
 export const FormItemLabel = ({
   children,
   title,
@@ -371,10 +392,16 @@ const BaseInfo = memo(
     // 组件卸载时重置重试状态，使用防抖避免 StrictMode 下的重复执行
     useDebouncedUnmount(onResetRetry)
 
+    useResetRetryCount()
+
     return (
       <>
         {rejectReason && <WarningInfo text={rejectReason} />}
-        <form onSubmit={handleSubmit(onSubmit)} className='w-full mt-2'>
+        <form 
+          onKeyDown={handleFormEnterKeyDown}
+          onSubmit={handleSubmit(onSubmit)} 
+        
+          className='w-full mt-2'>
           <SectionBox>
             <SectionTitle>{t('kyc.t2')}</SectionTitle>
             <div className=' grid grid-cols-4 font-normal gap-x-6'>

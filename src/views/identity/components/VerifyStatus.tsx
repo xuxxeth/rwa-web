@@ -77,6 +77,8 @@ function VerifyStatus(props: {
   btnOnClick?: () => void
   extra?: ReactNode
   retryComponent?: ReactNode
+  className?: string
+  showBtn?: boolean
 }) {
   const { t } = useTranslation()
   return (
@@ -88,14 +90,17 @@ function VerifyStatus(props: {
           {t(`${langPrefix}.${props.detail}`)}
         </div>
       </div>
-      <Button
-        onClick={() => {
-          if (props.btnOnClick) {
-            props.btnOnClick()
-          }
-        }}
-        text={props.btnText}
-      />
+      {props.showBtn === false ? null : (
+        <Button
+          className={props.className}
+          onClick={() => {
+            if (props.btnOnClick) {
+              props.btnOnClick()
+            }
+          }}
+          text={props.btnText}
+        />
+      )}
       {props.extra}
     </VerifyStatusWrapper>
   )
@@ -221,7 +226,7 @@ function HotRwas() {
                 </div>
                 <div className={cn('text-sm text-[#1A85FF]', getUpColor(rwa.change))}>
                   <button className='bg-white/10 px-2 py-[2px] rounded-sm'>
-                    {formatUp(rwa.up)}
+                    {rwa.up !== undefined ? formatUp(rwa.up) : '--'}
                   </button>
                 </div>
               </div>
@@ -237,24 +242,38 @@ function HotRwas() {
 export function Verifying(props: { refresh: () => Promise<ApiResponse<IKycDetail>> }) {
   const router = useRouter()
   const retryCount = useKycStore(state => state.retryCount)
+  const isWaiting = retryCount > 0 && retryCount <= 5
   return (
     <VerifyStatus
       type='verifying'
       title='verifying'
-      detail={retryCount > 0 && retryCount < 3 ? 'verifyingWait' : 'verifyingTip'}
-      btnText='m'
-      btnOnClick={() => router.push('/markets')}
+      detail={isWaiting ? 'verifyingWait' : 'verifyingTip'}
+      btnText='h'
+      btnOnClick={() => router.push('/trade')}
+      showBtn={!isWaiting}
+      className='bg-white text-black text-base font-semibold'
     />
   )
 }
 
-function Button({ onClick, text }: { onClick: () => void; text: string }) {
+function Button({
+  onClick,
+  text,
+  className,
+}: {
+  onClick: () => void
+  text: string
+  className?: string
+}) {
   const { t } = useTranslation()
   return (
     <div>
       <button
         onClick={onClick}
-        className='w-[402px] h-[46px] border rounded-lg cursor-pointer border-white bg-transparent text-white tex-base font-bold'
+        className={cn(
+          'w-[402px] h-[46px] border rounded-lg cursor-pointer border-white bg-transparent text-white tex-base font-bold',
+          className
+        )}
       >
         {t(`${langPrefix}.${text}`)}
       </button>

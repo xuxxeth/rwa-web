@@ -140,7 +140,7 @@ const openOrderTableConfig: ITableConfig<
     key: 'side',
     sortable: false,
     render: (item: IOpenOrder) => <SideCell side={item.side} className='text-xs/4' />,
-    width: 60,
+    width: 40,
   },
   {
     key: 'type',
@@ -148,7 +148,7 @@ const openOrderTableConfig: ITableConfig<
     render: (item: IOpenOrder) => (
       <OrderTypeCell orderType={item.orderType} className='text-xs/4' />
     ),
-    width: 60,
+    width: 50,
   },
   {
     key: 'token',
@@ -241,7 +241,11 @@ const openOrderTableConfig: ITableConfig<
   {
     key: 'session',
     sortable: false,
-    render: (item: IOpenOrder) => <SessionTypeCell sessionType={item.sessionType} />,
+    render: (item: IOpenOrder) => (
+      <div className='pr-2'>
+        <SessionTypeCell sessionType={item.sessionType} />
+      </div>
+    ),
   },
   {
     key: 'txHash',

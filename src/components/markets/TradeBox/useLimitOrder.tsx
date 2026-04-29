@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react"
 import BigNumber from "bignumber.js"
 import { TradeType, SideType, TifType, SessionType } from "@/hooks/useCaCommon"
-import { useBaseStore } from "@/stores/baseStore"
 import { parseAmount } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
@@ -58,7 +57,6 @@ export function useLimitOrder({
 }: UseLimitOrderParams) {
 
   const [loading, setLoading] = useState(false)
-  const marketTradeState = useBaseStore(state => state.marketTradeState)
 
   const validateRisk = useCallback(() => {
     if (riskUserConfig?.actions === 0) {
@@ -91,21 +89,16 @@ export function useLimitOrder({
   }, [tradeType, slippage, effectivePrice, toastError])
 
   const submit = useCallback(async () => {
-    // if (tradeType === TradeType.MARKET && marketTradeState === MARKET_STATUS.CLOSE) {
-    //   toastError({ title: t("v3.t10") })
-    //   return
-    // }
-
     if (!validateRisk()) return
-
-    setLoading(true)
-    onStart?.()
 
     try {
       const orderPrice = getOrderPrice()
       if (!orderPrice) {
         return
       }
+
+      setLoading(true)
+      onStart?.()
 
       const params = {
         stockId: String(inputToken?.stockId),
@@ -154,7 +147,6 @@ export function useLimitOrder({
     tradeType,
     sessionType,
     slippage,
-    marketTradeState,
     marketInfo,
     getOrderPrice,
     validateRisk,

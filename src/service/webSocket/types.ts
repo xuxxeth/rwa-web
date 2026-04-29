@@ -1,11 +1,10 @@
 export interface IAggregateData {
     timestamp: number
     items: {
-      S: string
-      p: number
-      c: number
-      pc: number
-      s: number
+      s: number  // 股票编号    
+      S: string  // 股票Symbol
+      p: number  // 最新价
+      o: number  // 今开价(24小时开始价格)新增
     }[]
   }
 
@@ -13,12 +12,9 @@ export type ISummaryData = {
   s: number // 股票编号
   S: string // 股票Symbol
   p: number // 最新价
-  o: number // 今开价
+  o: number // 今开价(24小时开始价格)
   l: number // 最低价
   h: number // 最高价
-  c: number // 当日收盘价
-  pc: number // 昨日收盘价
-  wc: number // 上周收盘价
   T: number // 时间戳(秒)
 }[]
 

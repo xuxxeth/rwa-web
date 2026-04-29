@@ -6,7 +6,7 @@ import { Upload } from "./Upload"
 import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import { RESPONSE_CODE } from "@/config/constants"
-import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
+import { ErrorBox, InputBox, retryRefresh, SectionBox, SectionTitle, useResetRetryCount, handleFormEnterKeyDown } from "./BaseInfo"
 import { LazyImage } from "@/components/image/LazyImage"
 import { KycInput } from "@/components/input/KycInput"
 import { KycTextarea } from "@/components/input/KycTextarea"
@@ -64,7 +64,7 @@ const ExtraInfo = memo(
     const errorList = findEmptyItemIndices(extraList) || []
 
     const [submiting, setSubmiting] = useState(false)
-    
+
     const onSubmit = async (data: FormData) => {
       if (errorList.length > 0) {
         toastError({title: t('kyc.t60')})
@@ -109,12 +109,18 @@ const ExtraInfo = memo(
       
     }
 
+    useResetRetryCount()
+
     const handlePlus = async (action: string, index: number) => {
 
     }
 
     return (
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full mt-2">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        onKeyDown={handleFormEnterKeyDown}
+        className="w-full mt-2"
+      >
         
         {/* <SectionBox className="pb-5"> */}
           <SectionTitle>{t('kyc.t25')}</SectionTitle>
@@ -137,6 +143,7 @@ const ExtraInfo = memo(
                             className=""
                             placeholder={t('kyc.t4')}
                             value={extraList[index].name}
+                            regex="^[a-zA-Z0-9\u4e00-\u9fa5 ,，]{1,30}$"
                             error={errors.extraList?.[index]?.name?.message}
                             {
                               ...register(`extraList.${index}.name`, {
@@ -146,7 +153,7 @@ const ExtraInfo = memo(
                                   message: t('kyc.t54', { num: 30 }),
                                 },
                                 pattern: {
-                                  value: /^[a-zA-Z\u4e00-\u9fa5]+$/,
+                                  value: /^[a-zA-Z0-9\u4e00-\u9fa5 ,，]+$/,
                                   message: t('kyc.t64')
                                 },
                                 
@@ -185,7 +192,7 @@ const ExtraInfo = memo(
                               if (!value || !value.trim()) return true
 
                               // 有值：按规则校验
-                              const regex = /^[\u4e00-\u9fa5a-zA-Z0-9]{1,200}$/
+                              const regex = /^[\u4e00-\u9fa5a-zA-Z0-9。．.,，"“”'‘’ \r\n]{1,200}$/
                               return (
                                 regex.test(value) || t('kyc.t63')
                               )

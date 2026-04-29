@@ -16,6 +16,9 @@ import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
 import { useNavigate } from 'react-router-dom'
+import TooltipWithIcon from '@/components/icon-tooltip'
+import { useBaseStore } from '@/stores/baseStore'
+import { extractHourMinute } from '@/hooks/useMarketState'
 
 export type OrderChanged = {
   orderId: string
@@ -123,6 +126,8 @@ export function ReasonCell({ reason }: { reason: IOrder['reason'] }) {
     5: '5',
     6: '6',
     7: '7',
+    8: '8',
+    9: '9',
   }
 
   const key = reasonMap[reason]
@@ -171,13 +176,17 @@ export function TokenCell(props: {
 }) {
   return (
     <div
-      className={'flex flex-row gap-2 font-normal cursor-pointer'}
+      className={'flex flex-row gap-2 font-normal cursor-pointer overflow-hidden'}
       onClick={() => props.onClick?.()}
     >
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
-      <div className='flex flex-col'>
+      <div className='flex flex-col overflow-hidden'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
-        <div className={cn('text-gray-400 text-xs/[15px]', props.nameClassName)}>{props.name}</div>
+        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
+          <div className={cn('text-gray-400 text-xs/[15px] truncate', props.nameClassName)}>
+            {props.name}
+          </div>
+        </TooltipWithIcon>
       </div>
     </div>
   )
@@ -244,11 +253,76 @@ export function OrderStatusCell(props: { state: number }) {
 }
 
 export function SessionTypeCell({ sessionType }: { sessionType: number }) {
+  const {
+    tradingStartTime,
+    tradingEndTime,
+    preMarketMinutes,
+    afterMarketMinutes,
+    nightTradingStartTime,
+    nightTradingEndTime,
+  } = useBaseStore(state => state.marketInfo)
+  const { t } = useTranslation()
+
+  const getDuration = (timestamp1: number, timestamp2: number) => {
+    const start = extractHourMinute(timestamp1)
+    const end = extractHourMinute(timestamp2)
+    if (start && start?.H && end && end?.H) {
+      return `${start.H}:${start.M} ~ ${end.H}:${end.M}`
+    }
+    return '--'
+  }
+
   switch (sessionType) {
     case 0:
-      return <TextCellWithTranslation text='portfolio.rthOnly' />
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t19', {
+                duration: getDuration(tradingStartTime, tradingEndTime) + ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.rthOnly'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
+    case 3:
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t201', {
+                duration:
+                  getDuration(nightTradingStartTime, nightTradingEndTime) + ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.overnight'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
+    case 1:
+    case 2:
     case 4:
-      return <TextCellWithTranslation text='portfolio.preAfter' />
+      return (
+        <IconWithTooltip
+          tooltip={
+            <span>
+              {t('v3.t20', {
+                duration:
+                  getDuration(tradingStartTime - preMarketMinutes * 60 * 1000, tradingStartTime) +
+                  ` (${t('v3.t31')})` +
+                  ' + ' +
+                  getDuration(tradingEndTime, tradingEndTime + afterMarketMinutes * 60 * 1000) +
+                  ` (${t('v3.t31')})`,
+              })}
+            </span>
+          }
+          text='portfolio.preAfter'
+          iconOrTextClassName='border-b border-dashed'
+        />
+      )
     default:
       return null
   }

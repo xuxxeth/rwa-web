@@ -24,12 +24,21 @@ export type ErrorHandlers = {
   [key in ErrorHandlerKeys]?: () => void
 }
 
+export const RWA_STATUS = {
+  BUYANDSELL: 0,
+  HALT: 1,
+  OFFLINE: 2,
+  SELL: 3,
+  
+}
+
 export const MARKET_STATUS = {
   DEFAULT: -1,
   CLOSE: 0,
   BEFORE: 1,
   OPEN: 2,
   AFTER: 3,
+  OVERNIGHT: 4,
 }
 
 export const RISK_STATUS = {
@@ -145,3 +154,7 @@ export const  GITBOOK_URL = 'https://cyberalpha.gitbook.io/cyberalpha-docs'
 
 // 推荐滑点
 export const DEFAULT_SLIPPAGE = 0.5
+
+// 只支持盘中的股票
+export const SUPPORT_REGULAR_PROD = ['ABNB', 'BLK', 'CCJ', 'CEG', 'COP', 'CRM', 'CVX', 'FCX', 'GLXY', 'HAL', 'KO', 'OKLO', 'OXY', 'SLB']
+export const SUPPORT_REGULAR_TEST = ['NFLX', 'CRCL']

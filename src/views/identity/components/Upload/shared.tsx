@@ -41,15 +41,11 @@ const langPrefix = 'identity.upload'
 export function Text(props: { text: string; className?: string }) {
   const { t } = useTranslation()
   const { text, className } = props
-  return (
-    <div className={cn('text-sm text-[#9DA3AF]', className)}>
-      {t(`${langPrefix}.${text}`)}
-    </div>
-  )
+  return <div className={cn('text-sm text-[#9DA3AF]', className)}>{t(`${langPrefix}.${text}`)}</div>
 }
 
-// 2M
-const MAX_FILE_SIZE = 1024 * 1024 * 2
+// 8M
+const MAX_FILE_SIZE = 1024 * 1024 * 8
 
 export class LivenessCheckError extends Error {
   constructor(message: string | null) {
@@ -164,8 +160,9 @@ export function UploadCard(props: {
   shouldCheckLiveness?: boolean
   onlyImageMimeType?: boolean
   step?: number
+  className?: string
 }) {
-  const { fileType, onUploaded, onDelete, onlyImageMimeType, s3Key, mode } = props
+  const { fileType, onUploaded, onDelete, onlyImageMimeType, s3Key, mode, className } = props
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
@@ -278,7 +275,8 @@ export function UploadCard(props: {
           className: cn(
             'dropzone flex-1 border border-[#383A40] border-dashed cursor-pointer h-[262px] rounded-lg disabled:cursor-not-allowed bg-[#1A1B1E] relative text-[#9DA3AF]',
             mode === 'view' ? 'disabled cursor-not-allowed' : 'hover:border-[rgba(26,133,255,1)]',
-            isSomethingError ? 'border-[#CA3F64]' : ''
+            isSomethingError ? 'border-[#CA3F64]' : '',
+            className
           ),
         })}
         onMouseEnter={() => setIsHover(true)}
@@ -356,5 +354,58 @@ export function UploadCard(props: {
         )}
       </div>
     </>
+  )
+}
+
+export function UploadTip({ className }: { className?: string }) {
+  const { t, i18n } = useTranslation()
+  const langPrefix = 'identity.upload'
+
+  const isZh = i18n.language.toLowerCase().startsWith('zh')
+
+  const orientation1Label = t(`${langPrefix}.orientation1`).trim()
+  const orientation1Text = isZh ? orientation1Label : orientation1Label.replace(/\s+/g, '\n')
+
+  return (
+    <div className={cn('mt-1 flex flex-col gap-2 text-gray-400 text-sm/4.5', className)}>
+      <div>{t(`${langPrefix}.uploadReq1`)}</div>
+      <div>{t(`${langPrefix}.uploadReq2`)}</div>
+      <div className={cn('flex flex-row justify-between h-25 w-full')}>
+        <div
+          className={cn(
+            'w-30 h-30  bg-[#22C55E1A] flex flex-col justify-between rounded-[8px]',
+            isZh ? 'pb-3' : 'pb-2'
+          )}
+        >
+          <div className='flex-1 flex flex-col items-center justify-center'>
+            <LazyImage className='h-[52px]' src='/images/v2/identity/correct-o.svg' />
+          </div>
+          <div
+            className={cn(
+              'text-center text-[10px]/[13px] text-white',
+              !isZh && 'whitespace-pre-line'
+            )}
+          >
+            {orientation1Text}
+          </div>
+        </div>
+        <div className='w-30 h-30 bg-[#EF44441A] flex flex-col justify-between rounded-[8px] pb-3'>
+          <div className='flex-1 flex flex-col items-center justify-center'>
+            <LazyImage className='h-[72px]' src='/images/v2/identity/wrong-o-1.svg' />
+          </div>
+          <div className='text-center text-[10px]/[13px] text-white'>
+            {t(`${langPrefix}.orientation2`)}
+          </div>
+        </div>
+        <div className='w-30 h-30 bg-[#EF44441A] flex flex-col justify-between rounded-[8px] pb-3'>
+          <div className='flex-1 flex flex-col items-center justify-center'>
+            <LazyImage className='h-[52px]' src='/images/v2/identity/wrong-o-2.svg' />
+          </div>
+          <div className='text-center text-[10px]/[13px] text-white'>
+            {t(`${langPrefix}.orientation2`)}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

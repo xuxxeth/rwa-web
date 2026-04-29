@@ -1,7 +1,7 @@
 import { BetweenText } from "@/components/between-text"
 import IconWithTooltip from "@/components/icon-tooltip"
 import { LazyImage } from "@/components/image/LazyImage"
-import { LabelWrap } from "@/components/markets/Klinebody"
+import { LabelWrap } from "@/components/markets/StockInfo"
 import { DEFAULT_SLIPPAGE } from "@/config/constants"
 import { useRwaPrice } from "@/hooks/useTokenBalances"
 import { useTranslation } from "@/hooks/useTranslation"

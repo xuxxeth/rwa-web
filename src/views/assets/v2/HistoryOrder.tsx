@@ -169,13 +169,13 @@ const orderHistoryTableConfig: ITableConfig<
     key: 'side',
     sortable: false,
     render: (item: IOrder) => <SideCell side={item.side} />,
-    width: 60,
+    width: 40,
   },
   {
     key: 'type',
     sortable: false,
     render: (item: IOrder) => <OrderTypeCell orderType={item.orderType} />,
-    width: 60,
+    width: 50,
   },
   {
     key: 'token',
@@ -264,7 +264,11 @@ const orderHistoryTableConfig: ITableConfig<
   {
     key: 'session',
     sortable: false,
-    render: (item: IOrder) => <SessionTypeCell sessionType={item.sessionType} />,
+    render: (item: IOrder) => (
+      <div className='pr-2'>
+        <SessionTypeCell sessionType={item.sessionType} />
+      </div>
+    ),
   },
   {
     key: 'txHash',
@@ -275,7 +279,7 @@ const orderHistoryTableConfig: ITableConfig<
   {
     key: 'details',
     sortable: false,
-    width: 50,
+    width: 40,
     render: (item: IOrder) => {
       if (item.orderType === 1) {
         return '--'

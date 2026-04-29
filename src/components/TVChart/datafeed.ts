@@ -11,6 +11,7 @@ import { klineApi } from "@/service/kline/api";
 import { MARKET_STATUS, RESPONSE_CODE } from "@/config/constants";
 import wsService from "@/service/webSocket/service";
 import { truncate } from "@/utils/format";
+import type { ISession } from "@/service/kline/types";
 
 // 图表类型	值
 // Bars	0
@@ -67,6 +68,7 @@ const lastBarsCache = new Map<string, Bar>();
 const barsRangeCache = new Map<string, { from: number; to: number }>();
 const minuteResultCache = new Map<string, { bars: any[]; ts: number }>();
 const minuteInFlight = new Map<string, Promise<any[]>>();
+const sessionCache: ISession[] = [];
 const MINUTE_CACHE_TTL = 3000;
 const _minPrice: Number = 0;
 const _maxPrice: Number = 0;
@@ -112,10 +114,13 @@ export function getDataFeed({
 }: any): IExtaIBasicDataFeed {
   let currentToken = token
   let currentChartType = 3;
-  let sessionType = 2
+  let sessionType = 0
   let initialLoadComplete = false;
   let marketState = -1; // 市场状态
   let tradingStartTime = 0; // 交易开始时间
+
+  let preLastBarTime = 0
+
   return {
     setTradingStartTime: (time) => {
       tradingStartTime = time
@@ -160,10 +165,10 @@ export function getDataFeed({
         name: ticker,
         description: ticker,
         type: "stock",
-        // session: "24x7",
+        session: "24x7",
         // timezone: "Asia/Hong_Kong",
         // session: "0930-1601",
-        session: '0400-2000',
+        // session: '0400-2000',
         "timezone": "America/New_York",
         minmov: 1,
         pricescale: 100,  // 小数点后2位精度
@@ -225,19 +230,24 @@ export function getDataFeed({
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       // area 模式下仅首次加载，后续拖拽/缩放不再请求
-      if (currentChartType === 3 && !firstDataRequest) {
+      if (currentChartType === 3 && !firstDataRequest && sessionType !== 0) {
         onHistoryCallback([], { noData: true })
         return
+      }
+
+      if (firstDataRequest) {
+        preLastBarTime = 0
       }
       
       // 如果是Kline
       try {
-        if (currentChartType !== 3) {
+        if (currentChartType !== 3 || sessionType === 0) {
           // if (resolution === '1' && !tradingStartTime) {
           //   onHistoryCallback([], { noData: false })
           //   return
           // }
-          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: to, limit: countBack })
+          const _limit = firstDataRequest ? (Math.floor(Math.random() * 201) + 300) : (Math.floor(Math.random() * 201) + 200)
+          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: preLastBarTime || to, limit: _limit })
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });
@@ -256,6 +266,7 @@ export function getDataFeed({
               "volume": bar.volume ?? 0,
             }
           })
+          preLastBarTime = Math.ceil(bars[0]?.time / 1000) || preLastBarTime
           // if (resolution === '1') {
           //   bars = bars.filter((bar: any) => bar.time < endTime)
           // }
@@ -303,9 +314,10 @@ export function getDataFeed({
             }
             return;
           }
-
+          
           const fetchPromise = (async () => {
-            const res = await klineApi.getMinute({stock: currentToken.stockId, sessionType: sessionType, day})
+            
+            const res = await klineApi.getMinute({ stock: currentToken.stockId, sessionType })
             const _data = res?.data?.items || []
             let bars = _data
               .sort((a, b) => a.startTime - b.startTime)
@@ -438,8 +450,9 @@ export function getDataFeed({
           if (
             (currentChartType === 1 && marketState === MARKET_STATUS.OPEN) // 如果是candle图，则正常执行回调
             || (marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前
-            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘前状态，且当前分时图是盘前
-            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘前状态，且当前分时图是盘前
+            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘中状态，且当前分时图是全部分时和盘中分时
+            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘后状态，且当前分时图是盘后和全部分时
+            || (marketState === MARKET_STATUS.OVERNIGHT && (sessionType === 0 || sessionType === 5)) // 夜盘状态，且当前分时图是夜盘和全部分时
           ) {
             onRealtimeCallback({
               "time": data.t * 1000,

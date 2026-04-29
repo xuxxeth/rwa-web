@@ -15,7 +15,9 @@ export const marketDefault = {
   "networkFeeInStable": "0",
   "timeInForce": 0,
   "validDate": 0,
-  "slippage": "0.05" // 默认滑点容忍度
+  "slippage": "0.05", // 默认滑点容忍度
+  "nightTradingEndTime": 0,
+  "nightTradingStartTime": 0
 }
 
 export const marketStateDefault = {

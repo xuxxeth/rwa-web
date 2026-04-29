@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/useToast"
 import { kycApi } from "@/service/kyc/api"
 import type { IKycDetail, IKycSubmitData } from "@/service/kyc/types"
 import { RESPONSE_CODE } from "@/config/constants"
-import { retryRefresh, SectionBox, SectionTitle } from "./BaseInfo"
+import { retryRefresh, useResetRetryCount, SectionBox, SectionTitle } from "./BaseInfo"
 import type { ApiResponse } from "@/service/client"
 import { usePendingStep } from "@/hooks/usePendingStep"
 import { WarningInfo } from "./WarningInfo"
@@ -105,6 +105,9 @@ const IDExpired = memo(
       }
       
     }
+
+    // reset retryCount when mounted
+    useResetRetryCount()
 
     useEffect(() => {
       if (userInfo && userInfo.basicInfo.firstName) {

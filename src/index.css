@@ -118,6 +118,27 @@ body {
     transform: scaleX(0);
   }
 }
+
+/* Step icon: animate conic-gradient angle for active border */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 180deg;
+  inherits: false;
+}
+
+@keyframes spin-border {
+  to {
+    --border-angle: 540deg;
+  }
+}
+
+.step-border-active {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-gray-850), var(--color-gray-850)) padding-box,
+    conic-gradient(from var(--border-angle), #f7ac19 50%, #282a2f 50%) border-box;
+  animation: spin-border 1s linear infinite;
+}
 @layer utilities {
   .text-80 {
     color: rgba(255, 255, 255, 0.8);

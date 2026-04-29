@@ -76,14 +76,6 @@ export function StockDialog({
         >
           <StockInfo inputToken={inputToken || undefined} />
           <IconArrowDown open={open} />
-          {
-            inputToken?.state === 1 && 
-              <IconWithTooltip
-                triggerClassName='ml-2'
-                icon='/images/v2/icons/trade_halt.svg'
-                tooltip='portfolio.tH'
-              />
-          }
         </div>
         
       </div>

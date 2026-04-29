@@ -73,19 +73,19 @@ const USDTSelect = memo(
           hideArrow={tokenListWithBalance.length <= 1}
           open={open}
           className={cn(
-            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px] cursor-pointer",
+            "px-3 py-0 h-[38px] shadow-none flex items-center justify-between rounded-[4px]",
             className,
             from === 'lite-trade' ? ' border-[#232427] w-auto bg-[#1A1B1E] px-[3px] rounded-full h-[21px] ' : ' border border-solid border-[rgba(35,36,39,1)]',
             open ? from !== 'lite-trade' ? 'border-[rgba(156,255,58,0.8)]' : '' : ''
           )}
         >
           <div className={cn(
-            "flex items-center gap-2 justify-between text-white font-normal text-[14px] w-full",
+            "flex items-center justify-between text-white font-normal text-[14px] w-full",
           )}>
             {
               from === 'lite-trade' ? 
                 <>
-                  <div className="flex justify-between items-center w-full">
+                  <div className="flex justify-between items-center w-full ">
                     <div className="w-[14px] h-[14px]">
                       {
                         outputToken?.icon && <LazyImage src={outputToken?.icon} className="w-full h-full" />
@@ -95,11 +95,11 @@ const USDTSelect = memo(
                   </div>
                 </>: 
                 <>
-                  <div className="text-[#9DA3AF]">{label ?? ' '}</div>
-                  <div className="">
-                    <span className={cn(
-                      "text-[#9DA3AF]",
-                    )}>{orderValue ?? ''}</span>
+                  <div className="text-[#9DA3AF] cursor-not-allowed flex-1 text-left pr-2">{label ?? ' '}</div>
+                  <div className="flex items-center flex-1">
+                    <div className={cn(
+                      "text-[#9DA3AF] cursor-not-allowed flex-1 text-right",
+                    )}>{orderValue ?? ''}</div>
                     <span className=" text-[#C7CCD6] ml-2 mr-[6px]">{outputToken?.symbol ?? '--'}</span>
                   </div>
                 </>

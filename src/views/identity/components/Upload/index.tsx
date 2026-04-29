@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState, useLayoutEffect } from 'react'
-import { Text, UploadCardAdd, UploadCard, type IUploadedResV2, uploadFile } from './shared'
+import {
+  Text,
+  UploadCardAdd,
+  UploadCard,
+  UploadTip,
+  type IUploadedResV2,
+  uploadFile,
+} from './shared'
 import { mergeTwoImageFromUrls, cn } from '@/utils'
 import { LazyImage } from '@/components/image/LazyImage'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export const useUpdateEffect = (effect: React.EffectCallback, deps?: React.DependencyList) => {
   const isMounted = useRef(false)
@@ -266,6 +274,9 @@ function PassportUpload({
   const onPassportDelete = (s3Key: string) => {
     onChanged('')
   }
+  const { i18n } = useTranslation()
+
+  const isZh = i18n.language.toLowerCase().startsWith('zh')
 
   return (
     <div>
@@ -278,8 +289,10 @@ function PassportUpload({
           s3Key={keys}
           mode={mode}
           step={step}
+          className={isZh ? '' : 'h-[300px]'}
         />
-        <div className='flex-1 flex flex-row items-center justify-center'>
+        <div className='flex-1 flex flex-col justify-between'>
+          <UploadTip />
           <Text text='passportTips' className='text-sm' />
         </div>
       </div>

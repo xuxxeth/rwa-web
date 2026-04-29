@@ -5,6 +5,37 @@
     <link rel="icon" type="image/png" href="/images/favicon_v2.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TIKO</title>
+    <script>
+      const VITE_MOBILE_SITE = window.__MOBILE_SITE__ || ''
+      const MOBILE_MAX_SIZE = 800
+      const NO_MOBILE_REDIRECT_PATHS = ['/kyc/liveness-complete']
+
+
+      function isMobile() {
+        return (
+          !!navigator.userAgent.match(
+            /(phone|pad|pod|iphone|ipod|ios|ipad|android|mobile|blackberry|iemobile|mqqbrowser|juc|fennec|wosbrowser|browserng|webos|symbian|windows phone)/i
+          ) ||
+          window?.screen?.availWidth < MOBILE_MAX_SIZE ||
+          window?.innerWidth < MOBILE_MAX_SIZE
+        )
+      }
+
+      function shouldSkipMobileRedirect() {
+        const pathname = window.location.pathname || ''
+        return NO_MOBILE_REDIRECT_PATHS.some(path => pathname.startsWith(path))
+      }
+
+      function redirectMobileSite() {
+        if (shouldSkipMobileRedirect()) return
+        if (isMobile() && VITE_MOBILE_SITE ) {
+          window.location.replace(VITE_MOBILE_SITE)
+        }
+      }
+
+      redirectMobileSite()
+      window.addEventListener('resize', redirectMobileSite)
+    </script>
   </head>
   <body>
     <div id="root"></div>

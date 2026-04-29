@@ -17,13 +17,13 @@ export const useTradeStore = create<TradeStore>()(
       inputSize: '',
       expires: 7,
       activeConvertTab: 'buy' as const,
-      tradeType: TradeType.MARKET,
-      sessionType: SessionType.PRE_MARKET_AND_AFTER_HOURS,
+      tradeType: TradeType.LIMIT,
+      sessionType: SessionType.DEFAULT,
       slippage: DEFAULT_SLIPPAGE,
       isSignatureValid: false,
       txStep: 0,
       txError: '',
-      txSuccess: {type: '', msg: '', tx: ''},
+      txSuccess: {type: '', msg: '', tx: '', id: 0},
       updateInputToken: (rwa: IRwa) => {
         set({inputToken: rwa})
       },
