@@ -116,7 +116,7 @@ export const TVChartContainer = memo(
           debug: false,
           datafeed: dataFeedRef.current,
           theme: "dark",
-          locale: language,
+          locale: language === 'zh' ? 'zh_TW' : language,
           container: elem,
           library_path: `/libraries/charting_library/`,
           loading_screen: {
