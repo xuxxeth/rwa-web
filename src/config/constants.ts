@@ -156,5 +156,5 @@ export const  GITBOOK_URL = 'https://cyberalpha.gitbook.io/cyberalpha-docs'
 export const DEFAULT_SLIPPAGE = 0.5
 
 // 只支持盘中的股票
-export const SUPPORT_REGULAR_PROD = ['ABNB', 'BLK', 'CCJ', 'CEG', 'COP', 'CRM', 'CVX', 'FCX', 'GLXY', 'HAL', 'KO', 'OKLO', 'OXY', 'SLB']
-export const SUPPORT_REGULAR_TEST = ['NFLX', 'CRCL']
+export const SUPPORT_REGULAR_PROD = ['ABNB', 'BLK', 'CCJ', 'CEG', 'COP', 'CVX', 'GLXY', 'HAL', 'KO', 'OXY', 'SLB']
+export const SUPPORT_REGULAR_TEST = ['NFLX', 'CRCL', 'GLXY']

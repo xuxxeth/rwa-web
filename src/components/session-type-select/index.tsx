@@ -13,6 +13,7 @@ import { MARKET_STATUS } from "@/config/constants";
 import { useTradingStartTime } from "@/hooks/useMarketState";
 import { useSupportRegular } from "@/hooks/useSupportRegular";
 import { useNotSupportSession } from "@/hooks/useNotSupportSession";
+import { useDisabledNight10 } from "@/hooks/useLimitNight10";
 
 export type ISessionTypeItem = {
   code: string,
@@ -50,6 +51,8 @@ const SessionTypeSelect = memo(
 
     const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, inputToken)
 
+    const { disabled: disabledNight10 } = useDisabledNight10()
+
     const sessionTypeList = useMemo(() => {
       return [
         {
@@ -71,10 +74,10 @@ const SessionTypeSelect = memo(
           timeLabel: tradingTime ? `${t('v3.t31')} ${tradingTime.nightTradingStartTime.H}:${tradingTime.nightTradingStartTime.M} ~ ${tradingTime.nightTradingEndTime.H}:${tradingTime.nightTradingEndTime.M}` : '--:--',
           timeLabelLocal: tradingTime ? `${tradingTime.nightTradingStartTimeLocal.H}:${tradingTime.nightTradingStartTimeLocal.M} ~ ${tradingTime.nightTradingEndTimeLocal.H}:${tradingTime.nightTradingEndTimeLocal.M}` : '--:--',
           // 夜盘时间段，仅在夜盘状态下可选
-          disabled: tradingTime?.tradeState !== MARKET_STATUS.OVERNIGHT || notSupportOvernight.notSupport
+          disabled: tradingTime?.tradeState !== MARKET_STATUS.OVERNIGHT || notSupportOvernight.notSupport || disabledNight10
         }
       ]
-    }, [t, tradingTime, isRegular, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
+    }, [t, tradingTime, isRegular, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport, disabledNight10])
 
     useEffect(() => {
       // 盘前盘后，只支持盘中交易的股票，在盘前盘后和夜盘状态，默认显示盘中
@@ -96,7 +99,7 @@ const SessionTypeSelect = memo(
       // 夜盘
       else if (marketTradeState === MARKET_STATUS.OVERNIGHT) {
         // 如果当前是夜盘时间，但不支持夜盘交易，则默认选中仅盘中
-        if (notSupportOvernight.notSupport) {
+        if (notSupportOvernight.notSupport || disabledNight10) {
           setTypeItem({
             code: SessionType.DEFAULT,
             label: t('v3.t16'),
@@ -127,7 +130,7 @@ const SessionTypeSelect = memo(
           updateSessionType(SessionType.PRE_MARKET_AND_AFTER_HOURS)
         }
       }
-    }, [marketTradeState, isRegular, t, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport, updateSessionType])
+    }, [marketTradeState, isRegular, t, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport, updateSessionType, disabledNight10])
     
     const [open, setOpen] = useState(false)
 
