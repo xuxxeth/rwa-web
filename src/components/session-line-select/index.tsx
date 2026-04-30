@@ -66,7 +66,6 @@ const SessionLineSelectt = memo(
           setOpen(open)
         }}
         onValueChange={(code) => {
-          console.log('code', code)
           if (code) {
             setCurrentCode(code)
             const _id = dataList.find(id => id.code === code)
