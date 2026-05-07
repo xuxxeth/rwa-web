@@ -315,7 +315,7 @@ export const TVChartContainer = memo(
           (_sessionType === 5 && notSupportOvernight.notSupport)
 
         dataFeedRef.current?.setSessionType(_sessionType, notSupportRealtime)
-
+        
         const resolution =
           (chart as any)?.resolution?.() || ("15" as ResolutionString)
 
@@ -348,6 +348,7 @@ export const TVChartContainer = memo(
         dataFeedRef.current = null
         tvWidgetReady.current = false
         chartTypeRef.current = true
+        setChartType(true)
         initChart && initChart(token)
         
       }
@@ -368,8 +369,6 @@ export const TVChartContainer = memo(
     useEffect(() => {
       dataFeedRef.current?.setTradingStartTime(tradingTime?.tradingEndTime || 0)
     }, [tradingTime?.tradingEndTime])
-
-    const areaDataCache: any = {}
 
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
