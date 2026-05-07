@@ -98,7 +98,8 @@ const wsListeners = new Map<string, any>()
 const wsSubscriptionVersion = new Map<string, number>()
 
 export type IExtaIBasicDataFeed = IBasicDataFeed & {
-  setSessionType: (type: number) => void,
+  getSessionType: () => number,
+  setSessionType: (type: number, notSupportRealtime?: boolean) => void,
   setCurrentType: (type: number) => void,
   setToken: (token: any) => void,
   getBarsRange: (symbol?: string, resolution?: string) => { from: number; to: number } | undefined,
@@ -120,16 +121,20 @@ export function getDataFeed({
   let tradingStartTime = 0; // 交易开始时间
 
   let preLastBarTime = 0
-
+  let sessionTypeNotSupportRealtime = false
   return {
+    getSessionType: () => {
+      return sessionType
+    },
     setTradingStartTime: (time) => {
       tradingStartTime = time
     },
     setMarketState: (state) => {
       marketState = state
     },
-    setSessionType: (type: number) => {
+    setSessionType: (type: number, notSupportRealtime?: boolean) => {
       sessionType = type
+      sessionTypeNotSupportRealtime = !!notSupportRealtime
     },
     setCurrentType: (type: number) => {
       currentChartType = type
@@ -408,7 +413,6 @@ export function getDataFeed({
     ) => {
       wsService.init({})
       
-      console.log('symbolInfo: ', symbolInfo, resolution)
       if (symbolInfo.name.startsWith('__empty__')) {
         return
       }
@@ -447,6 +451,7 @@ export function getDataFeed({
         }
         const lastBar = lastBarsCache.get(symbol)
         if (data?.c) {
+          if (sessionTypeNotSupportRealtime && currentChartType === 3) return
           if (
             (currentChartType === 1 && marketState === MARKET_STATUS.OPEN) // 如果是candle图，则正常执行回调
             || (marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前

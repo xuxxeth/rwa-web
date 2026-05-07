@@ -9,6 +9,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { SessionLineSelectt, type IItemCode } from "../session-line-select";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTradingStartTime } from "@/hooks/useMarketState";
+import { useNotSupportSession } from "@/hooks/useNotSupportSession";
 
 let initChart: any
 
@@ -48,6 +49,7 @@ export const TVChartContainer = memo(
     const marketStateRef = useRef(MARKET_STATUS.DEFAULT)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
     const tradingTime = useTradingStartTime()
+    const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, token)
 
     const syncAreaModeClass = useCallback((enabled: boolean) => {
       console.log('syncAreaModeClass', enabled)
@@ -114,7 +116,7 @@ export const TVChartContainer = memo(
           debug: false,
           datafeed: dataFeedRef.current,
           theme: "dark",
-          locale: language,
+          locale: language === 'zh' ? 'zh_TW' : language,
           container: elem,
           library_path: `/libraries/charting_library/`,
           loading_screen: {
@@ -270,22 +272,43 @@ export const TVChartContainer = memo(
         }
       };
     }, []);
-
+    // @ts-ignore
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
     // ✅ 当 token.symbol 变化时，切换 symbol，不销毁图表
     useEffect(() => {
-      if (!tvWidgetRef.current || !token?.symbol || !tvWidgetReady.current) return
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
 
-      const chart = tvWidgetRef.current.activeChart()
-      if (!chart) return
+      timerRef.current = setTimeout(() => {
+        if (!tvWidgetRef.current || !token?.symbol || !tvWidgetReady.current) return
 
-      // 更新 datafeed 中的 token
-      dataFeedRef.current?.setToken?.(token)
+        const chart = tvWidgetRef.current.activeChart()
+        if (!chart) return
 
-      const resolution = (chart as any)?.resolution?.() || ("15" as ResolutionString)
-      chart.resetData?.()
-      chart.setSymbol(token.symbol)
-      chart.setResolution(resolution)
-    }, [token?.symbol])
+        dataFeedRef.current?.setToken?.(token)
+
+        const _sessionType = dataFeedRef.current?.getSessionType() || 0
+
+        const notSupportRealtime =
+          (_sessionType === 1 || _sessionType === 3) && notSupportBeforeOrAfter.notSupport ||
+          (_sessionType === 5 && notSupportOvernight.notSupport)
+
+        dataFeedRef.current?.setSessionType(_sessionType, notSupportRealtime)
+
+        const resolution =
+          (chart as any)?.resolution?.() || ("15" as ResolutionString)
+
+        chart.resetData?.()
+        chart.setSymbol(token.symbol)
+        chart.setResolution(resolution)
+        
+      }, 100) // 可以改成 50~100ms
+
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current)
+      }
+    }, [token?.symbol, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
 
     // ✅ 当语言变化时，重新初始化图表
     useEffect(() => {
@@ -316,6 +339,7 @@ export const TVChartContainer = memo(
       dataFeedRef.current?.setTradingStartTime(tradingTime?.tradingEndTime || 0)
     }, [tradingTime?.tradingEndTime])
 
+
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
@@ -324,7 +348,9 @@ export const TVChartContainer = memo(
         addOrRemoveMA(chart, 3)
         chart.setChartType(3);
         dataFeedRef.current?.setCurrentType(3)
-        dataFeedRef.current?.setSessionType(Number(data.code))
+        const _sessionType = Number(data.code)
+        const notSupportRealtime = (_sessionType === 1 || _sessionType === 3) && notSupportBeforeOrAfter.notSupport || _sessionType === 5 && notSupportOvernight.notSupport
+        dataFeedRef.current?.setSessionType(Number(data.code), notSupportRealtime)
         skipIntervalChangeRef.current = true
         queueMicrotask(() => {
           skipIntervalChangeRef.current = false
@@ -336,7 +362,7 @@ export const TVChartContainer = memo(
         chart.setResolution(resolution)
       }
       
-    }, [token.symbol])
+    }, [token.symbol, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
 
     return (
       <div className={cn(
