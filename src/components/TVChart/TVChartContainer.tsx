@@ -67,21 +67,24 @@ export const TVChartContainer = memo(
       setChartType(false)
       dataFeedRef.current?.setCurrentType(1)
       chart.setChartType(1)
+      tvWidgetRef.current?.setSymbol(tokenSymbolRef.current, interval, () => {
 
-      const applyCandle = () => {
-        addOrRemoveMA(chart, 1)
-        wasAreaModeRef.current = false
-        ;(tvWidgetRef.current as any)?.resetCache?.()
-        chart.resetData()
-      }
-
-      const emptySymbol = `__empty__${Date.now()}`
-      tvWidgetRef.current.setSymbol(emptySymbol, interval, () => {
-        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
-        tvWidgetRef.current?.setSymbol(targetSymbol, interval, () => {
-          applyCandle()
-        })
       })
+
+      // const applyCandle = () => {
+      //   addOrRemoveMA(chart, 1)
+      //   wasAreaModeRef.current = false
+      //   ;(tvWidgetRef.current as any)?.resetCache?.()
+      //   chart.resetData()
+      // }
+
+      // const emptySymbol = `__empty__${Date.now()}`
+      // tvWidgetRef.current.setSymbol(emptySymbol, interval, () => {
+      //   const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
+      //   tvWidgetRef.current?.setSymbol(targetSymbol, interval, () => {
+      //     applyCandle()
+      //   })
+      // })
     }, [])
 
     useEffect(() => {
@@ -190,13 +193,30 @@ export const TVChartContainer = memo(
                 
               // });
 
+              chart.onChartTypeChanged().subscribe(
+                  null,
+                  (chartType) => {
+                    if (chartType === 3) {
+
+                    }
+                  }
+              );
               chart.onIntervalChanged().subscribe(null, (interval, obj) => {
                 if (skipIntervalChangeRef.current) {
                   skipIntervalChangeRef.current = false
                   return
                 }
-                // 先切换到 candle 模式，确保后续 getBars 首次请求走 candle 分支
-                switchToCandle(interval as ResolutionString)
+                // barSpacing默认是6，如果小于6，则重置
+                if (chart.getTimeScale().barSpacing() < 6) {
+                  chart.getTimeScale().setBarSpacing(6)
+                }
+                // X时间轴移到最右侧
+                chart.getTimeScale().setRightOffset(0)
+                 
+                if (chartTypeRef.current ) {
+                  switchToCandle(interval as ResolutionString)
+                }
+                
               });
 
               syncAreaModeClass(chartTypeRef.current)
@@ -299,9 +319,19 @@ export const TVChartContainer = memo(
         const resolution =
           (chart as any)?.resolution?.() || ("15" as ResolutionString)
 
-        chart.resetData?.()
+        // barSpacing默认是6，如果小于6，则重置
+        if (chart.getTimeScale().barSpacing() < 6) {
+          chart.getTimeScale().setBarSpacing(6)
+        }
+        // X时间轴移到最右侧
+        chart.getTimeScale().setRightOffset(0)  
         chart.setSymbol(token.symbol)
         chart.setResolution(resolution)
+
+        // dataFeedRef.current?.resetCache()
+        // chart.resetData?.()
+        
+        
         
       }, 100) // 可以改成 50~100ms
 
@@ -339,10 +369,13 @@ export const TVChartContainer = memo(
       dataFeedRef.current?.setTradingStartTime(tradingTime?.tradingEndTime || 0)
     }, [tradingTime?.tradingEndTime])
 
+    const areaDataCache: any = {}
 
     const handleSessionChange = useCallback((data: IItemCode) => {
       const chart = tvWidgetRef.current?.activeChart();
       if (chart) {
+
+
         setChartType(true)
         wasAreaModeRef.current = true
         addOrRemoveMA(chart, 3)
@@ -356,10 +389,24 @@ export const TVChartContainer = memo(
           skipIntervalChangeRef.current = false
         })
         const resolution = ("1" as ResolutionString)
-        chart.resetData?.()
-        const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
-        chart.setSymbol(targetSymbol)
+        // const emptySymbol = `__empty__${Date.now()}`
+        // tvWidgetRef.current?.setSymbol(emptySymbol, resolution, () => {
+          
+        // })
         chart.setResolution(resolution)
+        if (data.code !== '0') {
+          const targetSymbol = `__${tokenSymbolRef.current}__area`
+          chart.setSymbol(targetSymbol)
+        }
+        // barSpacing默认是6，如果小于6，则重置
+        if (chart.getTimeScale().barSpacing() < 6) {
+          chart.getTimeScale().setBarSpacing(6)
+        }
+        // X时间轴移到最右侧
+        chart.getTimeScale().setRightOffset(0)
+        dataFeedRef.current?.resetCache()
+        chart.resetData();
+        
       }
       
     }, [token.symbol, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
