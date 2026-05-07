@@ -42,7 +42,7 @@ export function WalletItem({
     >
       <div className='flex items-center'>
         {wallet.info.icon && (
-          <img src={wallet.info.icon} className='w-[40px] h-[40px] mr-4' alt='' />
+          <img src={wallet.info.icon} className='w-[40px] h-[40px] mr-4  rounded-[6px]' alt='' />
         )}
         <span className='text-[16px] font-semibold'>{wallet.info.name}</span>{' '}
       </div>

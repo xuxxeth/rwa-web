@@ -63,6 +63,23 @@ export function getSymbol(symbolName: string) {
   }
   return symbolName
 }
+function normalizeResolution(resolution: string) {
+  return `${resolution}`.toUpperCase()
+}
+
+function buildBarsCacheKey({
+  symbolName,
+  chartType,
+  sessionTypeValue,
+  resolution,
+}: {
+  symbolName: string
+  chartType: number
+  sessionTypeValue: number
+  resolution: string
+}) {
+  return `${symbolName}|${chartType}|${sessionTypeValue}|${normalizeResolution(resolution)}`
+}
 
 const lastBarsCache = new Map<string, Bar>();
 const barsRangeCache = new Map<string, { from: number; to: number }>();
@@ -105,6 +122,7 @@ export type IExtaIBasicDataFeed = IBasicDataFeed & {
   getBarsRange: (symbol?: string, resolution?: string) => { from: number; to: number } | undefined,
   setMarketState: (state: number) => void
   setTradingStartTime: (time: number) => void
+  resetCache: () => void
 }
 
 export function getDataFeed({
@@ -121,8 +139,14 @@ export function getDataFeed({
   let tradingStartTime = 0; // 交易开始时间
 
   let preLastBarTime = 0
+  let resetCacheCallback: (() => void) | null = null;
   let sessionTypeNotSupportRealtime = false
   return {
+    resetCache: () => {
+      if (resetCacheCallback) {
+        resetCacheCallback();  
+      }
+    },
     getSessionType: () => {
       return sessionType
     },
@@ -210,28 +234,19 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      const symbolName = `${symbolInfo?.name || ''}`
+      if (initialLoadComplete) {
+        return onHistoryCallback([], { noData: false })
+      }
+      initialLoadComplete = true
+      const rawSymbolName = `${symbolInfo?.name || ''}`
       
-      if (symbolName.startsWith('__empty__')) {
-        
+      if (rawSymbolName.startsWith('__empty__')) {
         onHistoryCallback([], { noData: true })
         return
       }
-      const currentTime = Date.now();
-      // 防止过于频繁的请求
-      // if (currentTime - lastRequestTime < requestInterval) {
-      //   console.log("请求过于频繁，跳过本次请求");
-      //   return;
-      // }
-      // 更新最后请求时间
-      lastRequestTime = currentTime;
-      // if (initialLoadComplete) {
-      //   return
-      // }
-      if (symbolInfo.name !== currentSymbol) {
-        currentSymbol = symbolInfo.name;
-        lastBarsCache.delete(symbolInfo.name);
-      } 
+      const symbolName = getSymbol(rawSymbolName)
+      // 获取缓存的key
+      const cacheKey = buildBarsCacheKey({ symbolName, chartType: currentChartType, sessionTypeValue: sessionType, resolution: resolution })
       // Use customPeriodParams if needed
       const { from, to, firstDataRequest, countBack } = periodParams
       // area 模式下仅首次加载，后续拖拽/缩放不再请求
@@ -242,26 +257,37 @@ export function getDataFeed({
 
       if (firstDataRequest) {
         preLastBarTime = 0
+        lastBarsCache.delete(cacheKey)
       }
       
       // 如果是Kline
       try {
         if (currentChartType !== 3 || sessionType === 0) {
-          // if (resolution === '1' && !tradingStartTime) {
-          //   onHistoryCallback([], { noData: false })
-          //   return
+          // 防止过于频繁的请求
+          // const currentTime = Date.now();
+          // if (currentTime - lastRequestTime < requestInterval) {
+          //   console.log("请求过于频繁，跳过本次请求");
+          //   return onHistoryCallback([], { noData: false });;
           // }
+          // // 更新最后请求时间
+          // lastRequestTime = currentTime;
+          // 针对 K线部分数据，放在K线分支里
+
+          if (symbolName !== currentSymbol) {
+            currentSymbol = symbolName;
+            lastBarsCache.clear()
+          } 
+          const _endTime = lastBarsCache.get(cacheKey)?.time || 0
           const _limit = firstDataRequest ? (Math.floor(Math.random() * 201) + 300) : (Math.floor(Math.random() * 201) + 200)
-          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: preLastBarTime || to, limit: _limit })
+          console.log('_endTime: ', _endTime, to, lastBarsCache.get(cacheKey))
+          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: _endTime || to, limit: _limit })
+          initialLoadComplete = false
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });
             return;
           }
-          let endTime = tradingStartTime
-          let tmpBars = []
           let bars = _data.reverse().map((bar: any) => {
-            tmpBars.push(bar)
             return {
               "time": bar.t * 1000,
               "open": Number(truncate(bar.o, 2)),
@@ -272,61 +298,31 @@ export function getDataFeed({
             }
           })
           preLastBarTime = Math.ceil(bars[0]?.time / 1000) || preLastBarTime
-          // if (resolution === '1') {
-          //   bars = bars.filter((bar: any) => bar.time < endTime)
-          // }
 
-          let symbolName = getSymbol(symbolInfo.name)
-          if (firstDataRequest) {
-            lastBarsCache.set(symbolName, { ...bars[bars.length - 1] });
-          }
-          if (bars.length > 0) {
-            const firstTime = bars[0]?.time
-            const lastTime = bars[bars.length - 1]?.time
-            if (firstTime && lastTime) {
-              let fromSec = Math.floor(firstTime / 1000)
-              let toSec = Math.floor(lastTime / 1000)
-              if (fromSec === toSec) {
-                const minutes = keyToMinutes(resolution as any || '15')
-                toSec = fromSec + Math.max(minutes, 1) * 60
-              }
-              barsRangeCache.set(`${symbolName}|${resolution}`, { from: fromSec, to: toSec })
-              barsRangeCache.set(symbolName, { from: fromSec, to: toSec })
-            }
-          }
-          onHistoryCallback(bars, { noData: tmpBars.length < countBack ? true : false });
+          bars[0] && lastBarsCache.set(cacheKey, { ...bars[0], time: Math.ceil(bars[0]?.time / 1000) })
+
+          onHistoryCallback(bars, { noData: bars.length <= 0 ? true : false });
         } else {
-          let symbolName = getSymbol(symbolInfo.name)
-          const day = parseInt(String(Date.now() / 1000))
-          const cacheKey = `${currentToken.stockId}|${sessionType}|${day}|${from}|${to}|${resolution}|${countBack ?? ''}`
-          const cached = minuteResultCache.get(cacheKey)
-          if (cached && Date.now() - cached.ts < MINUTE_CACHE_TTL) {
-            const bars = cached.bars
-            if (bars.length === 0) {
-              onHistoryCallback([], { noData: true });
-            } else {
-              onHistoryCallback(bars, { noData: false });
-            }
-            return;
+          // 如果用户选择的分时时段和当前市场状态相同，则不使用缓存，需要拉取最新的历史数据
+          let useCacheBars = true
+          if (
+            sessionType === 0 || 
+            sessionType === marketState ||
+            (sessionType === 5 && marketState === 4)
+          ) {
+            useCacheBars = false
           }
-
-          if (minuteInFlight.has(cacheKey)) {
-            const bars = await minuteInFlight.get(cacheKey)!
-            if (bars.length === 0) {
-              onHistoryCallback([], { noData: true });
-            } else {
-              onHistoryCallback(bars, { noData: false });
-            }
-            return;
+          const cacheMinuteBars = minuteResultCache.get(cacheKey)
+          if (useCacheBars && cacheMinuteBars && cacheMinuteBars.bars?.length > 0) {
+            onHistoryCallback(cacheMinuteBars.bars || [], { noData: true });
+            return 
           }
           
           const fetchPromise = (async () => {
-            
             const res = await klineApi.getMinute({ stock: currentToken.stockId, sessionType })
             const _data = res?.data?.items || []
             let bars = _data
               .sort((a, b) => a.startTime - b.startTime)
-              // .filter(bar => bar.startTime >= from && bar.startTime <= to)
               .map((bar: any) => {
                 return {
                   "time": bar.startTime * 1000,
@@ -342,61 +338,21 @@ export function getDataFeed({
               return []
             }
 
-            // if (typeof countBack === "number" && bars.length < countBack) {
-            //   const intervalSec = Math.max(keyToMinutes(resolution as any || '1'), 1) * 60
-            //   const intervalMs = intervalSec * 1000
-            //   const missing = countBack - bars.length
-            //   const firstTimeMs = bars[0]?.time ?? (to * 1000)
-            //   const startTimeMs = firstTimeMs - intervalMs * missing
-            //   const padBars = Array.from({ length: missing }).map((_, i) => {
-            //     const t = startTimeMs + intervalMs * i
-            //     return {
-            //       time: t,
-            //       open: 0,
-            //       high: 0,
-            //       low: 0,
-            //       close: 0,
-            //       volume: 0,
-            //     }
-            //   })
-            //   bars = [...padBars, ...bars]
-            // }
-
             return bars
           })()
 
-          minuteInFlight.set(cacheKey, fetchPromise)
+          // minuteInFlight.set(cacheKey, fetchPromise)
           let bars = await fetchPromise
-          minuteInFlight.delete(cacheKey)
-          minuteResultCache.set(cacheKey, { bars, ts: Date.now() })
-
+          initialLoadComplete = false
           if (bars.length === 0) {
             onHistoryCallback([], { noData: true });
             return;
           }
-
-          if (bars.length > 0) {
-            const firstTime = bars[0]?.time
-            const lastTime = bars[bars.length - 1]?.time
-            if (firstTime && lastTime) {
-              let fromSec = Math.floor(firstTime / 1000)
-              let toSec = Math.floor(lastTime / 1000)
-              if (fromSec === toSec) {
-                const minutes = keyToMinutes(resolution as any || '15')
-                toSec = fromSec + Math.max(minutes, 1) * 60
-              }
-              barsRangeCache.set(`${symbolName}|${resolution}`, { from: fromSec, to: toSec })
-              barsRangeCache.set(symbolName, { from: fromSec, to: toSec })
-            }
-          }
-
-          onHistoryCallback(bars, { noData: bars.length === 0 });
+          
+          minuteResultCache.set(cacheKey, { bars: bars, ts: bars[0].time })
+          onHistoryCallback(bars, { noData: true });
         }
-        
 
-        // if (!initialLoadComplete) {
-        //   initialLoadComplete = true;
-        // }
       } catch (error) {
         console.log(error)
         // @ts-ignore
@@ -411,6 +367,7 @@ export function getDataFeed({
       subscriberUID,
       onResetCacheNeededCallback,
     ) => {
+      resetCacheCallback = onResetCacheNeededCallback
       wsService.init({})
       
       if (symbolInfo.name.startsWith('__empty__')) {
@@ -449,15 +406,14 @@ export function getDataFeed({
         if (wsSubscriptionVersion.get(subscriberUID) !== currentVersion) {
           return
         }
-        const lastBar = lastBarsCache.get(symbol)
         if (data?.c) {
           if (sessionTypeNotSupportRealtime && currentChartType === 3) return
           if (
-            (currentChartType === 1 && marketState === MARKET_STATUS.OPEN) // 如果是candle图，则正常执行回调
-            || (marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前
-            || (marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘中状态，且当前分时图是全部分时和盘中分时
-            || (marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘后状态，且当前分时图是盘后和全部分时
-            || (marketState === MARKET_STATUS.OVERNIGHT && (sessionType === 0 || sessionType === 5)) // 夜盘状态，且当前分时图是夜盘和全部分时
+            currentChartType === 1
+            || (currentChartType === 3 && marketState === MARKET_STATUS.BEFORE && (sessionType === 0 || sessionType === 1)) // 盘前状态，且当前分时图是盘前
+            || (currentChartType === 3 && marketState === MARKET_STATUS.OPEN && (sessionType === 0 || sessionType === 2)) // 盘中状态，且当前分时图是全部分时和盘中分时
+            || (currentChartType === 3 && marketState === MARKET_STATUS.AFTER && (sessionType === 0 || sessionType === 3)) // 盘后状态，且当前分时图是盘后和全部分时
+            || (currentChartType === 3 && marketState === MARKET_STATUS.OVERNIGHT && (sessionType === 0 || sessionType === 5)) // 夜盘状态，且当前分时图是夜盘和全部分时
           ) {
             onRealtimeCallback({
               "time": data.t * 1000,
