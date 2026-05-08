@@ -42,7 +42,7 @@ export function WalletItem({
     >
       <div className='flex items-center'>
         {wallet.info.icon && (
-          <img src={wallet.info.icon} className='w-[40px] h-[40px] mr-4  rounded-[6px]' alt='' />
+          <img src={wallet.info.icon} className='w-[32px] h-[32px] mr-4  rounded-[6px]' alt='' />
         )}
         <span className='text-[16px] font-semibold'>{wallet.info.name}</span>{' '}
       </div>
@@ -381,6 +381,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
+        className="pr-0 pl-0"
+        headerClassName="px-4"
         open={showConnect}
         openChange={open => {
           setShowConnect(open)
@@ -393,7 +395,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         }}
         title={dialogTitle}
       >
-        <div className='rounded-[8px] pt-4 text-white w-[402px]'>
+        <div className='pt-1 text-white w-[402px] border-t border-[#232427]'>
           {connectorType === ConnectorType.WalletConnect ? (
             <QrCodeView
               refresh={() => handleConnect(ConnectorType.WalletConnect, currentWallet)}
