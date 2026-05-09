@@ -22,7 +22,8 @@ export type KYC_OVERALL_STATUS = (typeof KYC_OVERALL_STATUS)[keyof typeof KYC_OV
 export const PENDING_STEPS = {
   EXPIRED: 2,
   RISK3: 3,
-  REVIEW: 4
+  REVIEW: 4,
+  MANUALREVIEW: 5,
 }
 export type PENDING_STEPS = (typeof PENDING_STEPS)[keyof typeof PENDING_STEPS]
 export type PENDING_STEPS_LIST = PENDING_STEPS[]
@@ -38,6 +39,7 @@ export const KYC_STATUS = {
   EXPIRED: 5, // 已过期
   REJECTED: 6, // 已拒绝
   DECLINED: 7, // 已驳回
+  ISSUE: 9, // 异常
   
 }
 export type KYC_STATUS = (typeof KYC_STATUS)[keyof typeof KYC_STATUS]
@@ -59,6 +61,7 @@ export const KYC_VERIFY_TYPE = {
   AML: 'AML',
   KYT: 'KYT',
   ID_INFO: 'ID_INFO',
+  MANUAL_VERIFICATION: 'MANUAL_VERIFICATION'
 }
 export type KYC_VERIFY_TYPE = (typeof KYC_VERIFY_TYPE)[keyof typeof KYC_VERIFY_TYPE]
 

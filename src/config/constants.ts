@@ -158,3 +158,4 @@ export const DEFAULT_SLIPPAGE = 0.5
 // 只支持盘中的股票
 export const SUPPORT_REGULAR_PROD = ['ABNB', 'BLK', 'CCJ', 'CEG', 'COP', 'CVX', 'GLXY', 'HAL', 'KO', 'OXY', 'SLB']
 export const SUPPORT_REGULAR_TEST = ['NFLX', 'CRCL', 'GLXY']
+export const zeroAddress = '0x0000000000000000000000000000000000000000' as const

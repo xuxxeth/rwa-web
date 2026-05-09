@@ -34,7 +34,7 @@ import { ConvertAction } from "./ConvertAction";
 import { useKycStore } from "@/stores/kycStore";
 import { KYC_OVERALL_STATUS } from "@/service/kyc/types";
 import { useRealtimeRwa } from "@/hooks/useRealtimeRwa";
-import { RISK_STATUS } from "@/config/constants";
+import { RISK_STATUS, zeroAddress } from "@/config/constants";
 import { useRouter } from "@/hooks/useRouter";
 import { useTradePageReady } from "@/hooks/useTradePageReady";
 
@@ -201,7 +201,8 @@ export function ConverBody({
       networkFee: '0', // 0.002
       amount: '0', // 10 usdt
       price: parseAmount(truncateUP(limitPrice, 2)),   // 1 usdt
-      size: parseAmount(inputSize)    // 10
+      size: parseAmount(inputSize),    // 10
+      clientAddress: zeroAddress
     }
 
     setBuying(true)

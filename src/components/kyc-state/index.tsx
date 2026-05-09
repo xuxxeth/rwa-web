@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react"; // 关闭按钮图标（可换）
 import { Button } from "../ui/button";
 import { LazyImage } from "../image/LazyImage";
 import { KYC_OVERALL_STATUS, KYC_RISK_LEVEL, KYC_STATUS, KYC_VERIFY_TYPE, type IKycStatus } from "@/service/kyc/types";
@@ -25,6 +24,7 @@ const KycState = () => {
   const isNotShow = useMemo(() => NO_SHOW_PATH.includes(router.location.pathname), [router.location.pathname])
   const { expired, expiring, desc } = useKycExpired()
   const pendingStep = usePendingStep()
+  const { kycStatus } = useKycStatus()
 
   useFetchKycStatus()
 
@@ -63,9 +63,13 @@ const KycState = () => {
 
   }, [kycDetail])
 
-  
+  const kycIssue = useMemo(() => {
+    return kycStatus === KYC_STATUS.ISSUE
+  }, [kycStatus])
+
   // 显示后 10 秒自动隐藏
   useEffect(() => {
+    // 证件过期
     if (expired) {
       setContent({
         title: t('kyc.t48'),
@@ -77,7 +81,7 @@ const KycState = () => {
       setShow(true)
       return
     }
-
+    // 认证成功后，过期
     if (pendingStep.expired) {
       setContent({
         title: t('kyc.t45'),
@@ -88,7 +92,7 @@ const KycState = () => {
       setShow(true)
       return
     }
-
+    // 风险用户，需要补充资料
     if (pendingStep.risk3 && kycDetail?.expireTime) {
       setContent({
         title: t('kyc.t25'),
@@ -99,10 +103,33 @@ const KycState = () => {
       setShow(true)
       return
     }
+    // 需要人工复审
+    if (pendingStep.manualReiview) {
+      setContent({
+        title: t('kyc.t71'),
+        content: t('kyc.t72', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
+        btnText: t('kyc.t35'),
+        btn: 'upload'
+      })
+      setShow(true)
+      return
+    }
+    // 账号异常状态
+    if (kycIssue) {
+      setContent({
+        title: t('kyc.t70'),
+        content: t('identity.result.issue2'),
+        btnText: t('kyc.t35'),
+        btn: 'edit'
+      })
+      setShow(true)
+      return
+    }
     if (!kycDetail && !pendingStep.step) {
       setShow(false)
       setContent(defaultContent)
     }
+    
     if (!kycDetail || isNotShow || pendingStep.step) {
       
       return
@@ -150,9 +177,10 @@ const KycState = () => {
       setShow(true)
       return
     }
+    
     setShow(false)
     setContent(defaultContent)
-  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc, pendingStep]);
+  }, [t, ocrFail, ocrIncome, amlDeclined, isNotShow, expired, expiring, desc, pendingStep, kycIssue]);
 
   useEffect(() => {
     if (isNotShow) {

@@ -90,7 +90,6 @@ function Identity({ account }: { account: string }) {
   const pendingStepRef = useRef(0)
   const kycDetailInit = useRef(false)
   const retryCount = useRef(0)
-  const updateRetryCount = useKycStore(state => state.updateRetryCount)
   const addRetryCount = useKycStore(state => state.addRetryCount)
 
   const resetRetry = () => {
@@ -324,6 +323,19 @@ function Identity({ account }: { account: string }) {
         match: () =>
           overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
           verifyType === KYC_VERIFY_TYPE.AML &&
+          status === KYC_STATUS.DECLINED,
+        render: () => (
+          <ExtraInfo
+            reviewCommentToUser={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser}
+            refresh={refresh}
+          />
+        ),
+      },
+      // 人工复核
+      {
+        match: () =>
+          overallStatus === KYC_OVERALL_STATUS.VERIFYING &&
+          verifyType === KYC_VERIFY_TYPE.MANUAL_VERIFICATION &&
           status === KYC_STATUS.DECLINED,
         render: () => (
           <ExtraInfo

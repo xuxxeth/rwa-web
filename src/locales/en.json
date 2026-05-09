@@ -388,6 +388,7 @@
       "rv": "Retry Verify",
       "t67": "Identity verification is temporarily unavailable. Please try again later.",
       "issue": "If your account shows any abnormal activity and you need to file an appeal, please send an email to📧 contact@tiko.cc",
+      "issue2": "There is an abnormality in your profile. Transactions are temporarily unavailable. If you have any questions, please contact📧 contact@tiko.cc",
       "verifyingWait": "Submitting information, please do not leave this page."
     },
     "firstName": "First Name",
@@ -602,7 +603,10 @@
     "t65": "At least one of the document photo and description must be submitted.",
     "t66": "Only numeric and alphabetic characters are supported.",
     "t67": "Incorrect Date of Birth",
-    "t68": "Please enter a residential address outside of Mainland China."
+    "t68": "Please enter a residential address outside of Mainland China.",
+    "t70": "Identity verification issue",
+    "t71": "Compliance Review Reminder",
+    "t72": "The system requires additional information. Please update your documents by {{expire}}, otherwise you will not be able to continue trading."
   },
   "employment": {
     "t1": "Retired",

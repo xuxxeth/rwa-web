@@ -12,6 +12,7 @@ export function usePendingStep() {
       expired: pendingSteps.includes(PENDING_STEPS.EXPIRED),
       risk3: pendingSteps.includes(PENDING_STEPS.RISK3),
       review: pendingSteps.includes(PENDING_STEPS.REVIEW),
+      manualReiview: pendingSteps.includes(PENDING_STEPS.MANUALREVIEW),
       step: pendingSteps[0]
     }
   }, [kycStatus?.pendingSteps])
