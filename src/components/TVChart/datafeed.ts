@@ -280,7 +280,12 @@ export function getDataFeed({
           const _endTime = lastBarsCache.get(cacheKey)?.time || 0
           const _limit = firstDataRequest ? (Math.floor(Math.random() * 201) + 300) : (Math.floor(Math.random() * 201) + 200)
           console.log('_endTime: ', _endTime, to, lastBarsCache.get(cacheKey))
-          const res = await klineApi.getCandles({ stock: currentToken.stockId, interval: keyToMinutes(resolution as any || '15'), endTime: _endTime || to, limit: _limit })
+          const res = await klineApi.getCandles({ 
+            stock: currentToken.stockId, 
+            interval: keyToMinutes(resolution as any || '15'), 
+            endTime: _endTime ? (_endTime - 10) : to, 
+            limit: _limit 
+          })
           initialLoadComplete = false
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
