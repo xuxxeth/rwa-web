@@ -325,7 +325,8 @@ export const TVChartContainer = memo(
         }
         // X时间轴移到最右侧
         chart.getTimeScale().setRightOffset(0)  
-        chart.setSymbol(token.symbol)
+        const _symbol = _sessionType === 0 ? token.symbol : `__${token.symbol}__area__` + Date.now()
+        chart.setSymbol(_symbol)
         chart.setResolution(resolution)
 
         // dataFeedRef.current?.resetCache()
@@ -394,7 +395,7 @@ export const TVChartContainer = memo(
         // })
         chart.setResolution(resolution)
         if (data.code !== '0') {
-          const targetSymbol = `__${tokenSymbolRef.current}__area`
+          const targetSymbol = `__${tokenSymbolRef.current}__area__` + Date.now()
           chart.setSymbol(targetSymbol)
         }
         // barSpacing默认是6，如果小于6，则重置
@@ -403,8 +404,10 @@ export const TVChartContainer = memo(
         }
         // X时间轴移到最右侧
         chart.getTimeScale().setRightOffset(0)
-        dataFeedRef.current?.resetCache()
-        chart.resetData();
+        // setTimeout(() => {
+        //   dataFeedRef.current?.resetCache()
+        //   chart.resetData();
+        // }, 1000)
         
       }
       
