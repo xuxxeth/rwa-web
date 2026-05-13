@@ -151,7 +151,7 @@ export const useBaseStore = create<BaseStore>()(
         if (res.code === RESPONSE_CODE.SUCCESS) {
           const marketInfo = { ...(res.data || {}) }
           
-          set({ marketInfo: {...marketInfo, nightTradingEndTime: Math.max((marketInfo.nightTradingEndTime || 0) - 10 * 60 * 1000, 0)} })
+          set({ marketInfo: {...marketInfo } })
         }
         return res
       },

@@ -111,35 +111,35 @@ const limitDuration = 10 * 60 * 1000
 
 export function useDisabledNight10() {
   const [disabled, setDisabled] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const updateDisabled = () => {
-      const nowTime = new Date().getTime();
-      const _endTime = endTime.getTime()
-      if (_endTime > nowTime) {
-        if (nowTime < _endTime && _endTime - nowTime <= limitDuration) {
-          setDisabled(true)
-        }
-        // 当前时间过了夜盘时间，夜盘可选
-        if (nowTime > _endTime) {
-          setDisabled(false)
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-          }
-        }
-      }
-    }
+  // useEffect(() => {
+  //   const updateDisabled = () => {
+  //     const nowTime = new Date().getTime();
+  //     const _endTime = endTime.getTime()
+  //     if (_endTime > nowTime) {
+  //       if (nowTime < _endTime && _endTime - nowTime <= limitDuration) {
+  //         setDisabled(true)
+  //       }
+  //       // 当前时间过了夜盘时间，夜盘可选
+  //       if (nowTime > _endTime) {
+  //         setDisabled(false)
+  //         if (timerRef.current) {
+  //           clearInterval(timerRef.current);
+  //         }
+  //       }
+  //     }
+  //   }
 
-    timerRef.current = setInterval(updateDisabled, 1000);
+  //   timerRef.current = setInterval(updateDisabled, 1000);
     
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
+  //   return () => {
+  //     if (timerRef.current) {
+  //       clearInterval(timerRef.current);
+  //     }
+  //   };
 
-  }, [])
+  // }, [])
 
   return {
     disabled
