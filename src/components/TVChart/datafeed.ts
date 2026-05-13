@@ -134,13 +134,13 @@ export function getDataFeed({
   let currentToken = token
   let currentChartType = 3;
   let sessionType = 0
-  let initialLoadComplete = false;
   let marketState = -1; // 市场状态
   let tradingStartTime = 0; // 交易开始时间
 
   let preLastBarTime = 0
   let resetCacheCallback: (() => void) | null = null;
   let sessionTypeNotSupportRealtime = false
+
   return {
     resetCache: () => {
       if (resetCacheCallback) {
@@ -234,10 +234,7 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      if (initialLoadComplete) {
-        return onHistoryCallback([], { noData: false })
-      }
-      initialLoadComplete = true
+      
       const rawSymbolName = `${symbolInfo?.name || ''}`
       
       if (rawSymbolName.startsWith('__empty__')) {
@@ -259,7 +256,6 @@ export function getDataFeed({
         preLastBarTime = 0
         lastBarsCache.delete(cacheKey)
       }
-      
       // 如果是Kline
       try {
         if (currentChartType !== 3 || sessionType === 0) {
@@ -286,7 +282,6 @@ export function getDataFeed({
             endTime: _endTime ? (_endTime - 10) : to, 
             limit: _limit 
           })
-          initialLoadComplete = false
           const _data = res?.data || []
           if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });
@@ -348,7 +343,6 @@ export function getDataFeed({
 
           // minuteInFlight.set(cacheKey, fetchPromise)
           let bars = await fetchPromise
-          initialLoadComplete = false
           if (bars.length === 0) {
             onHistoryCallback([], { noData: true });
             return;
