@@ -606,7 +606,8 @@
     "t68": "Please enter a residential address outside of Mainland China.",
     "t70": "Identity verification issue",
     "t71": "Compliance Review Reminder",
-    "t72": "The system requires additional information. Please update your documents by {{expire}}, otherwise you will not be able to continue trading."
+    "t72": "The system requires additional information. Please update your documents by {{expire}}, otherwise you will not be able to continue trading.",
+    "t73": "Your trading access has been suspended due to overdue document updates. It will be restored once the required information is submitted."
   },
   "employment": {
     "t1": "Retired",

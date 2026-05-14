@@ -69,6 +69,7 @@ const KycState = () => {
 
   // 显示后 10 秒自动隐藏
   useEffect(() => {
+    
     // 证件过期
     if (expired) {
       setContent({
@@ -104,10 +105,12 @@ const KycState = () => {
       return
     }
     // 需要人工复审
-    if (pendingStep.manualReiview) {
+    if (pendingStep.manualReiview && kycDetail?.status === KYC_STATUS.DECLINED) {
+      // 过期
+      const isExpired = (kycDetail?.expireTime ?? 0) < Date.now()
       setContent({
         title: t('kyc.t71'),
-        content: t('kyc.t72', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
+        content: isExpired ? t('kyc.t73') : t('kyc.t72', {expire: formatSecondsToDateTime(Math.floor((kycDetail?.expireTime || 0) / 1000))}),
         btnText: t('kyc.t35'),
         btn: 'upload'
       })
@@ -131,7 +134,8 @@ const KycState = () => {
     }
     
     if (!kycDetail || isNotShow || pendingStep.step) {
-      
+      setShow(false)
+      setContent(defaultContent)
       return
     } 
 
@@ -193,6 +197,7 @@ const KycState = () => {
 
   const handleGo = useCallback(async () => {
     setShow(false)
+    setContent(defaultContent)
     if (content.btn === 'edit') {
       
     }

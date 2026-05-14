@@ -235,7 +235,10 @@ function Identity({ account }: { account: string }) {
             // 认证中或人工审核中都显示 认证中状态， 因为人工审核中也是在审核这个 OCR 结果
             (status === KYC_STATUS.VERIFYING || status === KYC_STATUS.REVIEW)) ||
           // 认证后，子流程需要重新提交收入证明材料
-          (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW),
+          (verifyType === KYC_VERIFY_TYPE.INCOME && status === KYC_STATUS.REVIEW) ||
+          (verifyType === KYC_VERIFY_TYPE.MANUAL_VERIFICATION && status === KYC_STATUS.REVIEW)
+          ,
+
         render: () => <Verifying refresh={refresh} />,
       },
       // 认证中 - OCR Failed/Rejected Retry
