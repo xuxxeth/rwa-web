@@ -78,7 +78,7 @@ const ExtraInfo = memo(
         }
       })
       const params: any = {
-        type: pendingStep.step ? 3 : 1,
+        type: pendingStep.step ? pendingStep.step : 1,
         extraInfo: {
           extras: extras
         }

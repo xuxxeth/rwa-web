@@ -67,3 +67,26 @@ export default tseslint.config([
   },
 ])
 ```
+
+## 删除远端tag
+```bash
+git tag -l | xargs git tag -d
+
+git ls-remote --tags origin \
+| awk '{name=$2; sub(/^refs\/tags\//,"",name); sub(/\^\{\}$/,"",name); print name}' \
+| sort -u \
+| awk '$0!="0.1.76" && $0!="0.1.77" && $0!="0.1.78"' \
+| while read -r tag; do
+  [ -n "$tag" ] && git push origin ":refs/tags/$tag"
+done
+
+git ls-remote --tags --refs origin \
+| awk '{sub(/^refs\/tags\//,"",$2); print $2}' \
+| awk '$0!="0.1.76" && $0!="0.1.77" && $0!="0.1.78"' \
+| while read -r tag; do
+  git push origin --delete "$tag"
+done
+
+
+
+```

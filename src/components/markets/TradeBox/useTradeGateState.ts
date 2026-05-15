@@ -5,6 +5,8 @@ import { RISK_STATUS } from "@/config/constants"
 import { useTradePageReady } from "@/hooks/useTradePageReady"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
+import { useKycStatus } from "@/hooks/useKycStatus"
+import { KYC_STATUS } from "@/service/kyc/types"
 
 type TokenBalance = {
   balance?: string
@@ -39,9 +41,10 @@ export function useTradeGateState({
 }: UseTradeGateStateParams) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const { riskStatus } = useRiskStatus()
+  const { kycStatus } = useKycStatus()
 
   const kycButtonText = useMemo(() => {
-    if (riskStatus === RISK_STATUS.ISSUE) {
+    if (riskStatus === RISK_STATUS.ISSUE || kycStatus === KYC_STATUS.ISSUE) {
       return t('issue')
     }
     if (riskStatus !== RISK_STATUS.VERIFIED && riskStatus !== RISK_STATUS.DEFAULT) {
@@ -58,7 +61,7 @@ export function useTradeGateState({
     }
     
     return ''
-  }, [riskUserConfig, action, riskStatus, t])
+  }, [riskUserConfig, action, riskStatus, kycStatus, t])
 
   const isPageReady = useTradePageReady({
     account,

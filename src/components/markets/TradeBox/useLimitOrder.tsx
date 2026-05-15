@@ -6,6 +6,7 @@ import { TradeType, SideType, TifType, SessionType } from "@/hooks/useCaCommon"
 import { parseAmount } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
+import { zeroAddress } from "@/config/constants"
 
 type PlaceOrderFn = (params: any, options?: any) => Promise<any>
 type ToastErrorFn = (payload: { title: string }) => void
@@ -113,7 +114,8 @@ export function useLimitOrder({
         networkFee: '0',
         amount: '0',
         price: parseAmount(orderPrice),
-        size: parseAmount(inputSize)
+        size: parseAmount(inputSize),
+        clientAddress: zeroAddress
       }
       console.log('place order params', params)
       const result = await placeOrder(params, {
