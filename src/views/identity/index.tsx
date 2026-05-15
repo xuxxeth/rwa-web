@@ -208,9 +208,10 @@ function Identity({ account }: { account: string }) {
         match: () => overallStatus === KYC_OVERALL_STATUS.REJECTED,
         render: () => <VerifyFailed />,
       },
+      // 用户异常状态
       {
         match: () => overallStatus === KYC_OVERALL_STATUS.ISSUE,
-        render: () => <VerifyIssue />,
+        render: () => <VerifyIssue issueInfo={kycDetail?.userInfo?.reviewInfo?.reviewCommentToUser} />,
       },
       // 认证中 - Income High Risk
       {
