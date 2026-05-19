@@ -68,7 +68,7 @@
         "subLabel": "SPEED",
         "value": "3S",
         "title": "Instant Trading Experience",
-        "description": "6-second settlement with synchronized on-chain and broker execution"
+        "description": "3-second settlement with synchronized on-chain and broker execution"
       },
       {
         "subLabel": "FEE MODEL",

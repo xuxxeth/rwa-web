@@ -68,7 +68,7 @@
         "subLabel": "SPEED",
         "value": "3S",
         "title": "即時的交易體驗",
-        "description": "鏈上確認與券商執行協同，最快約 6 秒完成成交與鏈上交割"
+        "description": "鏈上確認與券商執行協同，最快約 3 秒完成成交與鏈上交割"
       },
       {
         "subLabel": "FEE MODEL",
