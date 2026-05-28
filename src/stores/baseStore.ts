@@ -12,8 +12,10 @@ import type {
   ITokenWithPrice,
   IStockWithPrice,
   IChain,
+  IMarketState,
 } from '@/service/base/types'
 import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP, numberToBinaryArray } from '@/utils'
+import { WSS_MARKET_STATUS, type IWSSMarketState } from '@/service/webSocket/service'
 
 const ENABLE_CACHE = false
 // 缓存时间，2小时
@@ -154,6 +156,38 @@ export const useBaseStore = create<BaseStore>()(
           set({ marketInfo: {...marketInfo } })
         }
         return res
+      },
+      setMarketState: (data: IWSSMarketState) => {
+        
+        let marketState = MARKET_STATUS.CLOSE
+        // 盘中
+        if (data.s === WSS_MARKET_STATUS.OPEN) {
+          marketState = MARKET_STATUS.OPEN
+        }
+        // 盘前
+        if (data.s === WSS_MARKET_STATUS.BEFORE) { 
+          marketState = MARKET_STATUS.BEFORE
+        }
+        // 盘后
+        if (data.s === WSS_MARKET_STATUS.AFTER) { 
+          marketState = MARKET_STATUS.AFTER
+        }
+        // 夜盘
+        if (data.s === WSS_MARKET_STATUS.OVERNIGHT) { 
+          marketState = MARKET_STATUS.OVERNIGHT
+        }
+        
+        const _marketState = {
+          "market": data.m, // us
+          "desc": "",
+          "tradingDayType": data.d, // 0-非交易日，1-全天交易市，2-上半日市，3-下半日市
+          "status": data.s,
+          "availability": {
+            "trading": 0,
+            "pre_after_trading": 0,
+          }
+        }
+        set({ marketState: _marketState, marketTradeState: marketState })
       },
       getMarketState: async () => {
         const res = await baseApi.getMarketState()

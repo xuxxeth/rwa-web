@@ -1,6 +1,6 @@
 import { useState, type ReactNode, type RefObject } from 'react'
 import { LazyImage } from '@/components/image/LazyImage'
-import { cn, shortenAddress } from '@/utils'
+import { cn, shortenAddress, isGreater } from '@/utils'
 import { useTranslation } from '@/hooks/useTranslation'
 import CopyButton from '@/components/button/copyButton'
 import {
@@ -11,7 +11,7 @@ import {
 import VectorSVG from '@/components/pagination/vector.svg?react'
 import { CheckBoxBySVG } from '@/components/check-box'
 import { textSuffix, toFixed, sum } from '@/utils'
-import type { IOrder, OrderType, RiskType } from '@/service/scan/types'
+import type { IOrder, OrderType, RiskType, ICommissionItem } from '@/service/scan/types'
 import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom'
 import TooltipWithIcon from '@/components/icon-tooltip'
 import { useBaseStore } from '@/stores/baseStore'
 import { extractHourMinute } from '@/hooks/useMarketState'
+import { useFeeRulesI18n } from '@/hooks/useFeeRulesI18n'
 
 export type OrderChanged = {
   orderId: string
@@ -42,27 +43,55 @@ export function TextCell(props: { text: string | number; className?: string }) {
   return <div className={cn('text-xs/4 font-normal', props.className)}>{props.text}</div>
 }
 
-export function TradingFees(props: { currency: string; commission: string; fee: string }) {
-  let { currency, commission, fee } = props
+export function TradingFees(props: {
+  currency: string
+  commissionItems: ICommissionItem[] | null
+  commission: string
+  fee: string
+}) {
+  const { data: feeRulesI18n } = useFeeRulesI18n()
+  let { currency, commissionItems, commission, fee } = props
+
   commission = toFixed(commission)
   fee = toFixed(fee)
-
   const sumFees = sum(commission, fee)
-  const { t } = useTranslation()
+
+  const { t, i18n } = useTranslation()
+
+  function getRuleTitle(ruleId: number) {
+    const titleFromApi = feeRulesI18n?.[ruleId]
+    if (titleFromApi) return titleFromApi
+
+    const key = `portfolio.orderTable.ruleId.${ruleId}`
+    if (!i18n.exists(key)) return `ruleId${ruleId}`
+    return t(key)
+  }
+
+  const commissions = Array.isArray(commissionItems)
+    ? [...commissionItems]
+        .sort((a, b) => a.ruleId - b.ruleId)
+        .map(item => ({
+          title: getRuleTitle(item.ruleId)!,
+          value: item.amount,
+        }))
+    : [
+        {
+          title: t('portfolio.orderTable.bf'),
+          value: commission,
+        },
+      ]
+
   const tooltip = (
     <div className='flex flex-col gap-1'>
       {[
+        ...commissions,
         {
-          title: 'bf',
-          value: commission,
-        },
-        {
-          title: 'pf',
+          title: t('portfolio.orderTable.pf'),
           value: fee,
         },
       ].map(({ value, title }) => (
         <div className='text-xs/[15px] text-gray-300 flex flex-row justify-between'>
-          {t(`portfolio.orderTable.${title}`)}
+          {title}
           <span className='ml-9'>
             {value} {currency}
           </span>
@@ -72,11 +101,17 @@ export function TradingFees(props: { currency: string; commission: string; fee: 
   )
   return (
     <div>
-      <IconWithTooltip
-        iconOrTextClassName='text-xs/[15px] font-normal border-b border-dashed'
-        text={`${sumFees} ${currency}`}
-        tooltip={tooltip}
-      />
+      {isGreater(sumFees, 0) ? (
+        <IconWithTooltip
+          iconOrTextClassName='text-xs/[15px] font-normal border-b border-dashed'
+          text={`${sumFees} ${currency}`}
+          tooltip={tooltip}
+        />
+      ) : (
+        <span className='font-normal'>
+          {sumFees} {currency}
+        </span>
+      )}
     </div>
   )
 }

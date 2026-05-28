@@ -2,6 +2,7 @@ import client, { type ApiResponse } from "../client";
 import type { 
   IChain, 
   IMarket, 
+  IFeeRuleI18nByLang,
   IMarketState, 
   IStock, 
   IToken,
@@ -19,6 +20,7 @@ export const baseApi = {
   getStocks: () => client.get<ApiResponse<IStock[]>>('/v1/base/public/stocks'),
   getMarket: () => client.get<ApiResponse<IMarket>>('/v1/base/public/market'),
   getMarketState: () => client.get<ApiResponse<IMarketState>>('/v1/base/public/market/state'),
+  getMarketFeeConfig: () => client.get<ApiResponse<IFeeRuleI18nByLang>>('/v1/base/public/market/feeConfig'),
 
   // 公司财务相关接口
   getStatistic: (stockId: number) => client.get<ApiResponse<IStatistic>>('/v1/base/public/stock/statistic', { stockId }),

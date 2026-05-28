@@ -238,11 +238,16 @@ const orderHistoryTableConfig: ITableConfig<
     ),
   },
   {
-    key: 'tf',
+    key: 'tradingfee',
     sortable: false,
     breakOnSpace: false,
     render: (item: IOrder) => (
-      <TradingFees currency={item.currency} commission={item.commission} fee={item.fee} />
+      <TradingFees
+        currency={item.currency}
+        commissionItems={item.commissionItems}
+        commission={item.commission}
+        fee={item.fee}
+      />
     ),
   },
   {

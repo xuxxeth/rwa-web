@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useTrading } from "@/hooks/useTrading";
 import { setHx2ToastId, useTxToast } from "@/hooks/useTxToast";
-import { useCalcFee } from "@/hooks/useCalcFee";
+import { useCalcFee, useFetchFeeConfig } from "@/hooks/useCalcFee";
 import { cn } from "@/lib/utils";
 import { TradeFormUI } from "./TradeFormUI";
 import { TradeButtonUI } from "./TradeButtonUI";
@@ -108,10 +108,13 @@ export function TradeBox({
   useEffect(() => {
     updateInputSize('')
   }, [action, updateInputSize])
+  // 获取合约费用
+
+  useFetchFeeConfig()
 
   const orderValue = useOrderBase(effectivePrice, inputSize)
 
-  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee, allOrderValue } = useCalcFee(
+  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee, secFee, catFee, allOrderValue } = useCalcFee(
     orderValue,
     inputSize,
     action === 'buy',
@@ -263,6 +266,8 @@ export function TradeBox({
           platformFee={platformFee}
           brokerageFee={brokerageFee}
           tradingActivityFee={tradingActivityFee}
+          secFee={secFee}
+          catFee={catFee}
           estimatedFee={estimatedFee}
           feeRate={inputToken?.feeRate ?? ''}
           networkFeeInNative={marketInfo.networkFeeInNative}

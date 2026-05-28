@@ -211,7 +211,7 @@
       "status": "Status",
       "session": "Session",
       "action": "Action",
-      "tf": "Trading Fees",
+      "tradingfee": "Trading Fees",
       "bf": "Brokerage Fee",
       "pf": "Platform Service Fee",
       "reason": {
@@ -224,6 +224,12 @@
         "7": "Unsupported price precision",
         "8": "Not supported session",
         "9": "Exceed slippage"
+      },
+      "ruleId": {
+        "1": "Brokerage Fee",
+        "2": "Trading Activity Fee",
+        "3": "SEC Fee",
+        "4": "CAT Fee"
       }
     }
   },
@@ -715,6 +721,10 @@
       "t331": "Charged by the broker on sell orders at USD {{r1}} per share, with a minimum charge of USD {{r2}} per order and a maximum charge of USD {{r3}}.",
       "t34": "Platform Service Fee",
       "t341": "Platform Service Fee = Order amount × {{r1}}",
+      "t47": "SEC Fee",
+      "t471": "Charged by the U.S. Securities and Exchange Commission (SEC) at a rate of {{r1}} of the total transaction value, with a minimum fee of USD {{r2}} per trade.Applicable to sell transactions only ",
+      "t48": "CAT Fee",
+      "t481": "Charged by the SEC/FINRA and  Consolidated Audit Trail, LLC at a rate of {{r1}} per share with a minimum fee of USD {{r2}} per trade",
       "t35": "Do not show again",
       "t36": "Search By Token Name",
       "t37": "All",

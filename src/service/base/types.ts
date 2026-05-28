@@ -217,3 +217,7 @@ export interface IIndicators {
   "ocfps_annual_yoy": number,
   "grps_annual_yoy": number
 }
+
+export type IFeeRuleI18nByLang = Record<string, IFeeRulesI18n>
+
+export type IFeeRulesI18n = Record<string, string>

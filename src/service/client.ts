@@ -63,7 +63,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   // localSignature &&
   // localSignature.account?.toLowerCase() === account.toLowerCase() &&
   // localSignature.expires > Math.floor(Date.now() / 1000)
-  if (needAuth && (!localSignature || !localSignature.account || !localSignature.expires) && localSignature.expires < Math.floor(Date.now() / 1000)) {
+  if (needAuth && (!localSignature || !localSignature?.account || !localSignature?.expires) && localSignature?.expires < Math.floor(Date.now() / 1000)) {
     controller.abort()
     // 抛出一个自定义错误让上层能识别
     return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))

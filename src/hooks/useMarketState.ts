@@ -1,32 +1,19 @@
 import { useBaseStore } from "@/stores/baseStore";
 import { useEffect, useMemo, useRef, useState } from "react";
+import wsService, { type IWSSMarketState } from "@/service/webSocket/service";
 
 export function useMarketState() {
+  const setMarketState = useBaseStore(state => state.setMarketState)
   const getMarketState = useBaseStore(state => state.getMarketState)
 
-
-  // @ts-ignore
-  const marketTimer = useRef<NodeJS.Timeout | null>(null)
-
   useEffect(() => {
-    const getMarketStateInterval = () => {
-      getMarketState()
-        .finally(() => {
-          if (!marketTimer.current) {
-            marketTimer.current = setTimeout(() => {
-              marketTimer.current && clearTimeout(marketTimer.current)
-              marketTimer.current = null
-              getMarketStateInterval()
-            }, 5000)
-          }
-          
-        })
+    const listener = (data: IWSSMarketState) => {
+      setMarketState(data)
     }
-    getMarketStateInterval()
-
+    wsService.on('marketState', listener)
+    getMarketState()
     return () => {
-      marketTimer.current && clearTimeout(marketTimer.current)
-      marketTimer.current = null
+      wsService.off('marketState', listener)
     }
   }, [])
 

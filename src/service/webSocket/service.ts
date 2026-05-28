@@ -52,6 +52,35 @@ export interface ResMessage<T extends ResEventType> {
 // 订单相关事件的模板字面量类型
 export type OrderEventType = `order.${number}.${string}`
 
+
+export const WSS_MARKET_STATUS = {
+  CLOSE: 0,
+  BEFORE: 1,
+  OPEN: 2,
+  AFTER: 3,
+  CLOSED: 4,
+  OVERNIGHT: 5,
+}
+export type WSS_MARKET_STATUS = typeof WSS_MARKET_STATUS[keyof typeof WSS_MARKET_STATUS]
+// 市场状态数据
+export type IWSSMarketState = {
+  "m": string,          // 市场 (Market): "us"-US, "hk"-HK
+  "s": WSS_MARKET_STATUS,             // 盘段状态 (SessionType): 
+                      // 0-NOT_OPEN (未开盘)
+                      // 1-US_PRE_MARKET (盘前)
+                      // 2-TRADING (盘中)
+                      // 3-US_AFTER_HOURS (盘后)
+                      // 4-CLOSED (已收盘)
+                      // 5-US_NIGHT_SESSION (夜盘)
+  "d": number,             // 交易日类型 (TradingDayType): 
+                      // 0-DAY_TYPE_FULL (全天交易)
+                      // 1-DAY_TYPE_HALF_MORNING (午前半天)
+                      // 2-DAY_TYPE_HALF_AFTERNOON (午后半天)
+  "L": number,             // 限价单交易时段权限，如盘前时段：0111-夜盘-盘后-盘前-盘中
+  "M": number,             // 市价单交易时段权限，如盘前时段：0000-夜盘-盘后-盘前-盘中
+  "t": number  
+}
+
 /**
  * 所有客户端可以**订阅**的事件及其 `data` 载荷的类型映射。
  * 这是所有“可订阅事件”的“真实数据源”。
@@ -61,6 +90,7 @@ export type SubscribableEventDataMap = {
   summary: ISummaryData
   aggregate: IAggregateData
   auth: IAuthData // auth 是一个特殊的可订阅事件，通常只触发一次
+  marketState: IWSSMarketState
 } & {
   [key: OrderEventType]: IOrderData
 }
