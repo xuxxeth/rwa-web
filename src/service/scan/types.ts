@@ -37,6 +37,11 @@ export interface IOpenOrder {
   sessionType: SessionType
 }
 
+export interface ICommissionItem {
+  ruleId: number
+  amount: string
+}
+
 export interface IOrder {
   id: string
   orderId: string
@@ -64,6 +69,7 @@ export interface IOrder {
   txHash: string
   currency: string
   commission: string
+  commissionItems: ICommissionItem[]
   fee: string
   sessionType: SessionType
 }
