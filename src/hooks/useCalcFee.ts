@@ -241,17 +241,23 @@ export function calcFeeByMode(mode: FeeMode, value: number, orderValue: number |
 
 export function calcFeeItem(feeItem: FeeItem, orderValue: number | string, quantity: number | string) {
   let fee = calcFeeByMode(feeItem.mode, feeItem.value, orderValue, quantity)
+  let minFee = new BigNumber(0)
+  let maxFee = new BigNumber(0)
   if (feeItem.minMode !== FeeMode.NONE) {
-    const minFee = calcFeeByMode(feeItem.minMode, feeItem.minValue, orderValue, quantity)
+    minFee = calcFeeByMode(feeItem.minMode, feeItem.minValue, orderValue, quantity)
     if (fee.isLessThan(minFee)) {
       fee = minFee
     }
   }
-  if (feeItem.minMode !== FeeMode.NONE) {
-    const maxFee = calcFeeByMode(feeItem.maxMode, feeItem.maxValue, orderValue, quantity)
+  if (feeItem.maxMode !== FeeMode.NONE) {
+    maxFee = calcFeeByMode(feeItem.maxMode, feeItem.maxValue, orderValue, quantity)
     if (fee.isGreaterThan(maxFee) && feeItem.maxValue > 0) {
       fee = maxFee
     }
+  }
+  // 如果maxFee小于minFee， 则以minFee为准
+  if (maxFee.isGreaterThan(0) && maxFee.isLessThan(minFee)) {
+    fee = minFee
   }
 
   return fee

@@ -7,6 +7,7 @@ import { useBaseStore } from "@/stores/baseStore"
 import { LazyImage } from "../image/LazyImage"
 import { useNotSupportSession } from "@/hooks/useNotSupportSession"
 import { cn } from "@/lib/utils"
+import { TradeType } from "ca-common-web"
 
 const RwaSessionStatus = memo(
   ({
@@ -19,6 +20,7 @@ const RwaSessionStatus = memo(
     const { t, i18n } = useTranslation()
     const inputToken = useTradeStore((state) => state.inputToken)
     const marketTradeState = useBaseStore(state => state.marketTradeState)
+    const tradeType = useTradeStore(state => state.tradeType)
     const { notSupportBeforeOrAfter, notSupportOvernight } = useNotSupportSession(marketTradeState, inputToken)
     
     // 闭市状态下，
@@ -54,7 +56,7 @@ const RwaSessionStatus = memo(
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
                 <LazyImage src="/images/v2/icons/stop1.png" className="w-full h-full" />
               </div>
-              <span>{t("v3.t36", { session: notSupportBeforeOrAfter.session })}</span>
+              <span>{t("v3.t36", { session: notSupportBeforeOrAfter.session, tradeType: tradeType === TradeType.MARKET ? t("limit").toLowerCase() : "" })}</span>
             </div>
           </div>
         </>
@@ -73,7 +75,7 @@ const RwaSessionStatus = memo(
               <div className="w-[18px] h-[18px] shrink-0 p-[3px]">
                 <LazyImage src="/images/v2/icons/stop2.png" className="w-full h-full" />
               </div>
-              <span>{t("v3.t36", { session: notSupportOvernight.session })}</span>
+              <span>{t("v3.t36", { session: notSupportOvernight.session, tradeType: tradeType === TradeType.MARKET ? t("limit").toLowerCase() : "" })}</span>
             </div>
           </div>
         </>

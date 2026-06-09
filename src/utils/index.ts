@@ -259,3 +259,6 @@ export function numberToBinaryArray(num: number, options: { length?: number; hig
 
   return arr;
 }
+export function hasPermission(value: number, bit: number) {
+  return (value & (1 << bit)) !== 0
+}

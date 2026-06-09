@@ -67,7 +67,6 @@ export function TradeBox({
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
   
-  const isMarketCloseDisabled = marketTradeState !== MARKET_STATUS.OPEN && tradeType === TradeType.MARKET
   const effectivePrice = useEffectivePrice({
     tradeType,
     action,
@@ -176,6 +175,7 @@ export function TradeBox({
   })
 
   const uiState = useLimitOrderUIState({
+    tradeType,
     limitPrice,
     orderValue,
     inputSize,
@@ -188,6 +188,8 @@ export function TradeBox({
     realtimePrice: realtimeData?.p ? String(realtimeData.p) : '',
     t,
     language: i18n.language,
+    marketTradeState,
+    marketInfo
   })
 
   const buttonVariant = useMemo(() => (action === 'buy' ? 'primary' : 'warning'), [action])
@@ -258,7 +260,7 @@ export function TradeBox({
           sessionType={sessionType}
           slippage={slippage}
           buying={order.loading}
-          disabled={uiState.disabled || isMarketCloseDisabled}
+          disabled={uiState.disabled}
           buttonText={uiState.buttonText}
           showConfirm={showConfirm}
           onSubmit={order.submit}

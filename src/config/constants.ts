@@ -32,13 +32,21 @@ export const RWA_STATUS = {
   
 }
 
+// CLOSE: 0,
+// BEFORE: 1,
+// OPEN: 2,
+// AFTER: 3,
+// CLOSED: 4,
+// OVERNIGHT: 5,
+
 export const MARKET_STATUS = {
   DEFAULT: -1,
   CLOSE: 0,
   BEFORE: 1,
   OPEN: 2,
   AFTER: 3,
-  OVERNIGHT: 4,
+  CLOSED: 4,
+  OVERNIGHT: 5,
 }
 
 export const RISK_STATUS = {

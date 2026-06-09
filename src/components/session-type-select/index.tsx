@@ -2,7 +2,7 @@
 
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/v2/ui/select";
 import { cn } from "@/lib/utils";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTradeStore } from "@/stores/tradeStore";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -38,6 +38,7 @@ const SessionTypeSelect = memo(
   }: SessionTypeSelectProps) => {
     const { t } = useTranslation()
     const { isSupportRegular } = useSupportRegular()
+    const tradeType = useTradeStore((state) => state.tradeType);
     const inputToken = useTradeStore(state => state.inputToken)
     const tradingTime = useTradingStartTime()
     const marketTradeState = useBaseStore(state => state.marketTradeState)
@@ -128,6 +129,13 @@ const SessionTypeSelect = memo(
         }
       }
     }, [marketTradeState, isRegular, t, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport, updateSessionType])
+    const preTradeType = useRef<TradeType | null>(null)
+    useEffect(() => {
+      if (tradeType === TradeType.LIMIT && preTradeType.current === TradeType.MARKET) {
+        updateSessionType(typeItem.code)
+      }
+      preTradeType.current = tradeType
+    }, [tradeType, typeItem])
     
     const [open, setOpen] = useState(false)
 

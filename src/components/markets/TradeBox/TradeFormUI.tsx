@@ -63,13 +63,11 @@ export function TradeFormUI({
     <>
       {from === 'markets' && (
         <>
-          {
-            !isMarket && (
-              <div className="mb-3">
-                <SessionTypeSelect />
-              </div>
-            )
-          }
+          <div className="mb-3"
+            style={{ display: isMarket ? 'none' : 'block' }}
+          >
+            <SessionTypeSelect />
+          </div>
           <CurrencyInputPanel
             tradeType={tradeType}
             value={limitPrice}

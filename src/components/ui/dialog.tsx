@@ -53,7 +53,7 @@ const DialogContent = React.forwardRef<
     >
       {children}
       <DialogPrimitive.Close className={cn("absolute right-4 top-4 rounded-sm opacity-80 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground", closeClassName)}>
-        <img src="/images/v2/icons/close.png" className={cn("w-4 h-4", closeIconClassName)} alt="Close" />
+        <img src="/images/v2/icons/close3.png" className={cn("w-3 h-3", closeIconClassName)} alt="Close" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>

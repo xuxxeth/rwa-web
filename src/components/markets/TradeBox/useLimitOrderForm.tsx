@@ -6,7 +6,7 @@ import {
   isGreater,
   isLess,
 } from "@/utils"
-import type { IRwa, IToken } from "@/service/base/types"
+import type { IMarket, IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
 
 type TokenBalance = {
@@ -14,6 +14,7 @@ type TokenBalance = {
 }
 
 interface UseLimitOrderFormParams {
+  marketInfo: IMarket | null
   limitPrice: string
   inputSize: string
   inputToken?: IRwa | null
@@ -28,6 +29,7 @@ interface UseLimitOrderFormParams {
 }
 
 export function useLimitOrderForm({
+  marketInfo,
   limitPrice,
   inputSize,
   inputToken,
@@ -48,9 +50,9 @@ export function useLimitOrderForm({
   }, [limitPrice, inputSize])
 
   const isMinOrMax = useMemo(() => ({
-    min: isLess(orderValue, inputToken?.minLimitTradeAmount || '0'),
-    max: isGreater(orderValue, inputToken?.maxLimitTradeAmount || '0')
-  }), [orderValue, inputToken])
+    min: isLess(orderValue, marketInfo?.minAmountPerOrder || '0'),
+    max: isGreater(orderValue, marketInfo?.maxAmountPerOrder || '0')
+  }), [orderValue, marketInfo])
 
   const isBuyInsufficient = useMemo(() => {
     if (action !== 'buy') return false
@@ -83,8 +85,8 @@ export function useLimitOrderForm({
     if (Number(limitPrice) <= 0) return t('Enter Limit Price')
     if (Number(orderValue) <= 0) return t('Enter an amount')
     if (inputToken?.state === 1) return t('tradingHalt')
-    if (isMinOrMax.min) return t('amountMin', { amount: inputToken?.minLimitTradeAmount + ' ' + outputToken?.symbol })
-    if (isMinOrMax.max) return t('amountMax', { amount: inputToken?.maxLimitTradeAmount + ' ' + outputToken?.symbol })
+    if (isMinOrMax.min) return t('amountMin', { amount: marketInfo?.minAmountPerOrder + ' ' + outputToken?.symbol })
+    if (isMinOrMax.max) return t('amountMax', { amount: marketInfo?.maxAmountPerOrder + ' ' + outputToken?.symbol })
     if (isBuyInsufficient)
       return i18n.language === 'zh'
         ? `${outputToken?.symbol} ${t("Insufficient")}`
@@ -96,6 +98,7 @@ export function useLimitOrderForm({
 
     return `${action === 'buy' ? t('Buy') : t('Sell')} ${inputToken?.symbol}`
   }, [
+    marketInfo,
     limitPrice,
     orderValue,
     inputToken,

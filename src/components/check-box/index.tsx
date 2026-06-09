@@ -70,4 +70,26 @@ const SlippageCheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
   )
 })
 
-export { CheckBox, CheckBoxBySVG, SlippageCheckBox }
+
+const SlippageCheckBox2 = memo(({ checked, onChange }: CheckBoxProps) => {
+  const [check, setCheck] = useState(checked)
+  useEffect(() => {
+    setCheck(checked)
+  }, [checked])
+  return (
+    <button
+      type='button'
+      className=' cursor-pointer outline-none'
+      onClick={() => {
+        
+      }}
+    >
+      <LazyImage
+        src={check ? "/images/v2/icons/checked4.png" : "/images/v2/icons/checked4_2.png"}
+        className="w-[18px] h-[18px]"
+      />
+    </button>
+  )
+})
+
+export { CheckBox, CheckBoxBySVG, SlippageCheckBox, SlippageCheckBox2 }
