@@ -7,6 +7,7 @@ import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
 import { useKycStatus } from "@/hooks/useKycStatus"
 import { KYC_STATUS } from "@/service/kyc/types"
+import { hasPermission } from "@/utils"
 
 type TokenBalance = {
   balance?: string
@@ -53,10 +54,11 @@ export function useTradeGateState({
     if (riskUserConfig?.actions === 0) {
       return t('identity.verifyID')
     }
-    if (riskUserConfig?.actions === 1 && action === 'sell') {
+    // 
+    if (!hasPermission(riskUserConfig?.actions || 0, 1) && action === 'sell') {
       return t('kyc.t51')
     }
-    if (riskUserConfig?.actions === 2 && action === 'buy') {
+    if (!hasPermission(riskUserConfig?.actions || 0, 0) && action === 'buy') {
       return t('kyc.t51')
     }
     
