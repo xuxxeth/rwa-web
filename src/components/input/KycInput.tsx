@@ -5,10 +5,11 @@ import { cn } from "@/lib/utils"
 interface KycInputProps extends React.ComponentProps<"input"> {
   error?: string
   regex?: string
+  focusClassName?: string
 }
 
 const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
-  ({ className, type, error, value, regex, ...props }, ref) => {
+  ({ className, type, error, value, regex, focusClassName, ...props }, ref) => {
     const inputRegex = RegExp(regex || ".*")
     const controlledValue = value ?? ""
 
@@ -70,7 +71,7 @@ const KycInput = React.forwardRef<HTMLInputElement, KycInputProps>(
         className={cn(
           "caret-[#9CFF3A] flex h-[38px] w-full bg-[#1A1B1E] px-3 py-1 rounded-[4px] text-[14px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 outline-0 border border-[#1D1D1D] placeholder:text-[#737A87] ",
           className,
-          error ? "border-[#CA3F64]" : "focus:border-[#FFFFFF]"
+          error ? "border-[#CA3F64]" : (focusClassName || "focus:border-[#FFFFFF]")
         )}
         ref={ref}
         pattern={regex}

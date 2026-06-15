@@ -6,9 +6,10 @@ interface QRCodeProps {
   size?: number
   margin?: number
   className?: string
+  rounded?: boolean
 }
 
-const QRCode = ({ value, size = 200, margin = 0, className }: QRCodeProps) => {
+const QRCode = ({ value, size = 200, margin = 0, className, rounded = false }: QRCodeProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const qrCode = useRef<QRCodeStyling | null>(null)
 
@@ -22,6 +23,7 @@ const QRCode = ({ value, size = 200, margin = 0, className }: QRCodeProps) => {
       dotsOptions: {
         color: '#000000',
         type: 'square',
+        roundSize: rounded === false ? false : undefined,
       },
       backgroundOptions: {
         color: '#fff',

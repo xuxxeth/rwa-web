@@ -496,29 +496,29 @@ body {
     0 10px 10px rgba(0, 0, 0, 0.1),
     inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
-/* .glass {
+.gradient-border {
   position: relative;
-  border: 1px solid transparent;
+  border-radius: 32px;
+  padding: 1px;
+  background: conic-gradient(
+    from 24.29deg at 56.85% 47.22%,
+    #666666 -27.26deg,
+    #232323 112.22deg,
+    #202020 212.07deg,
+    #666666 332.74deg,
+    #232323 472.22deg
+  );
 }
 
-.glass::before {
+.gradient-border::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.1),
-    rgba(255,255,255,0.2)
-  );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask: 
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-} */
+  inset: 1px;
+  background: #131416;
+  border-radius: 31px;
+}
+
+.gradient-border > * {
+  position: relative;
+  z-index: 1;
+}

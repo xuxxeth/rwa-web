@@ -30,7 +30,7 @@ export function TableBody<T, Extra>(props: {
   const { data, config, isLoading, extra, getKey, tdClassName, ExtraComponent, onClick } = props
 
   return (
-    <div className={cn('relative', isLoading ? 'opacity-40 min-h-[150px]' : '')}>
+    <div className={cn('relative', isLoading ? 'opacity-40 min-h-[150px] text-white' : '')}>
       {data.map((item: T, index: number) => {
         return (
           <div

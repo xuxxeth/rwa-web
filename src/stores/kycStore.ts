@@ -10,16 +10,28 @@ export const useKycStore = create<KycStore>((set, get) => ({
   isLoading: false,
   error: null,
   riskUserConfig: null,
+  riskUserConfigForReferral: undefined,
   retryCount: 0,
   getUserConfig: async () => {
-    const res = await riskApi.getUserConfig()
-    if (res.code === 9401) {
-      set({ riskUserConfig: { actions: -1, verifyType: 2, verifyState: 2, blacklist: true } })
-    } else {
-      set({ riskUserConfig: res.data || {} })
-    }
+    try {
+      const res = await riskApi.getUserConfig()
+      if (res.code === 9401) {
+        set({ riskUserConfig: { actions: -1, verifyType: 2, verifyState: 2, blacklist: true } })
+        set({ riskUserConfigForReferral: undefined })
+      } else {
+        set({ riskUserConfig: res.data || {} })
+        set({ riskUserConfigForReferral: res.data })
+      }
 
-    return res
+      return res
+    } catch (error: any) {
+      set({ riskUserConfigForReferral: undefined })
+      return {
+        code: 9401,
+        data: { actions: -1, verifyType: 2, verifyState: 2, blacklist: true },
+        message: '',
+      }
+    }
   },
   refetchKycStatusAndConfigIfNeed: async (kycDetail: IKycDetail) => {
     const { kycStatus, fetchKycStatus, getUserConfig } = get()
@@ -32,15 +44,20 @@ export const useKycStore = create<KycStore>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const { data } = await kycApi.getKycStatus()
-      
+
       set({ kycStatus: data || { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
 
       // 如果是认证中\已过期\驳回
-      if (data && (data.status === KYC_STATUS.VERIFYING || data.status === KYC_STATUS.EXPIRED || data.status === KYC_STATUS.DECLINED)) {
+      if (
+        data &&
+        (data.status === KYC_STATUS.VERIFYING ||
+          data.status === KYC_STATUS.EXPIRED ||
+          data.status === KYC_STATUS.DECLINED)
+      ) {
         const { data } = await kycApi.getKycDetail()
         set({ kycDetail: data })
       } else {
-        set( {kycDetail: null })
+        set({ kycDetail: null })
       }
 
       if (data && data.pendingSteps?.length > 0) {
@@ -53,20 +70,19 @@ export const useKycStore = create<KycStore>((set, get) => ({
           // @ts-ignore
           set({ kycDetail: stepData })
         } else {
-          set( {kycDetail: null })
+          set({ kycDetail: null })
         }
       }
-      
     } catch (error: any) {
       set({ kycStatus: { status: 0, expiresTime: 0, pendingSteps: [] }, isLoading: false })
-      set( {kycDetail: null })
+      set({ kycDetail: null })
       set({ error: error.message, isLoading: false })
     }
   },
   updateRetryCount: (count: number) => {
-    set({retryCount: count})
+    set({ retryCount: count })
   },
   addRetryCount: () => {
-    set({retryCount: get().retryCount + 1})
-  }
+    set({ retryCount: get().retryCount + 1 })
+  },
 }))

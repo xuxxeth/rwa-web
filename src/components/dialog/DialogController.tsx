@@ -38,6 +38,7 @@ export function DialogController({
   titleClassName,
   closeClassName,
   closeIconClassName,
+  disableOutsideClose,
   openChange
 }: {
   children?: React.ReactNode;
@@ -51,6 +52,7 @@ export function DialogController({
   closeClassName?: string
   titleClassName?: string
   closeIconClassName?: string
+  disableOutsideClose?: boolean
   openChange: (open: boolean) => void
 }) {
   
@@ -59,6 +61,7 @@ export function DialogController({
   return (
     <Dialog open={open} onOpenChange={openChange}>
       <DialogContent 
+        disableOutsideClose={disableOutsideClose}
         overlayClassName={overlayClassName}
         closeClassName={closeClassName}
         closeIconClassName={closeIconClassName}

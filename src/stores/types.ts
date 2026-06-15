@@ -140,7 +140,8 @@ export interface WssStore {
 
 export interface RiskSTore {
   riskUserConfig: IUserCofnig | null
-  getUserConfig: () => Promise<ApiResponse<IUserCofnig>>;
+  riskUserConfigForReferral: { actions: number, blacklist: boolean } | null | undefined
+  getUserConfig: () => Promise<ApiResponse<IUserCofnig>>
 }
 
 export interface KycState {

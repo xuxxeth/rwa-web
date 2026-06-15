@@ -1,0 +1,27 @@
+[
+  {
+    "q": "How are rebates calculated and distributed?",
+    "a": "The platform charges a 0.2% trading fee on execution and allocates up to 40% of it as your rebate token (rates are subject to future updates). "
+  },
+  {
+    "q": "Is there a limit on how many friends I can invite?",
+    "a": "No limit. You can invite as many friends as you want to maximize your passive income."
+  },
+  {
+    "q": "What token will I receive my rebates in? ",
+    "a": "Rebates are settled in the same token your referred friends used to pay their trading fees. If you have earned rebates in multiple tokens, each will be shown as a separate balance, but all can be claimed together in a single wallet signature."
+  },
+  {
+    "q": "Is there a minimum withdrawal threshold or gas fee for claiming rebates? ",
+    "a": "There is no minimum withdrawal threshold — you can claim any amount at any time. As claims are processed on-chain, a standard network gas fee will apply per claim transaction."
+  }
+]
+  
+  
+  
+
+  
+  
+
+  
+  

@@ -16,10 +16,10 @@ import BigNumber from 'bignumber.js'
 import IconWithTooltip from '@/components/icon-tooltip'
 import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
 import { useNavigate } from 'react-router-dom'
-import TooltipWithIcon from '@/components/icon-tooltip'
 import { useBaseStore } from '@/stores/baseStore'
 import { extractHourMinute } from '@/hooks/useMarketState'
 import { useFeeRulesI18n } from '@/hooks/useFeeRulesI18n'
+import { type TableType } from '@/views/assets/v2/shared'
 
 export type OrderChanged = {
   orderId: string
@@ -40,7 +40,7 @@ export function checkOrderChangedEqual(a: OrderChanged | null, b: OrderChanged |
 }
 
 export function TextCell(props: { text: string | number; className?: string }) {
-  return <div className={cn('text-xs/4 font-normal', props.className)}>{props.text}</div>
+  return <div className={cn('text-xs/4 font-normal text-white', props.className)}>{props.text}</div>
 }
 
 export function TradingFees(props: {
@@ -201,6 +201,17 @@ export function TxHashCell({ hash }: { hash: string }) {
   )
 }
 
+export function AddressCell(props: { address: string; className?: string }) {
+  return (
+    <div className='flex flex-row items-center gap-1.5 cursor-pointer'>
+      <span className={cn('text-xs font-normal text-white', props.className)}>
+        {shortenAddress(props.address, 4, 4)}
+      </span>
+      <CopyButton copyText={props.address} />
+    </div>
+  )
+}
+
 export function TokenCell(props: {
   icon?: string | undefined
   token: string | undefined
@@ -217,11 +228,11 @@ export function TokenCell(props: {
       {props.icon && <LazyImage className={'w-8 h-8 rounded-[50%]'} src={props.icon} />}
       <div className='flex flex-col overflow-hidden'>
         <div className={cn('text-sm/4.5', props.tokenClassName)}>{props.token}</div>
-        <TooltipWithIcon tooltip={props.name} triggerClassName='justify-start'>
+        <IconWithTooltip tooltip={props.name} triggerClassName='justify-start'>
           <div className={cn('text-gray-400 text-xs/[15px] truncate', props.nameClassName)}>
             {props.name}
           </div>
-        </TooltipWithIcon>
+        </IconWithTooltip>
       </div>
     </div>
   )
@@ -504,7 +515,7 @@ export function ScrollLoadMore<TData>(props: {
   data: TData[]
   isLoading: boolean
   loadMoreRef: RefObject<HTMLDivElement | null>
-  type: 'open' | 'history' | 'trade'
+  type: TableType
 }) {
   const { t } = useTranslation()
   const { isFetchingNextPage, hasNextPage, data, isLoading, loadMoreRef, type } = props

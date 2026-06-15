@@ -6,7 +6,7 @@ export default function Pagination({
   totalPage,
   onPrevClick,
   onNextClick,
-  scrollToTopAferClick = true,
+  scrollToTopWhenPagination = true,
   prevDisabled,
   nextDisabled,
   className,
@@ -19,7 +19,7 @@ export default function Pagination({
   onNextClick: () => void
   // prev: { disabled: boolean; onClick: () => void };
   // next: { disabled: boolean; onClick: () => void };
-  scrollToTopAferClick?: boolean
+  scrollToTopWhenPagination?: boolean
   className?: string
 }) {
   return (
@@ -46,12 +46,12 @@ export default function Pagination({
           onClick={() => {
             if (disabled) return
             onClick()
-            if (scrollToTopAferClick) {
+            if (scrollToTopWhenPagination) {
               ScrollToTop()
             }
           }}
           className={cn(
-            'w-8 h-8 flex items-center cursor-pointer justify-center bg-gray-900 rounded-lg',
+            'w-8 h-8 flex items-center cursor-pointer text-white justify-center bg-gray-900 rounded-lg',
             disabled ? 'text-gray-500 pointer-events-none' : ''
           )}
         >

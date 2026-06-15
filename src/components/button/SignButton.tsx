@@ -5,8 +5,8 @@ import { Button } from '../ui/button'
 import { useKycStore } from '@/stores/kycStore'
 import { useState } from 'react'
 
-function SignButton(props: { className?: string; refreshIsSignatureValid?: () => void }) {
-  const { className, refreshIsSignatureValid } = props
+function SignButton(props: { className?: string; refreshIsSignatureValid?: () => void, label?: string, callback?: () => void }) {
+  const { className, refreshIsSignatureValid, label, callback } = props
   const { t } = useTranslation()
   const { signing, signature } = useRequestSignature()
   const [loading, setLoading] = useState(false)
@@ -14,18 +14,25 @@ function SignButton(props: { className?: string; refreshIsSignatureValid?: () =>
 
   const handleSignatureVerify = async () => {
     setLoading(true)
-    await signature()
-    refreshIsSignatureValid && refreshIsSignatureValid()
-    await getUserConfig()
+    try {
+      const res = await signature()
+      refreshIsSignatureValid && refreshIsSignatureValid()
+      await getUserConfig()
+      res && callback && await callback()
+    } catch (error) {
+      console.error('Signature verification failed:', error)
+    }
+    
     setLoading(false)
   }
   return (
     <Button
+      loading={signing || loading}
       disabled={signing || loading}
       onClick={handleSignatureVerify}
       className={cn('bg-white text-black w-[148px] h-[32px] rounded-[8px] text-[12px]', className)}
     >
-      {t('gotoSignature')}
+      {label || t('gotoSignature')}
     </Button>
   )
 }

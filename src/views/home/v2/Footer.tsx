@@ -1,53 +1,38 @@
 import React from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
+import { cn } from '@/lib/utils'
 
-export const Footer: React.FC = () => {
+export const Footer: React.FC<{ from?: string }> = ({ from }) => {
   const { t } = useTranslation('home')
 
   return (
-    <footer className='relative bg-[#131416] border-t border-white/10 pt-12 pb-8 text-white overflow-hidden'>
+    <footer className={cn(
+      'relative bg-[#131416] border-t border-white/10 pt-12 pb-8 text-white overflow-hidden',
+      from === 'no-account' ? 'border-t-0' : ''
+    )}>
       {/* Ambient Glow */}
       <div className='absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#9CFF3A] opacity-[0.03] blur-[150px] rounded-full pointer-events-none -translate-y-1/2 z-0' />
 
-      <div className='max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col'>
+      <div className={cn(
+        'max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col',
+        from === 'no-account' ? 'max-w-full md:px-0' : ''
+      )}>
         {/* Top Section: Brand/Email & Socials */}
         <div className='flex flex-col md:flex-row justify-between items-start md:items-start gap-10 mb-8'>
           {/* Left: Logo & Email */}
           <div className='flex flex-col items-start gap-6'>
-            <svg
-              width='56'
-              height='21'
-              viewBox='0 0 56 21'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-              className='h-7 w-auto'
-            >
-              <path
-                d='M47.8124 3.375C51.851 3.375 55.1249 6.64893 55.1249 10.6875C55.1249 14.7261 51.851 18 47.8124 18C43.7738 18 40.4999 14.7261 40.4999 10.6875C40.4999 6.64894 43.7738 3.37501 47.8124 3.375ZM47.8124 7.875C46.2591 7.875 44.9999 9.1342 44.9999 10.6875C44.9999 12.2408 46.2591 13.5 47.8124 13.5C49.3656 13.4999 50.6249 12.2407 50.6249 10.6875C50.6249 9.13425 49.3656 7.87508 47.8124 7.875Z'
-                fill='#9CFF3A'
-              />
-              <path d='M14.625 6.75H10.125V18H4.5V6.75H0V2.25H14.625V6.75Z' fill='white' />
-              <path
-                d='M30.3749 8.25L34.8749 3.375H40.4999L33.7499 10.6875L40.4999 18H34.8749L30.3749 13.125V18H24.7499V1.125H30.3749V8.25Z'
-                fill='white'
-              />
-              <rect
-                x='22.4999'
-                y='7.875'
-                width='10.125'
-                height='5.62501'
-                transform='rotate(90 22.4999 7.875)'
-                fill='white'
-              />
-              <path
-                d='M19.6875 0C21.5515 0 23.0624 1.51103 23.0625 3.375C23.0625 5.23902 21.5515 6.75 19.6875 6.75C17.8235 6.74994 16.3125 5.23898 16.3125 3.375C16.3126 1.51107 17.8236 6.42939e-05 19.6875 0ZM17.6611 1.35059V2.65723H19.5137L17.6621 4.50879L18.5859 5.43262L20.4043 3.61426V5.40039H21.7109V1.35059H17.6611Z'
-                fill='#9CFF3A'
-              />
-            </svg>
+            
+          <svg width="91" height="30" viewBox="0 0 91 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M78.2383 5.625C84.8469 5.625 90.2041 11.0816 90.2041 17.8125C90.2041 24.5434 84.8469 30 78.2383 30C71.6298 29.9998 66.2725 24.5433 66.2725 17.8125C66.2725 11.0817 71.6298 5.62516 78.2383 5.625ZM78.2383 13.125C75.6965 13.125 73.6357 15.2237 73.6357 17.8125C73.6357 20.4013 75.6965 22.5 78.2383 22.5C80.78 22.5 82.8408 20.4013 82.8408 17.8125C82.8408 15.2237 80.7801 13.125 78.2383 13.125Z" fill="#9CFF3A"/>
+            <path d="M23.9316 11.25H16.5684V30H7.36328V11.25H0V3.75H23.9316V11.25Z" fill="white"/>
+            <path d="M49.7041 13.75L57.0684 5.625H66.2725L55.2275 17.8125L66.2725 30H57.0684L49.7041 21.874V30H40.5V1.875H49.7041V13.75Z" fill="white"/>
+            <rect x="36.8184" y="13.125" width="16.875" height="9.20457" transform="rotate(90 36.8184 13.125)" fill="white"/>
+            <path d="M32.2158 0C35.266 0 37.7392 2.51838 37.7393 5.625C37.7393 8.7317 35.266 11.25 32.2158 11.25C29.1657 11.2499 26.6934 8.73162 26.6934 5.625C26.6935 2.51847 29.1658 0.000136219 32.2158 0ZM28.9004 2.25098V4.42871H31.9307L28.9023 7.51367L30.4131 9.05371L33.3896 6.02246V9H35.5273V2.25098H28.9004Z" fill="#9CFF3A"/>
+          </svg>
 
             <a
               href='mailto:contract@tiko.cc'
-              className='text-gray-400 hover:text-[#9CFF3A] transition-colors text-sm font-medium'
+              className='text-[#A5A9B5] hover:text-[#9CFF3A] transition-colors text-[14px] font-normal'
             >
               contact@tiko.cc
             </a>
@@ -99,7 +84,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Section: Copyright & Links on same line */}
         <div className='flex flex-col-reverse md:flex-row justify-between items-center gap-6 border-t border-white/5 pt-8'>
-          <div className='text-xs text-gray-500 font-light text-center md:text-left'>
+          <div className='text-[13px] text-[#737988] font-normal text-center md:text-left'>
             © 2026 Tiko Inc. All rights reserved.
           </div>
 

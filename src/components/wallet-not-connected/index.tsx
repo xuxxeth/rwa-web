@@ -2,6 +2,7 @@ import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
 import { ConnectButtonText } from '../button/ConnectButtonText'
 import { useBaseStore } from '@/stores/baseStore'
+import { cn } from '@/utils'
 
 function WalletNotConnected({ desc }: { desc: string }) {
   const { t } = useTranslation()
@@ -19,12 +20,12 @@ function WalletNotConnected({ desc }: { desc: string }) {
   )
 }
 
-export function WalletNotConnectedSmallVersion() {
+export function WalletNotConnectedSmallVersion(props: { className?: string }) {
   const { t } = useTranslation()
   const setShowConnect = useBaseStore(state => state.setShowConnect)
 
   return (
-    <div className='flex flex-col gap-2 mt-10'>
+    <div className={cn('flex flex-col gap-2 mt-10', props.className)}>
       <LazyImage src='/images/v2/icons/connect-wallet.svg' className='w-[65px] m-auto' />
       <div className='text-sm/4.5 font-medium text-center'>{t('walletNotConnected')}</div>
       <div className='text-xs/[15px] font-normal text-center text-gray-400'>

@@ -125,16 +125,21 @@ function TradeHistory(props: {
         PAGE_LIMIT={PAGE_LIMIT}
         account={account}
         api={scanApi.getTrades}
+        lngPrefix='portfolio.orderTable'
         scrollId={(item: ITrade) => item.id}
         filter={filters}
         tableConfig={tradeHistoryTableConfig}
-        type="trade"
+        type='trade'
+        signatureSubTitle='signatureVerifyDescBottom'
       />
     </>
   )
 }
 
-const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }> = [
+const tradeHistoryTableConfig: ITableConfig<
+  ITrade,
+  { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+> = [
   {
     key: 'side',
     sortable: false,
@@ -150,7 +155,10 @@ const tradeHistoryTableConfig: ITableConfig<ITrade, { rwaTokens: IRwa[]; refetch
   {
     key: 'token',
     sortable: false,
-    render: (item: ITrade, { rwaTokens, onTokenClick }: { rwaTokens: IRwa[], onTokenClick?: (rwa: IRwa) => void }) => {
+    render: (
+      item: ITrade,
+      { rwaTokens, onTokenClick }: { rwaTokens: IRwa[]; onTokenClick?: (rwa: IRwa) => void }
+    ) => {
       const rwa = rwaTokens.find(token => token.stockId === item.stockId)
       return (
         <TokenCell

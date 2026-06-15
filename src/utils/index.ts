@@ -77,7 +77,7 @@ export function subtract(num1: string | number, num2: string | number) {
   }
 }
 
-export function sum(...numbers: (string | number)[]) {
+export function sum(...numbers: (string | number | bigint)[]) {
   // 边界情况处理：如果没有输入数字或所有数字都是0，则返回"0"
   if (numbers.length === 0) return '0'
 
@@ -259,6 +259,16 @@ export function numberToBinaryArray(num: number, options: { length?: number; hig
 
   return arr;
 }
+
+/**
+ * 验证邀请码有效性
+ */
+
+export function validateInviteCode(code: string): boolean {
+  const inviteCodeRegex = /^[A-Za-z0-9]{10}$/
+  return inviteCodeRegex.test(code);
+}
+
 export function hasPermission(value: number, bit: number) {
   return (value & (1 << bit)) !== 0
 }

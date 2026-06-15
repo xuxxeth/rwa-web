@@ -10,9 +10,18 @@ import { useToast } from '@/hooks/useToast'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { PRIVACY_SERVICE } from '@/config/privacyService'
+import { useRouter } from '@/hooks/useRouter'
+import { validateInviteCode } from '@/utils'
+
+function getReferralCode(path: string) {
+  const match = path.match(/^\/referral\/([^/]+)$/)
+
+  return match ? match[1] : null
+}
 
 const Compliance = () => {
   const { t } = useTranslation()
+  const router = useRouter()
   const { account } = useActiveWeb3()
   const [isSignatureValid] = useSignatureValidStatus()
   const { toastError } = useToast()
@@ -55,12 +64,14 @@ const Compliance = () => {
   }
 
   useEffect(() => {
-    if (account && isSignatureValid) {
+    const inviteCode = getReferralCode(router.location.pathname)
+    
+    if (account && isSignatureValid && !validateInviteCode(inviteCode || '')) {
       getAgreementsAccepted()
     } else {
       setShow(false)
     }
-  }, [account, isSignatureValid])
+  }, [account, isSignatureValid, router.location?.pathname])
 
   useEffect(() => {
     if(!show) {

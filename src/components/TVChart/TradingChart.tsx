@@ -1,7 +1,7 @@
 import { useScript } from "@/hooks/useScript";
 import { cn } from "@/lib/utils";
 import { useTradeStore } from "@/stores/tradeStore";
-import { lazy, memo, useEffect, useState } from "react";
+import { lazy, memo, Suspense, useEffect, useState } from "react";
 import { IntradayLineChart } from "@/components/TVChart/IntradayLineChart";
 
 const TVChartContainer = lazy(() => import("@/components/TVChart/TVChartContainer"))
@@ -33,7 +33,12 @@ export const TradingChart = memo(
     }
 
     return ready && inputToken?.address ? (
-      <TVChartContainer token={inputToken} from={from} />
+      <div className="h-[500px]">
+        <Suspense fallback={null}>
+          <TVChartContainer token={inputToken} from={from} />
+        </Suspense>
+      </div>
+      
     ) : (
       <div className={cn(
         "",
