@@ -49,7 +49,7 @@ function FaqSection() {
   return (
     <div className="flex flex-col">
       {/* 标题 */}
-      <h2 className="font-normal text-[40px] text-white mb-[56px] text-center">{t('FAQ')}</h2>
+      <h2 className=" font-medium text-[28px] text-white mb-[56px] text-center">{t('FAQ')}</h2>
 
       {/* FAQ列表 */}
       <div className="flex flex-col">

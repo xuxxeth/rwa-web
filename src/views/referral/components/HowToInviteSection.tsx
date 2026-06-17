@@ -61,8 +61,8 @@ function Step({ stepNumber, title, description, icon }: StepProps) {
     <div className="flex flex-col gap-[20px] items-center">
       <StepIcon stepNumber={stepNumber} icon={icon} />
       <div className="flex flex-col gap-[8px] items-center text-center">
-        <h3 className="font-medium text-[24px] text-white">{title}</h3>
-        <p className="font-normal text-[16px] text-[#9da3af] w-[260px] leading-[22px]">
+        <h3 className="font-medium text-[20px] text-white">{title}</h3>
+        <p className="font-normal text-[14px] text-[#9da3af] w-[260px] leading-[22px]">
           {description}
         </p>
       </div>
@@ -79,7 +79,7 @@ export default function HowToInviteSection() {
           <div className=" px-[40px] py-[80px]">
             <div className="flex flex-col gap-[80px] items-center">
               {/* 标题 */}
-              <h2 className="font-normal text-[40px] text-white">{t("ref.t8")}</h2>
+              <h2 className="font-medium text-[28px] text-white">{t("ref.t8")}</h2>
 
               {/* 步骤流程 */}
               <div className="flex items-start justify-between w-full">

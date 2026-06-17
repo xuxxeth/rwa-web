@@ -15,7 +15,7 @@ export default function ReferralHeader() {
               i18nKey="ref.t2" 
               values={{ r1: '40%' }} 
               components={{
-                r1: <span className="font-semibold text-[#9cff3a] px-1" />
+                r1: <span className="font-semibold text-[#9cff3a] px-2" />
               }}
             />
           </p>

@@ -14,7 +14,7 @@ export default function HeroSection() {
             {/* 标题和说明 */}
             <div className="flex flex-col gap-[12px]">
               <div className="text-white">
-                <p className="font-normal text-[60px] leading-[120%]">
+                <p className="font-normal text-[48px] leading-[120%]">
                   <Trans 
                     i18nKey="ref.t2" 
                     values={{ r1: '40%' }} 
@@ -25,7 +25,7 @@ export default function HeroSection() {
                   
                 </p>
               </div>
-              <div className="flex items-center text-[20px] leading-[30px]">
+              <div className="flex items-center text-[14px] leading-[30px]">
                 <p className="font-normal text-white">
                   {t("ref.t3")}
                   <a href={REFERRAL_INFO} target="_blank" rel="noopener noreferrer">
@@ -46,12 +46,12 @@ export default function HeroSection() {
           </div>
 
           {/* 右侧3D视觉效果 */}
-          <div className="relative w-[600px] h-[561px]">
+          <div className="relative w-[480px] min-h-[360px]">
             <div className="absolute inset-0">
               <img
                 src={'/images/referral/referral.webp'}
                 alt="Tiko 3D"
-                className="absolute w-full top-[30px] left-0 object-cover mix-blend-lighten"
+                className="absolute w-full top-[0px] left-0 object-cover mix-blend-lighten"
               />
             </div>
           </div>

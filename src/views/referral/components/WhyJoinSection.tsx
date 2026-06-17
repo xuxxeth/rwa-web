@@ -15,11 +15,11 @@ function FeatureCard({ title, description, imageSrc, imagePosition, glowColor }:
     <div className={cn(
       "relative rounded-[16px] w-full border border-[#383A40] overflow-hidden",
     )}>
-      <div className="flex items-center gap-[20px] pl-8">
+      <div className="flex gap-[20px] pl-8">
         {/* 文字内容 */}
-        <div className="flex-1 flex flex-col gap-[12px]">
-          <h3 className="font-semibold text-[28px] text-white leading-[32px]">{title}</h3>
-          <p className="font-normal text-[16px] text-[#9da3af] leading-[24px]">
+        <div className="flex-1 flex flex-col gap-[12px] mt-8">
+          <h3 className="font-semibold text-[20px] text-white leading-[120%] capitalize">{title}</h3>
+          <p className="font-normal text-[14px] text-[#9da3af] leading-[24px]">
             {description}
           </p>
         </div>
@@ -49,11 +49,11 @@ function FeatureCard2({ title, description, imageSrc, imagePosition, glowColor }
     <div className={cn(
       "relative rounded-[16px] w-full border border-[#383A40] overflow-hidden",
     )}>
-      <div className="flex items-center gap-[20px] pl-8">
+      <div className="flex gap-[20px] pl-8">
         {/* 文字内容 */}
-        <div className="flex-1 flex flex-col gap-[12px]">
-          <h3 className="font-semibold text-[28px] text-white leading-[32px]">{title}</h3>
-          <p className="font-normal text-[16px] text-[#9da3af] leading-[24px]">
+        <div className="flex-1 flex flex-col gap-[12px] mt-8">
+          <h3 className="font-semibold text-[20px] text-white leading-[120%]">{title}</h3>
+          <p className="font-normal text-[14px] text-[#9da3af] leading-[24px]">
             {description}
           </p>
         </div>
@@ -87,8 +87,8 @@ function TransparencyCard() {
       <div className="flex flex-col gap-[20px] p-[32px] h-full">
         {/* 文字内容 */}
         <div className="flex flex-col gap-[12px]">
-          <h3 className="font-semibold text-[28px] text-white leading-[32px]">{t("ref.t7")}</h3>
-          <p className="font-normal text-[16px] text-[#9da3af] leading-[24px]">
+          <h3 className="font-semibold text-[20px] text-white leading-[120%]">{t("ref.t7")}</h3>
+          <p className="font-normal text-[14px] text-[#9da3af] leading-[24px]">
             {t("ref.t71")}
           </p>
         </div>
@@ -96,9 +96,9 @@ function TransparencyCard() {
         {/* 图片 */}
         <div className="flex-1 relative">
           <img
-            src={'/images/referral/feature3.png'}
+            src={'/images/referral/feature3.webp'}
             alt="链上结算"
-            className="absolute h-[358px] w-[600px] left-[-37px] top-[0px] object-bottom mix-blend-lighten"
+            className="absolute h-[272px] w-[588px] left-[-35px] top-[10px] object-bottom mix-blend-lighten"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function WhyJoinSection() {
       <div className="">
         <div className="flex flex-col gap-[80px]">
           {/* 标题 */}
-          <h2 className="text-center font-normal text-[40px] text-white">
+          <h2 className="text-center font-medium text-[28px] text-white">
             {t("ref.t4")}
           </h2>
 

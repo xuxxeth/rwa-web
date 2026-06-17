@@ -53,7 +53,7 @@ export const AccountPage = () => {
 
           {/* 4. Footer */}
           <div className='mt-20'>
-            <Footer />
+            <Footer from="no-account"  />
           </div>
         </div>
       </div>

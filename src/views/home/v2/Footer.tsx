@@ -11,7 +11,12 @@ export const Footer: React.FC<{ from?: string }> = ({ from }) => {
       from === 'no-account' ? 'border-t-0' : ''
     )}>
       {/* Ambient Glow */}
-      <div className='absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#9CFF3A] opacity-[0.03] blur-[150px] rounded-full pointer-events-none -translate-y-1/2 z-0' />
+      {
+        from !== 'no-account' && (
+          <div className='absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-[#9CFF3A] opacity-[0.03] blur-[150px] rounded-full pointer-events-none -translate-y-1/2 z-0' />
+        )
+      }
+      
 
       <div className={cn(
         'max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col',
