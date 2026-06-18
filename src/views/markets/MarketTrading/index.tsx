@@ -7,7 +7,6 @@ import { KlineBody } from '../components/Klinebody'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { OrderList } from '@/components/markets/OrderList'
 import { TradeTypeSwitch } from './TradeTypeSwitch'
-import { TradeTopTip } from '@/components/markets/TradeTopTip'
 import { RwaSessionStatus } from '@/components/markets/RwaSessionStatus'
 
 function Markets() {
@@ -26,7 +25,6 @@ function Markets() {
               <div className='w-[4px] bg-[#1A1B1E] h-full shrink-0'>&nbsp;</div>
               <div className='w-full relative bg-[#1A1B1E]'>
                 <RwaSessionStatus />
-                
                 <BoxCard className='min-h-[370px] rounded-l-[4px] px-4 pt-4 pb-8 bg-[#131416]'>
                   <ConvertTabs from='markets' />
                   <div className=' mt-3 '>

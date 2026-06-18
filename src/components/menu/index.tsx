@@ -46,6 +46,13 @@ export function Menus() {
             active={router.location.pathname === "/lite-trade"}
             
           />
+          <MenusItem
+            title={t("ref.t1")}
+            active={router.location.pathname === "/referral"}
+            onClick={() => {
+              router.push("/referral");
+            }}
+          />
           
         </div>
         </div>

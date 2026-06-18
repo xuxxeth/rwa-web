@@ -123,7 +123,9 @@ export interface IMarket {
   "validDate": number,
   "slippage": string, // 默认滑点容忍度
   "nightTradingEndTime": number,
-  "nightTradingStartTime": number
+  "nightTradingStartTime": number,
+  "maxAmountPerOrder": string,
+  "minAmountPerOrder": string,
 
 }
 // 券商状态信息
@@ -152,7 +154,9 @@ export interface IMarketState {
   "availability": {
    "trading": number,
    "pre_after_trading": number, 
-  }
+  },
+  "L": number, // 是否允许限价单
+  "M": number, // 是否允许市价单
 }
 
 export interface IRwaPrice {

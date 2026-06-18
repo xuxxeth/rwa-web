@@ -29,6 +29,20 @@
       function redirectMobileSite() {
         if (shouldSkipMobileRedirect()) return
         if (isMobile() && VITE_MOBILE_SITE ) {
+          const pathname = window.location.pathname
+          // 只保留 referral 路由
+          // referral 页面保留完整路径
+          if (pathname.startsWith('/referral')) {
+            const target = new URL(VITE_MOBILE_SITE)
+
+            target.pathname = pathname
+            target.search = window.location.search
+            target.hash = window.location.hash
+
+            window.location.replace(target.toString())
+            return
+          }
+
           window.location.replace(VITE_MOBILE_SITE)
         }
       }

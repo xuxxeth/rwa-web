@@ -17,7 +17,9 @@ export const marketDefault = {
   "validDate": 0,
   "slippage": "0.05", // 默认滑点容忍度
   "nightTradingEndTime": 0,
-  "nightTradingStartTime": 0
+  "nightTradingStartTime": 0,
+  "maxAmountPerOrder": "0",
+  "minAmountPerOrder": "0",
 }
 
 export const marketStateDefault = {
@@ -28,5 +30,7 @@ export const marketStateDefault = {
   "availability": {
     "trading": 0,
     "pre_after_trading": 0,
-  }
+  },
+  "L": 0, // 是否允许限价单
+  "M": 0, // 是否允许市价单
 }

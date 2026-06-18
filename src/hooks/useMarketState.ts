@@ -1,6 +1,8 @@
 import { useBaseStore } from "@/stores/baseStore";
 import { useEffect, useMemo, useRef, useState } from "react";
-import wsService, { type IWSSMarketState } from "@/service/webSocket/service";
+import wsService, { WSS_MARKET_STATUS, type IWSSMarketState } from "@/service/webSocket/service";
+import { hasPermission } from "@/utils";
+import { TradeType } from "./useCaCommon";
 
 export function useMarketState() {
   const setMarketState = useBaseStore(state => state.setMarketState)
@@ -17,6 +19,58 @@ export function useMarketState() {
     }
   }, [])
 
+}
+export function useSessionState(tradeType?: number) {
+  const marketState = useBaseStore(state => state.marketState)
+  return useMemo(() => {
+    if (!marketState) return true
+
+    if (marketState.status === WSS_MARKET_STATUS.CLOSE || marketState.status === WSS_MARKET_STATUS.CLOSED) {
+      if (tradeType === TradeType.MARKET) {
+        // 市价单闭市不可交易
+        return true
+      }
+      // 限价单市可交易
+      return false
+    }
+    // 盘前
+    if (marketState.status === WSS_MARKET_STATUS.BEFORE) {
+      if (tradeType === TradeType.MARKET) {
+        // 市价单盘前不可用
+        return !hasPermission(marketState.M, 1)
+      }
+      // 限价单盘前可用
+      return !hasPermission(marketState.L, 1)
+    }
+    // 盘中
+    if (marketState.status === WSS_MARKET_STATUS.OPEN) {
+      if (tradeType === TradeType.MARKET) {
+        // 市价单盘中不可用
+        return !hasPermission(marketState.M, 0)
+      }
+      // 限价单盘中可用
+      return !hasPermission(marketState.L, 0)
+    }
+    // 盘后
+    if (marketState.status === WSS_MARKET_STATUS.AFTER) {
+      if (tradeType === TradeType.MARKET) {
+        // 市价单盘后不可用
+        return !hasPermission(marketState.M, 2)
+      }
+      // 限价单盘后可用
+      return !hasPermission(marketState.L, 2)
+    }
+    // 夜盘
+    if (marketState.status === WSS_MARKET_STATUS.OVERNIGHT) {
+      if (tradeType === TradeType.MARKET) {
+        // 市价单夜盘不可用
+        return !hasPermission(marketState.M, 3)
+      }
+      // 限价单夜盘可用
+      return !hasPermission(marketState.L, 3)
+    }
+    return false    
+  }, [marketState, tradeType])
 }
 
 export function extractHourMinuteLocal(timestamp: number) {

@@ -32,13 +32,21 @@ export const RWA_STATUS = {
   
 }
 
+// CLOSE: 0,
+// BEFORE: 1,
+// OPEN: 2,
+// AFTER: 3,
+// CLOSED: 4,
+// OVERNIGHT: 5,
+
 export const MARKET_STATUS = {
   DEFAULT: -1,
   CLOSE: 0,
   BEFORE: 1,
   OPEN: 2,
   AFTER: 3,
-  OVERNIGHT: 4,
+  CLOSED: 4,
+  OVERNIGHT: 5,
 }
 
 export const RISK_STATUS = {
@@ -147,7 +155,7 @@ export const enabledFeatures: ChartingLibraryFeatureset[] = [
   "hide_left_toolbar_by_default", // 左侧工具栏隐藏
 ]
 
-export const  DISCORD_URL = 'https://discord.com/invite/J34YYjTh'
+export const  DISCORD_URL = 'https://discord.gg/3SnMamHAK'
 export const  X_URL = 'https://x.com/CyberAlpha_x'
 export const  TG_URL = 'https://t.me/+SI2ZHu3_QDdlY2Zl'
 export const  GITBOOK_URL = 'https://cyberalpha.gitbook.io/cyberalpha-docs'
@@ -159,3 +167,6 @@ export const DEFAULT_SLIPPAGE = 0.5
 export const SUPPORT_REGULAR_PROD = ['ABNB', 'CEG', 'GLXY']
 export const SUPPORT_REGULAR_TEST = ['NFLX', 'CRCL', 'GLXY']
 export const zeroAddress = '0x0000000000000000000000000000000000000000' as const
+
+export const REFERRAL_INFO = 'https://tiko.gitbook.io/tiko-docs/referral-program/quick-start-guide'
+export const REFERRAL_FAQ = 'https://tiko.gitbook.io/tiko-docs/referral-program/faq'

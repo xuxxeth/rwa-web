@@ -148,7 +148,7 @@ export default function MarketQuotes() {
     usePaginationData<IMarketQuote>(20, MarketQuotesListConfig, marketQuotes, sort, defaultSorter)
 
   useEffect(() => {
-    if (paginatedData.length === 0 && currentPage >= 1) {
+    if (paginatedData.length === 0 && currentPage > 1) {
       setPage(currentPage - 1)
     }
   }, [isFavorite, paginatedData.length, currentPage])

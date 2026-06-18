@@ -9,7 +9,7 @@ const MarketCloseTip = () => {
   const { t } = useTranslation()
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
-  if (tradeType === TradeType.MARKET && (marketTradeState !== MARKET_STATUS.OPEN)) {
+  if (tradeType === TradeType.MARKET && (marketTradeState == MARKET_STATUS.CLOSE)) {
     return (
       <div className="p-3 bg-[#1A1B1E] rounded-[4px] text-[12px] text-[#FFB219] flex mt-3">
         <div className="w-[18px] h-[18px] shrink-0 mr-2">

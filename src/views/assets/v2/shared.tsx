@@ -42,7 +42,7 @@ import { useRouter } from '@/hooks/useRouter'
 // }
 
 export function useOrderList<
-  T extends { orderId: string; id: string },
+  T extends { orderId?: string; id: string },
   F extends { after?: string; before?: string },
 >(
   chainId: number,
@@ -61,6 +61,8 @@ export function useOrderList<
   const [isListEmpty, setIsListEmpty] = useState(false)
 
   const [isFirstLoadDone, setIsFirstLoadDone] = useState(false)
+
+  const [isSignatureValid, _, validSignature] = useSignatureValidStatus()
 
   // 如果是第一页的话，把 prev 设置为 disabled
   const fetchFirstPage = async (isAutoRefresh?: boolean) => {
@@ -160,8 +162,9 @@ export function useOrderList<
   }
 
   useEffect(() => {
+    if (!validSignature()) return
     fetchFirstPage()
-  }, [chainId, account, filter])
+  }, [chainId, account, isSignatureValid, filter])
 
   return {
     data,
@@ -177,7 +180,7 @@ export function useOrderList<
 }
 
 export function OrderTable<
-  T extends { orderId: string; id: string },
+  T extends { orderId?: string; id: string },
   F extends { after?: string; before?: string },
 >({
   chainId,
@@ -189,6 +192,10 @@ export function OrderTable<
   dataMode,
   scrollId,
   type,
+  lngPrefix,
+  scrollToTopWhenPagination,
+  signatureSubTitle,
+  paginationClassName,
 }: {
   chainId?: number | null
   account?: string
@@ -201,13 +208,18 @@ export function OrderTable<
   >
   dataMode: 'pagination' | 'scroll'
   scrollId: (item: T) => string
-  type: 'open' | 'history' | 'trade'
+  type: TableType
+  lngPrefix: string
+  scrollToTopWhenPagination?: boolean
+  signatureSubTitle: string
+  paginationClassName?: string
 }) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
+  const isOrder = ['open', 'history', 'trade'].includes(type)
 
   if (!chainId || !account) {
     return (
-      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
+      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode} lngPrefix={lngPrefix}>
         <WalletNotConnectedSmallVersion />
       </WithTableHeader>
     )
@@ -215,11 +227,11 @@ export function OrderTable<
 
   if (!isSignatureValid) {
     return (
-      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
+      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode} lngPrefix={lngPrefix}>
         <SignatureVerify
           desc='signatureVerifyDescTop'
-          subDesc='signatureVerifyDescBottom'
-          className='mt-9'
+          subDesc={signatureSubTitle}
+          className={isOrder ? 'mt-9' : 'mt-14'}
           refreshIsSignatureValid={refreshIsSignatureValid}
         />
       </WithTableHeader>
@@ -227,16 +239,19 @@ export function OrderTable<
   }
 
   return (
-    <WithTableHeader tableConfig={tableConfig} dataMode={dataMode}>
+    <WithTableHeader tableConfig={tableConfig} dataMode={dataMode} lngPrefix={lngPrefix}>
       {dataMode === 'pagination' && (
         <OrderContentByPagination<T, F>
           chainId={chainId}
           account={account}
           PAGE_LIMIT={PAGE_LIMIT}
+          scrollToTopWhenPagination={scrollToTopWhenPagination}
           api={api}
           filter={filter}
           scrollId={scrollId}
           tableConfig={tableConfig}
+          type={type}
+          paginationClassName={paginationClassName}
         />
       )}
       {dataMode === 'scroll' && (
@@ -256,10 +271,10 @@ export function OrderTable<
   )
 }
 
-function WithTableHeader<T extends { orderId: string }>({
+function WithTableHeader<T extends { orderId?: string }>({
   children,
   tableConfig,
-  dataMode,
+  lngPrefix,
 }: {
   children: React.ReactNode
   tableConfig: ITableConfig<
@@ -267,6 +282,7 @@ function WithTableHeader<T extends { orderId: string }>({
     { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
   >
   dataMode: 'pagination' | 'scroll'
+  lngPrefix: string
 }) {
   return (
     <>
@@ -275,7 +291,7 @@ function WithTableHeader<T extends { orderId: string }>({
         T,
         { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
       >
-        lngPrefix='portfolio.orderTable'
+        lngPrefix={lngPrefix}
         config={tableConfig}
         sort={null}
         className={cn('border-none h-7 px-4', 'bg-gray-900')}
@@ -287,8 +303,10 @@ function WithTableHeader<T extends { orderId: string }>({
   )
 }
 
+export type TableType = 'open' | 'history' | 'trade' | 'invitee' | 'rebate' | 'claim'
+
 export function OrderContentByScroll<
-  T extends { orderId: string; id: string },
+  T extends { orderId?: string; id: string },
   F extends { after?: string; before?: string },
 >({
   api,
@@ -312,7 +330,7 @@ export function OrderContentByScroll<
   isSignatureValid: boolean
   refreshIsSignatureValid: (_isValid: boolean) => void
   scrollId: (item: T) => string
-  type: 'open' | 'history' | 'trade'
+  type: TableType
 }) {
   const router = useRouter()
   const rwaTokens = useRwaTokens()
@@ -335,8 +353,9 @@ export function OrderContentByScroll<
     })
   )
 
-  const isRefetchEnable = isFetchedAfterMount && !isLoading
-  useOrderChangedV2((isAutoRefresh) => refetch(), isRefetchEnable)
+  const needRefreshedWhenOrderChanged = ['open', 'history', 'trade'].includes(type)
+  const isRefetchEnable = isFetchedAfterMount && !isLoading && needRefreshedWhenOrderChanged
+  useOrderChangedV2(isAutoRefresh => refetch(), isRefetchEnable)
 
   const allOrders = data?.pages?.flatMap(page => page.data) || []
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -388,7 +407,10 @@ export function OrderContentByScroll<
   )
 }
 
-export function useOrderChangedV2(refetch: (isAutoRefresh?: boolean) => Promise<any>, isRefetchEnable: boolean) {
+export function useOrderChangedV2(
+  refetch: (isAutoRefresh?: boolean) => Promise<any>,
+  isRefetchEnable: boolean
+) {
   const newOrder = useWssStore(state => state.newOrder)
   const preNewOrder = useRef(newOrder)
 
@@ -430,7 +452,7 @@ export function useOrderChangedV2(refetch: (isAutoRefresh?: boolean) => Promise<
 }
 
 export function OrderContentByPagination<
-  T extends { orderId: string; id: string },
+  T extends { orderId?: string; id: string },
   F extends { after?: string; before?: string },
 >({
   chainId,
@@ -440,6 +462,9 @@ export function OrderContentByPagination<
   filter,
   tableConfig,
   scrollId,
+  scrollToTopWhenPagination,
+  type,
+  paginationClassName,
 }: {
   chainId: number
   account: string
@@ -451,6 +476,9 @@ export function OrderContentByPagination<
     T,
     { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
   >
+  scrollToTopWhenPagination?: boolean
+  type: TableType
+  paginationClassName?: string
 }) {
   const rwaTokens = useRwaTokens()
 
@@ -466,23 +494,18 @@ export function OrderContentByPagination<
     isFirstLoadDone,
   } = useOrderList<T, F>(chainId, account, PAGE_LIMIT, scrollId, api, filter)
 
-  // useEffect(() => {
-  //   if (newOrder === null) return
-  //   if (!isFirstLoadDone) return
-
-  //   fetchFirstPage()
-  // }, [newOrder, isFirstLoadDone])
-
-  const isRefetchEnable = isFirstLoadDone
+  const needRefreshedWhenOrderChanged = ['open', 'history', 'trade'].includes(type)
+  const isRefetchEnable = isFirstLoadDone && needRefreshedWhenOrderChanged
   useOrderChangedV2(fetchFirstPage, isRefetchEnable)
 
   const onTokenClick = (rwa: IRwa) => {
-    // router.push(`/trade/${rwa.symbol}`)
     window.open(`/trade/${rwa.symbol}`, '_blank')
   }
 
+  const isOrder = ['open', 'history', 'trade'].includes(type)
+
   if (isListEmpty) {
-    return <NoRecord />
+    return <NoRecord className={isOrder ? '' : 'mt-14'} />
   }
 
   return (
@@ -504,6 +527,8 @@ export function OrderContentByPagination<
             onPrevClick={() => {
               tryFetchPrevPage()
             }}
+            className={paginationClassName}
+            scrollToTopWhenPagination={scrollToTopWhenPagination}
             onNextClick={() => {
               tryFetchNextPage()
             }}

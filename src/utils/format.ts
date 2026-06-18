@@ -292,7 +292,7 @@ export function isEqual(a: string | number | BigNumber, b: string | number | Big
 }
 
 /** 是否大于 */
-export function isGreater(a: string | number | BigNumber, b: string | number | BigNumber): boolean {
+export function isGreater(a: string | number | BigNumber | bigint, b: string | number | BigNumber | bigint): boolean {
   return toBN(a).isGreaterThan(toBN(b))
 }
 
@@ -314,8 +314,8 @@ export function isLess(
 
 /** 是否小于等于 */
 export function isLessOrEqual(
-  a: string | number | BigNumber,
-  b: string | number | BigNumber
+  a: string | number | BigNumber | bigint,
+  b: string | number | BigNumber | bigint
 ): boolean {
   return toBN(a).isLessThanOrEqualTo(toBN(b))
 }

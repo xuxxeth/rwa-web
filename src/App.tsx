@@ -1,7 +1,7 @@
 import { useRoutes } from 'react-router-dom'
 import BigNumber from 'bignumber.js'
 import routes from './routes'
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import storage from './utils/storage'
 import { useTranslation } from './hooks/useTranslation'
 
@@ -98,7 +98,9 @@ function App() {
         document.getElementById('toast-root')!
       )}
       
-      <Updater />
+      <Suspense fallback={null}>
+        <Updater />
+      </Suspense>
 
     </>
   )

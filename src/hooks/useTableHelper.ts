@@ -32,7 +32,7 @@ export function useTableSort<SortableField extends string>() {
   return {
     sort,
     onSortChange,
-    cancelSort
+    cancelSort,
   }
 }
 

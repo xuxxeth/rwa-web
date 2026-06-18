@@ -154,8 +154,10 @@ function HistoryOrder(props: {
         api={scanApi.getOrderHistory}
         scrollId={(item: IOrder) => item.orderId}
         filter={filters}
+        lngPrefix='portfolio.orderTable'
         tableConfig={orderHistoryTableConfig}
         type='history'
+        signatureSubTitle='signatureVerifyDescBottom'
       />
     </>
   )

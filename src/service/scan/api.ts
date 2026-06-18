@@ -1,5 +1,5 @@
 import client, { type ApiResponse } from '../client'
-import type { IOrder, ITrade, IOpenOrder } from './types'
+import type { IOrder, ITrade, IOpenOrder, IRebate, IClaim, IRebateFilter } from './types'
 import type {
   IOpenOrderFilter,
   IOrderHistoryFilter,
@@ -35,4 +35,18 @@ export const scanApi = {
       },
       { errorHandlers }
     ),
+  getRebates: (filters?: IRebateFilter, errorHandlers?: ErrorHandlers) => {
+    return client.get<ApiResponse<IRebate[]>>(
+      '/v1/scan/api/ref/rebates',
+      { ...filters },
+      { errorHandlers }
+    )
+  },
+  getClaims: (filters?: IRebateFilter, errorHandlers?: ErrorHandlers) => {
+    return client.get<ApiResponse<IClaim[]>>(
+      '/v1/scan/api/ref/claims',
+      { ...filters },
+      { errorHandlers }
+    )
+  },
 }

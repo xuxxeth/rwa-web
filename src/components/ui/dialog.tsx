@@ -29,23 +29,31 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { overlayClassName?: string, closeClassName?: string, closeIconClassName?: string }
->(({ className, children, overlayClassName, closeClassName, closeIconClassName, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { overlayClassName?: string, closeClassName?: string, closeIconClassName?: string, disableOutsideClose?: boolean }
+>(({ className, children, overlayClassName, closeClassName, closeIconClassName, disableOutsideClose, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay className={overlayClassName} />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-[49] grid w-auto min-w-[320px] translate-x-[-50%] translate-y-[-50%] gap-4 bg-[#131416] border border-[#232427] p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-[8px] text-white",
+        "fixed left-[50%] top-[50%] z-[49] grid w-auto min-w-[320px] translate-x-[-50%] translate-y-[-50%] gap-4 bg-[#131416] border border-[#232427] p-4 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-[8px] text-white focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0",
         className
       )}
       onPointerDownOutside={(e) => {
-        if ((e.target as HTMLElement)?.closest('#toast-root')) {
+        const _target = (e.target as HTMLElement)
+        if (_target?.closest('#toast-root')) {
+          e.preventDefault()
+        }
+        if (disableOutsideClose && _target.getAttribute('data-state') === 'open') {
           e.preventDefault()
         }
       }}
       onInteractOutside={(e) => {
-        if ((e.target as HTMLElement)?.closest('#toast-root')) {
+        const _target = (e.target as HTMLElement)
+        if (_target?.closest('#toast-root')) {
+          e.preventDefault()
+        }
+        if (disableOutsideClose && _target.getAttribute('data-state') === 'open') {
           e.preventDefault()
         }
       }}

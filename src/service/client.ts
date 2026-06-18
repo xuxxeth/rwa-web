@@ -48,7 +48,7 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL,
 })
 
-const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api', '/risk/api/']
+const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api', '/risk/api/', '/ref/api/'] // 需要授权的接口前缀列表
 
 axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
@@ -63,7 +63,8 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   // localSignature &&
   // localSignature.account?.toLowerCase() === account.toLowerCase() &&
   // localSignature.expires > Math.floor(Date.now() / 1000)
-  if (needAuth && (!localSignature || !localSignature?.account || !localSignature?.expires) && localSignature?.expires < Math.floor(Date.now() / 1000)) {
+  
+  if (needAuth && (!localSignature || !localSignature?.account || !localSignature?.expires) || Number(localSignature?.expires) < Math.floor(Date.now() / 1000)) {
     controller.abort()
     // 抛出一个自定义错误让上层能识别
     return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))

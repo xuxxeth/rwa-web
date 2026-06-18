@@ -125,6 +125,8 @@ function OpenOrder(props: {
         api={scanApi.getOpenOrders}
         scrollId={(item: IOpenOrder) => item.orderId}
         filter={filter}
+        signatureSubTitle='signatureVerifyDescBottom'
+        lngPrefix='portfolio.orderTable'
         tableConfig={openOrderTableConfig}
         type={'open'}
       />

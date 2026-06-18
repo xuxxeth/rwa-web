@@ -3,9 +3,11 @@
 import { useMemo } from "react"
 import BigNumber from "bignumber.js"
 import { isGreater, isLess } from "@/utils"
-import type { IRwa, IToken } from "@/service/base/types"
+import type { IMarket, IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
-import { RWA_STATUS } from "@/config/constants"
+import { MARKET_STATUS, RWA_STATUS } from "@/config/constants"
+import { useSessionState } from "@/hooks/useMarketState"
+import { TradeType } from "@/hooks/useCaCommon"
 
 /**
  * 余额结构
@@ -21,6 +23,7 @@ export interface UseLimitOrderUIStateParams {
   limitPrice: string
   orderValue: string
   inputSize: string
+  tradeType: number
 
   inputToken?: IRwa | null
   outputToken?: IToken | null
@@ -35,6 +38,8 @@ export interface UseLimitOrderUIStateParams {
 
   t: TFunction
   language: string
+  marketTradeState: number
+  marketInfo: IMarket | null
 }
 
 /**
@@ -60,6 +65,7 @@ export function useLimitOrderUIState({
   limitPrice,
   orderValue,
   inputSize,
+  tradeType,
   inputToken,
   outputToken,
   action,
@@ -69,7 +75,12 @@ export function useLimitOrderUIState({
   realtimePrice,
   t,
   language,
+  marketTradeState,
+  marketInfo
 }: UseLimitOrderUIStateParams): UseLimitOrderUIStateResult {
+  // wss过来的L和M交易状态, 整个市场变更
+  const sessionDisabled = useSessionState(tradeType)
+  
   // 订单价格偏离度, 超过+20%则提示用户确认价格
   const isOrderPriceDeviation = useMemo(() => {
     const referencePrice = new BigNumber(realtimePrice || 0)
@@ -88,15 +99,15 @@ export function useLimitOrderUIState({
    * 是否低于最小金额
    */
   const isMin = useMemo(() => {
-    return isLess(orderValue, inputToken?.minLimitTradeAmount || "0")
-  }, [orderValue, inputToken])
+    return isLess(orderValue, marketInfo?.minAmountPerOrder || "0")
+  }, [orderValue, marketInfo])
 
   /**
    * 是否超过最大金额
    */
   const isMax = useMemo(() => {
-    return isGreater(orderValue, inputToken?.maxLimitTradeAmount || "0")
-  }, [orderValue, inputToken])
+    return isGreater(orderValue, marketInfo?.maxAmountPerOrder || "0")
+  }, [orderValue, marketInfo])
 
   /**
    * 买单余额不足
@@ -135,6 +146,48 @@ export function useLimitOrderUIState({
   const isTradingHalt = useMemo(() => {
     return inputToken?.state === RWA_STATUS.HALT
   }, [inputToken])
+
+  // 要不要在这里根据inputToken的session，把按钮禁掉，因为市价交易没有禁掉, 这里只控制市价交易的按钮，限制交易选择时段下拉框控制
+  /**
+   * 不支持盘前盘后交易
+   */
+  const notSupportBeforeOrAfter = useMemo(() => {
+    if (!inputToken) return true
+    if ((inputToken.sessionMaskList?.[1] === 0 && marketTradeState === MARKET_STATUS.AFTER) || 
+      (inputToken.sessionMaskList?.[2] === 0 && marketTradeState === MARKET_STATUS.BEFORE)) {
+        if (tradeType === TradeType.MARKET) {
+          return true
+        }
+        return false
+    }
+    return false
+  }, [inputToken, marketTradeState, tradeType])
+  /**
+   * 不支持夜盘交易
+   */
+  const notSupportOvernight = useMemo(() => {
+    if (!inputToken) return true
+    if (inputToken.sessionMaskList?.[0] === 0 && marketTradeState === MARKET_STATUS.OVERNIGHT) {
+      
+      if (tradeType === TradeType.MARKET) {
+        return true
+      }
+      return false
+    }
+    return false
+  }, [inputToken, marketTradeState, tradeType])
+
+  // console.log('isOrderPriceDeviation: ', isOrderPriceDeviation)
+  // console.log('isMin: ', isMin)
+  // console.log('isMax: ', isMax)
+  // console.log('isBuyInsufficient: ', isBuyInsufficient)
+  // console.log('isSellInsufficient: ', isSellInsufficient)
+  // console.log('isSellOnly: ', isSellOnly)
+  // console.log('isTradingHalt: ', isTradingHalt)
+  // console.log('sessionDisabled: ', sessionDisabled)
+  // console.log('notSupportBeforeOrAfter: ', notSupportBeforeOrAfter)
+  // console.log('notSupportOvernight: ', notSupportOvernight)
+  // console.log('---------------------------------------------------')
   /**
    * 按钮是否禁用
    */
@@ -147,7 +200,10 @@ export function useLimitOrderUIState({
       isBuyInsufficient ||
       isSellInsufficient ||
       isSellOnly ||
-      isTradingHalt
+      isTradingHalt ||
+      sessionDisabled ||
+      notSupportBeforeOrAfter ||
+      notSupportOvernight
     )
   }, [
     orderValue,
@@ -157,7 +213,10 @@ export function useLimitOrderUIState({
     isBuyInsufficient,
     isSellInsufficient,
     isSellOnly,
-    isTradingHalt
+    isTradingHalt,
+    sessionDisabled,
+    notSupportBeforeOrAfter,
+    notSupportOvernight
   ])
 
   /**
@@ -176,7 +235,7 @@ export function useLimitOrderUIState({
     if (isMin)
       return t("amountMin", {
         amount:
-          inputToken?.minLimitTradeAmount +
+          (marketInfo?.minAmountPerOrder || "0") +
           " " +
           outputToken?.symbol,
       })
@@ -184,7 +243,7 @@ export function useLimitOrderUIState({
     if (isMax)
       return t("amountMax", {
         amount:
-          inputToken?.maxLimitTradeAmount +
+          (marketInfo?.maxAmountPerOrder || "0") +
           " " +
           outputToken?.symbol,
       })
@@ -205,6 +264,7 @@ export function useLimitOrderUIState({
       inputToken?.symbol
     }`
   }, [
+    marketInfo,
     limitPrice,
     orderValue,
     inputToken,

@@ -151,9 +151,9 @@ export const useBaseStore = create<BaseStore>()(
       getMarket: async () => {
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          const marketInfo = { ...(res.data || {}) }
+          const marketInfo = {...(res.data || {}) }
           
-          set({ marketInfo: {...marketInfo } })
+          set({ marketInfo: {...marketInfo, minAmountPerOrder: marketInfo.minAmountPerOrder || "20", maxAmountPerOrder: marketInfo.maxAmountPerOrder || "500000" } })
         }
         return res
       },
@@ -185,11 +185,17 @@ export const useBaseStore = create<BaseStore>()(
           "availability": {
             "trading": 0,
             "pre_after_trading": 0,
-          }
+          },
+          "L": data.L, // 是否允许限价单
+          "M": data.M, // 是否允许市价单
         }
         set({ marketState: _marketState, marketTradeState: marketState })
       },
       getMarketState: async () => {
+        const marketState = get().marketState
+        if (marketState && marketState.status !== MARKET_STATUS.DEFAULT) {
+          return { code: RESPONSE_CODE.SUCCESS, data: marketState, message: null }
+        }
         const res = await baseApi.getMarketState()
         if (res && res.code === RESPONSE_CODE.SUCCESS) {
           const _data = res.data || {}
@@ -207,6 +213,10 @@ export const useBaseStore = create<BaseStore>()(
             if (_data.status === 6) { 
               marketState = MARKET_STATUS.AFTER
             }
+            // 已收盘
+            if (_data.status === 7) { 
+              marketState = MARKET_STATUS.CLOSE // 这里应该是跟 CLOSED 区分开一个状态的，但目前前端只区分了闭市和开市，所以先放在一起
+            }
             // 夜盘
             if (_data.status === 12) { 
               marketState = MARKET_STATUS.OVERNIGHT
@@ -214,7 +224,7 @@ export const useBaseStore = create<BaseStore>()(
           }
           
           // marketState = MARKET_STATUS.AFTER
-          set({ marketState: _data, marketTradeState: marketState })
+          set({ marketState: { ..._data, status: marketState }, marketTradeState: marketState })
         }
         return res
       },

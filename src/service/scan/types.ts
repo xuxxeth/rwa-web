@@ -90,3 +90,30 @@ export interface ITrade {
   reason: Reason
   currency: string
 }
+
+export interface IRebate {
+  id: string
+  orderId: string
+  txHash: string
+  chainId: number
+  referee: string
+  amount: string
+  token: string
+  ratio: number
+  rebateTime: number
+}
+
+export interface IRebateFilter {
+  after?: string
+  before?: string
+  limit?: number
+}
+
+export interface IClaim {
+  id: string
+  txHash: string
+  chainId: number
+  account: string
+  data: string
+  claimTime: number
+}

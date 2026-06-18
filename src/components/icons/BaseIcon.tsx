@@ -20,7 +20,6 @@ export default function BaseIcon({
       className
     )}
       onMouseOver={() => {
-        
         setIsHover(true)
       }}
       onMouseLeave={() => {

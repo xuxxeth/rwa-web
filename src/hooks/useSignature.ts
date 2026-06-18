@@ -1,6 +1,6 @@
 import { useSignature } from '@/hooks/useCaCommon'
 import storage from '@/utils/storage'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { useTradeStore } from '@/stores/tradeStore'
 import { SIGNATURE_EXPIRES } from '@/config/constants'
@@ -22,7 +22,6 @@ export function useRequestSignature() {
       setSigning(false)
       return null
     }
-
   }, [signing, requestSignature])
 
   // 浏览器原生的 localStorage API 是同步的? 所以这里不需要 async await
@@ -43,12 +42,13 @@ export function useRequestSignature() {
   }
 }
 
-export function useSignatureValidStatus(): [boolean, (isValid?: boolean) => void] {
+export function useSignatureValidStatus(): [boolean, (isValid?: boolean) => void, () => any] {
   const { validSignature } = useRequestSignature()
   const isSignatureValid = useTradeStore(state => state.isSignatureValid)
   const setIsSignatureValid = useTradeStore(state => state.setIsSignatureValid)
 
   const { account, chainId } = useActiveWeb3()
+
   useEffect(() => {
     setIsSignatureValid(!!validSignature())
   }, [account, chainId])
@@ -61,5 +61,5 @@ export function useSignatureValidStatus(): [boolean, (isValid?: boolean) => void
     }
   }
 
-  return [isSignatureValid, refreshIsSignatureValid]
+  return [isSignatureValid, refreshIsSignatureValid, validSignature]
 }
