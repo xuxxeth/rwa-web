@@ -1,6 +1,7 @@
 import {
   useTokenBalances as useBalances,
   useChainId,
+  useIsSupportChain,
 } from './useCaCommon'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
@@ -14,6 +15,7 @@ import { useWssStore } from '@/stores/wssStore'
 export function useTokenBalances() {
   const { getTokenBalances } = useBalances()
   const chainId = useChainId()
+  const isSupportChain = useIsSupportChain()
   const { account } = useActiveWeb3()
   const tokenList = useTokens()
   const rwaRwaList = useRwaTokens()
@@ -104,12 +106,12 @@ export function useTokenBalances() {
   }, [account, tokenList, rwaRwaList])
 
   useEffect(() => {
-    if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0) {
+    if (chainId && account && tokenList.length > 0 && rwaRwaList.length > 0 && isSupportChain) {
 
       // @ts-ignore
       getTokensData(account, [...tokenList, ...rwaRwaList])
     }
-  }, [chainId, account, tokenList.length, rwaRwaList.length, freshTokenBalancesCount])
+  }, [chainId, account, tokenList.length, rwaRwaList.length, freshTokenBalancesCount, isSupportChain])
 
   return {
     getTokensDataByStockId: getTokensDataByStockId,

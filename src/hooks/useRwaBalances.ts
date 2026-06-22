@@ -1,5 +1,5 @@
 import { baseApi } from "@/service/base/api"
-import { useTokenBalances as useBalances, useChainId  } from './useCaCommon'
+import { useTokenBalances as useBalances, useChainId, useIsSupportChain  } from './useCaCommon'
 import { RESPONSE_CODE } from '@/config/constants'
 import { useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
@@ -11,6 +11,7 @@ export function useRwaBalances() {
   const chainId = useChainId()
   const { account } = useActiveWeb3()
   const baseStore = useBaseStore()
+  const isSupportChain = useIsSupportChain()
 
   const getRwaData = async (chainId: number, account: `0x${string}`) => {
     const res = await baseApi.getBaseRwas(chainId)
@@ -32,10 +33,10 @@ export function useRwaBalances() {
   }
 
   useEffect(() => {
-    if (chainId && account) {
+    if (chainId && account && isSupportChain) {
       getRwaData(chainId, account as `0x${string}`)
     }
-  }, [chainId, account])
+  }, [chainId, account, isSupportChain])
 
 }
 

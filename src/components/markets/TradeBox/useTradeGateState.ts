@@ -15,7 +15,6 @@ type TokenBalance = {
 
 interface UseTradeGateStateParams {
   account?: string
-  isSameChain?: boolean
   inputToken?: IRwa | null
   outputToken?: IToken | null
   inputTokenBalance?: TokenBalance | null
@@ -30,7 +29,6 @@ interface UseTradeGateStateParams {
 
 export function useTradeGateState({
   account,
-  isSameChain,
   inputToken,
   outputToken,
   inputTokenBalance,
@@ -67,7 +65,6 @@ export function useTradeGateState({
 
   const isPageReady = useTradePageReady({
     account,
-    isSameChain,
     inputToken,
     outputToken,
     inputTokenBalance,

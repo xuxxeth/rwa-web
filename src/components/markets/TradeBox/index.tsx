@@ -62,7 +62,7 @@ export function TradeBox({
     realtimeData,
     slippage
   } = useTradeStoreBindings()
-  const { account, isSameChain } = useActiveWeb3()
+  const { account } = useActiveWeb3()
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
@@ -206,7 +206,6 @@ export function TradeBox({
     isPageReady,
   } = useTradeGateState({
     account,
-    isSameChain,
     inputToken,
     outputToken,
     inputTokenBalance,
@@ -249,7 +248,6 @@ export function TradeBox({
         <TradeButtonUI
           from={from}
           account={account}
-          isSameChain={isSameChain}
           isSignatureValid={isSignatureValid}
           refreshIsSignatureValid={refreshIsSignatureValid}
           isPageReady={isPageReady}

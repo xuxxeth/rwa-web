@@ -6,7 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
-import { ConnectorType, useQrCodeData, type WalletConfig } from '@/hooks/useCaCommon'
+import { ConnectorType, useQrCodeData, type WalletConfig, useIsSupportChain } from '@/hooks/useCaCommon'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
 import { DialogController } from '@/components/dialog/DialogController'
@@ -77,8 +77,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     handleDisConnect,
     handleSwitchChain,
     initialized,
-    isSameChain
   } = useActiveWeb3()
+
+  const isSupportChain = useIsSupportChain()
 
   const chains = useBaseStore(s => s.chainList)
   const showConnect = useBaseStore(s => s.showConnect)
@@ -127,9 +128,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       setStatus(WalletStatus.IDLE)
       return
     }
-
     const supported = chains.some(c => c.id === chainId)
-
     setStatus(supported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
   }, [account, chainId, chains])
 
@@ -156,25 +155,25 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         break
 
       case WalletStatus.WRONG_NETWORK:
+        // 不支持的链，不再进行自动切换链操作，后期会有个弹窗提示
+
+        // if (chains[0]) {
+        //   handleSwitchChain(chains[0].id)
+        //     .then(res => {
+        //       if (res) {
+        //         // window.location.reload()
+        //       } else {
+        //         toastError({
+        //           title: t('switchNetwork', { network: networkText }),
+        //         })
+        //       }
+        //     })
+        // } else {
+        //   toastError({
+        //     title: t('switchNetwork', { network: networkText }),
+        //   })
+        // }
         
-        if (chains[0]) {
-          handleSwitchChain(chains[0].id)
-            .then(res => {
-              if (res) {
-                // window.location.reload()
-              } else {
-                toastError({
-                  title: t('switchNetwork', { network: networkText }),
-                })
-              }
-            })
-        } else {
-          toastError({
-            title: t('switchNetwork', { network: networkText }),
-          })
-        }
-        
-        // handleDisConnect()
         break
 
       // case WalletStatus.IDLE:
@@ -260,7 +259,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   return (
     <>
-      {(!account || !isSameChain) ? (
+      {(!account) ? (
         <div
           className={cn(
             'h-[36px] flex items-center px-6 bg-[#9CFF3A] text-sm font-medium rounded-[8px] cursor-pointer',

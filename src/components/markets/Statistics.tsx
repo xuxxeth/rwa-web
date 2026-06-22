@@ -2,7 +2,6 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { useTradeStore } from '@/stores/tradeStore'
 import { divide, formatLargeNumber, multiply, shortenAddress, toFixed } from '@/utils'
-import { useChainById } from '@/hooks/useChain'
 import { baseApi } from '@/service/base/api'
 import type { IStatistic } from '@/service/base/types'
 

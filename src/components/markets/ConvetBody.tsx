@@ -68,7 +68,7 @@ export function ConverBody({
   const pendingStep = usePendingStep()
   const { expired } = useKycExpired()
   const action = useTradeStore(state => state.activeConvertTab)
-  const { account, isSameChain } = useActiveWeb3()
+  const { account } = useActiveWeb3()
   const expiresDialog = useShowDialog()
   const orderDialog = useShowDialog()
   const [orderValue, setOrderValue] = useState('')
@@ -374,7 +374,6 @@ export function ConverBody({
 
   const isPageReady = useTradePageReady({
     account,
-    isSameChain,
     inputToken,
     outputToken,
     inputTokenBalance,
@@ -494,7 +493,7 @@ export function ConverBody({
         isPageReady ? " opacity-100" : ""
       )}>
         {
-          (!account || !isSameChain) ? 
+          (!account) ? 
             <div className="mt-3"><ConnectButtonText /></div> :
             !isSignatureValid ?
             <SignButton className="mt-3 w-full h-[40px] rounded-[8px] text-[14px]" refreshIsSignatureValid={() => {

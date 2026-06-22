@@ -11,7 +11,6 @@ import { SessionType, type TradeType } from "@/hooks/useCaCommon"
 type TradeButtonUIProps = {
   from?: string
   account?: string
-  isSameChain?: boolean
   isSignatureValid: boolean
   refreshIsSignatureValid: () => void
   isPageReady: boolean
@@ -40,7 +39,6 @@ type TradeButtonUIProps = {
 export function TradeButtonUI({
   from,
   account,
-  isSameChain,
   isSignatureValid,
   refreshIsSignatureValid,
   isPageReady,
@@ -77,7 +75,7 @@ export function TradeButtonUI({
           isPageReady ? " opacity-100" : ""
         )}
       >
-        {(!account || !isSameChain) ? (
+        {(!account) ? (
           <div className="mt-3"><ConnectButtonText /></div>
         ) : !isSignatureValid ? (
           <SignButton
