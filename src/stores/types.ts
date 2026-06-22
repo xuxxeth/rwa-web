@@ -15,33 +15,26 @@ import type { ICandlesItem, ICandlesParams } from "@/service/kline/types";
 import type { IUserCofnig } from "@/service/risk/types";
 import type { IOrderData, ISummaryData, ISummaryDataItem } from "@/service/webSocket/types";
 import { type IKycDetail, type IKycStatus } from '@/service/kyc/types'
-import type { FeeItem, SessionType, TradeType } from "@/hooks/useCaCommon"
+import type { CommissionConfig, SessionType, TradeType } from "@/hooks/useCaCommon"
 import type { IWSSMarketState } from "@/service/webSocket/service";
 
 export type IFeeRate = {
   value: string;
   minValue: string;
-  maxValue: string;
   noFee?: boolean;
 }
 
 export type IFeeConfig = {
   platformFee: number;
-  buyFeeConfigs: FeeItem[];
-  sellFeeConfigs: FeeItem[];
+  buyFeeConfigs: CommissionConfig;
+  sellFeeConfigs: CommissionConfig;
   buyFeeRate: {
     platformFeeRate: IFeeRate;
     brokerageFeeRate: IFeeRate;
-    tradingActivityFeeRate: IFeeRate;
-    secFeeRate: IFeeRate;
-    catFeeRate: IFeeRate;
   };
   sellFeeRate: {
     platformFeeRate: IFeeRate;
     brokerageFeeRate: IFeeRate;
-    tradingActivityFeeRate: IFeeRate;
-    secFeeRate: IFeeRate;
-    catFeeRate: IFeeRate;
   };
 }
 
