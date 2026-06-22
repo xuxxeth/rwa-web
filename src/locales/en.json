@@ -224,12 +224,6 @@
         "7": "Unsupported price precision",
         "8": "Not supported session",
         "9": "Exceed slippage"
-      },
-      "ruleId": {
-        "1": "Brokerage Fee",
-        "2": "Trading Activity Fee",
-        "3": "SEC Fee",
-        "4": "CAT Fee"
       }
     }
   },
