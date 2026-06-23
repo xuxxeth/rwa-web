@@ -72,7 +72,7 @@ const OrderConfirm = memo(
     },[feeConfig, action])
 
     const feeRatePercent = useMemo(() => {
-      return feeRate ? 
+      return Number(feeRate) > 0 ? 
         `${(Number(feeRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%` : 
         feeRateConfig ? `${(Number(feeRateConfig.platformFeeRate?.value) * 100).toFixed(2).replace(/\.?0+$/, '')}%` : '--'
     }, [feeRate, feeRateConfig?.platformFeeRate?.value]);
