@@ -124,7 +124,7 @@ export function useCalcFee(
     const { platformFee, buyFeeConfigs, sellFeeConfigs } = feeConfig
     
     let _feeRate = platformFee
-    if (feeRate) { 
+    if (feeRate && Number(feeRate) > 0) { 
       _feeRate = new BigNumber(feeRate).multipliedBy(FEE_RATE_SCALE_6).toNumber()
     }
     // 计算平台服务费
