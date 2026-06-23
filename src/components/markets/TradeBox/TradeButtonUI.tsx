@@ -28,9 +28,6 @@ type TradeButtonUIProps = {
   orderValue: string
   platformFee: string
   brokerageFee: string
-  tradingActivityFee: string
-  secFee: string
-  catFee: string
   estimatedFee: string
   feeRate: string
   networkFeeInNative: string
@@ -56,9 +53,6 @@ export function TradeButtonUI({
   orderValue,
   platformFee,
   brokerageFee,
-  tradingActivityFee,
-  secFee,
-  catFee,
   estimatedFee,
   feeRate,
   networkFeeInNative,
@@ -132,9 +126,6 @@ export function TradeButtonUI({
           orderValue={orderValue}
           platformFee={platformFee}
           brokerageFee={brokerageFee}
-          tradingActivityFee={tradingActivityFee}
-          secFee={secFee}
-          catFee={catFee}
           estimatedFee={estimatedFee}
           feeRate={feeRate}
           networkFeeInNative={networkFeeInNative}

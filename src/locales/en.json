@@ -224,12 +224,6 @@
         "7": "Unsupported price precision",
         "8": "Not supported session",
         "9": "Exceed slippage"
-      },
-      "ruleId": {
-        "1": "Brokerage Fee",
-        "2": "Trading Activity Fee",
-        "3": "SEC Fee",
-        "4": "CAT Fee"
       }
     }
   },
@@ -717,12 +711,12 @@
       "t30": "Order Type",
       "t31": "Order Value",
       "t311": "Order value=Limit price*Quantity",
-      "t32": "Brokerage Fee",
-      "t321": "Brokerage base commission of USD {{r1}} per share, with a minimum charge of USD {{r2}} per orde",
+      "t32": "Brokerage Fees",
+      "t321": "Brokerage Fees: Order value × {{r1}}, with a minimum charge of {{r2}} USDT per order, to cover brokerage fee, trading activity fees, SEC fees, CAT fees, and other brokerage expenses.",
       "t33": "Trading Activity Fee ",
       "t331": "Charged by the broker on sell orders at USD {{r1}} per share, with a minimum charge of USD {{r2}} per order and a maximum charge of USD {{r3}}.",
       "t34": "Platform Service Fee",
-      "t341": "Platform Service Fee = Order amount × {{r1}}",
+      "t341": "Platform Service Fee = Order value × {{r1}}",
       "t47": "SEC Fee",
       "t471": "Charged by the U.S. Securities and Exchange Commission (SEC) at a rate of {{r1}} of the total transaction value, with a minimum fee of USD {{r2}} per trade.Applicable to sell transactions only ",
       "t48": "CAT Fee",

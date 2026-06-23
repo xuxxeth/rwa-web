@@ -113,7 +113,7 @@ export function TradeBox({
 
   const orderValue = useOrderBase(effectivePrice, inputSize)
 
-  const { estimatedFee, platformFee, brokerageFee, tradingActivityFee, secFee, catFee, allOrderValue } = useCalcFee(
+  const { estimatedFee, platformFee, brokerageFee, allOrderValue } = useCalcFee(
     orderValue,
     inputSize,
     action === 'buy',
@@ -265,9 +265,6 @@ export function TradeBox({
           orderValue={orderValue}
           platformFee={platformFee}
           brokerageFee={brokerageFee}
-          tradingActivityFee={tradingActivityFee}
-          secFee={secFee}
-          catFee={catFee}
           estimatedFee={estimatedFee}
           feeRate={inputToken?.feeRate ?? ''}
           networkFeeInNative={marketInfo.networkFeeInNative}
