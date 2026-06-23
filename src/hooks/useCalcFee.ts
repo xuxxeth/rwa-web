@@ -98,7 +98,7 @@ export function calcFeeByConfig(orderValue: number | string, feeConfig: Commissi
   let rateFee = new BigNumber(orderValue).multipliedBy(Number(feeConfig.rate)).dividedBy(FEE_RATE_SCALE_6)
   let fee = rateFee.isLessThan(minFee) ? minFee : rateFee
   return {
-    brokerageFee: fee.decimalPlaces(2, BigNumber.ROUND_HALF_UP).toFixed(2),
+    brokerageFee: Number(orderValue) > 0 ? fee.decimalPlaces(2, BigNumber.ROUND_HALF_UP).toFixed(2) : '0',
   }
 }
 
