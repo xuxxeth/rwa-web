@@ -2,6 +2,7 @@ import { useEffect, useCallback, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
+import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
@@ -73,6 +74,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     wallets,
     account,
     chainId,
+    isChainSupported,
     handleConnect: rwaHandleConnect,
     handleDisConnect,
     handleSwitchChain,
@@ -128,9 +130,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       setStatus(WalletStatus.IDLE)
       return
     }
-    const supported = chains.some(c => c.id === chainId)
-    setStatus(supported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
-  }, [account, chainId, chains])
+    // const supported = chains.some(c => c.id === chainId)
+    setStatus(isChainSupported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
+    if (isChainSupported) {
+      storage.setItem(LAST_CONNECTED_CHAIN_ID, chainId.toString())
+    }
+  }, [account, chainId, chains, isChainSupported])
 
   const hasInitializedRef = useRef(false)
   useEffect(() => {

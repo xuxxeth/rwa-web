@@ -241,7 +241,6 @@ export const useBaseStore = create<BaseStore>()(
         }
 
         await Promise.all([
-          get().getChains(),
           get().getTokens(chainId),
           get().getBaseRwas(chainId),
           get().getStocks(),

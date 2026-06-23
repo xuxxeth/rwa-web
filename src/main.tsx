@@ -11,6 +11,8 @@ import { ErrorChildren } from './components/error/ErrorChildren.tsx'
 import { SuspenseLoading } from './components/loading/SuspenseLoading.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { useBaseStore } from './stores/baseStore.ts'
+import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
+import storage from '@/utils/storage'
 
 const CHAIN_CONFIG = [...defaultChains, bscTestnet, xLayerTestnet]
 
@@ -28,23 +30,27 @@ function Root() {
             name: chain.displayName,
             rpcUrls: {
               ..._chain.rpcUrls,
-              public: { http: [..._chain.rpcUrls.public.http, chain.rpc] }
+              public: { http: [..._chain.rpcUrls.public.http, chain.rpc] },
             },
             blockExplorers: {
-              default: { name: chain.displayName, url: chain.scan }
-            }
+              default: { name: chain.displayName, url: chain.scan },
+            },
           }
         }
-        
       })
-      .filter((chain) => chain !== undefined)
+      .filter(chain => chain !== undefined)
   }, [chainList])
+
+  const defaultChainId = useMemo(() => {
+    const lastConnectedChainId = storage.getItem(LAST_CONNECTED_CHAIN_ID)
+    return lastConnectedChainId ? parseInt(lastConnectedChainId) : chains[0]?.id
+  }, [chains])
 
   return (
     <WalletProvider
       config={{
         chains: chains,
-        defaultChainId: chains[0] ? chains[0].id : defaultChains[0].id,
+        defaultChainId: defaultChainId,
       }}
     >
       <QueryClientProvider client={queryClient}>
@@ -56,9 +62,7 @@ function Root() {
   )
 }
 
-
 createRoot(document.getElementById('root')!).render(
-  
   <StrictMode>
     <ErrorBoundary fallback={<ErrorChildren />}>
       <Suspense fallback={<SuspenseLoading />}>
@@ -66,5 +70,4 @@ createRoot(document.getElementById('root')!).render(
       </Suspense>
     </ErrorBoundary>
   </StrictMode>
-    
 )

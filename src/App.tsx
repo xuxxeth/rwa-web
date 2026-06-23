@@ -41,6 +41,8 @@ function App() {
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
   const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
+  const getChains = useBaseStore(state => state.getChains)
+
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
     if (i18n.language !== lng) {
@@ -58,6 +60,10 @@ function App() {
   useRiskUserConfig()
 
   useWssAuth()
+
+  useEffect(() => {
+    getChains()
+  }, [])
 
   useEffect(() => {
     if (!chainId) return

@@ -1,4 +1,13 @@
-import { useAccount, useChainId, useConnect, useDisconnect, useWallets, useInitialized, useSwitchChain } from '@/hooks/useCaCommon'
+import {
+  useAccount,
+  useChainId,
+  useConnect,
+  useDisconnect,
+  useWallets,
+  useInitialized,
+  useSwitchChain,
+  useChainIdAndIsSupported,
+} from '@/hooks/useCaCommon'
 
 import { useCallback, useMemo } from 'react'
 import type { ConnectorType, WalletConfig } from '@/hooks/useCaCommon'
@@ -12,7 +21,7 @@ export function useActiveWeb3() {
   const connect = useConnect()
   const disConnect = useDisconnect()
   const account = useAccount() as unknown as string | undefined
-  const chainId = useChainId()
+  const { chainId, isChainSupported } = useChainIdAndIsSupported()
   const initialized = useInitialized()
   const switchChain = useSwitchChain()
 
@@ -41,15 +50,18 @@ export function useActiveWeb3() {
     await disConnect()
   }, [disConnect])
 
-  const handleSwitchChain = useCallback(async (chainId: number) => {
-    try {
-      await switchChain(chainId)
-      return true
-    } catch(error) {
-      await disConnect()
-      return false
-    }
-  }, [switchChain, disConnect])
+  const handleSwitchChain = useCallback(
+    async (chainId: number) => {
+      try {
+        await switchChain(chainId)
+        return true
+      } catch (error) {
+        await disConnect()
+        return false
+      }
+    },
+    [switchChain, disConnect]
+  )
 
   const isSameChain = useMemo(() => {
     return currentChain?.id === chainId
@@ -60,9 +72,10 @@ export function useActiveWeb3() {
     wallets,
     account,
     chainId,
+    isChainSupported,
     handleConnect,
     handleDisConnect,
     handleSwitchChain,
-    isSameChain
+    isSameChain,
   }
 }
