@@ -11,12 +11,13 @@ import type {
   IProfile,
   IIndicators
 } from "./types"
+import { xlayerRwas, xplayerTokens } from "./xlayerRwas";
 
 
 export const baseApi = {
   getChains: () => client.get<ApiResponse<IChain[]>>('/v1/base/public/chains'),
-  getTokens: (chainId?: number) => client.get<ApiResponse<IToken[]>>('/v1/base/public/tokens', { chainId }),
-  getBaseRwas: (chainId?: number) => client.get<ApiResponse<IRwa[]>>('/v1/base/public/rwas', { chainId }),
+  getTokens: (chainId?: number) => chainId === 1952 ? xplayerTokens : client.get<ApiResponse<IToken[]>>('/v1/base/public/tokens', { chainId }),
+  getBaseRwas: (chainId?: number) => chainId === 1952 ? xlayerRwas : client.get<ApiResponse<IRwa[]>>('/v1/base/public/rwas', { chainId }),
   getStocks: () => client.get<ApiResponse<IStock[]>>('/v1/base/public/stocks'),
   getMarket: () => client.get<ApiResponse<IMarket>>('/v1/base/public/market'),
   getMarketState: () => client.get<ApiResponse<IMarketState>>('/v1/base/public/market/state'),

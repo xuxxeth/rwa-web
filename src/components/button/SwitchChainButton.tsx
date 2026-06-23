@@ -101,19 +101,7 @@ export function SwitchButton() {
           <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           <div className=" px-4">
             {
-              chains.concat([
-                {
-                    "id": 972,
-                    "name": "X Layer",
-                    "displayName": "X Layer",
-                    "state": 0,
-                    "nativeToken": "BNB",
-                    "contract": "0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9",
-                    "icon": "/images/icons/chains/xlayer.png",
-                    "rpc": "https://bsc-dataseed.binance.org/",
-                    "scan": "https://bscscan.com"
-                }
-              ]).map((chain) => {
+              chains.map((chain) => {
                 return (
                   <ChainItem 
                     key={chain.id} 

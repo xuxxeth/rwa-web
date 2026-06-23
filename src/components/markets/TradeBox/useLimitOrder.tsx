@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import BigNumber from "bignumber.js"
-import { TradeType, SideType, TifType, SessionType } from "@/hooks/useCaCommon"
+import { TradeType, SideType, TifType, SessionType, useChainId } from "@/hooks/useCaCommon"
 import { hasPermission, parseAmount } from "@/utils"
 import type { IRwa, IToken } from "@/service/base/types"
 import type { TFunction } from "i18next"
@@ -56,7 +56,7 @@ export function useLimitOrder({
   onError,
   onFinally,
 }: UseLimitOrderParams) {
-
+  const chainId = useChainId()
   const [loading, setLoading] = useState(false)
 
   const validateRisk = useCallback(() => {
@@ -117,9 +117,9 @@ export function useLimitOrder({
         size: parseAmount(inputSize),
         clientAddress: zeroAddress
       }
-      console.log('place order params', params)
+      console.log('place order params', params, marketInfo.networkFeeInNative)
       const result = await placeOrder(params, {
-        value: parseAmount(marketInfo.networkFeeInNative, 18),
+        value: parseAmount(chainId === 1952 ? '0.00003' : marketInfo.networkFeeInNative, 18),
         wait: true,
         skipSimulate: true
       })
@@ -158,6 +158,7 @@ export function useLimitOrder({
     onError,
     onFinally,
     t,
+    chainId, // 后面要去掉
   ])
 
   return {

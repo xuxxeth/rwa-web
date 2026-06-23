@@ -79,7 +79,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     req.headers.set('Authorization', auth)
   }
   const chainId =
-    localStorage.getItem('CA-Chain-Id') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id)
+    localStorage.getItem('DEFAULT_CHAIN_ID') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id)
   const lng = storage.getItem(CA_LANGUAGE) || 'en'
 
   req.headers.set('CA-Chain-Id', chainId)

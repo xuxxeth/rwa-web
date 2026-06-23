@@ -229,6 +229,7 @@ export const useBaseStore = create<BaseStore>()(
         return res
       },
       init: async (chainId: number | null) => {
+        console.log(chainId, 1111)
         if (!chainId) return
 
         if (
