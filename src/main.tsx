@@ -11,8 +11,7 @@ import { ErrorChildren } from './components/error/ErrorChildren.tsx'
 import { SuspenseLoading } from './components/loading/SuspenseLoading.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { useBaseStore } from './stores/baseStore.ts'
-import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
-import storage from '@/utils/storage'
+import { useAppStore } from './stores/appStore'
 
 const CHAIN_CONFIG = [...defaultChains, bscTestnet, xLayerTestnet]
 
@@ -41,16 +40,13 @@ function Root() {
       .filter(chain => chain !== undefined)
   }, [chainList])
 
-  const defaultChainId = useMemo(() => {
-    const lastConnectedChainId = storage.getItem(LAST_CONNECTED_CHAIN_ID)
-    return lastConnectedChainId ? parseInt(lastConnectedChainId) : chains[0]?.id
-  }, [chains])
+  const currentChainId = useAppStore(state => state.currentChainId)
 
   return (
     <WalletProvider
       config={{
         chains: chains,
-        defaultChainId: defaultChainId,
+        defaultChainId: currentChainId ?? undefined,
       }}
     >
       <QueryClientProvider client={queryClient}>

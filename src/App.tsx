@@ -7,6 +7,7 @@ import { useTranslation } from './hooks/useTranslation'
 
 import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
+import { useAppStore } from './stores/appStore'
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -41,6 +42,8 @@ function App() {
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
   const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
 
+  const currentChainId = useAppStore(state => state.currentChainId)
+
   const getChains = useBaseStore(state => state.getChains)
 
   useEffect(() => {
@@ -66,10 +69,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!chainId) return
+    if (!currentChainId) return
     // 初始化baseStore
-    initBaseStore(chainId)
-  }, [chainId])
+    initBaseStore(currentChainId)
+  }, [currentChainId])
 
   const { wsService } = useWssOn()
 
