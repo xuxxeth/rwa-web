@@ -40,13 +40,11 @@ function Root() {
       .filter(chain => chain !== undefined)
   }, [chainList])
 
-  const currentChainId = useAppStore(state => state.currentChainId)
-
   return (
     <WalletProvider
       config={{
         chains: chains,
-        defaultChainId: currentChainId ?? undefined,
+        defaultChainId: undefined,
       }}
     >
       <QueryClientProvider client={queryClient}>

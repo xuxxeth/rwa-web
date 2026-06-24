@@ -48,7 +48,6 @@ const USDTSelect = memo(
       })
     }, [tokenList, tokenWithBalance])
 
-    console.log(tokenListWithBalance, tokenList, 11111)
     
     const [open, setOpen] = useState(false)
 

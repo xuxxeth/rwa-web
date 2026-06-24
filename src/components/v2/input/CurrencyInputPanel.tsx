@@ -10,6 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useTradeStore } from "@/stores/tradeStore";
 import { useRouter } from "@/hooks/useRouter";
 import { TradeType, useChainId } from "ca-common-web";
+import { useAppStore } from "@/stores/appStore";
 
 type CurrencyInputPanelProps = {
   mode?: string; // in | out
@@ -28,7 +29,7 @@ type CurrencyInputPanelProps = {
 const CurrencyInputPanel = memo(
   ({ mode = 'in', type, label, placeholder, value, from, regex, isInsufficient, tradeType, onUserInput }: CurrencyInputPanelProps) => {
     const router = useRouter()
-    const chainId = useChainId()
+    const currentChainId = useAppStore(state => state.currentChainId)
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
@@ -49,21 +50,33 @@ const CurrencyInputPanel = memo(
     }, [mode])
 
     useEffect(() => {
-      
+      // 当前链和rwaList里的数据chainId一致，才进行更新操作
+      if (rwaList[0] && currentChainId) {
+        if (rwaList[0].chainId !== currentChainId) return
+      }
       if (!router.params.symbol) {
         rwaList[0] && updateInputToken(rwaList[0])
       } else {
         // 通过symbol查找对应的token
         const _rwa = rwaList.find(rwa => rwa.symbol.toLowerCase() === router.params.symbol?.toLowerCase())
-        _rwa && updateInputToken(_rwa)
+        // 切换链的时候，找到了正常更新，未找到，则返回到市场页
+        if (_rwa) {
+          updateInputToken(_rwa)
+        } else {
+          router.push('/markets')
+        }
+        
       }
-    }, [rwaList.length, inputToken, router.params])
+    }, [rwaList.length, router.params, currentChainId])
 
     useEffect(() => {
+      if (tokenList[0] && currentChainId) {
+        if (tokenList[0].chainId !== currentChainId) return
+      }
       if (tokenList[0]) {
         updateOutputToken(tokenList[0])
       }
-    }, [tokenList.length, chainId])
+    }, [tokenList.length, currentChainId])
 
     return (
       <div className={cn(

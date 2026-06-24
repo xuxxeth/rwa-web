@@ -1,4 +1,3 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useEffect, useId, useMemo, useState } from "react";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
@@ -6,6 +5,9 @@ import { getChainIconById } from "@/utils/chains";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { useAppStore } from "@/stores/appStore";
+import { LAST_CONNECTED_CHAIN_ID } from "@/config/storage";
 
 export function ChainItem({
   title,
@@ -51,19 +53,36 @@ export function ChainItem({
 
 
 export function SwitchButton() {
+  const { handleSwitchChain, isChainSupported, chainId } = useActiveWeb3()
   const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
 
   const currentChain = useBaseStore(state => state.currentChain)
   const setCurrentChain = useBaseStore(state => state.setCurrentChain)
+  const setCurrentChainId = useAppStore(state => state.setCurrentChainId)
+  const currentChainId = useAppStore(state => state.currentChainId)
 
   useEffect(() => {
     if (chains[0]) {
-      const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
-      setCurrentChain(chains.find(chain => chain.id === _chainId) || chains[0])
+      const _chainId = Number(storage.getItem('LAST_CONNECTED_CHAIN_ID') || chains[0].id)
+      const chain = chains.find(chain => chain.id === _chainId)
+      if (chain) {
+        handleSwitchChain(chain.id)
+      }
     }
-    
   }, [chains])
+
+  // 如果真实钱包chain切换，则更新当前链
+  useEffect(() => {
+    if (chainId && isChainSupported) {
+      const chain = chains.find(chain => chain.id === chainId)
+      if (chain) {
+        storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
+        setCurrentChainId(chainId)
+        setCurrentChain(chain)
+      }
+    }
+  }, [chainId, isChainSupported])
 
   return (
     <HoverCard
@@ -112,7 +131,13 @@ export function SwitchButton() {
                     onClick={() => {
                       if (chain.state !== 0) {
                         setOpen(false)
-                        setCurrentChain(chain)
+                        handleSwitchChain(chain.id)
+                          .then(() => {
+                            // storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
+                            // setCurrentChain(chain)
+                            // setCurrentChainId(chain.id)
+                          })
+                        
                       }
                       
                     }}

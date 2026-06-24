@@ -17,6 +17,7 @@ import type {
   AxiosError,
 } from 'axios'
 import storage from '@/utils/storage'
+import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
 import { CONNECT_STATE_KEY } from 'ca-common-web'
 
 // 从本地存储中获取连接状态, 这个会比 react state 优先更新
@@ -95,6 +96,7 @@ function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortCo
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
     req.headers.set('Authorization', auth)
   }
+  
 }
 
 function handleReqChainIdHeader(req: InternalAxiosRequestConfig, chainId: number | null, isChainSupported: boolean) {
@@ -125,6 +127,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     controller.abort()
     return Promise.reject(new axios.Cancel(`Chain ID ${chainId} is not supported`))
   }
+  // const chainId = localStorage.getItem(LAST_CONNECTED_CHAIN_ID) 
 
   handleReqSignature(req, controller, account)
   handleReqChainIdHeader(req, chainId, isChainSupported)

@@ -3,14 +3,16 @@ import { useTradingV2, useTradeUtilsV2 as useTradeUtilsCommon } from "@/hooks/us
 import { useActiveWeb3 } from "./useActiveWe3";
 import { useBaseStore } from "@/stores/baseStore";
 import { useMemo } from "react";
+import { useAppStore } from "@/stores/appStore";
 
 export function useTrading(token: Address, amount: BigInt) {
-  const { chainId } = useActiveWeb3()
+  // const { chainId } = useActiveWeb3()
+  const currentChainId = useAppStore(state => state.currentChainId)
   const chainList = useBaseStore(state => state.chainList)
   const trading = useMemo(() => {
-    const chain = chainList.find(chain => chain.id === chainId)
+    const chain = chainList.find(chain => chain.id === currentChainId)
     return chain?.contract as Address
-  }, [chainId, chainList])
+  }, [currentChainId, chainList.length])
 
   const { placeOrder, refetchAllowance, txStep, approvalState, allowance } = useTradingV2(token, trading, amount)
 

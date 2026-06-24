@@ -129,6 +129,7 @@ export const useBaseStore = create<BaseStore>()(
         set({ tokenList: res.data || [] })
         return res
       },
+      // @ts-ignore
       getBaseRwas: async (chainId?: number) => {
         const res = await baseApi.getBaseRwas(chainId)
         if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -137,6 +138,7 @@ export const useBaseStore = create<BaseStore>()(
             is24H: rwa.sessionMask === 15,
             sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),
           }))
+          // @ts-ignore
           set({ rwaList: rwaList })
         }
         return res
@@ -148,11 +150,13 @@ export const useBaseStore = create<BaseStore>()(
         }
         return res
       },
-      getMarket: async () => {
+      getMarket: async (chainId: number) => {
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          const marketInfo = {...(res.data || {}) }
-          
+          // @ts-ignore
+          const chainIdRes = (res.data || []).find(item => item.id === chainId)
+          const marketInfo = {...(chainIdRes || {}) }
+          // @ts-ignore
           set({ marketInfo: {...marketInfo, minAmountPerOrder: marketInfo.minAmountPerOrder || "20", maxAmountPerOrder: marketInfo.maxAmountPerOrder || "500000" } })
         }
         return res
@@ -229,7 +233,6 @@ export const useBaseStore = create<BaseStore>()(
         return res
       },
       init: async (chainId: number | null) => {
-        console.log(chainId, 1111)
         if (!chainId) return
 
         if (
@@ -245,7 +248,7 @@ export const useBaseStore = create<BaseStore>()(
           get().getTokens(chainId),
           get().getBaseRwas(chainId),
           get().getStocks(),
-          get().getMarket(),
+          get().getMarket(chainId),
         ])
         set(() => ({
           lastChainId: chainId,
