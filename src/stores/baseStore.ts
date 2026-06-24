@@ -177,10 +177,12 @@ export const useBaseStore = create<BaseStore>()(
       getMarket: async (chainId: number) => {
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          // @ts-ignore
-          const chainIdRes = (res.data || []).find(item => item.id === chainId)
-          const marketInfo = {...(chainIdRes || {}) }
-          // @ts-ignore
+          const rawMarketInfo = Array.isArray(res.data)
+            ? res.data[0] || {}
+            : (res.data || {})
+
+          const marketInfo = { ...rawMarketInfo }
+          
           set({ marketInfo: {...marketInfo, minAmountPerOrder: marketInfo.minAmountPerOrder || "20", maxAmountPerOrder: marketInfo.maxAmountPerOrder || "500000" } })
         }
         return res
