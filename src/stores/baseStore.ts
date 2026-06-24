@@ -143,6 +143,30 @@ export const useBaseStore = create<BaseStore>()(
         }
         return res
       },
+      getAllTokens: async (chainId?: number) => {
+        const stableTokenRes =  await baseApi.getTokens(chainId)
+        const rwaTokenRes = await baseApi.getBaseRwas(chainId)
+
+        let newStableTokenList: IToken[] = []
+        let newRwaList: IRwa[] = []
+
+        if (stableTokenRes.code === RESPONSE_CODE.SUCCESS) {
+          newStableTokenList = stableTokenRes.data || []
+        }
+        if (rwaTokenRes.code === RESPONSE_CODE.SUCCESS) {
+          // @ts-ignore
+          newRwaList = (rwaTokenRes.data || []).map(rwa => ({
+            ...rwa,
+            is24H: rwa.sessionMask === 15,
+            sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),
+          })) 
+        }
+        
+        set({
+          tokenList: newStableTokenList,
+          rwaList: newRwaList,
+        })
+      },
       getStocks: async () => {
         const res = await baseApi.getStocks()
         if (res.code === RESPONSE_CODE.SUCCESS) {
@@ -245,8 +269,7 @@ export const useBaseStore = create<BaseStore>()(
         }
 
         await Promise.all([
-          get().getTokens(chainId),
-          get().getBaseRwas(chainId),
+          get().getAllTokens(chainId),
           get().getStocks(),
           get().getMarket(chainId),
         ])

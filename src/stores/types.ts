@@ -75,6 +75,7 @@ export interface BaseStore {
   getChains: () => Promise<ApiResponse<IChain[]>>;
   getTokens: (chainId?: number) => Promise<ApiResponse<IToken[]>>;
   getBaseRwas: (chainId?: number) => Promise<ApiResponse<IRwa[]>>;
+  getAllTokens: (chainId?: number) => Promise<void>
   getStocks: () => Promise<ApiResponse<IStock[]>>;
   getMarket: (chainId: number) => Promise<ApiResponse<IMarket[]>>;
   getMarketState: () => Promise<ApiResponse<IMarketState>>;

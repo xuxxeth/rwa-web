@@ -11,7 +11,6 @@ import { ErrorChildren } from './components/error/ErrorChildren.tsx'
 import { SuspenseLoading } from './components/loading/SuspenseLoading.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { useBaseStore } from './stores/baseStore.ts'
-import { useAppStore } from './stores/appStore'
 
 const CHAIN_CONFIG = [...defaultChains, bscTestnet, xLayerTestnet]
 
