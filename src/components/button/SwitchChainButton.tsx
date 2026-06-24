@@ -64,13 +64,13 @@ export function SwitchButton() {
 
   useEffect(() => {
     if (chains[0]) {
-      const _chainId = Number(storage.getItem('LAST_CONNECTED_CHAIN_ID') || chains[0].id)
+      const _chainId = Number(storage.getItem(LAST_CONNECTED_CHAIN_ID) || chains[0].id)
       const chain = chains.find(chain => chain.id === _chainId)
-      if (chain) {
+      if (chain && currentChainId !== _chainId) {
         handleSwitchChain(chain.id)
       }
     }
-  }, [chains])
+  }, [chains, currentChainId])
 
   // 如果真实钱包chain切换，则更新当前链
   useEffect(() => {
