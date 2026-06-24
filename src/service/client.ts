@@ -17,6 +17,29 @@ import type {
   AxiosError,
 } from 'axios'
 import storage from '@/utils/storage'
+import { CONNECT_STATE_KEY } from 'ca-common-web'
+
+// 从本地存储中获取连接状态, 这个会比 react state 优先更新
+function getConnectStateFromStorage(): {
+  account: string
+  chainId: number | null
+  isChainSupported: boolean
+} {
+  try {
+    const res = JSON.parse(storage.getItem(CONNECT_STATE_KEY) || "{}")
+    return {
+      account: res.accounts?.[0] || '',
+      chainId: res.chainId || null,
+      isChainSupported: res.isChainSupported || false,
+    }
+  } catch(error) {
+    return {
+      account: '',
+      chainId: null,
+      isChainSupported: false,
+    }
+  }
+}
 
 interface RequestInterceptors<T> {
   // 请求拦截
@@ -51,20 +74,10 @@ const axiosInstance: AxiosInstance = axios.create({
 const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api', '/risk/api/', '/ref/api/'] // 需要授权的接口前缀列表
 const NO_CHAIN_ID_HEADER_URL_SUFFIX = ['/base/public/chains']
 
-axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
-  const controller = new AbortController()
+function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortController, account: string) {
   const url = req.url || ''
-  req.signal = controller.signal
-  abortControllerMap.set(url, controller)
-  // const needAuth = url.includes('/scan/api/') || url.includes('/kyc/api/') // ✅ 判断 URL 是否需要授权
   const needAuth = AUTH_URL_PREFIX.some(prefix => url.includes(prefix))
-  const account = storage.getItem(CONNECT_ACCOUNT)
   const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
-  // ✅ 如果存在 account 但没有签名信息，则中止请求
-  // localSignature &&
-  // localSignature.account?.toLowerCase() === account.toLowerCase() &&
-  // localSignature.expires > Math.floor(Date.now() / 1000)
-
   if (
     (needAuth && (!localSignature || !localSignature?.account || !localSignature?.expires)) ||
     Number(localSignature?.expires) < Math.floor(Date.now() / 1000)
@@ -82,14 +95,39 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
     const auth = `Bearer ecdsa-1.${localSignature.account}-${localSignature.nonce}-${localSignature.expires}.${localSignature.signature}`
     req.headers.set('Authorization', auth)
   }
-  const chainId =
-    localStorage.getItem('DEFAULT_CHAIN_ID') ?? (isTiko ? defaultChains[0]?.id : bscTestnet.id)
-  const lng = storage.getItem(CA_LANGUAGE) || 'en'
+}
 
-  if (!NO_CHAIN_ID_HEADER_URL_SUFFIX.some(suffix => url.includes(suffix))) {
+function handleReqChainIdHeader(req: InternalAxiosRequestConfig, chainId: number | null, isChainSupported: boolean) {
+  const url = req.url || ''
+  if (NO_CHAIN_ID_HEADER_URL_SUFFIX.some(suffix => url.includes(suffix))) {
+    return
+  }
+  if (chainId && isChainSupported) {
     req.headers.set('CA-Chain-Id', chainId)
   }
+}
+
+function handleReqLanguageHeader(req: InternalAxiosRequestConfig) {
+  const lng = storage.getItem(CA_LANGUAGE) || 'en'
   req.headers.set('Accept-Language', lng)
+}
+
+axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
+  const controller = new AbortController()
+  const url = req.url || ''
+  req.signal = controller.signal
+  abortControllerMap.set(url, controller)
+  const { account, chainId, isChainSupported } = getConnectStateFromStorage()
+
+  // 拦截住不支持的 chain 的请求
+  if (chainId && isChainSupported) {
+    controller.abort()
+    return Promise.reject(new axios.Cancel(`Chain ID ${chainId} is not supported`))
+  }
+
+  handleReqSignature(req, controller, account)
+  handleReqChainIdHeader(req, chainId, isChainSupported)
+  handleReqLanguageHeader(req)
 
   return req
 })
