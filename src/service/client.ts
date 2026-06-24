@@ -26,11 +26,11 @@ function getConnectStateFromStorage(): {
   isChainSupported: boolean
 } {
   try {
-    const res = JSON.parse(storage.getItem(CONNECT_STATE_KEY) || "{}")
+    const connectState = storage.getItem(CONNECT_STATE_KEY) || "{}"
     return {
-      account: res.accounts?.[0] || '',
-      chainId: res.chainId || null,
-      isChainSupported: res.isChainSupported || false,
+      account: connectState.accounts?.[0] || '',
+      chainId: connectState.chainId || null,
+      isChainSupported: connectState.isChainSupported || false,
     }
   } catch(error) {
     return {
@@ -115,12 +115,13 @@ function handleReqLanguageHeader(req: InternalAxiosRequestConfig) {
 axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   const url = req.url || ''
+
   req.signal = controller.signal
   abortControllerMap.set(url, controller)
   const { account, chainId, isChainSupported } = getConnectStateFromStorage()
 
   // 拦截住不支持的 chain 的请求
-  if (chainId && isChainSupported) {
+  if (chainId && !isChainSupported) {
     controller.abort()
     return Promise.reject(new axios.Cancel(`Chain ID ${chainId} is not supported`))
   }
