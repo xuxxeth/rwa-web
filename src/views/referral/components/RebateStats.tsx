@@ -442,7 +442,7 @@ export function AmountDisplay(props: {
 
   if (isLess(amountStr, '0.01')) {
     return showTooltip ? (
-      <IconWithTooltip tooltip={amountStr}>
+      <IconWithTooltip tooltip={amountStr} triggerClassName='inline-flex'>
         <span>{'<0.01'}</span>
       </IconWithTooltip>
     ) : (
