@@ -36,7 +36,6 @@ const NO_MENUS_PATH = ['/kyc/liveness-complete']
 function App() {
   const { t, i18n } = useTranslation()
   const router = useRouter()
-  const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
   const refreshByLanguage = useBaseStore(state => state.refreshByLanguage)
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
