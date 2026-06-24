@@ -90,6 +90,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const setCurrentWallet = useBaseStore(s => s.setCurrentWallet)
 
   const setIsWalletConnecting = useAppStore(s => s.setIsWalletConnecting)
+  const currentChainId = useAppStore(s => s.currentChainId)
 
   const [status, setStatus] = useState<WalletStatus>(WalletStatus.IDLE)
   const prevStatusRef = useRef<WalletStatus>(WalletStatus.IDLE)
@@ -110,10 +111,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const pendingStep = usePendingStep()
 
   const handleConnect = useCallback(
-    async (connectorType: ConnectorType, wallet: WalletConfig) => {
+    async (connectorType: ConnectorType, chainId: number, wallet: WalletConfig) => {
       try {
         setIsQrCodeInvalid(false)
-        await rwaHandleConnect(connectorType, wallet)
+        await rwaHandleConnect(connectorType, chainId, wallet)
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
           setIsQrCodeInvalid(true)
@@ -194,7 +195,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [status])
 
   useEffect(() => {
-    if (!wallets.length || account || !initialized) return
+    if (!wallets.length || account || !initialized || !currentChainId) return
 
     const walletUUID = storage.getItem(WALLET_UUID)
     const connector = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
@@ -215,10 +216,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setStatus(WalletStatus.CONNECTING)
     setIsWalletConnecting(true)
 
-    handleConnect(connector, wallet)
-  }, [wallets, initialized])
+    handleConnect(connector, currentChainId, wallet)
+  }, [wallets, initialized, currentChainId])
 
-  const connectWallet = async (wallet: WalletConfig) => {
+  const connectWallet = async (wallet: WalletConfig, chainId: number | null) => {
+    if (!chainId) return
+
     isManualConnect.current = true
     setCurrentWallet(wallet)
     setIsWalletConnecting(true)
@@ -232,13 +235,13 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
       setConnectorType(ConnectorType.Injected)
 
-      await handleConnect(ConnectorType.Injected, wallet)
+      await handleConnect(ConnectorType.Injected, chainId, wallet)
       return
     }
 
     setConnectorType(ConnectorType.WalletConnect)
 
-    await handleConnect(ConnectorType.WalletConnect, wallet)
+    await handleConnect(ConnectorType.WalletConnect, chainId, wallet)
   }
 
   const goTo = (path: string) => {
@@ -402,7 +405,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         <div className='pt-1 text-white w-[402px] border-t border-[#232427]'>
           {connectorType === ConnectorType.WalletConnect ? (
             <QrCodeView
-              refresh={() => handleConnect(ConnectorType.WalletConnect, currentWallet)}
+              refresh={() => {
+                if (!currentChainId) {
+                  return
+                }
+                handleConnect(ConnectorType.WalletConnect, currentChainId, currentWallet)
+              }}
               currentWallet={currentWallet}
               isQrCodeInvalid={isQrCodeInvalid}
             />
@@ -412,7 +420,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 <WalletItem
                   key={wallet.info.name}
                   wallet={wallet}
-                  onClick={() => connectWallet(wallet)}
+                  onClick={() => connectWallet(wallet, currentChainId)}
                 />
               ))}
             </div>

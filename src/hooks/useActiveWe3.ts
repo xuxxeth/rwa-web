@@ -26,9 +26,9 @@ export function useActiveWeb3() {
   const switchChain = useSwitchChain()
 
   const handleConnect = useCallback(
-    async (connectorType: ConnectorType, wallet: WalletConfig) => {
+    async (connectorType: ConnectorType, chainId: number, wallet: WalletConfig) => {
       try {
-        await connect(connectorType, wallet)
+        await connect(connectorType, chainId, wallet)
         // 这里应该是连接成功之后，才存储状态
         storage.setItem(CONNECTOR_TYPE, connectorType)
         storage.setItem(WALLET_UUID, wallet.info.name)
