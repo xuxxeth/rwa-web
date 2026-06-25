@@ -10,7 +10,6 @@ import {
 } from '../assetsList'
 import { useRwaTokens, useTokens } from '@/hooks/useTokens'
 import { LazyImage } from '@/components/image/LazyImage'
-// import { cn, toFixed } from '@/utils'
 import { DialogController } from '@/components/dialog/DialogController'
 import AssetsPieChart, { type ChartData, COLORS } from './pieChart'
 import {
@@ -29,7 +28,7 @@ import {
 
 function Assets({ chainId, account }: { chainId: number; account: string }) {
   const { assetsList, estimatedBalance, estimatedRwaTotalValue, estimatedStableTokenTotalValue } =
-    useAssetsList(chainId, account)
+    useAssetsList()
 
   const riskControlledAssets = useRiskControlAssets(chainId, account)
 

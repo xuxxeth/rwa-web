@@ -15,7 +15,7 @@ function Portfolio() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
 
   const account = useAccount()
-  const chainId = useChainId()
+  const chainId = useAppStore(state => state.currentChainId)
 
   const walltedConnected = account && chainId
 

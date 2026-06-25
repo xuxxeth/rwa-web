@@ -45,7 +45,7 @@ export function useRiskControlAssets(chainId: number, account: string): IRiskCon
     .sort((a, b) => advancedSort(a.quantity, b.quantity, 'desc'))
 }
 
-export function useAssetsList(chainId: number, account: string) {
+export function useAssetsList() {
   const tokenList = useTokens()
   const rwaList = useRwaTokens(false)
 
@@ -65,6 +65,9 @@ export function useAssetsList(chainId: number, account: string) {
         balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
       if (token.price && token.holdings) {
         token.value = multiply(token.holdings, token.price)
+      }
+      if (!token.holdings || !token.price) {
+        token.value = undefined
       }
       return token
     })
