@@ -57,10 +57,15 @@ export function SwitchButton() {
   const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
 
-  const currentChain = useBaseStore(state => state.currentChain)
   const setCurrentChain = useBaseStore(state => state.setCurrentChain)
   const setCurrentChainId = useAppStore(state => state.setCurrentChainId)
   const currentChainId = useAppStore(state => state.currentChainId)
+
+  console.log(currentChainId, chainId)
+
+  const currentChain = useMemo(() => {
+    return chains.find(chain => chain.id === currentChainId)
+  }, [chains, currentChainId])
 
   useEffect(() => {
     if (chains[0]) {
@@ -132,10 +137,13 @@ export function SwitchButton() {
                       if (chain.state !== 0) {
                         setOpen(false)
                         handleSwitchChain(chain.id)
-                          .then(() => {
-                            // storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
-                            // setCurrentChain(chain)
-                            // setCurrentChainId(chain.id)
+                          .then((res) => {
+                            if (!res) {
+                              storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
+                              setCurrentChain(chain)
+                              setCurrentChainId(chain.id)
+                            }
+                            
                           })
                         
                       }

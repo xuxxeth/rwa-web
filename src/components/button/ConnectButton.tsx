@@ -10,7 +10,7 @@ import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import { ConnectorType, useQrCodeData, type WalletConfig, useIsSupportChain } from '@/hooks/useCaCommon'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
-import { DialogController } from '@/components/dialog/DialogController'
+import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 import { Divide } from '../divide'
 import { LazyImage } from '../image/LazyImage'
@@ -23,6 +23,7 @@ import QRCode from '@/components/qrcode'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
 import { usePendingStep } from '@/hooks/usePendingStep'
+import SwitchChainModal from '../dialog/SwitchChainModal'
 
 export function WalletItem({
   wallet,
@@ -81,8 +82,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     initialized,
   } = useActiveWeb3()
 
-  const isSupportChain = useIsSupportChain()
-
+  const switchDialog = useShowDialog()
   const chains = useBaseStore(s => s.chainList)
   const showConnect = useBaseStore(s => s.showConnect)
   const setShowConnect = useBaseStore(s => s.setShowConnect)
@@ -118,12 +118,16 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
           setIsQrCodeInvalid(true)
+        } else {
+          toastError({
+            title: t('switchNetwork', { network: networkText }),
+          })
         }
       } finally {
         setIsWalletConnecting(false)
       }
     },
-    [rwaHandleConnect]
+    [rwaHandleConnect, networkText]
   )
 
   useEffect(() => {
@@ -162,7 +166,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
       case WalletStatus.WRONG_NETWORK:
         // 不支持的链，不再进行自动切换链操作，后期会有个弹窗提示
-
+        switchDialog.show()
         // if (chains[0]) {
         //   handleSwitchChain(chains[0].id)
         //     .then(res => {
@@ -242,6 +246,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setConnectorType(ConnectorType.WalletConnect)
 
     await handleConnect(ConnectorType.WalletConnect, chainId, wallet)
+    
   }
 
   const goTo = (path: string) => {
@@ -427,6 +432,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           )}
         </div>
       </DialogController>
+      <SwitchChainModal open={switchDialog.open} onClose={switchDialog.hide} />
     </>
   )
 }
@@ -478,6 +484,7 @@ function QrCodeView({
           <div className='text-base/6 text-center font-normal mt-4'>{t('scanCode')}</div>
         </div>
       </div>
+      
     </>
   )
 }
