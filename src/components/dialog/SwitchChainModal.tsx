@@ -31,14 +31,19 @@ function ChainItem({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'flex h-[64px] w-full items-center gap-4 rounded-[2px] bg-[#111111] px-4 text-left transition-opacity',
+        'flex h-[64px] w-full items-center justify-between gap-3 bg-[#232427] px-4 text-left transition-opacity rounded-[8px] group',
         disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:opacity-90'
       )}
     >
-      <div className='flex h-[36px] w-[36px] items-center justify-center overflow-hidden rounded-full bg-[#1B1B1B]'>
-        <LazyImage src={icon} className='h-[36px] w-[36px] object-cover' />
+      <div className='flex items-center space-x-3'>
+        <div className='flex h-[36px] w-[36px] items-center justify-center overflow-hidden rounded-full bg-[#1B1B1B]'>
+          <LazyImage src={icon} className='h-[36px] w-[36px] object-cover' />
+        </div>
+        <span className='text-[16px] font-medium text-white'>{label}</span>
       </div>
-      <span className='text-[18px] font-medium text-white'>{label}</span>
+      <div className='hidden group-hover:block'>
+        <LazyImage src='/images/referral/chain_selected.png' className='w-6 h-6 ' />
+      </div>
     </button>
   )
 }
@@ -52,37 +57,18 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
   const [loadingChainId, setLoadingChainId] = useState<number | null>(null)
   const [disconnecting, setDisconnecting] = useState(false)
 
+
   const supportedChains = useMemo(
     () =>
-      chainList.filter(chain => chain.state === 1).slice(0, 2),
+      chainList.filter(chain => chain.state === 1),
     [chainList]
   )
 
+
   const chains = useMemo(() => {
-    if (supportedChains.length >= 2) return supportedChains
-
-    const fallbackChains = [
-      {
-        id: 56,
-        displayName: 'BNB Smart Chain',
-        icon: '/images/icons/chains/bsc.png',
-      },
-      {
-        id: 1,
-        displayName: 'Ethereum',
-        icon: '/images/icons/metamask.png',
-      },
-    ]
-
-    const merged = fallbackChains.map(item => {
-      const existed = supportedChains.find(chain => chain.id === item.id)
-      return existed ?? item
-    })
-
-    return merged
+    return supportedChains
   }, [supportedChains])
 
-  const currentActiveChainId = currentChainId ?? chainId ?? null
   const networkText = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains])
 
   if (!open) return null
@@ -120,44 +106,45 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
 
   return createPortal(
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4'>
-      <div className='relative w-full max-w-[560px] rounded-[12px] bg-white px-6 py-6 text-[#111111] shadow-2xl'>
-        <div className='flex flex-col items-center text-center'>
-          <h2 className='text-[28px] font-bold leading-[1.2]'>{t('switchNetwork')}</h2>
-          <p className='mt-4 max-w-[420px] text-[15px] font-medium leading-[1.5] text-[#7A7A7A]'>
-            {t('switchNetworkDesc') || '平台暂不支持当前钱包选择的网络，请切换至可用网络后继续交易'}
-          </p>
+      <div className='relative w-[418px] rounded-[16px] bg-[#131416] text-white shadow-2xl'>
+        <div className='flex items-center px-6 pt-6 pb-4 border-b border-[#232427]'>
+          <h2 className='text-[16px] font-semibold '>{'切换网络'}</h2>
         </div>
+        <div className='p-6'>
+          <div className=' font-normal text-[#C7CCD6] text-[14px] mb-4'>{'平台暂不支持当前钱包选择的网络，请切换至可用网络后继续交易'}</div>
+          <div className='flex flex-col gap-5'>
+            {chains.map(chain => (
+              <ChainItem
+                key={chain.id}
+                icon={chain.icon}
+                label={chain.displayName}
+                disabled={loadingChainId === chain.id}
+                onClick={() => handleSwitch(chain.id)}
+              />
+            ))}
+          </div>
+          <div className='mt-3 flex items-center gap-4'>
+            <div className='h-px flex-1 bg-[#232427]' />
+            <span className='text-[14px] font-medium text-[#737A87]'>or</span>
+            <div className='h-px flex-1 bg-[#232427]' />
+          </div>
 
-        <div className='mt-8 flex flex-col gap-5 px-6'>
-          {chains.map(chain => (
-            <ChainItem
-              key={chain.id}
-              icon={chain.icon}
-              label={chain.displayName}
-              disabled={loadingChainId === chain.id}
-              onClick={() => handleSwitch(chain.id)}
-            />
-          ))}
+          <div className='mt-3'>
+            <Button
+              type='button'
+              variant='default'
+              outline
+              className='h-[64px] w-full rounded-[8px] bg-[#232427] border-[#232427] text-[16px] font-medium text-white hover:bg-[#232427]'
+              onClick={handleDisconnect}
+              loading={disconnecting}
+            >
+              {t('Disconnect')}
+            </Button>
+          </div>
         </div>
+        
 
-        <div className='mt-8 flex items-center gap-4 px-4'>
-          <div className='h-px flex-1 bg-[#D9D9D9]' />
-          <span className='text-[14px] font-medium text-[#7A7A7A]'>or</span>
-          <div className='h-px flex-1 bg-[#D9D9D9]' />
-        </div>
-
-        <div className='mt-6 px-4'>
-          <Button
-            type='button'
-            variant='default'
-            outline
-            className='h-[56px] w-full rounded-[14px] border-[#D6D6D6] bg-white text-[18px] font-semibold text-[#111111] hover:bg-[#F6F6F6]'
-            onClick={handleDisconnect}
-            loading={disconnecting}
-          >
-            断开连接
-          </Button>
-        </div>
+        
       </div>
     </div>,
     document.body

@@ -61,8 +61,6 @@ export function SwitchButton() {
   const setCurrentChainId = useAppStore(state => state.setCurrentChainId)
   const currentChainId = useAppStore(state => state.currentChainId)
 
-  console.log(currentChainId, chainId)
-
   const currentChain = useMemo(() => {
     return chains.find(chain => chain.id === currentChainId)
   }, [chains, currentChainId])
