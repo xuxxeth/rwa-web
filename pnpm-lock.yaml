@@ -48,8 +48,8 @@ importers:
         specifier: ^9.3.1
         version: 9.3.1
       ca-common-web:
-        specifier: 0.1.84-alpha.6
-        version: 0.1.84-alpha.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)
+        specifier: 0.1.84-alpha.7
+        version: 0.1.84-alpha.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1706,8 +1706,8 @@ packages:
     peerDependencies:
       esbuild: '>=0.17'
 
-  ca-common-web@0.1.84-alpha.6:
-    resolution: {integrity: sha512-T2vXTInjLE0hzmUEQhWW5PyxJG1M2XM/uOoDeeFIfxgz7gkMFUEUPmH9FJwYfpEJSomzAPl5tjS+7hfg4jmG5w==}
+  ca-common-web@0.1.84-alpha.7:
+    resolution: {integrity: sha512-tP2Ymp50VmzF8nhleY9chCG2Pate8X339NwD33zZFZ53c4EJ/beJvXF8u7TJevYurJA19U/QH4b3HhtZMVewJw==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -4484,7 +4484,7 @@ snapshots:
       esbuild: 0.25.9
       load-tsconfig: 0.2.5
 
-  ca-common-web@0.1.84-alpha.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3):
+  ca-common-web@0.1.84-alpha.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.8.3):
     dependencies:
       qr-code-styling: 1.9.2
       react: 19.1.1
