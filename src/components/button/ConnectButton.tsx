@@ -7,7 +7,12 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
-import { ConnectorType, useQrCodeData, type WalletConfig, useIsSupportChain } from '@/hooks/useCaCommon'
+import {
+  ConnectorType,
+  useQrCodeData,
+  type WalletConfig,
+  useIsSupportChain,
+} from '@/hooks/useCaCommon'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
@@ -117,7 +122,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         await rwaHandleConnect(connectorType, chainId, wallet)
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
-          setIsQrCodeInvalid(true)
+          if ((error as any).message === 'SwitchChainFailed') {
+            toastError({
+              title: t('switchNetwork', { network: networkText }),
+            })
+            setConnectorType(undefined);
+          } else {
+             setIsQrCodeInvalid(true)
+          }
         } else {
           toastError({
             title: t('switchNetwork', { network: networkText }),
@@ -137,9 +149,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     }
     // const supported = chains.some(c => c.id === chainId)
     setStatus(isChainSupported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
-    if (isChainSupported) {
-      storage.setItem(LAST_CONNECTED_CHAIN_ID, chainId.toString())
-    }
   }, [account, chainId, chains, isChainSupported])
 
   const hasInitializedRef = useRef(false)
@@ -183,10 +192,17 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         //     title: t('switchNetwork', { network: networkText }),
         //   })
         // }
-        
-        break
 
-      // case WalletStatus.IDLE:
+        break
+      case WalletStatus.IDLE:
+        // 如果上次是通过 walletConnect 连接的，去掉 walletConenct 连接记录
+        const connectorTypeFromStorage = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
+        if (connectorTypeFromStorage === ConnectorType.WalletConnect) {
+          setConnectorType(undefined);
+          storage.removeItem(CONNECTOR_TYPE);
+          storage.removeItem(WALLET_UUID);
+        }
+        break;
       //   if (!isRestoringRef.current && hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
       //     toastError({
       //       title: t('walletDisconnect'),
@@ -246,7 +262,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setConnectorType(ConnectorType.WalletConnect)
 
     await handleConnect(ConnectorType.WalletConnect, chainId, wallet)
-    
   }
 
   const goTo = (path: string) => {
@@ -272,7 +287,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   return (
     <>
-      {(!account) ? (
+      {!account ? (
         <div
           className={cn(
             'h-[36px] flex items-center px-6 bg-[#9CFF3A] text-sm font-medium rounded-[8px] cursor-pointer',
@@ -298,10 +313,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       ) : (
         <HoverCard open={hoverOpen} onOpenChange={setHoverOpen}>
           <HoverCardTrigger asChild>
-            <div className={cn(
-              'h-[36px] flex items-center px-2 py-1 bg-[#191B1E] text-sm font-semibold rounded-[8px] cursor-pointer text-white',
-              hoverOpen ? "bg-[#383A40]" : ""
-            )}>
+            <div
+              className={cn(
+                'h-[36px] flex items-center px-2 py-1 bg-[#191B1E] text-sm font-semibold rounded-[8px] cursor-pointer text-white',
+                hoverOpen ? 'bg-[#383A40]' : ''
+              )}
+            >
               {currentWallet?.info?.icon && (
                 <img src={currentWallet.info.icon} className='w-6 mr-2' />
               )}
@@ -315,9 +332,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             align='end'
             className='bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]'
           >
-            <div
-              className='bg-[#131416] border border-[#232427] rounded-[8px] pt-2 text-white'
-            >
+            <div className='bg-[#131416] border border-[#232427] rounded-[8px] pt-2 text-white'>
               <div className='px-5 pb-2'>
                 <div className='flex items-center justify-between py-3'>
                   <div className=' text-sm font-medium'>{shortenAddress(account)}</div>
@@ -340,20 +355,31 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('identity')}
                 >
-                  <div className={cn(
-                    ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
-                    kycStatus === KYC_OVERALL_STATUS.VERIFIED && !pendingStep.step ? 'bg-[#25A750]' :
-                    (kycStatus === KYC_OVERALL_STATUS.ISSUE) ? 'bg-[#CA3F64]' : 'bg-[#FFB219]'
-                  )}>
-                    <img src={
-                      kycStatus === KYC_OVERALL_STATUS.VERIFIED ? '/images/v2/icons/verify.png' :
-                      (kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step) ? '/images/v2/icons/issue.png' : '/images/v2/icons/unverify.png'
-                    } className='w-[20px] h-[14px]' alt='' />
+                  <div
+                    className={cn(
+                      ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
+                      kycStatus === KYC_OVERALL_STATUS.VERIFIED && !pendingStep.step
+                        ? 'bg-[#25A750]'
+                        : kycStatus === KYC_OVERALL_STATUS.ISSUE
+                          ? 'bg-[#CA3F64]'
+                          : 'bg-[#FFB219]'
+                    )}
+                  >
+                    <img
+                      src={
+                        kycStatus === KYC_OVERALL_STATUS.VERIFIED
+                          ? '/images/v2/icons/verify.png'
+                          : kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step
+                            ? '/images/v2/icons/issue.png'
+                            : '/images/v2/icons/unverify.png'
+                      }
+                      className='w-[20px] h-[14px]'
+                      alt=''
+                    />
                     <span className='text-[12px] font-medium ml-1 text-black'>
                       {!isSignatureValid ? t('identity.verifyID') : verifyTip || t('verified')}
                     </span>
                   </div>
-                  
                 </div>
                 <div
                   className='flex items-center py-3 cursor-pointer'
@@ -369,8 +395,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <img src='/images/v2/icons/order.png' className='w-[16px] h-[16px]' alt='' />
                   <span className='text-[14px] font-medium ml-2'>{t('v2.hd.h1')}</span>
                 </div>
-
-                
               </div>
 
               <Divide />
@@ -393,8 +417,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
-        className="pr-0 pl-0"
-        headerClassName="px-4"
+        className='pr-0 pl-0'
+        headerClassName='px-4'
         open={showConnect}
         openChange={open => {
           setShowConnect(open)
@@ -484,7 +508,6 @@ function QrCodeView({
           <div className='text-base/6 text-center font-normal mt-4'>{t('scanCode')}</div>
         </div>
       </div>
-      
     </>
   )
 }
