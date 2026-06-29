@@ -53,7 +53,6 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
   const { toastError } = useToast()
   const { handleSwitchChain, handleDisConnect, chainId } = useActiveWeb3()
   const chainList = useBaseStore(s => s.chainList)
-  const currentChainId = useAppStore(s => s.currentChainId)
   const [loadingChainId, setLoadingChainId] = useState<number | null>(null)
   const [disconnecting, setDisconnecting] = useState(false)
 
@@ -108,10 +107,10 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4'>
       <div className='relative w-[418px] rounded-[16px] bg-[#131416] text-white shadow-2xl'>
         <div className='flex items-center px-6 pt-6 pb-4 border-b border-[#232427]'>
-          <h2 className='text-[16px] font-semibold '>{'切换网络'}</h2>
+          <h2 className='text-[16px] font-semibold '>{t('multiChain.t1')}</h2>
         </div>
         <div className='p-6'>
-          <div className=' font-normal text-[#C7CCD6] text-[14px] mb-4'>{'平台暂不支持当前钱包选择的网络，请切换至可用网络后继续交易'}</div>
+          <div className=' font-normal text-[#C7CCD6] text-[14px] mb-4'>{t('multiChain.t2')}</div>
           <div className='flex flex-col gap-5'>
             {chains.map(chain => (
               <ChainItem
@@ -125,7 +124,7 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
           </div>
           <div className='mt-3 flex items-center gap-4'>
             <div className='h-px flex-1 bg-[#232427]' />
-            <span className='text-[14px] font-medium text-[#737A87]'>or</span>
+            <span className='text-[14px] font-medium text-[#737A87]'>{t('multiChain.t3')}</span>
             <div className='h-px flex-1 bg-[#232427]' />
           </div>
 

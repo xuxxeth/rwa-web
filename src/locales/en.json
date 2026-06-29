@@ -876,5 +876,10 @@
     "claimSuccess": "Claim successful",
     "claimFailed": "Claim failed",
     "sigSubTitle": "Please complete a wallet signature to view your referral history."
+  },
+  "multiChain": {
+    "t1": "Switch Network",
+    "t2": "This app doesn’t support your current network. Switch to an available option to continue.",
+    "t3": "or"
   }
 }
