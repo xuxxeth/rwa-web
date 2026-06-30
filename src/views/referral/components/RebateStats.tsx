@@ -157,6 +157,14 @@ export function RebateStats(props: {
   )
   const { startRefresh: startOnceRefresh } = useMultiDelayedRefresh(refresh, [0])
 
+  if (isSwitchingChain) {
+    return (
+      <div className='flex gap-10 px-8 py-9 h-full relative'>
+        <CircleLoading className='text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+      </div>
+    )
+  }
+
   return (
     <div className='flex gap-10 px-8 py-9 h-full'>
       <div className='flex-1 flex flex-col h-[217px] justify-between overflow-hidden'>
@@ -170,13 +178,9 @@ export function RebateStats(props: {
 
           <div className='flex gap-[8px] max-w-full items-baseline relative'>
             <p className='font-bold text-[32px] text-[#9cff3a] leading-none truncate'>
-              {isSwitchingChain ? (
-                '--'
-              ) : (
-                <AmountDisplay
-                  amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
-                />
-              )}
+              <AmountDisplay
+                amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
+              />
             </p>
             <p className='font-medium flex-none text-[18px] text-[#9da3af] leading-normal'>USD</p>
           </div>
