@@ -57,12 +57,12 @@ function useClaimableReferralTokens(
       if (!validSignature()) return null
       if (!ready) return null
       const next = await getReferralRebates(tokenAddrs)
-      return tokenList
+      return tokenAddrs
         .slice(0, next.length)
-        .map((token, index) => [token.address, next[index]] as [string, bigint])
+        .map((tokenAddr, index) => [tokenAddr, next[index]] as [string, bigint])
         .filter(([_, amount]) => amount !== 0n)
     },
-    [ready, isSignatureValid, account, getReferralRebates, tokenAddrs, tokenList, chainId],
+    [ready, isSignatureValid, account, getReferralRebates, tokenAddrs, chainId],
     {
       immediate: ready,
       initialData: null,
@@ -159,14 +159,6 @@ export function RebateStats(props: {
     [0, 500, 2500, 3800, 60000]
   )
   const { startRefresh: startOnceRefresh } = useMultiDelayedRefresh(refresh, [0])
-
-  if (isSwitchingChain) {
-    return (
-      <div className='flex gap-10 px-8 py-9 h-full relative'>
-        <CircleLoading className='text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
-      </div>
-    )
-  }
 
   return (
     <div className='flex gap-10 px-8 py-9 h-full'>
