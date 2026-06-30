@@ -38,12 +38,15 @@ function useClaimableReferralTokens(
   isSignatureValid: boolean
 ) {
   const tokenList = useTokens()
-  const diamondAddress = useDiamondAddr()
   const [, , validSignature] = useSignatureValidStatus()
+  const chainList = useBaseStore(state => state.chainList)
 
-  const tokenAddrs = useMemo(() => {
-    return tokenList.map(token => token.address as `0x${string}`)
-  }, [tokenList])
+  const [tokenAddrs, diamondAddress] = useMemo(() => {
+    const tokenAddrs = tokenList.map(token => token.address as `0x${string}`)
+    const chain = chainList.find(item => item.id === chainId)
+    const diamondAddress = chain?.contract as Address | undefined
+    return [tokenAddrs, diamondAddress]
+  }, [tokenList, chainId, chainList])
 
   const { getReferralRebates } = useReferralRebates(diamondAddress)
 
