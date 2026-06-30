@@ -174,7 +174,13 @@ export function RebateStats(props: {
           <div className='flex gap-[8px] max-w-full items-baseline relative'>
             <p className='font-bold text-[32px] text-[#9cff3a] leading-none truncate'>
               <AmountDisplay
-                amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
+                amount={
+                  isSwitchingChain
+                    ? undefined
+                    : totalAmount !== undefined
+                      ? formatAmount(totalAmount)
+                      : undefined
+                }
               />
             </p>
             <p className='font-medium flex-none text-[18px] text-[#9da3af] leading-normal'>USD</p>
