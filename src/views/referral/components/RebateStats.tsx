@@ -118,7 +118,6 @@ export function RebateStats(props: {
   const { inviteCodeInfo, isSignatureValid, refreshCodeInfo, account } = props
   const [, , validSignature] = useSignatureValidStatus()
   const { t } = useTranslation()
-  const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
   const { rebates, rebatesLoading, totalAmount, canClaimRebate, isKycFinished, refreshRebates } =
     useRebateClaimState(isSignatureValid)
@@ -174,13 +173,7 @@ export function RebateStats(props: {
           <div className='flex gap-[8px] max-w-full items-baseline relative'>
             <p className='font-bold text-[32px] text-[#9cff3a] leading-none truncate'>
               <AmountDisplay
-                amount={
-                  isSwitchingChain
-                    ? undefined
-                    : totalAmount !== undefined
-                      ? formatAmount(totalAmount)
-                      : undefined
-                }
+                amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
               />
             </p>
             <p className='font-medium flex-none text-[18px] text-[#9da3af] leading-normal'>USD</p>
@@ -188,7 +181,7 @@ export function RebateStats(props: {
         </div>
 
         <RebateClaimButton
-          disabled={disabled || isSwitchingChain}
+          disabled={disabled}
           rebates={rebates ?? []}
           isKycFinished={isKycFinished}
           multiRefresh={startMultiRefresh}
