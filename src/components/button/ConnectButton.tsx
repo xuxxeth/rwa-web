@@ -106,7 +106,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const isManualConnect = useRef(false)
   const isMobile = useMemo(() => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent), [])
 
-  const networkText = useMemo(() => chains.map(c => c.displayName).join(' / '), [chains])
+  const networkText = useMemo(() => chains.filter(c => c.state === 1).map(c => c.displayName).join(' / '), [chains])
 
   const { verifyTip } = useVerifyTip()
   const [isSignatureValid] = useSignatureValidStatus()

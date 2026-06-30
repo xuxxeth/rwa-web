@@ -68,7 +68,7 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
     return supportedChains
   }, [supportedChains])
 
-  const networkText = useMemo(() => chains.map(chain => chain.displayName).join(' / '), [chains])
+  const networkText = useMemo(() => chains.filter(c => c.state === 1).map(chain => chain.displayName).join(' / '), [chains])
 
   if (!open) return null
 
