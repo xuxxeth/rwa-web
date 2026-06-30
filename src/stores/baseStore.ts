@@ -144,8 +144,10 @@ export const useBaseStore = create<BaseStore>()(
         return res
       },
       getAllTokens: async (chainId?: number) => {
-        const stableTokenRes =  await baseApi.getTokens(chainId)
-        const rwaTokenRes = await baseApi.getBaseRwas(chainId)
+        const [stableTokenRes, rwaTokenRes] = await Promise.all([
+          baseApi.getTokens(chainId),
+          baseApi.getBaseRwas(chainId),
+        ])
 
         let newStableTokenList: IToken[] = []
         let newRwaList: IRwa[] = []

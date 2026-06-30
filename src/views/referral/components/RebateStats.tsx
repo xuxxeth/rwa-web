@@ -13,13 +13,13 @@ import { useTokens } from '@/hooks/useTokens'
 import type { IToken } from '@/service/base/types'
 import { LazyImage } from '@/components/image/LazyImage'
 import IconWithTooltip from '@/components/icon-tooltip'
-import { riskApi } from '@/service/risk/api'
-import type { IUserCofnig } from '@/service/risk/types'
 import { useKycStore } from '@/stores/kycStore'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
 import { useMultiDelayedRefresh } from '@/hooks/useMultiDelayedRefresh'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
+import { useAppStore } from '@/stores/appStore'
+import { CircleLoading } from '@/components/loading'
 
 export function useDiamondAddr() {
   const chainList = useBaseStore(state => state.chainList)
@@ -32,7 +32,11 @@ export function useDiamondAddr() {
   }, [chainId, chainList])
 }
 
-function useClaimableReferralTokens(account: string, isSignatureValid: boolean) {
+function useClaimableReferralTokens(
+  account: string,
+  chainId: number | null,
+  isSignatureValid: boolean
+) {
   const tokenList = useTokens()
   const diamondAddress = useDiamondAddr()
   const [, , validSignature] = useSignatureValidStatus()
@@ -43,7 +47,7 @@ function useClaimableReferralTokens(account: string, isSignatureValid: boolean) 
 
   const { getReferralRebates } = useReferralRebates(diamondAddress)
 
-  const ready = Boolean(diamondAddress) && tokenAddrs.length > 0
+  const ready = Boolean(diamondAddress) && tokenAddrs.length > 0 && !!chainId
 
   const query = useRequest<Array<[symbol: string, amount: bigint]>>(
     async () => {
@@ -55,7 +59,7 @@ function useClaimableReferralTokens(account: string, isSignatureValid: boolean) 
         .map((token, index) => [token.address, next[index]] as [string, bigint])
         .filter(([_, amount]) => amount !== 0n)
     },
-    [ready, isSignatureValid, account, getReferralRebates, tokenAddrs, tokenList],
+    [ready, isSignatureValid, account, getReferralRebates, tokenAddrs, tokenList, chainId],
     {
       immediate: ready,
       initialData: null,
@@ -71,29 +75,7 @@ function useClaimableReferralTokens(account: string, isSignatureValid: boolean) 
 function useRebateClaimState(isSignatureValid: boolean) {
   const account = useAccount()
   const [, , validSignature] = useSignatureValidStatus()
-
-  // const [riskUserConfig, setRiskUserConfig] = useState<IUserCofnig | null | undefined>(undefined)
-
-  // useEffect(() => {
-  //   if (!account || !validSignature()) {
-  //     setRiskUserConfig(undefined)
-  //     return
-  //   }
-  //   setRiskUserConfig(undefined)
-
-  //   riskApi
-  //     .getUserConfig()
-  //     .then(res => {
-  //       if (res?.code === RESPONSE_CODE.SUCCESS) {
-  //         setRiskUserConfig(res.data)
-  //         return
-  //       }
-  //       setRiskUserConfig(null)
-  //     })
-  //     .catch(() => {
-  //       setRiskUserConfig(null)
-  //     })
-  // }, [account, isSignatureValid])
+  const currentChainId = useAppStore(state => state.currentChainId)
 
   const riskUserConfigForReferral = useKycStore(state => state.riskUserConfigForReferral)
 
@@ -107,26 +89,11 @@ function useRebateClaimState(isSignatureValid: boolean) {
         : false
       : undefined
 
-  // const isKycFinished =
-  //   kycStatusForReferral?.status === -1
-  //     ? undefined
-  //     : // 2-已通过 5-已过期 9-风控
-  //       kycStatusForReferral?.status === 2 ||
-  //       kycStatusForReferral?.status === 5 ||
-  //       kycStatusForReferral?.status === 9
-
-  // console.log('===>isKycFinished', kycStatusForReferral?.status, isKycFinished)
-
-  // console.log('===>riskUserConfig', riskUserConfig)
-  // const canClaimRebate =
-  //   riskUserConfig?.actions !== undefined ? (riskUserConfig?.actions & (1 << 2)) !== 0 : false
-  // console.log('===>canClaimRebate', canClaimRebate)
-
   const {
     rebates,
     loading: rebatesLoading,
     refresh: refreshRebates,
-  } = useClaimableReferralTokens(account, isSignatureValid)
+  } = useClaimableReferralTokens(account, currentChainId, isSignatureValid)
   const totalAmount = rebates?.reduce((acc, [, amount]) => acc + amount, BigInt(0))
 
   return {
@@ -148,6 +115,7 @@ export function RebateStats(props: {
   const { inviteCodeInfo, isSignatureValid, refreshCodeInfo, account } = props
   const [, , validSignature] = useSignatureValidStatus()
   const { t } = useTranslation()
+  const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
   const { rebates, rebatesLoading, totalAmount, canClaimRebate, isKycFinished, refreshRebates } =
     useRebateClaimState(isSignatureValid)
@@ -199,18 +167,23 @@ export function RebateStats(props: {
             </span>
             {isKycFinished && canClaimRebate === false && <OnRisk />}
           </div>
-          <div className='flex gap-[8px] max-w-full items-baseline'>
+
+          <div className='flex gap-[8px] max-w-full items-baseline relative'>
             <p className='font-bold text-[32px] text-[#9cff3a] leading-none truncate'>
-              <AmountDisplay
-                amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
-              />
+              {isSwitchingChain ? (
+                '--'
+              ) : (
+                <AmountDisplay
+                  amount={totalAmount !== undefined ? formatAmount(totalAmount) : undefined}
+                />
+              )}
             </p>
             <p className='font-medium flex-none text-[18px] text-[#9da3af] leading-normal'>USD</p>
           </div>
         </div>
 
         <RebateClaimButton
-          disabled={disabled}
+          disabled={disabled || isSwitchingChain}
           rebates={rebates ?? []}
           isKycFinished={isKycFinished}
           multiRefresh={startMultiRefresh}

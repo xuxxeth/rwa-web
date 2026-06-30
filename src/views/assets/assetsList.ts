@@ -45,7 +45,7 @@ export function useRiskControlAssets(chainId: number, account: string): IRiskCon
     .sort((a, b) => advancedSort(a.quantity, b.quantity, 'desc'))
 }
 
-export function useAssetsList() {
+export function useAssetsList(chainId: number) {
   const tokenList = useTokens()
   const rwaList = useRwaTokens(false)
 
@@ -54,7 +54,7 @@ export function useAssetsList() {
 
   const allTokenList = useMemo(() => {
     return [...tokenList.map(getAssetItemFromToken), ...rwaList.map(getAssetItemFromRwa)]
-  }, [rwaList, tokenList])
+  }, [rwaList, tokenList, chainId])
 
   const assetsList = useMemo(() => {
     return allTokenList.map(token => {
@@ -73,13 +73,20 @@ export function useAssetsList() {
     })
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
-  const estimatedRwaTotalValue = sum(
-    ...assetsList.filter(item => item.rwaId).map(item => item.value ?? 0)
-  )
-  const estimatedStableTokenTotalValue = sum(
-    ...assetsList.filter(item => !item.rwaId).map(item => item.value ?? 0)
-  )
-  const estimatedBalance = sum(estimatedRwaTotalValue, estimatedStableTokenTotalValue)
+  const estimatedRwaTotalValue =
+    assetsList.length > 0
+      ? sum(...assetsList.filter(item => item.rwaId).map(item => item.value ?? 0))
+      : undefined
+
+  const estimatedStableTokenTotalValue =
+    assetsList.length > 0
+      ? sum(...assetsList.filter(item => !item.rwaId).map(item => item.value ?? 0))
+      : undefined
+
+  const estimatedBalance =
+    estimatedRwaTotalValue !== undefined && estimatedStableTokenTotalValue !== undefined
+      ? sum(estimatedRwaTotalValue, estimatedStableTokenTotalValue)
+      : undefined
 
   useEffect(() => {
     const listener = (data: IAggregateData) => {

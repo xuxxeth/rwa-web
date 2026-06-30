@@ -7,6 +7,8 @@ export interface AppStore {
   setFavorites: (favorites: number[]) => void
   currentChainId: number | null
   setCurrentChainId: (chainId: number | null) => void
+  isSwitchingChain: boolean
+  setIsSwitchingChain: (isSwitching: boolean) => void
 }
 
 export const useAppStore = create<AppStore>()((set, get) => ({
@@ -21,5 +23,9 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   },
   setCurrentChainId: (chainId: number | null) => {
     set({ currentChainId: chainId })
+  },
+  isSwitchingChain: false,
+  setIsSwitchingChain: (isSwitching: boolean) => {
+    set({ isSwitchingChain: isSwitching })
   },
 }))

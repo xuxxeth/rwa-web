@@ -22,11 +22,9 @@ import { type IQuote } from '@/service/quote/types'
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { truncate } from '@/utils'
 import { useRouter } from '@/hooks/useRouter'
-import IconWithTooltip from '@/components/icon-tooltip'
 import SearchFilter from './SearchFilter'
 import useFavorites from '@/hooks/useFavorites'
 import type { IRwa } from '@/service/base/types'
-import { PreMarketOpen } from '@/components/markets/PreMarketOpen'
 import {
   NoDataReason,
   TextCellWithColor,
@@ -37,6 +35,8 @@ import {
 } from './shared'
 import { useBaseStore } from '@/stores/baseStore'
 import { MarketStatus } from '@/components/markets/MarketStatus'
+import { useAppStore } from '@/stores/appStore'
+import { CircleLoading } from '@/components/loading'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
@@ -105,6 +105,7 @@ export default function MarketQuotes() {
   const router = useRouter()
 
   const marketTradeState = useBaseStore(state => state.marketTradeState)
+  const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
   const rwaList = useRwaTokens(false)
 
@@ -187,9 +188,14 @@ export default function MarketQuotes() {
             onSortChange={onSortChange}
             thClassName={'text-xs/[15px] text-gray-400 font-normal'}
           />
-          {paginatedData.length === 0 && (
+          {isSwitchingChain ? (
+            <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+          ) : paginatedData.length === 0 ? (
             <NoDataReason isFavorites={isFavorites} {...favoritesRest} />
-          )}
+          ) : null}
+          {/* {paginatedData.length === 0 && (
+            <NoDataReason isFavorites={isFavorites} {...favoritesRest} />
+          )} */}
           <TableBody<IMarketQuote, ITableExtra>
             data={paginatedData}
             config={MarketQuotesListConfig}
