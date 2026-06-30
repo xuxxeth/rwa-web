@@ -32,7 +32,7 @@ export function ChainItem({
     )}>
       <div className="flex items-center">
         <div className="w-6 h-6 mr-2">
-          <img src={icon} className="w-6 h-6" alt="" />
+          <img src={icon} className="w-6 h-6 rounded-full" alt="" />
         </div>
 
         <span className={cn(
@@ -104,7 +104,7 @@ export function SwitchButton() {
           )}
             
           >
-            <img src={getChainIconById(String(currentChain.id))} className="w-6 mr-1 rounded-full" alt="" />
+            <img src={currentChain.icon} className="w-6 mr-1 rounded-full" alt="" />
             <span >{currentChain.displayName}</span>
             <img src="/images/icons/down.png" className={cn(
               "w-3 ml-4 mr-2 transition-all",
@@ -115,7 +115,7 @@ export function SwitchButton() {
         
       </HoverCardTrigger>
       <HoverCardContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]"
+          className="bg-[rgba(0,0,0,0)] min-w-[340px] border-none pt-2 -mr-[16px]"
        >
         <div 
           className="bg-[#131416] border border-[#232427] rounded-[8px] py-4 text-white relative"
