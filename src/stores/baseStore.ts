@@ -176,7 +176,7 @@ export const useBaseStore = create<BaseStore>()(
         }
         return res
       },
-      getMarket: async (chainId: number) => {
+      getMarket: async () => {
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
           const rawMarketInfo = Array.isArray(res.data)
@@ -275,7 +275,7 @@ export const useBaseStore = create<BaseStore>()(
         await Promise.all([
           get().getAllTokens(chainId),
           get().getStocks(),
-          get().getMarket(chainId),
+          get().getMarket(),
         ])
         set(() => ({
           lastChainId: chainId,
