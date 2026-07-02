@@ -28,6 +28,7 @@ import { useBaseStore } from "@/stores/baseStore";
 import { useTradeStore } from "@/stores/tradeStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { Slippage } from "@/components/slippage";
+import { useCurrentChain } from "@/hooks/useChain";
 
 type TradeBoxProps = {
   action?: string
@@ -66,6 +67,7 @@ export function TradeBox({
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const tradeType = useTradeStore(state => state.tradeType)
   const sessionType = useTradeStore(state => state.sessionType)
+  const currentChain = useCurrentChain()
   
   const effectivePrice = useEffectivePrice({
     tradeType,
@@ -278,6 +280,7 @@ export function TradeBox({
             estimatedFee={estimatedFee}
             networkFeeInNative={marketInfo.networkFeeInNative}
             maxSlippage={marketInfo.slippage}
+            nativeToken={currentChain?.nativeToken}
             expires={expires}
             onEdit={() => {
               expiresDialog.show()

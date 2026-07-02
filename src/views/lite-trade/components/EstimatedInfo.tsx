@@ -9,6 +9,7 @@ import { SessionType, TradeType } from "ca-common-web"
 import { memo } from "react"
 
 type EstimatedInfoProps = {
+  nativeToken?: string
   estimatedFee: string
   networkFeeInNative: string
   expires: number,
@@ -19,7 +20,7 @@ type EstimatedInfoProps = {
 }
 
 const EstimatedInfo = memo(
-  ({ estimatedFee, networkFeeInNative, tradeType, slippage, maxSlippage, onEdit }: EstimatedInfoProps) => {
+  ({ estimatedFee, networkFeeInNative, tradeType, slippage, maxSlippage, onEdit, nativeToken }: EstimatedInfoProps) => {
     const { t } = useTranslation()
     // const inputTokenPrice = useRwaPrice(inputToken?.symbol || '')
     return (
@@ -91,7 +92,7 @@ const EstimatedInfo = memo(
         />
         <BetweenText 
           left={t("Network Fee")}
-          right={`${networkFeeInNative} BNB` }
+          right={`${networkFeeInNative} ${nativeToken || ''}` }
         />
         
       </div>
