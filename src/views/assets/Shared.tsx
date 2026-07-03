@@ -18,7 +18,6 @@ import NoRecord, { NoRecordAndSeeMore } from '@/components/no-record'
 import { useNavigate } from 'react-router-dom'
 import { useBaseStore } from '@/stores/baseStore'
 import { extractHourMinute } from '@/hooks/useMarketState'
-import { useFeeRulesI18n } from '@/hooks/useFeeRulesI18n'
 import { type TableType } from '@/views/assets/v2/shared'
 
 export type OrderChanged = {
@@ -49,37 +48,20 @@ export function TradingFees(props: {
   commission: string
   fee: string
 }) {
-  const { data: feeRulesI18n } = useFeeRulesI18n()
   let { currency, commissionItems, commission, fee } = props
 
   commission = toFixed(commission)
   fee = toFixed(fee)
   const sumFees = sum(commission, fee)
 
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
-  function getRuleTitle(ruleId: number) {
-    const titleFromApi = feeRulesI18n?.[ruleId]
-    if (titleFromApi) return titleFromApi
-
-    const key = `portfolio.orderTable.ruleId.${ruleId}`
-    if (!i18n.exists(key)) return `ruleId${ruleId}`
-    return t(key)
-  }
-
-  const commissions = Array.isArray(commissionItems)
-    ? [...commissionItems]
-        .sort((a, b) => a.ruleId - b.ruleId)
-        .map(item => ({
-          title: getRuleTitle(item.ruleId)!,
-          value: item.amount,
-        }))
-    : [
-        {
-          title: t('portfolio.orderTable.bf'),
-          value: commission,
-        },
-      ]
+  const commissions = [
+    {
+      title: t('portfolio.orderTable.bf'),
+      value: commission,
+    },
+  ]
 
   const tooltip = (
     <div className='flex flex-col gap-1'>

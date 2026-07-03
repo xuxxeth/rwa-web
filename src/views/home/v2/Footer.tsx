@@ -139,7 +139,7 @@ export const Footer: React.FC<{ from?: string }> = ({ from }) => {
               <div className='absolute bottom-full right-0 mb-2 w-max bg-[#1A1A1A] border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50'>
                 <div className='py-2 flex flex-col'>
                   <a
-                    href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Cyberalpha+Protocol+Phase3+-+SlowMist+Audit+Report+(2).pdf'
+                    href='https://ca-public-s3.s3.ap-southeast-1.amazonaws.com/web/Cyberalpha+Protocol+Phase4+-+SlowMist+Audit+Report.pdf'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='px-4 py-2 text-xs md:text-sm text-gray-400 hover:text-[#9CFF3A] hover:bg-white/5 transition-colors whitespace-nowrap'

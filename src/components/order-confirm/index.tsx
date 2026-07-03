@@ -19,9 +19,6 @@ type OrderConfirmProps = {
   orderValue?: string,
   platformFee: string,
   brokerageFee: string,
-  tradingActivityFee: string,
-  secFee: string,
-  catFee: string,
   estimatedFee: string,
   action: string
   tradeType: TradeType
@@ -40,9 +37,6 @@ const OrderConfirm = memo(
     orderValue,
     platformFee, 
     brokerageFee, 
-    tradingActivityFee, 
-    secFee,
-    catFee,
     estimatedFee,
     networkFeeInNative,
     feeRate,
@@ -78,7 +72,7 @@ const OrderConfirm = memo(
     },[feeConfig, action])
 
     const feeRatePercent = useMemo(() => {
-      return feeRate ? 
+      return Number(feeRate) > 0 ? 
         `${(Number(feeRate) * 100).toFixed(2).replace(/\.?0+$/, '')}%` : 
         feeRateConfig ? `${(Number(feeRateConfig.platformFeeRate?.value) * 100).toFixed(2).replace(/\.?0+$/, '')}%` : '--'
     }, [feeRate, feeRateConfig?.platformFeeRate?.value]);
@@ -182,40 +176,6 @@ const OrderConfirm = memo(
                   }
                   right={`${brokerageFee} ${feeSymbol}`}
                 />
-                {
-                  action === 'sell' &&  
-                    <BetweenText 
-                      left={
-                        <TooltipWithBorder tooltip={t('v2.tx.t331', {r1: feeRateConfig?.tradingActivityFeeRate?.value || '--', r2: feeRateConfig?.tradingActivityFeeRate?.minValue || '--', r3: feeRateConfig?.tradingActivityFeeRate?.maxValue || '--'})}>
-                          {t('v2.tx.t33')}
-                        </TooltipWithBorder>
-                      }
-                      right={`${tradingActivityFee} ${feeSymbol}`}
-                    />
-                }
-                {
-                  action === 'sell' && !feeRateConfig?.secFeeRate?.noFee &&  
-                    <BetweenText 
-                      left={
-                        <TooltipWithBorder tooltip={t('v2.tx.t471', {r1: feeRateConfig?.secFeeRate?.value || '--', r2: feeRateConfig?.secFeeRate?.minValue || '--'})}>
-                          {t('v2.tx.t47')}
-                        </TooltipWithBorder>
-                      }
-                      right={`${secFee || '--'} ${feeSymbol}`}
-                    />
-                }
-                {
-                    !feeRateConfig?.catFeeRate?.noFee && (
-                      <BetweenText 
-                        left={
-                          <TooltipWithBorder tooltip={t('v2.tx.t481', {r1: feeRateConfig?.catFeeRate?.value || '--', r2: feeRateConfig?.catFeeRate?.minValue || '--'})}>
-                            {t('v2.tx.t48')}
-                          </TooltipWithBorder>
-                        }
-                        right={`${catFee || '--'} ${feeSymbol}`}
-                      />
-                    )
-                }
                 
                 <BetweenText 
                   left={
