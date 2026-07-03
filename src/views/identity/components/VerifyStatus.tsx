@@ -9,7 +9,7 @@ import { formatUp, isLess, parseAmount, textPrefix, truncate, getUpColor, cn } f
 import type { ApiResponse } from '@/service/client'
 import type { IKycDetail } from '@/service/kyc/types'
 
-import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
+import { useRwaWithPriceAndUp } from '@/hooks/useRwaWithPriceAndUp'
 import { useKycStore } from '@/stores/kycStore'
 
 export type VerifyType = 'succeeded' | 'failed' | 'verifying'
@@ -43,9 +43,7 @@ export function FaceRecognitionFailed(props: { retry: () => void }) {
   )
 }
 
-export function VerifyIssue(props: {
-  issueInfo?: string
-}) {
+export function VerifyIssue(props: { issueInfo?: string }) {
   const router = useRouter()
   return (
     <VerifyStatus
@@ -90,14 +88,10 @@ function VerifyStatus(props: {
       <LazyImage src={getIconFromType(props.type)} className='w-[120px] h-[90px] pt-5' />
       <div>
         <div className='text-2xl mb-2 text-center'>{t(`${langPrefix}.${props.title}`)}</div>
-        {
-          props.issueInfo && (
-            <div className='text-base text-[#909090] text-center mb-2'>
-              {props.issueInfo}
-            </div>
-          )
-        }
-        
+        {props.issueInfo && (
+          <div className='text-base text-[#909090] text-center mb-2'>{props.issueInfo}</div>
+        )}
+
         <div className='text-base text-[#909090] text-center'>
           {t(`${langPrefix}.${props.detail}`)}
         </div>

@@ -15,7 +15,7 @@ import {
 import Pagination from '@/components/pagination'
 import { type IMarketQuote } from '@/service/quote/types'
 import { TableHeader, TableBody } from '@/components/table-header'
-import { useRwaTokens } from '@/hooks/useTokens'
+import { useRwaTokens, useStockMap } from '@/hooks/useTokens'
 import wsService from '@/service/webSocket/service'
 import { type ISummaryData } from '@/service/webSocket/types'
 import { type IQuote } from '@/service/quote/types'
@@ -37,29 +37,29 @@ import { useBaseStore } from '@/stores/baseStore'
 import { MarketStatus } from '@/components/markets/MarketStatus'
 import { useAppStore } from '@/stores/appStore'
 import { CircleLoading } from '@/components/loading'
+import { type IStock } from '@/service/base/types'
 
 type SortableField = 'name' | 'token' | 'price' | 'change' | 'marketCap' | 'dailyHigh'
 
-export function useRwaListWithQuote(rwaList: IRwa[]) {
+export function useRwaListWithQuote(rwaList: IRwa[], stockMap: Record<string, IStock>) {
   const [tokenWithQuote, setTokenWithQuote] = useState<Record<string, IQuote>>({})
 
   const rwaListWithQuote = useMemo(() => {
     return rwaList.map(rwa => {
       const stockId = rwa.stockId
       const quote = tokenWithQuote[stockId]
+      const stockStatistics = stockMap[stockId]?.stockStatistics
 
       return {
         ...rwa,
         ...quote,
         marketCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics?.totalShare || 0)
+          ? multiply(quote.price, stockStatistics?.totalShare || 0)
           : undefined,
-        floatCap: quote?.price
-          ? multiply(quote.price, rwa.stockStatistics?.circShare || 0)
-          : undefined,
+        floatCap: quote?.price ? multiply(quote.price, stockStatistics?.circShare || 0) : undefined,
       }
     })
-  }, [rwaList, tokenWithQuote])
+  }, [rwaList, tokenWithQuote, stockMap])
 
   useEffect(() => {
     const listener = (data: ISummaryData) => {
@@ -108,6 +108,7 @@ export default function MarketQuotes() {
   const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
   const rwaList = useRwaTokens(false)
+  const stockMap = useStockMap(false)
 
   const [isFavorites, setIsFavorites] = useState(false)
 
@@ -130,7 +131,7 @@ export default function MarketQuotes() {
     )
   }, [rwaList, isFavorites, favorites, isFavorite, searchText])
 
-  const marketQuotes = useRwaListWithQuote(newRwaList)
+  const marketQuotes = useRwaListWithQuote(newRwaList, stockMap)
 
   const defaultMarketSorter = useCallback((item1: IMarketQuote, item2: IMarketQuote) => {
     if (item1.weight === item2.weight) {

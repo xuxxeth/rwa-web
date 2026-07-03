@@ -14,7 +14,18 @@ import type {
   IChain,
   IMarketState,
 } from '@/service/base/types'
-import { truncate, checkSymbolEqual, symbolToLower, getEasternSecondsSinceMidnight, calculateUp, subtract, divide, multiply, calculateTruncateUP, numberToBinaryArray } from '@/utils'
+import {
+  truncate,
+  checkSymbolEqual,
+  symbolToLower,
+  getEasternSecondsSinceMidnight,
+  calculateUp,
+  subtract,
+  divide,
+  multiply,
+  calculateTruncateUP,
+  numberToBinaryArray,
+} from '@/utils'
 import { WSS_MARKET_STATUS, type IWSSMarketState } from '@/service/webSocket/service'
 
 const ENABLE_CACHE = false
@@ -73,7 +84,7 @@ export const useBaseStore = create<BaseStore>()(
               acc[symbolToLower(cur.S)] = {
                 closePrice: truncate(cur.c || 0, rwa.precision),
                 price: truncate(cur.p || 0, rwa.precision),
-                upValue: truncate(subtract(cur.p ?? '0', (cur.o ?? '0')), 2),
+                upValue: truncate(subtract(cur.p ?? '0', cur.o ?? '0'), 2),
                 up: cur.p && cur.o ? calculateUp(cur.p, cur.o) : '0.00',
                 dailyHigh: truncate(cur?.h || 0, rwa.precision),
               }
@@ -161,9 +172,9 @@ export const useBaseStore = create<BaseStore>()(
             ...rwa,
             is24H: rwa.sessionMask === 15,
             sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),
-          })) 
+          }))
         }
-        
+
         set({
           tokenList: newStableTokenList,
           rwaList: newRwaList,
@@ -179,47 +190,50 @@ export const useBaseStore = create<BaseStore>()(
       getMarket: async () => {
         const res = await baseApi.getMarket()
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          const rawMarketInfo = Array.isArray(res.data)
-            ? res.data[0] || {}
-            : (res.data || {})
+          const rawMarketInfo = Array.isArray(res.data) ? res.data[0] || {} : res.data || {}
 
           const marketInfo = { ...rawMarketInfo }
-          
-          set({ marketInfo: {...marketInfo, minAmountPerOrder: marketInfo.minAmountPerOrder || "20", maxAmountPerOrder: marketInfo.maxAmountPerOrder || "500000" } })
+
+          set({
+            marketInfo: {
+              ...marketInfo,
+              minAmountPerOrder: marketInfo.minAmountPerOrder || '20',
+              maxAmountPerOrder: marketInfo.maxAmountPerOrder || '500000',
+            },
+          })
         }
         return res
       },
       setMarketState: (data: IWSSMarketState) => {
-        
         let marketState = MARKET_STATUS.CLOSE
         // 盘中
         if (data.s === WSS_MARKET_STATUS.OPEN) {
           marketState = MARKET_STATUS.OPEN
         }
         // 盘前
-        if (data.s === WSS_MARKET_STATUS.BEFORE) { 
+        if (data.s === WSS_MARKET_STATUS.BEFORE) {
           marketState = MARKET_STATUS.BEFORE
         }
         // 盘后
-        if (data.s === WSS_MARKET_STATUS.AFTER) { 
+        if (data.s === WSS_MARKET_STATUS.AFTER) {
           marketState = MARKET_STATUS.AFTER
         }
         // 夜盘
-        if (data.s === WSS_MARKET_STATUS.OVERNIGHT) { 
+        if (data.s === WSS_MARKET_STATUS.OVERNIGHT) {
           marketState = MARKET_STATUS.OVERNIGHT
         }
-        
+
         const _marketState = {
-          "market": data.m, // us
-          "desc": "",
-          "tradingDayType": data.d, // 0-非交易日，1-全天交易市，2-上半日市，3-下半日市
-          "status": data.s,
-          "availability": {
-            "trading": 0,
-            "pre_after_trading": 0,
+          market: data.m, // us
+          desc: '',
+          tradingDayType: data.d, // 0-非交易日，1-全天交易市，2-上半日市，3-下半日市
+          status: data.s,
+          availability: {
+            trading: 0,
+            pre_after_trading: 0,
           },
-          "L": data.L, // 是否允许限价单
-          "M": data.M, // 是否允许市价单
+          L: data.L, // 是否允许限价单
+          M: data.M, // 是否允许市价单
         }
         set({ marketState: _marketState, marketTradeState: marketState })
       },
@@ -232,29 +246,29 @@ export const useBaseStore = create<BaseStore>()(
         if (res && res.code === RESPONSE_CODE.SUCCESS) {
           const _data = res.data || {}
           let marketState = MARKET_STATUS.CLOSE
-          if ((_data.tradingDayType === 4 || _data.tradingDayType === 5))  {
+          if (_data.tradingDayType === 4 || _data.tradingDayType === 5) {
             // 盘中
             if (_data.status === 3) {
               marketState = MARKET_STATUS.OPEN
             }
             // 盘前
-            if (_data.status === 2) { 
+            if (_data.status === 2) {
               marketState = MARKET_STATUS.BEFORE
             }
             // 盘后
-            if (_data.status === 6) { 
+            if (_data.status === 6) {
               marketState = MARKET_STATUS.AFTER
             }
             // 已收盘
-            if (_data.status === 7) { 
+            if (_data.status === 7) {
               marketState = MARKET_STATUS.CLOSE // 这里应该是跟 CLOSED 区分开一个状态的，但目前前端只区分了闭市和开市，所以先放在一起
             }
             // 夜盘
-            if (_data.status === 12) { 
+            if (_data.status === 12) {
               marketState = MARKET_STATUS.OVERNIGHT
             }
           }
-          
+
           // marketState = MARKET_STATUS.AFTER
           set({ marketState: { ..._data, status: marketState }, marketTradeState: marketState })
         }
@@ -272,21 +286,15 @@ export const useBaseStore = create<BaseStore>()(
           return
         }
 
-        await Promise.all([
-          get().getAllTokens(chainId),
-          get().getStocks(),
-          get().getMarket(),
-        ])
+        await Promise.all([get().getAllTokens(chainId), get().getMarket()])
         set(() => ({
           lastChainId: chainId,
           lastInitTime: Date.now(),
         }))
       },
       refreshByLanguage: async () => {
-        const chainId = get().lastChainId
-        if (chainId) {
-          await get().getBaseRwas(chainId)
-        }
+        await get().getBaseRwas()
+        await get().getStocks()
       },
       updateRwasPrice: (priceList: IRwaPrice[]) => {
         const rwaList = get().rwaList.map(rwa => {

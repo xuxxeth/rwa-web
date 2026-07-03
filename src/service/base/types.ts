@@ -48,11 +48,17 @@ export interface IStock {
   "stockCode": string,
   "stockName": string,
   "icon": string,
-  "state": number,
   "weight": number,
-  "price"?: string , 
+  "state": number,
+  "listingState": number,
+  "precision"?: number
+  "price"?: string | number, 
   "up"?: string, 
   "cPrice"?: string, 
+  "stockStatistics"?: {
+    "totalShare": number,
+    "circShare": number
+  }
 }
 
 // token信息

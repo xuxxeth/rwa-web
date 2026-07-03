@@ -84,7 +84,6 @@ export interface BaseStore {
   freshTokenBalances: () => void;
   setCurrentChain: (chain: IChain | null) => void;
   setMarketState: (data: IWSSMarketState) => void;
-
 }
 
 export interface TradeStore {
