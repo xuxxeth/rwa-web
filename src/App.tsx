@@ -45,6 +45,7 @@ function App() {
   const setIsSwitchingChain = useAppStore(state => state.setIsSwitchingChain)
 
   const getChains = useBaseStore(state => state.getChains)
+  const getStocks = useBaseStore(state => state.getStocks)
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -66,6 +67,7 @@ function App() {
 
   useEffect(() => {
     getChains()
+    getStocks()
   }, [])
 
   useEffect(() => {

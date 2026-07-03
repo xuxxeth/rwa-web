@@ -1,6 +1,26 @@
 import { useEffect, useMemo } from 'react'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
+import { type IStock } from '@/service/base/types'
+
+export function useStockList(includeDelisted: boolean = false) {
+  const stockList = useBaseStore(state => state.stocksList)
+  if (includeDelisted) return stockList
+  return stockList.filter(stock => stock.listingState !== 0)
+}
+
+export function useStockMap(includeDelisted: boolean = false) {
+  const stockList = useStockList(includeDelisted)
+  return useMemo(() => {
+    return stockList.reduce(
+      (acc, stock) => {
+        acc[stock.id] = stock
+        return acc
+      },
+      {} as Record<string, IStock>
+    )
+  }, [stockList])
+}
 
 // 获取原生的 rwa 列表
 export function useRwaTokens(includeDelisted: boolean = true) {
