@@ -62,30 +62,31 @@ export function SwitchButton() {
   const currentChainId = useAppStore(state => state.currentChainId)
 
   const currentChain = useMemo(() => {
-    return chains.find(chain => chain.id === currentChainId)
+    return chains.filter(chain => chain.state === 1).find(chain => chain.id === currentChainId)
   }, [chains, currentChainId])
 
   useEffect(() => {
     if (chains[0]) {
       const _chainId = Number(storage.getItem(LAST_CONNECTED_CHAIN_ID) || chains[0].id)
-      const chain = chains.find(chain => chain.id === _chainId)
+      const chain = chains.filter(chain => chain.state === 1).find(chain => chain.id === _chainId)
       if (chain && currentChainId !== _chainId) {
-        handleSwitchChain(chain.id)
+        handleSwitchChain(chain.state === 1 ? chain.id : chains[0].id)
       }
     }
   }, [chains, currentChainId])
 
   // 如果真实钱包chain切换，则更新当前链
   useEffect(() => {
-    if (chainId && isChainSupported) {
-      const chain = chains.find(chain => chain.id === chainId)
+    if (chainId && isChainSupported && chains[0]) {
+      const chain = (chains.filter(chain => chain.state === 1).find(chain => chain.id === chainId)) || chains[0]
+
       if (chain) {
         storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
         setCurrentChainId(chainId)
         setCurrentChain(chain)
       }
     }
-  }, [chainId, isChainSupported])
+  }, [chains, chainId, isChainSupported])
 
   return (
     <HoverCard
