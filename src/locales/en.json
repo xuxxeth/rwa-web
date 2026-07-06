@@ -457,7 +457,7 @@
   "approveSuccess": "Approval successful.",
   "connectSuccess": "Wallet connected.",
   "walletDisconnect": "Wallet disconnected.",
-  "switchNetwork": "Unsupported network detected. Please switch to {{network}}.",
+  "switchNetwork": "Unsupported network. Please switch or add the network in your wallet to continue.",
   "amountMin": "Order less limit: {{amount}} ",
   "amountMax": "Order limit: {{amount}}",
   "tradingHalt": "Trading Halt",

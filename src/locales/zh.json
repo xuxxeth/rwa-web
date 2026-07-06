@@ -457,7 +457,7 @@
   "approveSuccess": "授權成功",
   "connectSuccess": "錢包連接成功",
   "walletDisconnect": "錢包已斷开",
-  "switchNetwork": "檢測到不支持的網絡，請切換網路至 {{network}}",
+  "switchNetwork": "平台暫不支援当前選擇網絡，請在錢包中新增或切換網路後繼續交易",
   "amountMin": "金額下限：{{amount}}",
   "amountMax": "金額上限：{{amount}}",
   "tradingHalt": "交易暫停",
