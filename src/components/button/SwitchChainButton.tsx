@@ -69,17 +69,18 @@ export function SwitchButton() {
     if (chains[0]) {
       const _chainId = Number(storage.getItem(LAST_CONNECTED_CHAIN_ID) || chains[0].id)
       const chain = chains.filter(chain => chain.state === 1).find(chain => chain.id === _chainId)
-      if (chain && currentChainId !== _chainId) {
-        handleSwitchChain(chain.state === 1 ? chain.id : chains[0].id)
+      if (chain && chain.state === 1) {
+        handleSwitchChain(chain.id)
+      } else {
+        handleSwitchChain(chains[0].id)
       }
     }
-  }, [chains, currentChainId])
+  }, [chains])
 
   // 如果真实钱包chain切换，则更新当前链
   useEffect(() => {
     if (chainId && isChainSupported && chains[0]) {
       const chain = (chains.filter(chain => chain.state === 1).find(chain => chain.id === chainId)) || chains[0]
-
       if (chain) {
         storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
         setCurrentChainId(chainId)
