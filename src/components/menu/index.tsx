@@ -8,6 +8,7 @@ import { SubMenus } from "./SubMenus";
 import { SettingSubMenus } from "../button/SettingSubMenus";
 import { cn } from "@/utils/tw";
 import { useMemo } from "react";
+import { EventsSubMenus } from "./EventsSubMenus";
 
 export function Menus() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export function Menus() {
           />
           <SubMenus
             title={t("Trade")}
-            active={router.location.pathname === "/lite-trade"}
+            active={router.location.pathname.startsWith("/trade") || router.location.pathname.startsWith("/lite-trade")}
             
           />
           <MenusItem
@@ -52,6 +53,11 @@ export function Menus() {
             onClick={() => {
               router.push("/referral");
             }}
+          />
+          <EventsSubMenus
+            title={t("events.t1")}
+            active={router.location.pathname === "/splits"}
+            
           />
           
         </div>

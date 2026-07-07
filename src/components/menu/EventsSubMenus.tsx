@@ -4,29 +4,8 @@ import { lazy, useMemo, useState } from "react";
 import { IconArrowDown } from "../icons/ArrowDown";
 import { useRouter } from "@/hooks/useRouter";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { SubMenuItem } from "./SubMenus";
 
-export function SubMenuItem({
-  title,
-  selected,
-  onClick
-}: {
-  title?: string;
-  selected?: boolean;
-  onClick?: () => void
-}) {
-  return (
-    <div 
-      onClick={() => onClick && onClick()}
-      className={cn(
-      "flex items-center justify-between py-3 cursor-pointer font-medium hover:bg-[#191B1E] px-5",
-    )}>
-      <span className="text-[14px]">{title}</span>
-      {
-        selected && <img src="/images/icons/selected.png" className="w-3" alt="" />
-      }
-    </div>
-  )
-}
 
 type SubMenusProps = {
   title: string;
@@ -34,7 +13,7 @@ type SubMenusProps = {
   children?: React.ReactNode
 }
 
-export function SubMenus({
+export function EventsSubMenus({
   title,
   active,
   children
@@ -44,8 +23,7 @@ export function SubMenus({
 
   const router = useRouter();
   
-  const isPro = useMemo(() => router.location.pathname === "/trade", [router])
-  const isLite = useMemo(() => router.location.pathname === "/lite-trade", [router])
+  const isSplits = useMemo(() => router.location.pathname === "/splits", [router.location.pathname])
 
   return (
     <HoverCard
@@ -57,7 +35,6 @@ export function SubMenus({
       <HoverCardTrigger asChild>
         <div className={cn(
           "text-[14px] font-medium text-[#9DA3AF] cursor-pointer h-[36px] flex items-center leading-[36px] ",
-          isPro || isLite ? "" : "",
           active ? "text-white" : ""
         )}
           onClick={e => {
@@ -78,20 +55,20 @@ export function SubMenus({
         >
           <div className="h-[50px] w-[60px] absolute right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           <div className="">
-            <SubMenuItem title={t('proTrade')}
+            <SubMenuItem title={t('events.t2')}
               onClick={() => {
-                router.push('/trade')
+                router.push('/splits')
                 setOpen(false)
               }}
-              selected={isPro}
+              selected={isSplits}
             />
-            <SubMenuItem title={t('Lite Trade')}
+            {/* <SubMenuItem title={t('Lite Trade')}
               onClick={() => {
                 router.push('/lite-trade')
                 setOpen(false)
               }}
               selected={isLite}
-            />
+            /> */}
             
           </div>
           

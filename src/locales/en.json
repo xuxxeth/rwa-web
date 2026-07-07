@@ -881,5 +881,32 @@
     "t1": "Switch Network",
     "t2": "This app doesn’t support your current network. Switch to an available option to continue.",
     "t3": "or"
+  },
+  "events": {
+    "t1": "Corporate Actions",
+    "t2": "Stock Split",
+    "t3": "Dividends",
+    "t4": "Stock Split & Reverse Split",
+    "t5": "Stay up to date on stock splits. Convert your tokens promptly to keep your on-chain assets in sync. ",
+    "t6": "Holdings",
+    "t7": "Events",
+    "t8": "History",
+    "t9": "Event Type",
+    "t10": "Ratio",
+    "t11": "Start Time",
+    "t12": "End Time",
+    "t13": "Eligible Holdings",
+    "t14": "Details",
+    "t15": "Convert",
+    "t16": "Holding",
+    "t17": "Stock Split",
+    "t18": "Reverse Split",
+    "t19": "Event Type",
+    "t20": "Active",
+    "t21": "Ended",
+    "t22": "Paused",
+    "t23": "Not Started",
+    "t24": "Stock splits only adjust your token quantity. Your total asset value stays the same."
+
   }
 }
