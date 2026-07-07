@@ -2,8 +2,6 @@ import { useEffect, useCallback, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
-import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
-import { CONNECT_STATE_KEY } from 'ca-common-web'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
@@ -12,7 +10,6 @@ import {
   ConnectorType,
   useQrCodeData,
   type WalletConfig,
-  useIsSupportChain,
 } from '@/hooks/useCaCommon'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
