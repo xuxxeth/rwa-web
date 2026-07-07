@@ -357,9 +357,10 @@ function ClaimRebateDialog(props: {
     const chainAmount = props.rebates[currentChainId]?.totalAmount
     if (chainAmount === undefined || chainAmount === 0n) return
 
-    const chainRebates = props.rebates[currentChainId]
-    const addresses = chainRebates.details.map(([address]) => address as `0x${string}`)
-    const amounts = chainRebates.details.map(([, amount]) => amount)
+    const rebateDetails = (props.rebates[currentChainId].details ?? []).filter(item => item[1] > 0n)
+    if (rebateDetails.length === 0) return
+    const addresses = rebateDetails.map(([address]) => address as `0x${string}`)
+    const amounts = rebateDetails.map(([, amount]) => amount)
 
     setIsClaiming(true)
     try {
