@@ -73,7 +73,7 @@ type WalletStatus = (typeof WalletStatus)[keyof typeof WalletStatus]
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
-  const { toastSuccess, toastError, toastWarning, toastInfo } = useToast()
+  const { toastSuccess, toastError } = useToast()
   const {
     wallets,
     account,
@@ -119,16 +119,18 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
+  const hasAutoConnected = useRef(false)
 
   const handleConnect = useCallback(
-    async (connectorType: ConnectorType, chainId: number, wallet: WalletConfig) => {
+    async (connectorType: ConnectorType, chainId: number, wallet: WalletConfig, noToast?: boolean) => {
+      hasAutoConnected.current = true
       try {
         setIsQrCodeInvalid(false)
         await rwaHandleConnect(connectorType, chainId, wallet)
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
           if ((error as any).message === 'SwitchChainFailed') {
-            toastError({
+            noToast && toastError({
               title: t('switchNetwork', { network: networkText }),
             })
             setConnectorType(undefined)
@@ -136,7 +138,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             setIsQrCodeInvalid(true)
           }
         } else {
-          toastError({
+          noToast || toastError({
             title: t('switchNetwork', { network: networkText }),
           })
         }
@@ -200,6 +202,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
         break
       case WalletStatus.IDLE:
+        switchDialog.hide()
         break
       //   if (!isRestoringRef.current && hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
       //     toastError({
@@ -213,8 +216,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [status])
 
   useEffect(() => {
+    if (hasAutoConnected.current) return
+    
     if (!wallets.length || account || !initialized || !currentChainId) return
-
+    
     const walletUUID = storage.getItem(WALLET_UUID)
     const connector = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
 
@@ -234,7 +239,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setStatus(WalletStatus.CONNECTING)
     setIsWalletConnecting(true)
 
-    handleConnect(connector, currentChainId, wallet)
+    handleConnect(connector, currentChainId, wallet, true)
+   
+    
   }, [wallets, initialized, currentChainId])
 
   const connectWallet = async (wallet: WalletConfig, chainId: number | null) => {
@@ -454,7 +461,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
           )}
         </div>
       </DialogController>
-      <SwitchChainModal open={switchDialog.open} onClose={switchDialog.hide} />
+      {
+        account && <SwitchChainModal open={switchDialog.open} onClose={switchDialog.hide} />
+      }
+      
     </>
   )
 }

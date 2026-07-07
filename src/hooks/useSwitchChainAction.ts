@@ -23,6 +23,7 @@ export function useSwitchChainAction() {
           setCurrentChainId(nextChain.id)
           setCurrentChain(nextChain)
         }
+        return false
       }
       return true
     },
