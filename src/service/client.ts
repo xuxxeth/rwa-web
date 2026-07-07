@@ -6,8 +6,6 @@ import {
   type ErrorHandlers,
 } from '@/config/constants'
 import axios from 'axios'
-import { defaultChains, bscTestnet } from '@/hooks/useCaCommon'
-
 import type {
   InternalAxiosRequestConfig,
   AxiosResponse,
@@ -17,7 +15,6 @@ import type {
   AxiosError,
 } from 'axios'
 import storage from '@/utils/storage'
-import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
 import { CONNECT_STATE_KEY } from 'ca-common-web'
 
 // 从本地存储中获取连接状态, 这个会比 react state 优先更新
@@ -27,7 +24,7 @@ function getConnectStateFromStorage(): {
   isChainSupported: boolean
 } {
   try {
-    const connectState = storage.getItem(CONNECT_STATE_KEY) || "{}"
+    const connectState = storage.getItem(CONNECT_STATE_KEY) || {}
     return {
       account: connectState.accounts?.[0] || '',
       chainId: connectState.chainId || null,
@@ -73,7 +70,7 @@ const axiosInstance: AxiosInstance = axios.create({
 })
 // /v1/base/public/stock/indicators?stockId=1
 const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api', '/risk/api/', '/ref/api/'] // 需要授权的接口前缀列表
-const NO_CHAIN_ID_HEADER_URL_SUFFIX = ['/base/public/chains']
+const NO_CHAIN_ID_HEADER_URL_SUFFIX = ['/base/public/chains', '/base/public/tokens']
 const NO_SUPPORTED_CHAIN_URL_SUFFIX = ['/v1/uc/api/agreements/accept'] // 不支持的链的接口后缀列表
 
 function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortController, account: string) {

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import storage from '@/utils/storage'
 import { CONNECT_ACCOUNT, CONNECTOR_TYPE, WALLET_UUID } from '@/config/constants'
 import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
+import { CONNECT_STATE_KEY } from 'ca-common-web'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
@@ -106,7 +107,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const isManualConnect = useRef(false)
   const isMobile = useMemo(() => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent), [])
 
-  const networkText = useMemo(() => chains.filter(c => c.state === 1).map(c => c.displayName).join(' / '), [chains])
+  const networkText = useMemo(
+    () =>
+      chains
+        .filter(c => c.state === 1)
+        .map(c => c.displayName)
+        .join(' / '),
+    [chains]
+  )
 
   const { verifyTip } = useVerifyTip()
   const [isSignatureValid] = useSignatureValidStatus()
@@ -126,9 +134,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             toastError({
               title: t('switchNetwork', { network: networkText }),
             })
-            setConnectorType(undefined);
+            setConnectorType(undefined)
           } else {
-             setIsQrCodeInvalid(true)
+            setIsQrCodeInvalid(true)
           }
         } else {
           toastError({
@@ -195,14 +203,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
         break
       case WalletStatus.IDLE:
-        // 如果上次是通过 walletConnect 连接的，去掉 walletConenct 连接记录
-        const connectorTypeFromStorage = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
-        if (connectorTypeFromStorage === ConnectorType.WalletConnect) {
-          setConnectorType(undefined);
-          storage.removeItem(CONNECTOR_TYPE);
-          storage.removeItem(WALLET_UUID);
-        }
-        break;
+        break
       //   if (!isRestoringRef.current && hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
       //     toastError({
       //       title: t('walletDisconnect'),

@@ -876,7 +876,8 @@
     "verifyNow": "立即認證",
     "claimSuccess": "返傭領取成功",
     "claimFailed": "返傭領取失敗",
-    "sigSubTitle": "請通過錢包授權後查看您的邀請返傭相關記錄"
+    "sigSubTitle": "請通過錢包授權後查看您的邀請返傭相關記錄",
+    "switchThenClaim": "切換鏈並領取"
   },
   "multiChain": {
     "t1": "切換網路",

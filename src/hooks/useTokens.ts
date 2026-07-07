@@ -49,7 +49,8 @@ export function useTokens() {
 
 export function useUSDT() {
   const tokens = useTokens()
+  const currentChainId = useAppStore(state => state.currentChainId)
   return useMemo(() => {
-    return tokens.find(token => token.symbol === 'USDT')
-  }, [tokens])
+    return tokens.find(token => token.chainId === currentChainId && token.symbol === 'USDT')
+  }, [tokens, currentChainId])
 }

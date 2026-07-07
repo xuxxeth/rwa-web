@@ -875,7 +875,8 @@
     "verifyNow": "Verify Now",
     "claimSuccess": "Claim successful",
     "claimFailed": "Claim failed",
-    "sigSubTitle": "Please complete a wallet signature to view your referral history."
+    "sigSubTitle": "Please complete a wallet signature to view your referral history.",
+    "switchThenClaim": "Switch and claim"
   },
   "multiChain": {
     "t1": "Switch Network",
