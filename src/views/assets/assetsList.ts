@@ -5,8 +5,9 @@ import { useBaseStore } from '@/stores/baseStore'
 import { useEffect, useState, useMemo } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
-import { useRegulateAssets } from 'ca-common-web'
+import { useRegulateAssets, type RegulateAssetItem } from 'ca-common-web'
 import { useContractAddr } from '@/hooks/useContractAddr'
+import { useAppStore } from '@/stores/appStore'
 
 export interface IRiskControlAsset {
   token: string
@@ -16,19 +17,32 @@ export interface IRiskControlAsset {
 }
 
 export function useRiskControlAssets(chainId: number, account: string): IRiskControlAsset[] {
+  const currentChainId = useAppStore(state => state.currentChainId)
+  const chainList = useBaseStore(state => state.chainList)
   const rwaList = useRwaTokens(false)
   const tokenList = useTokens()
-  const diamondContract = useContractAddr()
+  const allTokens = [...tokenList, ...rwaList]
 
-  const { assets, isLoading, error, refetch } = useRegulateAssets(
-    diamondContract,
-    account,
-    [...rwaList, ...tokenList].map(rwa => rwa.address)
-  )
+  const { getRegulateAssets } = useRegulateAssets()
 
-  if (!assets) return []
+  const [assets, setAssets] = useState<RegulateAssetItem[]>([])
 
-  const allTokens = [...rwaList, ...tokenList]
+  useEffect(() => {
+    const filteredTokens = [...rwaList, ...tokenList].filter(
+      item => item.chainId === currentChainId
+    )
+    const diamondContractAddr =
+      chainList.find(chain => chain.id === currentChainId)?.contract ?? null
+    if (!diamondContractAddr || !account || !filteredTokens.length) return
+
+    getRegulateAssets(
+      diamondContractAddr,
+      account,
+      filteredTokens.map(rwa => rwa.address)
+    ).then(res => {
+      setAssets(res)
+    })
+  }, [currentChainId, account, rwaList, tokenList, chainList])
 
   return Object.entries(assets.filter(item => item.amount !== 0n))
     .map(([_, { token, amount }]) => {
