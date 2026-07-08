@@ -907,7 +907,17 @@
     "t21": "Ended",
     "t22": "Paused",
     "t23": "Not Started",
-    "t24": "Stock splits only adjust your token quantity. Your total asset value stays the same."
-
+    "t24": "Stock splits only adjust your token quantity. Your total asset value stays the same.",
+    "t25": "Est. Whole Tokens Received",
+    "t26": "Fractional Shares Cash Settlement",
+    "t27": "Fractional Shares",
+    "t28": "Settlement Price per Share",
+    "t281": "Fractional shares from the stock split are settled in USDT at the official closing or average price on the U.S. execution date.",
+    "t29": "Old Tokens Returned",
+    "t30": "New Tokens Received",
+    "t31": "Conversion opens at {{t1}}. Stay tuned for official updates.",
+    "t32": "For historical holdings or fractional share compensation, contact support via <r1>[{{t1}}]</r1>: {{t2}}",
+    "t33": "Check official announcements for updates.",
+    "t34": "This address has not completed identity verification. Please complete verification before proceeding."
   }
 }
