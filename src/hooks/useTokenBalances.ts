@@ -1,4 +1,5 @@
-import { useTokenBalances as useBalances, useChainId, useIsSupportChain } from './useCaCommon'
+// import { useTokenBalances as useBalances, useChainId, useIsSupportChain } from './useCaCommon'
+import { useTokenBalancesV2 as useBalancesV2 } from 'ca-common-web'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { formatAmount, symbolToLower } from '@/utils'
@@ -8,9 +9,12 @@ import type { IToken, ITokenWithBalance } from '@/service/base/types'
 import { useTokens, useRwaTokens } from './useTokens'
 import { useWssStore } from '@/stores/wssStore'
 import { useAppStore } from '@/stores/appStore'
+import { useContractAddr } from '@/hooks/useContractAddr'
+
 
 export function useTokenBalances() {
-  const { getTokenBalances } = useBalances()
+  const contractAddr = useContractAddr() as `0x${string}` | null
+  const { getTokenBalances } = useBalancesV2(contractAddr)
 
   const currentChainId = useAppStore(state => state.currentChainId)
 
@@ -21,8 +25,12 @@ export function useTokenBalances() {
   const setTokenWithBalance = useBaseStore(state => state.setTokenWithBalance)
   const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
 
-  const getTokensData = async (account: `0x${string}`, chainId: number, tokenList: Array<IToken | IToken>) => {
-    if(tokenList[0].chainId !== chainId) {
+  const getTokensData = async (
+    account: `0x${string}`,
+    chainId: number,
+    tokenList: Array<IToken | IToken>
+  ) => {
+    if (tokenList[0].chainId !== chainId) {
       return
     }
     const balancesRes = await getTokenBalances(
@@ -115,7 +123,12 @@ export function useTokenBalances() {
 
   useEffect(() => {
     const tokensToFetch = [...tokenList, ...rwaRwaList]
-    if (currentChainId && account && tokensToFetch.length > 0 && currentChainId === tokensToFetch[0].chainId) {
+    if (
+      currentChainId &&
+      account &&
+      tokensToFetch.length > 0 &&
+      currentChainId === tokensToFetch[0].chainId
+    ) {
       // @ts-ignore
       getTokensData(account, currentChainId, tokensToFetch)
     }
@@ -128,7 +141,8 @@ export function useTokenBalances() {
 }
 
 export function useGetTokenBalances() {
-  const { getTokenBalances } = useBalances()
+  const contractAddr = useContractAddr() as `0x${string}` | null
+  const { getTokenBalances } = useBalancesV2(contractAddr)
   const { account } = useActiveWeb3()
   const tokenList = useTokens()
   const rwaRwaList = useRwaTokens()
