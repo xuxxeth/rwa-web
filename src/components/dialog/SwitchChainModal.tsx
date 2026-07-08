@@ -8,6 +8,8 @@ import { useToast } from '@/hooks/useToast'
 import { useTranslation } from '@/hooks/useTranslation'
 import { cn } from '@/lib/utils'
 import { useMemo, useState } from 'react'
+import storage from '@/utils/storage'
+import { LAST_CONNECTED_CHAIN_ID } from '@/config/storage'
 
 interface SwitchChainModalProps {
   open: boolean
@@ -55,7 +57,7 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
   const chainList = useBaseStore(s => s.chainList)
   const [loadingChainId, setLoadingChainId] = useState<number | null>(null)
   const [disconnecting, setDisconnecting] = useState(false)
-
+  const setCurrentChainId = useAppStore(state => state.setCurrentChainId)
 
   const supportedChains = useMemo(
     () =>
@@ -81,6 +83,8 @@ export default function SwitchChainModal({ open, onClose }: SwitchChainModalProp
       if (ok) {
         onClose()
       } else {
+        storage.setItem(LAST_CONNECTED_CHAIN_ID, String(targetChainId))
+        setCurrentChainId(targetChainId)
         toastError({ title: t('switchNetwork', { network: networkText }) })
       }
     } catch (error) {

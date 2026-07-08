@@ -1,15 +1,15 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { useTranslation, Trans } from '@/hooks/useTranslation'
 import type { Address } from '@/config/constants'
-import { RESPONSE_CODE } from '@/config/constants'
 import { useBaseStore } from '@/stores/baseStore'
 import type { IInviteCodeInfo } from '@/service/referral/types'
-import { useReferralRebates, useChainId, useAccount } from 'ca-common-web'
+import { RESPONSE_CODE } from '@/config/constants'
+import { useReferralRebates, useReferralRebatesBatch, useChainId, useAccount } from 'ca-common-web'
+import { type RebateParam } from 'ca-common-web'
 import { formatAmount, isLess, isLessOrEqual, truncate, formatWithCommas, cn } from '@/utils'
 import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { useRequest } from '@/hooks/useRequest'
-import { useTokens } from '@/hooks/useTokens'
 import type { IToken } from '@/service/base/types'
 import { LazyImage } from '@/components/image/LazyImage'
 import IconWithTooltip from '@/components/icon-tooltip'
@@ -19,7 +19,8 @@ import { useToast } from '@/hooks/useToast'
 import { useMultiDelayedRefresh } from '@/hooks/useMultiDelayedRefresh'
 import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { useAppStore } from '@/stores/appStore'
-import { CircleLoading } from '@/components/loading'
+import VectorSVG from '@/components/pagination/vector.svg?react'
+import { useSwitchChainAction } from '@/hooks/useSwitchChainAction'
 
 export function useDiamondAddr() {
   const chainList = useBaseStore(state => state.chainList)
@@ -32,53 +33,95 @@ export function useDiamondAddr() {
   }, [chainId, chainList])
 }
 
-function useClaimableReferralTokens(
-  account: string,
-  chainId: number | null,
-  isSignatureValid: boolean
-) {
-  const tokenList = useTokens()
-  const [, , validSignature] = useSignatureValidStatus()
+function useClaimableReferralTokens(account: string, isSignatureValid: boolean) {
   const chainList = useBaseStore(state => state.chainList)
+  const tokenList = useBaseStore(state => state.tokenList)
 
-  const [tokenAddrs, diamondAddress] = useMemo(() => {
-    const tokenAddrs = tokenList.map(token => token.address as `0x${string}`)
-    const chain = chainList.find(item => item.id === chainId)
-    const diamondAddress = chain?.contract as Address | undefined
-    return [tokenAddrs, diamondAddress]
-  }, [tokenList, chainId, chainList])
+  const rebateParams: RebateParam[] = useMemo(() => {
+    const params: RebateParam[] = []
+    chainList
+      .filter(chain => chain.state === 1)
+      .forEach(chain => {
+        const chainId = chain.id
+        const diamondAddress = chain.contract as Address | undefined
+        if (!diamondAddress) return
+        params.push({
+          chainId,
+          diamondAddress,
+          tokens: tokenList
+            .filter(token => token.chainId === chainId && token.state === 1)
+            .map(token => token.address as `0x${string}`),
+        })
+      })
+    return params
+  }, [chainList, tokenList])
 
-  const { getReferralRebates } = useReferralRebates(diamondAddress)
+  const [, , validSignature] = useSignatureValidStatus()
 
-  const ready = Boolean(diamondAddress) && tokenAddrs.length > 0 && !!chainId
+  const { getReferralRebatesBatch } = useReferralRebatesBatch()
 
-  const query = useRequest<Array<[symbol: string, amount: bigint]>>(
+  const ready = rebateParams.length > 0
+
+  const query = useRequest<
+    [
+      bigint,
+      {
+        [chainId: number]: {
+          details: Array<[string, bigint]>
+          totalAmount: bigint
+        }
+      },
+    ]
+  >(
     async () => {
       if (!validSignature()) return null
       if (!ready) return null
-      const next = await getReferralRebates(tokenAddrs)
-      return tokenAddrs
-        .slice(0, next.length)
-        .map((tokenAddr, index) => [tokenAddr, next[index]] as [string, bigint])
-        .filter(([_, amount]) => amount !== 0n)
+      const next = await getReferralRebatesBatch(rebateParams)
+      let totalAmount = 0n
+      const rebatesInfo = rebateParams.reduce(
+        (acc, cur, index) => {
+          const chainId = cur.chainId
+          const rebates = next[index]
+          let chainAmount = 0n
+          const details: Array<[string, bigint]> = cur.tokens.map((token, idx) => {
+            chainAmount += rebates[idx]
+            totalAmount += rebates[idx]
+            return [token, rebates[idx]]
+          })
+          acc[chainId] = {
+            details: details,
+            totalAmount: chainAmount,
+          }
+          return acc
+        },
+        {} as Record<
+          number,
+          {
+            details: Array<[string, bigint]>
+            totalAmount: bigint
+          }
+        >
+      )
+      return [totalAmount, rebatesInfo]
     },
-    [ready, isSignatureValid, account, getReferralRebates, tokenAddrs, chainId],
+    [ready, isSignatureValid, account, rebateParams],
     {
       immediate: ready,
       initialData: null,
     }
   )
 
-  const rebates = query.data
-  const loading = !ready || query.loading || query.data === null
+  const loading = query.loading
+  const totalAmount = query.data?.[0]
+  const rebates = query.data?.[1]
 
-  return { rebates, loading, refresh: query.run }
+  console.log(rebates)
+
+  return { totalAmount, rebates, loading, refresh: query.run }
 }
 
 function useRebateClaimState(isSignatureValid: boolean) {
   const account = useAccount()
-  const [, , validSignature] = useSignatureValidStatus()
-  const currentChainId = useAppStore(state => state.currentChainId)
 
   const riskUserConfigForReferral = useKycStore(state => state.riskUserConfigForReferral)
 
@@ -93,11 +136,11 @@ function useRebateClaimState(isSignatureValid: boolean) {
       : undefined
 
   const {
+    totalAmount,
     rebates,
     loading: rebatesLoading,
     refresh: refreshRebates,
-  } = useClaimableReferralTokens(account, currentChainId, isSignatureValid)
-  const totalAmount = rebates?.reduce((acc, [, amount]) => acc + amount, BigInt(0))
+  } = useClaimableReferralTokens(account, isSignatureValid)
 
   return {
     canClaimRebate,
@@ -119,7 +162,7 @@ export function RebateStats(props: {
   const [, , validSignature] = useSignatureValidStatus()
   const { t } = useTranslation()
 
-  const { rebates, rebatesLoading, totalAmount, canClaimRebate, isKycFinished, refreshRebates } =
+  const { totalAmount, rebates, rebatesLoading, canClaimRebate, isKycFinished, refreshRebates } =
     useRebateClaimState(isSignatureValid)
 
   const [disabled, setDisabled] = useState(true)
@@ -182,7 +225,8 @@ export function RebateStats(props: {
 
         <RebateClaimButton
           disabled={disabled}
-          rebates={rebates ?? []}
+          rebates={rebates ?? {}}
+          totalAmount={totalAmount}
           isKycFinished={isKycFinished}
           multiRefresh={startMultiRefresh}
           onceRefresh={startOnceRefresh}
@@ -216,7 +260,14 @@ function OnRisk() {
 
 export default function RebateClaimButton(props: {
   disabled: boolean
-  rebates: Array<[string, bigint]>
+  totalAmount: bigint | undefined
+  rebates: Record<
+    number,
+    {
+      details: Array<[string, bigint]>
+      totalAmount: bigint
+    }
+  >
   isKycFinished: boolean | undefined
   multiRefresh: () => void
   onceRefresh: () => void
@@ -239,7 +290,12 @@ export default function RebateClaimButton(props: {
       </button>
 
       {props.isKycFinished === true ? (
-        <ClaimRebateDialog dialog={dialog} rebates={props.rebates} refresh={props.multiRefresh} />
+        <ClaimRebateDialog
+          totalAmount={props.totalAmount}
+          dialog={dialog}
+          rebates={props.rebates}
+          refresh={props.multiRefresh}
+        />
       ) : (
         <FinishKycDialog dialog={dialog} />
       )}
@@ -248,35 +304,63 @@ export default function RebateClaimButton(props: {
 }
 
 function ClaimRebateDialog(props: {
+  totalAmount: bigint | undefined
   dialog: {
     open: boolean
     setOpen: Dispatch<SetStateAction<boolean>>
     show: () => void
     hide: () => void
   }
-  rebates: Array<[string, bigint]>
+  rebates: Record<
+    number,
+    {
+      details: Array<[string, bigint]>
+      totalAmount: bigint
+    }
+  >
   refresh: () => void
 }) {
   const { t } = useTranslation()
   const { toastSuccess, toastError } = useToast()
 
-  const tokens = useTokens()
-  const getSpecificToken = (address: string, tokens: IToken[]) => {
-    const token = tokens.find(item => item.address === address)
-    return token
-  }
+  const chainList = useBaseStore(state => state.chainList)
+  const currentChainId = useAppStore(state => state.currentChainId)
+
+  const displayChainList = useMemo(() => {
+    return chainList
+      .filter(
+        item =>
+          item.state === 1 &&
+          props.rebates[item.id] !== undefined &&
+          props.rebates[item.id].totalAmount > 0n
+      )
+      .sort((a, b) => (a.id === currentChainId ? -1 : b.id === currentChainId ? 1 : 0))
+  }, [chainList, currentChainId, props.rebates])
+
+  const allTokens = useBaseStore(state => state.tokenList)
+  const getSpecificToken = useCallback(
+    (address: string, tokens: IToken[]) => {
+      const token = tokens.find(item => item.address === address)
+      return token
+    },
+    [allTokens]
+  )
 
   const diamondAddress = useDiamondAddr()
   const { claimReferralRebates, txStep } = useReferralRebates(diamondAddress)
 
   const [isClaiming, setIsClaiming] = useState(false)
+  const [expandedChainId, setExpandedChainId] = useState<number | null>(currentChainId)
 
   const handleClaim = async () => {
-    if (isClaiming) return
-    if (props.rebates.length === 0) return
+    if (isClaiming || currentChainId === null) return
+    const chainAmount = props.rebates[currentChainId]?.totalAmount
+    if (chainAmount === undefined || chainAmount === 0n) return
 
-    const addresses = props.rebates.map(([address]) => address as `0x${string}`)
-    const amounts = props.rebates.map(([, amount]) => amount)
+    const rebateDetails = (props.rebates[currentChainId].details ?? []).filter(item => item[1] > 0n)
+    if (rebateDetails.length === 0) return
+    const addresses = rebateDetails.map(([address]) => address as `0x${string}`)
+    const amounts = rebateDetails.map(([, amount]) => amount)
 
     setIsClaiming(true)
     try {
@@ -285,14 +369,12 @@ function ClaimRebateDialog(props: {
         skipSimulate: true,
       })
       const ok = res?.code === RESPONSE_CODE.SUCCESS
-
       if (ok) {
         toastSuccess({ title: t('rebate.claimSuccess') })
         props.dialog.hide()
         props.refresh()
         return
       }
-
       toastError({ title: t('rebate.claimFailed') })
     } catch (error) {
       toastError({ title: error instanceof Error ? error.message : t('rebate.claimFailed') })
@@ -301,53 +383,120 @@ function ClaimRebateDialog(props: {
     }
   }
 
+  const { switchToChain } = useSwitchChainAction()
+
   return (
     <DialogController
       topFixed
       open={props.dialog.open}
       headerClassName={'border-b pt-4 pb-3 px-6 border-b-gray-850'}
-      closeClassName={'w-4 h-4 cursor-pointer opacity-100'}
-      closeIconClassName={'w-4 h-4'}
+      closeClassName={'cursor-pointer opacity-100 mr-1'}
+      closeIconClassName={'w-6 h-6'}
       titleClassName={'text-base/5'}
       openChange={props.dialog.setOpen}
       title={t('rebate.unClaimed')}
       overlayClassName='bg-gray-900/60'
       className='w-[420px] top-[20vh] [@media(min-height:900px)]:top-[197px] bg-gray-950 border border-gray-850 rounded-2xl p-0 gap-0'
     >
-      <div className='p-6 gap-6 flex flex-col font-normal'>
-        <div className='flex flex-row justify-between'>
-          <div className='text-base text-gray-400'>{t('rebate.totalUnClaimed')}</div>
-          <div className='flex flex-col gap-1'>
-            {props.rebates.map(([address, amount]) => {
-              const token = getSpecificToken(address, tokens)
-              return (
-                <div
-                  key={address}
-                  className='flex flex-row text-white items-center gap-1 text-sm/4.5'
-                >
-                  <LazyImage src={token?.icon || ''} className='w-3.5 h-3.5' />
-                  <AmountDisplay amount={formatAmount(amount)} />
-                  <TokenCell token={token?.symbol || ''} className='ml-auto' />
-                </div>
-              )
-            })}
+      <div className='px-6 py-5 flex flex-col font-normal'>
+        <div className='flex flex-row justify-between text-sm/4.5 font-medium px-1'>
+          <div className='text-gray-300'>{t('rebate.totalUnClaimed')}</div>
+          <div>
+            <AmountDisplay
+              amount={props.totalAmount !== undefined ? formatAmount(props.totalAmount) : undefined}
+            />
+            <span className='ml-1'>USD</span>
           </div>
         </div>
-        <button
-          disabled={isClaiming}
-          onClick={() => {
-            handleClaim()
-          }}
-          className='w-full flex items-center justify-center font-semibold cursor-pointer bg-white text-black h-12 text-base/5 rounded-[8px] disabled:text-gray-500 disabled:bg-gray-900 disabled:cursor-not-allowed'
-        >
-          {isClaiming && (
-            <LazyImage
-              src='/images/icons/loading.png'
-              className='w-[22px] h-[22px] animate-spin mr-2'
-            />
-          )}
-          {isClaiming ? t('rebate.claiming') : t('rebate.claimNow')}
-        </button>
+        <div className='flex flex-col gap-3 mt-3'>
+          {displayChainList.map(item => {
+            const expanded = expandedChainId === item.id
+
+            return (
+              <div key={item.id} className='border bg-gray-900 border-gray-500 p-4 rounded-[10px]'>
+                <div className='flex flex-row text-sm/4.5 font-medium items-center'>
+                  <img src={item.icon} className='w-[24px] h-[24px] mr-2' />
+                  <span className='text-gray-300'>{item.displayName}</span>
+                  <div className='ml-auto flex items-center gap-1'>
+                    <div className={cn('font-semibold', expanded ? 'text-brand' : '')}>
+                      <AmountDisplay amount={formatAmount(props.rebates[item.id].totalAmount)} />
+                      <span className='ml-1'>USD</span>
+                    </div>
+                    <button
+                      type='button'
+                      className='flex h-4 w-4 items-center justify-center cursor-pointer'
+                      onClick={() => {
+                        setExpandedChainId(prev => (prev === item.id ? null : item.id))
+                      }}
+                    >
+                      <VectorSVG
+                        className={cn(
+                          'h-3 w-3 transition-transform duration-200 [&>path]:[stroke-width:0.8]',
+                          expanded ? 'rotate-270 text-brand' : 'rotate-450'
+                        )}
+                      />
+                    </button>
+                  </div>
+                </div>
+                {expanded && (
+                  <>
+                    <div className='border border-gray-800 p-4 rounded-[10px] mt-3'>
+                      {props.rebates[item.id].details
+                        .filter(([, amount]) => amount > 0n)
+                        .map(([address, amount], index) => {
+                          const token = getSpecificToken(address, allTokens)
+                          return (
+                            <>
+                              {index > 0 && (
+                                <div className='w-full border-t border-gray-850 my-3'></div>
+                              )}
+                              <div
+                                key={address}
+                                className='flex flex-row items-center text-xs/[15px]'
+                              >
+                                <LazyImage src={token?.icon || ''} className='w-5 h-5 mr-2' />
+                                <span className='text-gray-300'>{token?.symbol || address}</span>
+                                <div className='ml-auto font-semibold text-sm/4.5'>
+                                  <AmountDisplay amount={formatAmount(amount)} />
+                                </div>
+                              </div>
+                            </>
+                          )
+                        })}
+                    </div>
+                    {item.id === currentChainId ? (
+                      <button
+                        disabled={isClaiming}
+                        onClick={() => {
+                          handleClaim()
+                        }}
+                        className='w-full flex items-center justify-center font-semibold cursor-pointer bg-white text-black h-12 text-base/5 rounded-[8px] disabled:text-gray-500 disabled:bg-gray-900 disabled:cursor-not-allowed mt-4'
+                      >
+                        {isClaiming && (
+                          <LazyImage
+                            src='/images/icons/loading.png'
+                            className='w-[22px] h-[22px] animate-spin mr-2'
+                          />
+                        )}
+                        {isClaiming ? t('rebate.claiming') : t('rebate.claimNow')}
+                      </button>
+                    ) : (
+                      <button
+                        disabled={isClaiming}
+                        onClick={() => {
+                          switchToChain(item.id)
+                        }}
+                        className='w-full flex items-center justify-center font-semibold cursor-pointer bg-white text-black h-12 text-base/5 rounded-[8px] disabled:text-gray-500 disabled:bg-gray-900 disabled:cursor-not-allowed mt-4'
+                      >
+                        {t('rebate.switchThenClaim')}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </DialogController>
   )

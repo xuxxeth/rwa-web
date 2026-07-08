@@ -1,13 +1,14 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
-import { getChainIconById } from "@/utils/chains";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useAppStore } from "@/stores/appStore";
 import { LAST_CONNECTED_CHAIN_ID } from "@/config/storage";
+import { useSwitchChainAction } from "@/hooks/useSwitchChainAction";
+import { useToast } from "@/hooks/useToast";
 
 export function ChainItem({
   title,
@@ -53,6 +54,8 @@ export function ChainItem({
 
 
 export function SwitchButton() {
+  const { t } = useTranslation()
+  const { toastError } = useToast()
   const { handleSwitchChain, isChainSupported, chainId } = useActiveWeb3()
   const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
@@ -64,6 +67,8 @@ export function SwitchButton() {
   const currentChain = useMemo(() => {
     return chains.filter(chain => chain.state === 1).find(chain => chain.id === currentChainId)
   }, [chains, currentChainId])
+
+  const { switchToChain } = useSwitchChainAction()
 
   useEffect(() => {
     if (chains[0]) {
@@ -136,14 +141,13 @@ export function SwitchButton() {
                     onClick={() => {
                       if (chain.state !== 0) {
                         setOpen(false)
-                        handleSwitchChain(chain.id)
-                          .then((res) => {
-                            if (!res) {
-                              storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
-                              setCurrentChain(chain)
-                              setCurrentChainId(chain.id)
+                        switchToChain(chain.id)
+                          .then((ok) => {
+                            if (!ok) {
+                              toastError({
+                                title: t('switchNetwork'),
+                              })
                             }
-                            
                           })
                         
                       }
