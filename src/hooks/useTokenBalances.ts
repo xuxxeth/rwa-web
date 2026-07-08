@@ -33,15 +33,12 @@ export function useTokenBalances() {
     if (tokenList[0].chainId !== chainId) {
       return
     }
-    console.log('===>diamondAddr', diamondAddr)
-    console.log('===>tokenList', tokenList)
 
     const balancesRes = await getTokenBalances(
       diamondAddr,
       account,
       tokenList.map(token => token.address as `0x${string}`)
     )
-    console.log('===>balancesRes', balancesRes)
 
     const tokenWithBalance = balancesRes.reduce(
       (acc, cur, index) => {
