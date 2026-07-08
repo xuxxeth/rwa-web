@@ -6,12 +6,7 @@ import { useEffect, useState, useMemo } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
 import { useRegulateAssets } from 'ca-common-web'
-
-function useDiamondContract(chainId: number) {
-  const chainList = useBaseStore(state => state.chainList)
-  const chain = chainList.find(chain => chain.id === chainId)
-  return chain?.contract
-}
+import { useContractAddr } from '@/hooks/useContractAddr'
 
 export interface IRiskControlAsset {
   token: string
@@ -23,7 +18,7 @@ export interface IRiskControlAsset {
 export function useRiskControlAssets(chainId: number, account: string): IRiskControlAsset[] {
   const rwaList = useRwaTokens(false)
   const tokenList = useTokens()
-  const diamondContract = useDiamondContract(chainId)
+  const diamondContract = useContractAddr()
 
   const { assets, isLoading, error, refetch } = useRegulateAssets(
     diamondContract,
