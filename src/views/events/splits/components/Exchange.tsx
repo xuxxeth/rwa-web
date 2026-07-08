@@ -1,4 +1,5 @@
 import CopyButton from "@/components/button/copyButton";
+import { TooltipWithBorder } from "@/components/icon-tooltip";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
@@ -19,7 +20,7 @@ function InfoRow({
   valueColor = "text-white",
   underlineLabel = false,
 }: {
-  label: string;
+  label: string | React.ReactNode;
   value: string;
   valueColor?: string;
   underlineLabel?: boolean;
@@ -107,7 +108,11 @@ export function ExchangeStock() {
         <div className="px-1 flex flex-col gap-2">
           <InfoRow label={t('events.t19')} value="合股" />
           <InfoRow label={t('events.t15') + t('events.t10')} value="10:1" />
-          <InfoRow label={t('events.t28')} value="10 USDT/股" valueColor="text-[#9cff3a]" underlineLabel />
+          <InfoRow label={
+            <TooltipWithBorder tooltip={t('events.t281')} className="cursor-pointer text-[14px]">
+              {t('events.t28')}
+            </TooltipWithBorder>
+          } value="10 USDT/股" valueColor="text-[#9cff3a]" />
           <InfoRow label={t('events.t11')} value="2026/06/12 12:00:00" />
           <InfoRow label={t('events.t12')} value="2026/06/12 12:00:00" />
         </div>
