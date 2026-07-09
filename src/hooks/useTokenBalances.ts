@@ -11,6 +11,16 @@ import { useWssStore } from '@/stores/wssStore'
 import { useAppStore } from '@/stores/appStore'
 import { useContractAddr } from '@/hooks/useContractAddr'
 
+const CHUNK_SIZE = 50
+
+const chunk = <T,>(arr: T[], size: number): T[][] => {
+  const result: T[][] = []
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size))
+  }
+  return result
+}
+
 export function useTokenBalances() {
   const { getTokenBalances } = useBalancesV2()
   const chainList = useBaseStore(state => state.chainList)
@@ -30,30 +40,32 @@ export function useTokenBalances() {
     chainId: number,
     tokenList: Array<IToken | IRwa>
   ) => {
-    if (tokenList[0].chainId !== chainId) {
-      return
-    }
+    if (!tokenList.length || tokenList[0].chainId !== chainId) return
 
-    const balancesRes = await getTokenBalances(
-      diamondAddr,
-      account,
-      tokenList.map(token => token.address as `0x${string}`)
-    )
+    const chunks = chunk(tokenList, CHUNK_SIZE)
 
-    const tokenWithBalance = balancesRes.reduce(
-      (acc, cur, index) => {
-        acc[symbolToLower(tokenList[index].symbol)] = {
-          origin: String(cur.balance),
+    const tokenWithBalance: Record<string, ITokenWithBalance> = {}
+
+    for (const tokens of chunks) {
+      const balancesRes = await getTokenBalances(
+        diamondAddr,
+        account,
+        tokens.map(token => token.address as `0x${string}`)
+      )
+
+      balancesRes.forEach((balance, index) => {
+        const token = tokens[index]
+
+        tokenWithBalance[symbolToLower(token.symbol)] = {
+          origin: String(balance.balance),
           balance: formatAmount(
-            String(cur.balance),
-            tokenList[index].decimals,
-            tokenList[index].precision
+            String(balance.balance),
+            token.decimals,
+            token.precision
           ),
         }
-        return acc
-      },
-      {} as Record<string, ITokenWithBalance>
-    )
+      })
+    }
 
     setTokenWithBalance(tokenWithBalance)
   }
