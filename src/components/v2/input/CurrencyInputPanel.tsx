@@ -51,6 +51,7 @@ const CurrencyInputPanel = memo(
 
     useEffect(() => {
       // 当前链和rwaList里的数据chainId一致，才进行更新操作
+      if (!rwaList[0] || !currentChainId) return
       if (rwaList[0] && currentChainId) {
         if (rwaList[0].chainId !== currentChainId) return
       }

@@ -4,165 +4,123 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useActiveWeb3 } from './useActiveWe3'
 import { formatAmount, symbolToLower } from '@/utils'
 import { useBaseStore } from '@/stores/baseStore'
-import type { IToken, ITokenWithBalance } from '@/service/base/types'
+import type { IToken, IRwa, ITokenWithBalance } from '@/service/base/types'
 
 import { useTokens, useRwaTokens } from './useTokens'
 import { useWssStore } from '@/stores/wssStore'
 import { useAppStore } from '@/stores/appStore'
 import { useContractAddr } from '@/hooks/useContractAddr'
 
+const CHUNK_SIZE = 50
+
+const chunk = <T,>(arr: T[], size: number): T[][] => {
+  const result: T[][] = []
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size))
+  }
+  return result
+}
 
 export function useTokenBalances() {
-  const contractAddr = useContractAddr() as `0x${string}` | null
-  const { getTokenBalances } = useBalancesV2(contractAddr)
+  const { getTokenBalances } = useBalancesV2()
+  const chainList = useBaseStore(state => state.chainList)
 
   const currentChainId = useAppStore(state => state.currentChainId)
 
   const { account } = useActiveWeb3()
+  const rwaList = useRwaTokens()
   const tokenList = useTokens()
-  const rwaRwaList = useRwaTokens()
-  const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
+
   const setTokenWithBalance = useBaseStore(state => state.setTokenWithBalance)
   const freshTokenBalancesCount = useBaseStore(state => state.freshTokenBalancesCount)
 
   const getTokensData = async (
+    diamondAddr: `0x${string}`,
     account: `0x${string}`,
     chainId: number,
-    tokenList: Array<IToken | IToken>
+    tokenList: Array<IToken | IRwa>
   ) => {
-    if (tokenList[0].chainId !== chainId) {
-      return
-    }
-    const balancesRes = await getTokenBalances(
-      account,
-      tokenList.map(token => token.address as `0x${string}`)
-    )
+    if (!tokenList.length || tokenList[0].chainId !== chainId) return
 
-    const tokenWithBalance = balancesRes.reduce(
-      (acc, cur, index) => {
-        acc[symbolToLower(tokenList[index].symbol)] = {
-          origin: String(cur.balance),
+    const chunks = chunk(tokenList, CHUNK_SIZE)
+
+    const tokenWithBalance: Record<string, ITokenWithBalance> = {}
+
+    for (const tokens of chunks) {
+      const balancesRes = await getTokenBalances(
+        diamondAddr,
+        account,
+        tokens.map(token => token.address as `0x${string}`)
+      )
+
+      balancesRes.forEach((balance, index) => {
+        const token = tokens[index]
+
+        tokenWithBalance[symbolToLower(token.symbol)] = {
+          origin: String(balance.balance),
           balance: formatAmount(
-            String(cur.balance),
-            tokenList[index].decimals,
-            tokenList[index].precision
+            String(balance.balance),
+            token.decimals,
+            token.precision
           ),
         }
-        return acc
-      },
-      {} as Record<string, ITokenWithBalance>
-    )
+      })
+    }
 
     setTokenWithBalance(tokenWithBalance)
   }
-  const getTokensDataByStockId = useCallback(
-    async (account: `0x${string}`, stockIds: number[]) => {
-      const newTokenWithBalance = Object.entries(tokenWithBalance).reduce<
-        Record<string, ITokenWithBalance>
-      >((acc, [key, token]) => {
-        acc[key] = token
-        return acc
-      }, {})
-      // 先通过stockId找到对应的token地址
-      const stockIdToTokenMap: Record<number, IToken> = {}
-      if (rwaRwaList.length > 0) {
-        // 生成一条全新的 rwaRwaList, 后面要更新它，然后再setTokenWithBalance
-        let newRwaList = rwaRwaList.map(rwa => ({ ...rwa }))
-
-        newRwaList.forEach(token => {
-          if (token.stockId) {
-            stockIdToTokenMap[token.stockId] = token
-          }
-        })
-
-        const tokensToFetch = stockIds.map(stockId => stockIdToTokenMap[stockId]).filter(Boolean)
-        const balancesRes = await getTokenBalances(
-          account,
-          tokensToFetch.map(token => token.address as `0x${string}`)
-        )
-        balancesRes.forEach((balance, index) => {
-          const token = tokensToFetch[index]
-          // 更新tokenWithBalance中对应的token余额信息
-          const tokenKey = symbolToLower(token.symbol)
-          newTokenWithBalance[tokenKey] = {
-            origin: String(balance.balance),
-            balance: formatAmount(String(balance.balance), token.decimals, token.precision),
-          }
-        })
-      }
-      // 处理稳定币余额获取更新
-      if (tokenList.length > 0) {
-        const balancesRes = await getTokenBalances(
-          account,
-          tokenList.map(token => token.address as `0x${string}`)
-        )
-
-        balancesRes.forEach((balance, index) => {
-          const token = tokenList[index]
-          // 更新tokenWithBalance中对应的token余额信息
-          const tokenKey = symbolToLower(token.symbol)
-          newTokenWithBalance[tokenKey] = {
-            origin: String(balance.balance),
-            balance: formatAmount(String(balance.balance), token.decimals, token.precision),
-          }
-        })
-      }
-
-      setTokenWithBalance(newTokenWithBalance)
-    },
-    [tokenList, rwaRwaList, tokenWithBalance, setTokenWithBalance]
-  )
 
   const refreshTokenBalances = useCallback(() => {
-    const tokensToFetch = [...tokenList, ...rwaRwaList]
-    if (account && tokensToFetch.length > 0 && currentChainId === tokensToFetch[0].chainId) {
+    const filteredTokenList = tokenList.filter(token => token.chainId === currentChainId)
+    const filteredRwaList = rwaList.filter(rwa => rwa.chainId === currentChainId)
+    const tokensToFetch = [...filteredTokenList, ...filteredRwaList]
+    if (currentChainId && tokensToFetch.length > 0 && account) {
+      const chain = chainList.find(item => item.id === currentChainId)
+      const diamondAddr = chain?.contract ?? null
+      if (!diamondAddr) return
       // @ts-ignore
-      getTokensData(account, currentChainId, tokensToFetch)
+      getTokensData(
+        diamondAddr as `0x${string}`,
+        account as `0x${string}`,
+        currentChainId,
+        tokensToFetch
+      )
     }
-  }, [currentChainId, account, tokenList, rwaRwaList])
+  }, [currentChainId, account, rwaList, tokenList])
 
   useEffect(() => {
-    const tokensToFetch = [...tokenList, ...rwaRwaList]
-    if (
-      currentChainId &&
-      account &&
-      tokensToFetch.length > 0 &&
-      currentChainId === tokensToFetch[0].chainId
-    ) {
-      // @ts-ignore
-      getTokensData(account, currentChainId, tokensToFetch)
-    }
-  }, [currentChainId, account, tokenList.length, rwaRwaList.length, freshTokenBalancesCount])
+    refreshTokenBalances()
+  }, [refreshTokenBalances, freshTokenBalancesCount])
 
   return {
-    getTokensDataByStockId: getTokensDataByStockId,
     refreshTokenBalances: refreshTokenBalances,
   }
 }
 
 export function useGetTokenBalances() {
-  const contractAddr = useContractAddr() as `0x${string}` | null
-  const { getTokenBalances } = useBalancesV2(contractAddr)
+  const { getTokenBalances } = useBalancesV2()
   const { account } = useActiveWeb3()
+  const contractAddr = useContractAddr() as `0x${string}` | null
   const tokenList = useTokens()
   const rwaRwaList = useRwaTokens()
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
   const setTokenWithBalance = useBaseStore(state => state.setTokenWithBalance)
 
   const getTokensDataByStockId = useCallback(
-    async (stockIds: number[]) => {
+    async (stockIds: number[], chainId?: number) => {
       const newTokenWithBalance = Object.entries(tokenWithBalance).reduce<
         Record<string, ITokenWithBalance>
       >((acc, [key, token]) => {
         acc[key] = token
         return acc
       }, {})
-      if (!account) return
+      if (!account || !contractAddr) return
       // 先通过stockId找到对应的token地址
       const stockIdToTokenMap: Record<number, IToken> = {}
-      if (rwaRwaList.length > 0) {
+      const filteredRwaList = rwaRwaList.filter(rwa => rwa.chainId === chainId)
+      if (filteredRwaList.length > 0) {
         // 生成一条全新的 rwaRwaList, 后面要更新它，然后再setTokenWithBalance
-        let newRwaList = rwaRwaList.map(rwa => ({ ...rwa }))
+        let newRwaList = filteredRwaList.map(rwa => ({ ...rwa }))
 
         newRwaList.forEach(token => {
           if (token.stockId) {
@@ -172,9 +130,11 @@ export function useGetTokenBalances() {
 
         const tokensToFetch = stockIds.map(stockId => stockIdToTokenMap[stockId]).filter(Boolean)
         const balancesRes = await getTokenBalances(
+          contractAddr,
           account as `0x${string}`,
           tokensToFetch.map(token => token.address as `0x${string}`)
         )
+        // const balancesRes: any[] = []
         balancesRes.forEach((balance, index) => {
           const token = tokensToFetch[index]
           // 更新tokenWithBalance中对应的token余额信息
@@ -186,14 +146,18 @@ export function useGetTokenBalances() {
         })
       }
       // 处理稳定币余额获取更新
-      if (tokenList.length > 0) {
+      const filteredTokenList = tokenList.filter(token => token.chainId === chainId)
+      if (filteredTokenList.length > 0) {
         const balancesRes = await getTokenBalances(
+          // '0x00000000000000000000000000000000',
+          contractAddr,
           account as `0x${string}`,
-          tokenList.map(token => token.address as `0x${string}`)
+          filteredTokenList.map(token => token.address as `0x${string}`)
         )
+        // const balancesRes: any[] = []
 
         balancesRes.forEach((balance, index) => {
-          const token = tokenList[index]
+          const token = filteredTokenList[index]
           // 更新tokenWithBalance中对应的token余额信息
           const tokenKey = symbolToLower(token.symbol)
           newTokenWithBalance[tokenKey] = {
@@ -205,7 +169,7 @@ export function useGetTokenBalances() {
 
       setTokenWithBalance(newTokenWithBalance)
     },
-    [account, tokenList, rwaRwaList, tokenWithBalance, setTokenWithBalance]
+    [account, tokenList, rwaRwaList, tokenWithBalance, contractAddr, setTokenWithBalance]
   )
 
   return {

@@ -28,7 +28,7 @@ function Root() {
             name: chain.displayName,
             rpcUrls: {
               ..._chain.rpcUrls,
-              public: { http: [..._chain.rpcUrls.public.http, chain.rpc] },
+              public: { http: [..._chain.rpcUrls.public.http, ...(chain.rpcUrls || [])] },
             },
             blockExplorers: {
               default: { name: chain.displayName, url: chain.scan },
