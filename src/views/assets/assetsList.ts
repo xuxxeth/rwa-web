@@ -5,13 +5,9 @@ import { useBaseStore } from '@/stores/baseStore'
 import { useEffect, useState, useMemo } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
-import { useRegulateAssets } from 'ca-common-web'
-
-function useDiamondContract(chainId: number) {
-  const chainList = useBaseStore(state => state.chainList)
-  const chain = chainList.find(chain => chain.id === chainId)
-  return chain?.contract
-}
+import { useRegulateAssets, type RegulateAssetItem } from 'ca-common-web'
+import { useContractAddr } from '@/hooks/useContractAddr'
+import { useAppStore } from '@/stores/appStore'
 
 export interface IRiskControlAsset {
   token: string
@@ -21,19 +17,32 @@ export interface IRiskControlAsset {
 }
 
 export function useRiskControlAssets(chainId: number, account: string): IRiskControlAsset[] {
+  const currentChainId = useAppStore(state => state.currentChainId)
+  const chainList = useBaseStore(state => state.chainList)
   const rwaList = useRwaTokens(false)
   const tokenList = useTokens()
-  const diamondContract = useDiamondContract(chainId)
+  const allTokens = [...tokenList, ...rwaList]
 
-  const { assets, isLoading, error, refetch } = useRegulateAssets(
-    diamondContract,
-    account,
-    [...rwaList, ...tokenList].map(rwa => rwa.address)
-  )
+  const { getRegulateAssets } = useRegulateAssets()
 
-  if (!assets) return []
+  const [assets, setAssets] = useState<RegulateAssetItem[]>([])
 
-  const allTokens = [...rwaList, ...tokenList]
+  useEffect(() => {
+    const filteredTokens = [...rwaList, ...tokenList].filter(
+      item => item.chainId === currentChainId
+    )
+    const diamondContractAddr =
+      chainList.find(chain => chain.id === currentChainId)?.contract ?? null
+    if (!diamondContractAddr || !account || !filteredTokens.length) return
+
+    getRegulateAssets(
+      diamondContractAddr,
+      account,
+      filteredTokens.map(rwa => rwa.address)
+    ).then(res => {
+      setAssets(res)
+    })
+  }, [currentChainId, account, rwaList, tokenList, chainList])
 
   return Object.entries(assets.filter(item => item.amount !== 0n))
     .map(([_, { token, amount }]) => {
@@ -45,7 +54,7 @@ export function useRiskControlAssets(chainId: number, account: string): IRiskCon
     .sort((a, b) => advancedSort(a.quantity, b.quantity, 'desc'))
 }
 
-export function useAssetsList(chainId: number, account: string) {
+export function useAssetsList(chainId: number) {
   const tokenList = useTokens()
   const rwaList = useRwaTokens(false)
 
@@ -54,7 +63,7 @@ export function useAssetsList(chainId: number, account: string) {
 
   const allTokenList = useMemo(() => {
     return [...tokenList.map(getAssetItemFromToken), ...rwaList.map(getAssetItemFromRwa)]
-  }, [rwaList, tokenList])
+  }, [rwaList, tokenList, chainId])
 
   const assetsList = useMemo(() => {
     return allTokenList.map(token => {
@@ -66,17 +75,27 @@ export function useAssetsList(chainId: number, account: string) {
       if (token.price && token.holdings) {
         token.value = multiply(token.holdings, token.price)
       }
+      if (!token.holdings || !token.price) {
+        token.value = undefined
+      }
       return token
     })
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
-  const estimatedRwaTotalValue = sum(
-    ...assetsList.filter(item => item.rwaId).map(item => item.value ?? 0)
-  )
-  const estimatedStableTokenTotalValue = sum(
-    ...assetsList.filter(item => !item.rwaId).map(item => item.value ?? 0)
-  )
-  const estimatedBalance = sum(estimatedRwaTotalValue, estimatedStableTokenTotalValue)
+  const estimatedRwaTotalValue =
+    assetsList.length > 0
+      ? sum(...assetsList.filter(item => item.rwaId).map(item => item.value ?? 0))
+      : undefined
+
+  const estimatedStableTokenTotalValue =
+    assetsList.length > 0
+      ? sum(...assetsList.filter(item => !item.rwaId).map(item => item.value ?? 0))
+      : undefined
+
+  const estimatedBalance =
+    estimatedRwaTotalValue !== undefined && estimatedStableTokenTotalValue !== undefined
+      ? sum(estimatedRwaTotalValue, estimatedStableTokenTotalValue)
+      : undefined
 
   useEffect(() => {
     const listener = (data: IAggregateData) => {

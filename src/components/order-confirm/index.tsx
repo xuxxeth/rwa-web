@@ -11,6 +11,7 @@ import { useSettingStore } from "@/stores/settingStore"
 import IconWithTooltip, { TooltipWithBorder } from "../icon-tooltip"
 import { useBaseStore } from "@/stores/baseStore"
 import { TradeType, SessionType } from "ca-common-web"
+import { useCurrentChain } from "@/hooks/useChain"
 
 
 
@@ -43,7 +44,7 @@ const OrderConfirm = memo(
     onClick
   }: OrderConfirmProps) => {
     const { t } = useTranslation()
-    const marketInfo = useBaseStore(state => state.marketInfo)
+    const currentChain = useCurrentChain()
     const [showDetails, setShowDetails] = useState(false);
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
@@ -148,7 +149,7 @@ const OrderConfirm = memo(
           
           <BetweenText 
             left={t("Network Fee")}
-            right={`${networkFeeInNative} BNB`}
+            right={`${networkFeeInNative} ${currentChain?.nativeToken || 'BNB'}`}
           />
           <BetweenText 
             left={

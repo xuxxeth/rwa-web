@@ -3,49 +3,37 @@ import { Button } from './ui/Button'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { LazyImage } from '@/components/image/LazyImage'
-import { useRwaTokens } from '@/hooks/useTokens'
-import {
-  symbolToLower,
-  textPrefix,
-  formatUp,
-  getUpColor,
-  truncate,
-  type Change,
-} from '@/utils/index'
-import type { IRwa } from '@/service/base/types'
-import useRwaWithPriceAndUp from '@/hooks/useRwaWithPriceAndUp'
+import { useStockList } from '@/hooks/useTokens'
+import { textPrefix, formatUp, getUpColor, truncate, getSymbol, type Change } from '@/utils/index'
+import type { IStock } from '@/service/base/types'
+import { useStockWithPriceAndUp } from '@/hooks/useRwaWithPriceAndUp'
 import { HighlightText } from './ui/HighlightText'
 
 // --- Types ---
 interface StockData {
   icon: string
-  name: string
-  symbol: string
+  stockName: string
+  stockCode: string
+  // symbol: string
   price: number | undefined
+  precision?: number
   up: string | undefined
   color?: string
   change: Change
-  precision: number
+  // precision: number
 }
 
 // --- Constants ---
-const SHOWN_STOCK_SYMBOL_PREFIX = ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'TSLA', 'NFLX', 'META']
+// const SHOWN_STOCK_SYMBOL_PREFIX = ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'TSLA', 'NFLX', 'META']
+const SHOWN_STOCK_ID_LIST = [1, 8, 18, 7, 4, 15, 6]
 
 function useStockData() {
-  const rwaList = useRwaTokens()
+  const stockList = useStockList(false)
+  const filteredStockList = stockList.filter(stock => SHOWN_STOCK_ID_LIST.includes(stock.id))
 
-  const rwaMap = useMemo(() => {
-    return new Map(rwaList.map(rwa => [symbolToLower(rwa.symbol).slice(0, -1), rwa]))
-  }, [rwaList])
+  const stockWithPriceAndUP = useStockWithPriceAndUp(filteredStockList)
 
-  const filteredRwaList = useMemo(() => {
-    return SHOWN_STOCK_SYMBOL_PREFIX.map(prefix => rwaMap.get(symbolToLower(prefix))).filter(
-      rwa => rwa !== undefined
-    ) as IRwa[]
-  }, [rwaMap])
-
-  const rwaWithPriceAndUp = useRwaWithPriceAndUp(filteredRwaList)
-  return rwaWithPriceAndUp.map(item => ({
+  return stockWithPriceAndUP.map(item => ({
     ...item,
     color: getUpColor(item.change),
   }))
@@ -144,16 +132,16 @@ const StockCard: React.FC<{
       >
         <div className='flex items-center gap-4'>
           <div className='w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm'>
-            <LazyImage src={stock.icon} alt={stock.name} />
+            <LazyImage src={stock.icon} alt={stock.icon} />
           </div>
           <div className='text-left'>
-            <div className='font-bold text-gray-900 text-lg'>{stock.name}</div>
-            <div className='text-xs text-gray-400 font-medium'>{stock.symbol}</div>
+            <div className='font-bold text-gray-900 text-lg'>{getSymbol(stock.stockCode)}</div>
+            <div className='text-xs text-gray-400 font-medium'>{stock.stockName}</div>
           </div>
         </div>
         <div className='flex justify-between items-end'>
           <div className={`text-3xl font-medium ${stock.color} text-gray-900 tracking-tight`}>
-            {stock.price ? textPrefix(truncate(stock.price, stock.precision), '$') : '--'}
+            {stock.price ? textPrefix(truncate(stock.price, stock.precision ?? 2), '$') : '--'}
           </div>
           <div className={`text-sm font-bold ${stock.color} bg-white/50 px-2 py-1 rounded-lg`}>
             {stock.up !== undefined ? formatUp(stock.up) : '--'}
@@ -184,8 +172,9 @@ export const Hero: React.FC = () => {
 
   const centerIndex = Math.floor(stockData.length / 2)
 
-  const handleClick = useCallback((rwa: IRwa) => {
-    router.push('/trade/' + rwa.symbol)
+  const handleClick = useCallback((stock: IStock) => {
+    const symbol = getSymbol(stock.stockCode)
+    router.push('/trade/' + symbol)
   }, [])
 
   return (
@@ -209,7 +198,7 @@ export const Hero: React.FC = () => {
         <div className='mt-[-190px] relative w-full h-[450px] flex justify-center items-end hidden md:flex perspective-1000 pointer-events-none'>
           {stockData.map((stock, idx) => (
             <StockCard
-              key={stock.name}
+              key={stock.stockCode}
               stock={stock}
               index={idx}
               centerIndex={centerIndex}

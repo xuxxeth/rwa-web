@@ -76,4 +76,5 @@ export type IOrderData = {
     "sl": string  // 提取的具体的 rwa symbol
     "c": number // Cumulative trade amount
     "r"?: number
+    "chi": string // chainId
   }

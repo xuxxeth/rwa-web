@@ -457,7 +457,7 @@
   "approveSuccess": "授權成功",
   "connectSuccess": "錢包連接成功",
   "walletDisconnect": "錢包已斷开",
-  "switchNetwork": "檢測到不支持的網絡，請切換網路至 {{network}}",
+  "switchNetwork": "平台暫不支援当前選擇網絡，請在錢包中新增或切換網路後繼續交易",
   "amountMin": "金額下限：{{amount}}",
   "amountMax": "金額上限：{{amount}}",
   "tradingHalt": "交易暫停",
@@ -876,6 +876,12 @@
     "verifyNow": "立即認證",
     "claimSuccess": "返傭領取成功",
     "claimFailed": "返傭領取失敗",
-    "sigSubTitle": "請通過錢包授權後查看您的邀請返傭相關記錄"
+    "sigSubTitle": "請通過錢包授權後查看您的邀請返傭相關記錄",
+    "switchThenClaim": "切換鏈並領取"
+  },
+  "multiChain": {
+    "t1": "切換網路",
+    "t2": "平台暫不支援目前錢包選擇網絡，請切換至可用網絡後繼續交易",
+    "t3": "或"
   }
 }

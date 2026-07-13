@@ -1,11 +1,14 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useEffect, useId, useMemo, useState } from "react";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
-import { getChainIconById } from "@/utils/chains";
 import { useBaseStore } from "@/stores/baseStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
+import { useAppStore } from "@/stores/appStore";
+import { LAST_CONNECTED_CHAIN_ID } from "@/config/storage";
+import { useSwitchChainAction } from "@/hooks/useSwitchChainAction";
+import { useToast } from "@/hooks/useToast";
 
 export function ChainItem({
   title,
@@ -30,7 +33,7 @@ export function ChainItem({
     )}>
       <div className="flex items-center">
         <div className="w-6 h-6 mr-2">
-          <img src={icon} className="w-6 h-6" alt="" />
+          <img src={icon} className="w-6 h-6 rounded-full" alt="" />
         </div>
 
         <span className={cn(
@@ -51,19 +54,45 @@ export function ChainItem({
 
 
 export function SwitchButton() {
+  const { t } = useTranslation()
+  const { toastError } = useToast()
+  const { handleSwitchChain, isChainSupported, chainId } = useActiveWeb3()
   const chains = useBaseStore(state => state.chainList)
   const [open, setOpen] = useState(false)
 
-  const currentChain = useBaseStore(state => state.currentChain)
   const setCurrentChain = useBaseStore(state => state.setCurrentChain)
+  const setCurrentChainId = useAppStore(state => state.setCurrentChainId)
+  const currentChainId = useAppStore(state => state.currentChainId)
+
+  const currentChain = useMemo(() => {
+    return chains.filter(chain => chain.state === 1).find(chain => chain.id === currentChainId)
+  }, [chains, currentChainId])
+
+  const { switchToChain } = useSwitchChainAction()
 
   useEffect(() => {
     if (chains[0]) {
-      const _chainId = storage.getItem('CA_CHAIN_ID') || chains[0].id
-      setCurrentChain(chains.find(chain => chain.id === _chainId) || chains[0])
+      const _chainId = Number(storage.getItem(LAST_CONNECTED_CHAIN_ID) || chains[0].id)
+      const chain = chains.filter(chain => chain.state === 1).find(chain => chain.id === _chainId)
+      if (chain && chain.state === 1) {
+        handleSwitchChain(chain.id)
+      } else {
+        handleSwitchChain(chains[0].id)
+      }
     }
-    
   }, [chains])
+
+  // 如果真实钱包chain切换，则更新当前链
+  useEffect(() => {
+    if (chainId && isChainSupported && chains[0]) {
+      const chain = (chains.filter(chain => chain.state === 1).find(chain => chain.id === chainId)) || chains[0]
+      if (chain) {
+        storage.setItem(LAST_CONNECTED_CHAIN_ID, String(chain.id))
+        setCurrentChainId(chainId)
+        setCurrentChain(chain)
+      }
+    }
+  }, [chains, chainId, isChainSupported])
 
   return (
     <HoverCard
@@ -82,7 +111,7 @@ export function SwitchButton() {
           )}
             
           >
-            <img src={getChainIconById(String(currentChain.id))} className="w-6 mr-1 rounded-full" alt="" />
+            <img src={currentChain.icon} className="w-6 mr-1 rounded-full" alt="" />
             <span >{currentChain.displayName}</span>
             <img src="/images/icons/down.png" className={cn(
               "w-3 ml-4 mr-2 transition-all",
@@ -93,7 +122,7 @@ export function SwitchButton() {
         
       </HoverCardTrigger>
       <HoverCardContent align="end" 
-          className="bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]"
+          className="bg-[rgba(0,0,0,0)] min-w-[340px] border-none pt-2 -mr-[16px]"
        >
         <div 
           className="bg-[#131416] border border-[#232427] rounded-[8px] py-4 text-white relative"
@@ -101,19 +130,7 @@ export function SwitchButton() {
           <div className="h-[50px] absolute left-0 right-0 -top-[50px] bg-[rgba(0,0,0,0)]"></div>
           <div className=" px-4">
             {
-              chains.concat([
-                {
-                    "id": 972,
-                    "name": "X Layer",
-                    "displayName": "X Layer",
-                    "state": 0,
-                    "nativeToken": "BNB",
-                    "contract": "0xe3ec160b8c5e0DeCFd254AB59740b92A2E840Fe9",
-                    "icon": "/images/icons/chains/xlayer.png",
-                    "rpc": "https://bsc-dataseed.binance.org/",
-                    "scan": "https://bscscan.com"
-                }
-              ]).map((chain) => {
+              chains.map((chain) => {
                 return (
                   <ChainItem 
                     key={chain.id} 
@@ -124,7 +141,15 @@ export function SwitchButton() {
                     onClick={() => {
                       if (chain.state !== 0) {
                         setOpen(false)
-                        setCurrentChain(chain)
+                        switchToChain(chain.id)
+                          .then((ok) => {
+                            if (!ok) {
+                              toastError({
+                                title: t('switchNetwork'),
+                              })
+                            }
+                          })
+                        
                       }
                       
                     }}

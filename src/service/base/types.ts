@@ -9,7 +9,8 @@ export interface IChain {
   "icon": string,
   "nativeToken": string,
   "rpc": string,
-  "scan": string
+  "scan": string,
+  "rpcUrls": string[],
 }
 
 export interface ITokenWithBalance {
@@ -48,11 +49,17 @@ export interface IStock {
   "stockCode": string,
   "stockName": string,
   "icon": string,
-  "state": number,
   "weight": number,
-  "price"?: string , 
+  "state": number,
+  "listingState": number,
+  "precision"?: number
+  "price"?: string | number, 
   "up"?: string, 
   "cPrice"?: string, 
+  "stockStatistics"?: {
+    "totalShare": number,
+    "circShare": number
+  }
 }
 
 // token信息
@@ -100,6 +107,7 @@ export interface IRwa {
   "up"?: string,
   "upValue"?: string,
   "price"?: string | number,
+  "showState": boolean
 }
 
 export type IRwaWithBalancePrice = IRwa & ITokenWithBalance & ITokenWithPrice

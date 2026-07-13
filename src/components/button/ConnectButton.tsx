@@ -6,10 +6,14 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { useRouter } from '@/hooks/useRouter'
 import { useToast } from '@/hooks/useToast'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
-import { ConnectorType, useQrCodeData, type WalletConfig } from '@/hooks/useCaCommon'
+import {
+  ConnectorType,
+  useQrCodeData,
+  type WalletConfig,
+} from '@/hooks/useCaCommon'
 import { useBaseStore } from '@/stores/baseStore'
 import { useAppStore } from '@/stores/appStore'
-import { DialogController } from '@/components/dialog/DialogController'
+import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 import { Divide } from '../divide'
 import { LazyImage } from '../image/LazyImage'
@@ -22,6 +26,7 @@ import QRCode from '@/components/qrcode'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
 import { usePendingStep } from '@/hooks/usePendingStep'
+import SwitchChainModal from '../dialog/SwitchChainModal'
 
 export function WalletItem({
   wallet,
@@ -68,18 +73,19 @@ type WalletStatus = (typeof WalletStatus)[keyof typeof WalletStatus]
 export function ConnectButton(props: { connectBtnClassName?: string }) {
   const { t } = useTranslation()
   const router = useRouter()
-  const { toastSuccess, toastError, toastWarning, toastInfo } = useToast()
+  const { toastSuccess, toastError } = useToast()
   const {
     wallets,
     account,
     chainId,
+    isChainSupported,
     handleConnect: rwaHandleConnect,
     handleDisConnect,
     handleSwitchChain,
     initialized,
-    isSameChain
   } = useActiveWeb3()
 
+  const switchDialog = useShowDialog()
   const chains = useBaseStore(s => s.chainList)
   const showConnect = useBaseStore(s => s.showConnect)
   const setShowConnect = useBaseStore(s => s.setShowConnect)
@@ -87,6 +93,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const setCurrentWallet = useBaseStore(s => s.setCurrentWallet)
 
   const setIsWalletConnecting = useAppStore(s => s.setIsWalletConnecting)
+  const currentChainId = useAppStore(s => s.currentChainId)
 
   const [status, setStatus] = useState<WalletStatus>(WalletStatus.IDLE)
   const prevStatusRef = useRef<WalletStatus>(WalletStatus.IDLE)
@@ -97,7 +104,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   const isManualConnect = useRef(false)
   const isMobile = useMemo(() => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent), [])
 
-  const networkText = useMemo(() => chains.map(c => c.displayName).join(' / '), [chains])
+  const networkText = useMemo(
+    () =>
+      chains
+        .filter(c => c.state === 1)
+        .map(c => c.displayName)
+        .join(' / '),
+    [chains]
+  )
 
   const { verifyTip } = useVerifyTip()
   const [isSignatureValid] = useSignatureValidStatus()
@@ -105,21 +119,34 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   const { kycStatus } = useKycStatus()
   const pendingStep = usePendingStep()
+  const hasAutoConnected = useRef(false)
 
   const handleConnect = useCallback(
-    async (connectorType: ConnectorType, wallet: WalletConfig) => {
+    async (connectorType: ConnectorType, chainId: number, wallet: WalletConfig, noToast?: boolean) => {
+      hasAutoConnected.current = true
       try {
         setIsQrCodeInvalid(false)
-        await rwaHandleConnect(connectorType, wallet)
+        await rwaHandleConnect(connectorType, chainId, wallet)
       } catch (error) {
         if (connectorType === ConnectorType.WalletConnect) {
-          setIsQrCodeInvalid(true)
+          if ((error as any).message === 'SwitchChainFailed') {
+            noToast && toastError({
+              title: t('switchNetwork', { network: networkText }),
+            })
+            setConnectorType(undefined)
+          } else {
+            setIsQrCodeInvalid(true)
+          }
+        } else {
+          noToast || toastError({
+            title: t('switchNetwork', { network: networkText }),
+          })
         }
       } finally {
         setIsWalletConnecting(false)
       }
     },
-    [rwaHandleConnect]
+    [rwaHandleConnect, networkText]
   )
 
   useEffect(() => {
@@ -127,11 +154,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       setStatus(WalletStatus.IDLE)
       return
     }
-
-    const supported = chains.some(c => c.id === chainId)
-
-    setStatus(supported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
-  }, [account, chainId, chains])
+    // const supported = chains.some(c => c.id === chainId)
+    setStatus(isChainSupported ? WalletStatus.CONNECTED : WalletStatus.WRONG_NETWORK)
+  }, [account, chainId, chains, isChainSupported])
 
   const hasInitializedRef = useRef(false)
   useEffect(() => {
@@ -156,28 +181,29 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         break
 
       case WalletStatus.WRONG_NETWORK:
-        
-        if (chains[0]) {
-          handleSwitchChain(chains[0].id)
-            .then(res => {
-              if (res) {
-                // window.location.reload()
-              } else {
-                toastError({
-                  title: t('switchNetwork', { network: networkText }),
-                })
-              }
-            })
-        } else {
-          toastError({
-            title: t('switchNetwork', { network: networkText }),
-          })
-        }
-        
-        // handleDisConnect()
-        break
+        // 不支持的链，不再进行自动切换链操作，后期会有个弹窗提示
+        switchDialog.show()
+        // if (chains[0]) {
+        //   handleSwitchChain(chains[0].id)
+        //     .then(res => {
+        //       if (res) {
+        //         // window.location.reload()
+        //       } else {
+        //         toastError({
+        //           title: t('switchNetwork', { network: networkText }),
+        //         })
+        //       }
+        //     })
+        // } else {
+        //   toastError({
+        //     title: t('switchNetwork', { network: networkText }),
+        //   })
+        // }
 
-      // case WalletStatus.IDLE:
+        break
+      case WalletStatus.IDLE:
+        switchDialog.hide()
+        break
       //   if (!isRestoringRef.current && hasInitializedRef.current && prevStatus === WalletStatus.CONNECTED) {
       //     toastError({
       //       title: t('walletDisconnect'),
@@ -190,8 +216,10 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
   }, [status])
 
   useEffect(() => {
-    if (!wallets.length || account || !initialized) return
-
+    if (hasAutoConnected.current) return
+    
+    if (!wallets.length || account || !initialized || !currentChainId) return
+    
     const walletUUID = storage.getItem(WALLET_UUID)
     const connector = storage.getItem(CONNECTOR_TYPE) as ConnectorType | null
 
@@ -211,10 +239,14 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
     setStatus(WalletStatus.CONNECTING)
     setIsWalletConnecting(true)
 
-    handleConnect(connector, wallet)
-  }, [wallets, initialized])
+    handleConnect(connector, currentChainId, wallet, true)
+   
+    
+  }, [wallets, initialized, currentChainId])
 
-  const connectWallet = async (wallet: WalletConfig) => {
+  const connectWallet = async (wallet: WalletConfig, chainId: number | null) => {
+    if (!chainId) return
+
     isManualConnect.current = true
     setCurrentWallet(wallet)
     setIsWalletConnecting(true)
@@ -228,13 +260,13 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
       setConnectorType(ConnectorType.Injected)
 
-      await handleConnect(ConnectorType.Injected, wallet)
+      await handleConnect(ConnectorType.Injected, chainId, wallet)
       return
     }
 
     setConnectorType(ConnectorType.WalletConnect)
 
-    await handleConnect(ConnectorType.WalletConnect, wallet)
+    await handleConnect(ConnectorType.WalletConnect, chainId, wallet)
   }
 
   const goTo = (path: string) => {
@@ -260,7 +292,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
 
   return (
     <>
-      {(!account || !isSameChain) ? (
+      {!account ? (
         <div
           className={cn(
             'h-[36px] flex items-center px-6 bg-[#9CFF3A] text-sm font-medium rounded-[8px] cursor-pointer',
@@ -286,10 +318,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       ) : (
         <HoverCard open={hoverOpen} onOpenChange={setHoverOpen}>
           <HoverCardTrigger asChild>
-            <div className={cn(
-              'h-[36px] flex items-center px-2 py-1 bg-[#191B1E] text-sm font-semibold rounded-[8px] cursor-pointer text-white',
-              hoverOpen ? "bg-[#383A40]" : ""
-            )}>
+            <div
+              className={cn(
+                'h-[36px] flex items-center px-2 py-1 bg-[#191B1E] text-sm font-semibold rounded-[8px] cursor-pointer text-white',
+                hoverOpen ? 'bg-[#383A40]' : ''
+              )}
+            >
               {currentWallet?.info?.icon && (
                 <img src={currentWallet.info.icon} className='w-6 mr-2' />
               )}
@@ -303,9 +337,7 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
             align='end'
             className='bg-[rgba(0,0,0,0)] w-[240px] border-none pt-2 -mr-[16px]'
           >
-            <div
-              className='bg-[#131416] border border-[#232427] rounded-[8px] pt-2 text-white'
-            >
+            <div className='bg-[#131416] border border-[#232427] rounded-[8px] pt-2 text-white'>
               <div className='px-5 pb-2'>
                 <div className='flex items-center justify-between py-3'>
                   <div className=' text-sm font-medium'>{shortenAddress(account)}</div>
@@ -328,20 +360,31 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   className='flex items-center py-3 cursor-pointer'
                   onClick={() => goTo('identity')}
                 >
-                  <div className={cn(
-                    ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
-                    kycStatus === KYC_OVERALL_STATUS.VERIFIED && !pendingStep.step ? 'bg-[#25A750]' :
-                    (kycStatus === KYC_OVERALL_STATUS.ISSUE) ? 'bg-[#CA3F64]' : 'bg-[#FFB219]'
-                  )}>
-                    <img src={
-                      kycStatus === KYC_OVERALL_STATUS.VERIFIED ? '/images/v2/icons/verify.png' :
-                      (kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step) ? '/images/v2/icons/issue.png' : '/images/v2/icons/unverify.png'
-                    } className='w-[20px] h-[14px]' alt='' />
+                  <div
+                    className={cn(
+                      ' flex items-center h-[23px] rounded-[4px] px-[6px] ',
+                      kycStatus === KYC_OVERALL_STATUS.VERIFIED && !pendingStep.step
+                        ? 'bg-[#25A750]'
+                        : kycStatus === KYC_OVERALL_STATUS.ISSUE
+                          ? 'bg-[#CA3F64]'
+                          : 'bg-[#FFB219]'
+                    )}
+                  >
+                    <img
+                      src={
+                        kycStatus === KYC_OVERALL_STATUS.VERIFIED
+                          ? '/images/v2/icons/verify.png'
+                          : kycStatus === KYC_OVERALL_STATUS.ISSUE || pendingStep.step
+                            ? '/images/v2/icons/issue.png'
+                            : '/images/v2/icons/unverify.png'
+                      }
+                      className='w-[20px] h-[14px]'
+                      alt=''
+                    />
                     <span className='text-[12px] font-medium ml-1 text-black'>
                       {!isSignatureValid ? t('identity.verifyID') : verifyTip || t('verified')}
                     </span>
                   </div>
-                  
                 </div>
                 <div
                   className='flex items-center py-3 cursor-pointer'
@@ -357,8 +400,6 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                   <img src='/images/v2/icons/order.png' className='w-[16px] h-[16px]' alt='' />
                   <span className='text-[14px] font-medium ml-2'>{t('v2.hd.h1')}</span>
                 </div>
-
-                
               </div>
 
               <Divide />
@@ -381,8 +422,8 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
-        className="pr-0 pl-0"
-        headerClassName="px-4"
+        className='pr-0 pl-0'
+        headerClassName='px-4'
         open={showConnect}
         openChange={open => {
           setShowConnect(open)
@@ -398,7 +439,12 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
         <div className='pt-1 text-white w-[402px] border-t border-[#232427]'>
           {connectorType === ConnectorType.WalletConnect ? (
             <QrCodeView
-              refresh={() => handleConnect(ConnectorType.WalletConnect, currentWallet)}
+              refresh={() => {
+                if (!currentChainId) {
+                  return
+                }
+                handleConnect(ConnectorType.WalletConnect, currentChainId, currentWallet)
+              }}
               currentWallet={currentWallet}
               isQrCodeInvalid={isQrCodeInvalid}
             />
@@ -408,13 +454,17 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
                 <WalletItem
                   key={wallet.info.name}
                   wallet={wallet}
-                  onClick={() => connectWallet(wallet)}
+                  onClick={() => connectWallet(wallet, currentChainId)}
                 />
               ))}
             </div>
           )}
         </div>
       </DialogController>
+      {
+        account && <SwitchChainModal open={switchDialog.open} onClose={switchDialog.hide} />
+      }
+      
     </>
   )
 }

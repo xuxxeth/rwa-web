@@ -2,7 +2,7 @@ import { LazyImage } from '@/components/image/LazyImage'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from '@/hooks/useRouter'
 import { useAppStore } from '@/stores/appStore'
-import { useAccount, useChainId } from 'ca-common-web'
+import { useAccount } from 'ca-common-web'
 import WalletNotConnected from '@/components/wallet-not-connected'
 import Assets from './Assets'
 import Order from './Order'
@@ -15,7 +15,7 @@ function Portfolio() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
 
   const account = useAccount()
-  const chainId = useChainId()
+  const chainId = useAppStore(state => state.currentChainId)
 
   const walltedConnected = account && chainId
 
@@ -81,7 +81,7 @@ function MainContent({ chainId, account }: { chainId: number; account: string })
           })}
         </div>
       </div>
-      <div className='flex-1 flex flex-col'>
+      <div className='flex-1 flex flex-col relative'>
         {activeTab === 'assets' && <Assets chainId={chainId} account={account} />}
         {activeTab === 'order' && (
           <div className='h-full py-4'>

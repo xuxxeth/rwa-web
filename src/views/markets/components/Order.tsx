@@ -1,9 +1,10 @@
 import Order from '@/views/assets/v2/Order'
 import { useAccount, useChainId } from 'ca-common-web'
+import { useAppStore } from '@/stores/appStore'
 
 export function OrderInTrade() {
   const account = useAccount()
-  const chainId = useChainId()
+  const chainId = useAppStore(state => state.currentChainId)
 
   return (
     <div className='pt-2 flex flex-col max-h-full'>

@@ -3,11 +3,12 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { languages } from "@/i18n";
 import { cn } from "@/utils";
 import storage from "@/utils/storage";
-import { lazy, useState } from "react";
+import { lazy, useMemo, useState } from "react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 import { LazyImage } from "../image/LazyImage";
 import { Switch } from "../ui/switch-label";
 import { useSettingStore } from "@/stores/settingStore";
+import { useCurrentChain } from "@/hooks/useChain";
 
 export function LanguageItem({
   title,
@@ -38,7 +39,7 @@ export function SettingSubMenus({
   const { t, i18n } = useTranslation();
   const showConfirm = useSettingStore(state => state.showConfirm)
   const setShowConfirm = useSettingStore(state => state.setShowConfirm)
-
+  const currentChain = useCurrentChain()
   const [open, setOpen] = useState(false)
   
   return (
@@ -87,8 +88,13 @@ export function SettingSubMenus({
             >
               <span className="">{t('v2.hd.h4')}</span>
               <div className="flex items-center gap-x-1">
-                <LazyImage src="/images/icons/chains/bsc.png" className="w-4 h-4" />
-                <span>BNB</span>
+                <div className="w-4 h-4">
+                  {
+                    currentChain?.icon && <LazyImage src={currentChain.icon} className="w-4 h-4 rounded-full" />
+                  }
+                </div>
+                
+                <span>{currentChain?.nativeToken}</span>
               </div>
             </div>
           </div>

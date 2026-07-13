@@ -42,6 +42,8 @@ export default function AssetsPieChart({
     const dotY = cy + labelRadius * sin
 
     const isRight = cos >= 0
+    const isTop = sin < 0
+    // const tooltipY = dotY - 30 + (isTop ? 10 : -10)
 
     return (
       <g style={{ cursor: 'pointer' }}>
@@ -63,7 +65,7 @@ export default function AssetsPieChart({
             // x={isRight ? dotX + 10 : dotX - 10} // 如果在右侧，起点为圆点右侧 10px；如果在左侧，起点为圆点左侧 10px
             // y={dotY - 12}
             x={isRight ? dotX - 70 : dotX + 70}
-            y={dotY - 30}
+            y={isTop ? dotY - 30 + 8 : dotY - 30}
             height={24}
             className='overflow-visible pointer-events-none'
           >

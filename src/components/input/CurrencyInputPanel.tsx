@@ -10,7 +10,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useTradeStore } from "@/stores/tradeStore";
 import { PriceChangeTab } from "../markets/PriceChangeTab";
 import { useRouter } from "@/hooks/useRouter";
-import { TradeType } from "ca-common-web";
+import { TradeType, useChainId } from "ca-common-web";
 
 type CurrencyInputPanelProps = {
   isMarket?: boolean
@@ -31,6 +31,7 @@ type CurrencyInputPanelProps = {
 const CurrencyInputPanel = memo(
   ({ mode = 'in', label, placeholder, value, from, regex, isInsufficient, tradeType, isMarket, onUserInput, handleChangePrice }: CurrencyInputPanelProps) => {
     const router = useRouter()
+    const chainId = useChainId()
     const inputToken = useTradeStore(state => state.inputToken)
     const outputToken = useTradeStore(state => state.outputToken)
     const updateInputToken = useTradeStore(state => state.updateInputToken)
@@ -68,7 +69,9 @@ const CurrencyInputPanel = memo(
       if (tokenList[0]) {
         updateOutputToken(tokenList[0])
       }
-    }, [tokenList.length])
+    }, [tokenList.length, chainId])
+
+    
 
     return (
       <div className={cn(

@@ -39,7 +39,6 @@ const USDTSelect = memo(
     const outputToken = useTradeStore(state => state.outputToken)
     const updateOutputToken = useTradeStore(state => state.updateOutputToken)
 
-    const _id = useId()
     const tokenListWithBalance = useMemo(() => {
       return tokenList.map(rwa => {
         return {
@@ -48,6 +47,7 @@ const USDTSelect = memo(
         }
       })
     }, [tokenList, tokenWithBalance])
+
     
     const [open, setOpen] = useState(false)
 

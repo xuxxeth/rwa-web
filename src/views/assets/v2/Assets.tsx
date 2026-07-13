@@ -10,7 +10,6 @@ import {
 } from '../assetsList'
 import { useRwaTokens, useTokens } from '@/hooks/useTokens'
 import { LazyImage } from '@/components/image/LazyImage'
-// import { cn, toFixed } from '@/utils'
 import { DialogController } from '@/components/dialog/DialogController'
 import AssetsPieChart, { type ChartData, COLORS } from './pieChart'
 import {
@@ -23,13 +22,16 @@ import {
   multiply,
   sum,
   truncate,
-  textSuffix,
   isLess,
 } from '@/utils'
+import { useAppStore } from '@/stores/appStore'
+import { CircleLoading } from '@/components/loading'
 
 function Assets({ chainId, account }: { chainId: number; account: string }) {
+  const { t } = useTranslation()
   const { assetsList, estimatedBalance, estimatedRwaTotalValue, estimatedStableTokenTotalValue } =
-    useAssetsList(chainId, account)
+    useAssetsList(chainId)
+  const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
   const riskControlledAssets = useRiskControlAssets(chainId, account)
 
@@ -37,7 +39,10 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
 
   const assetsClassName = isRiskControlled ? '' : 'flex-1'
 
-  const { t } = useTranslation()
+  if (isSwitchingChain) {
+    return <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+  }
+
   return (
     <div className='w-full h-full flex flex-col'>
       <div className='flex flex-row gap-1 border-gray-900 border-b-4 py-4'>
@@ -46,20 +51,29 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
             <div className='pb-4'>
               <div className='text-base/5'>{t('portfolio.total')}</div>
               <div className='text-lg/5.5 font-semibold mt-1'>
-                {formatWithCommas(truncate(estimatedBalance, 2), 2)} USD
+                {estimatedBalance !== undefined
+                  ? formatWithCommas(truncate(estimatedBalance, 2), 2)
+                  : '--'}{' '}
+                USD
               </div>
             </div>
             <div className='pt-4 mt-1 flex flex-row justify-between items-center'>
               <div className={assetsClassName}>
                 <div className='text-gray-400 text-sm'>{t('portfolio.rwa')}</div>
                 <div className='mt-2 text-lg/[23px] font-medium'>
-                  {formatWithCommas(truncate(estimatedRwaTotalValue, 2), 2)} USD
+                  {estimatedRwaTotalValue !== undefined
+                    ? formatWithCommas(truncate(estimatedRwaTotalValue, 2), 2)
+                    : '--'}{' '}
+                  USD
                 </div>
               </div>
               <div className={assetsClassName}>
                 <div className='text-gray-400 text-sm'>{t('portfolio.settle')}</div>
                 <div className='mt-2 text-lg/[23px] font-medium'>
-                  {formatWithCommas(truncate(estimatedStableTokenTotalValue, 2), 2)} USD
+                  {estimatedStableTokenTotalValue !== undefined
+                    ? formatWithCommas(truncate(estimatedStableTokenTotalValue, 2), 2)
+                    : '--'}{' '}
+                  USD
                 </div>
               </div>
               {isRiskControlled && (
@@ -76,7 +90,9 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
         </div>
         <div className='flex-none border-l border-gray-850'></div>
         <div className='flex-1 px-4 h-full relative'>
-          <AssetsRatio assetsList={assetsList} estimatedBalance={estimatedBalance} />
+          {estimatedBalance !== undefined && (
+            <AssetsRatio assetsList={assetsList} estimatedBalance={estimatedBalance} />
+          )}
         </div>
       </div>
       <div className='p-4'>

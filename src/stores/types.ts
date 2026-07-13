@@ -75,15 +75,15 @@ export interface BaseStore {
   getChains: () => Promise<ApiResponse<IChain[]>>;
   getTokens: (chainId?: number) => Promise<ApiResponse<IToken[]>>;
   getBaseRwas: (chainId?: number) => Promise<ApiResponse<IRwa[]>>;
+  getAllTokens: (chainId?: number) => Promise<void>
   getStocks: () => Promise<ApiResponse<IStock[]>>;
-  getMarket: () => Promise<ApiResponse<IMarket>>;
+  getMarket: () => Promise<ApiResponse<IMarket[]>>;
   getMarketState: () => Promise<ApiResponse<IMarketState>>;
   updateRwasPrice: (priceList: IRwaPrice[]) => void;
   updateStocksPrice: (priceList: IRwaPrice[]) => void;
   freshTokenBalances: () => void;
   setCurrentChain: (chain: IChain | null) => void;
   setMarketState: (data: IWSSMarketState) => void;
-
 }
 
 export interface TradeStore {

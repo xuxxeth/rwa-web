@@ -7,6 +7,7 @@ import { useTranslation } from './hooks/useTranslation'
 
 import { Toaster } from "./components/ui/sonner";
 import { useBaseStore } from "./stores/baseStore";
+import { useAppStore } from './stores/appStore'
 import { useTokenBalances } from "./hooks/useTokenBalances";
 import { useActiveWeb3 } from "./hooks/useActiveWe3";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -35,11 +36,16 @@ const NO_MENUS_PATH = ['/kyc/liveness-complete']
 function App() {
   const { t, i18n } = useTranslation()
   const router = useRouter()
-  const { account, chainId } = useActiveWeb3()
   const initBaseStore = useBaseStore(state => state.init)
   const refreshByLanguage = useBaseStore(state => state.refreshByLanguage)
   const isHomeMenus = useMemo(() => HOME_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
   const isNoMenus = useMemo(() => NO_MENUS_PATH.includes(router.location.pathname), [router.location.pathname])
+
+  const currentChainId = useAppStore(state => state.currentChainId)
+  const setIsSwitchingChain = useAppStore(state => state.setIsSwitchingChain)
+
+  const getChains = useBaseStore(state => state.getChains)
+  const getStocks = useBaseStore(state => state.getStocks)
 
   useEffect(() => {
     const lng = storage.getItem('CA_LANGUAGE') || 'en'
@@ -60,10 +66,18 @@ function App() {
   useWssAuth()
 
   useEffect(() => {
-    if (!chainId) return
+    getChains()
+    getStocks()
+  }, [])
+
+  useEffect(() => {
+    if (!currentChainId) return
+    setIsSwitchingChain(true)
     // 初始化baseStore
-    initBaseStore(chainId)
-  }, [chainId])
+    initBaseStore(currentChainId).finally(() => {
+      setIsSwitchingChain(false)
+    })
+  }, [currentChainId])
 
   const { wsService } = useWssOn()
 
