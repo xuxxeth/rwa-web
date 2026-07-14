@@ -1,3 +1,4 @@
+import { bscTestnet, xLayerTestnet, defaultChains } from '../hooks/useCaCommon.ts'
 import type { ChartingLibraryFeatureset } from '@/lib/charting_library/charting_library'
 
 export const CONNECTOR_TYPE = 'CONNECTOR_TYPE'
@@ -170,3 +171,11 @@ export const zeroAddress = '0x0000000000000000000000000000000000000000' as const
 
 export const REFERRAL_INFO = 'https://tiko.gitbook.io/tiko-docs/referral-program/quick-start-guide'
 export const REFERRAL_FAQ = 'https://tiko.gitbook.io/tiko-docs/referral-program/faq'
+
+
+export const CHAIN_SCAN: Record<string, String> = {
+  '56': defaultChains[0].blockExplorers.default.url,
+  '196': defaultChains[1].blockExplorers.default.url,
+  '97': bscTestnet.blockExplorers.default.url,
+  '1952': xLayerTestnet.blockExplorers.default.url,
+}

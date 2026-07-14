@@ -413,8 +413,13 @@ function ClaimRebateDialog(props: {
             const expanded = expandedChainId === item.id
 
             return (
-              <div key={item.id} className='border bg-gray-900 border-gray-500 p-4 rounded-[10px]'>
-                <div className='flex flex-row text-sm/4.5 font-medium items-center'>
+              <div key={item.id} className='border bg-gray-900 border-gray-500 p-4 rounded-[10px] '>
+                <div
+                  className='flex flex-row text-sm/4.5 font-medium items-center cursor-pointer'
+                  onClick={() => {
+                    setExpandedChainId(prev => (prev === item.id ? null : item.id))
+                  }}
+                >
                   <img src={item.icon} className='w-[24px] h-[24px] mr-2' />
                   <span className='text-gray-300'>{item.displayName}</span>
                   <div className='ml-auto flex items-center gap-1'>
@@ -425,9 +430,6 @@ function ClaimRebateDialog(props: {
                     <button
                       type='button'
                       className='flex h-4 w-4 items-center justify-center cursor-pointer'
-                      onClick={() => {
-                        setExpandedChainId(prev => (prev === item.id ? null : item.id))
-                      }}
                     >
                       <VectorSVG
                         className={cn(
