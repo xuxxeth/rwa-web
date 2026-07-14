@@ -34,8 +34,10 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
 
     if (item1.value !== item2.value) {
       return advancedSort(item1.value, item2.value, 'desc')
-    } else {
+    } else if (item1.weight !== item2.weight) {
       return advancedSort(item1.weight, item2.weight, 'desc')
+    } else {
+      return advancedSort(item1.symbol, item2.symbol, 'asc')
     }
   }, [])
 

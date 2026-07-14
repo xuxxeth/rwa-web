@@ -229,9 +229,16 @@ const CTokenList = memo(
         return newRwa
       })
 
-      return selectTab === 'stared' ? rwaListWithBalanceList : rwaListWithBalanceList.sort((a, b) => Number(b.balanceValue) - Number(a.balanceValue))
+      return selectTab === 'stared' ? rwaListWithBalanceList : 
+        rwaListWithBalanceList.sort((a, b) => {
+          const nameA = a.symbol?.toLowerCase() || ''
+          const nameB = b.symbol?.toLowerCase() || ''
+          return nameA.localeCompare(nameB) 
+        })
+        .sort((a, b) => Number(b.weight) - Number(a.weight))
+        .sort((a, b) => Number(b.balanceValue) - Number(a.balanceValue))
 
-    }, [newRwaList, tokenWithBalance, tokenWithPrice, marketTradeState])
+    }, [newRwaList, tokenWithBalance, tokenWithPrice])
 
     const [searchTerm, setSearchTerm] = useState("")
     
