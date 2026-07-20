@@ -2,6 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/badge";
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/utils/tw";
+import type { IStockActionEvent } from "@/service/event/types";
+import { useMemo } from "react";
+import { formatTimestamp } from "@/utils/format";
+import { useGetRwaByAddress } from "@/hooks/useTokens";
 
 export type EventStatus = "active" | "ended" | "suspended" | "pending";
 
@@ -49,22 +53,46 @@ function CornerRibbon({ status }: { status: EventStatus }) {
   );
 }
 
-export function EventCard({ data }: { data: EventData }) {
+export function EventCard({ data }: { data: IStockActionEvent }) {
   const { t } = useTranslation();
-  const isActive = data.status === "active";
+
+  const status = useMemo(() => {
+    let _status = null
+    if (data?.showStatus === 0) {
+      _status = 'pending'
+    }
+    if (data?.showStatus === 1) {
+      _status = 'active'
+    }
+    if (data?.showStatus === 2) {
+      _status = 'suspended'
+    }
+    if (data?.showStatus === 3) {
+      _status = 'ended'
+    }
+    return _status
+  }, [data.showStatus])
+
+  const isActive = status === 'active'
+
+  const rwaData = useGetRwaByAddress(data.payinAddress)
+  console.log(rwaData)
 
   return (
     <div className="bg-[#1a1b1e] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
-      <CornerRibbon status={data.status} />
+      {
+        status && <CornerRibbon status={status as EventStatus} />
+      }
+      
       {/* Header */}
       <div className="flex gap-2 items-center">
-        <img src={'/images/tokens/AAPL.png'} alt={data.symbol} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+        <img src={'/images/tokens/AAPL.png'} alt={''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5">
-            <span className="text-white text-[16px] font-semibold leading-none">{data.symbol}</span>
-            {data.isHeld && <Badge variant="held">{t("events.t16")}</Badge>}
+            {/* <span className="text-white text-[16px] font-semibold leading-none">{data.symbol}</span> */}
+            {/* {data.isHeld && <Badge variant="held">{t("events.t16")}</Badge>} */}
           </div>
-          <span className="text-[#737a87] text-[12px] leading-none font-normal">{data.company}</span>
+          {/* <span className="text-[#737a87] text-[12px] leading-none font-normal">{data.company}</span> */}
         </div>
       </div>
 
@@ -73,11 +101,11 @@ export function EventCard({ data }: { data: EventData }) {
         {/* Type + Ratio */}
         <div className="flex gap-3 items-start">
           <div className="flex-1 flex flex-col gap-1.5">
-            <span className="text-white text-[14px] font-semibold">{data.eventType}</span>
+            <span className="text-white text-[14px] font-semibold">{data.businessType === 1 ? t('events.t17') : t('events.t18')}</span>
             <span className="text-[#848e9c] text-[12px]">{t("events.t19")}</span>
           </div>
           <div className="flex-1 flex flex-col gap-1.5 items-end">
-            <span className="text-white text-[14px] font-semibold">{data.ratio}</span>
+            <span className="text-white text-[14px] font-semibold">{data.payinAmount} : 1</span>
             <span className="text-[#848e9c] text-[12px]">{t("events.t10")}</span>
           </div>
         </div>
@@ -89,11 +117,11 @@ export function EventCard({ data }: { data: EventData }) {
         <div className="flex flex-col gap-2 text-[12px]">
           <div className="flex justify-between items-center">
             <span className="text-[#848e9c]">{t("events.t11")}</span>
-            <span className="text-white font-semibold">{data.startTime}</span>
+            <span className="text-white font-semibold">{formatTimestamp(data.exchangeStartTime / 1000, true)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[#848e9c]">{t("events.t12")}</span>
-            <span className="text-white font-semibold">{data.endTime}</span>
+            <span className="text-white font-semibold">{formatTimestamp(data.exchangeEndTime / 1000, true)}</span>
           </div>
         </div>
       </div>

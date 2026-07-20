@@ -33,7 +33,6 @@ export function Splits() {
           </div>
           <RecordsSection />
 
-          
           <div className='mt-20'></div>
           <Footer from="no-account"  />
 
@@ -51,7 +50,7 @@ export function Splits() {
           open={exchangeDialog.open}
           openChange={exchangeDialog.setOpen}
         >
-        <ExchangeStock />
+          <ExchangeStock />
         </DialogController>
         <DialogController
           className="p-0 "

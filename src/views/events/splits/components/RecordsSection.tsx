@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { OrderTable } from '@/views/assets/v2/shared'
 import { TextCell, TxHashCell, AddressCell } from '@/views/assets/Shared'
@@ -9,39 +9,67 @@ import { useAccount, useChainId } from 'ca-common-web'
 import { formatTimestamp, multiply, textSuffix,  sum } from '@/utils'
 import { TabNav, type TabKey } from './TabNav'
 import { EventCard, type EventData } from './EventCard'
-
-
-
+import type { IStockActionEvent } from '@/service/event/types'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
+import { useAppStore } from '@/stores/appStore'
+import { eventApi } from '@/service/event/api'
+import { RESPONSE_CODE } from '@/config/constants'
+import { useRiskControlAssets } from '@/views/assets/assetsList'
+import { useBaseStore } from '@/stores/baseStore'
+import { useWssStore } from '@/stores/wssStore'
+import { useWssOn } from '@/hooks/useWssOn'
 
 export default function RecordsSection() {
   
-  const EVENTS: EventData[] = [
-    // Row 1 — active (进行中)
-    { symbol: "APPLt", company: "Apple Inc", isHeld: true,  eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "active" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "active" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "active" },
-    // Row 2 — ended (已结束)
-    { symbol: "APPLt", company: "Apple Inc", isHeld: true,  eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "ended" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "ended" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "ended" },
-    // Row 3 — suspended (暂停中)
-    { symbol: "APPLt", company: "Apple Inc", isHeld: true,  eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "suspended" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "suspended" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "suspended" },
-    // Row 4 — pending (未开始)
-    { symbol: "APPLt", company: "Apple Inc", isHeld: true,  eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "pending" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "pending" },
-    { symbol: "APPLt", company: "Apple Inc", isHeld: false, eventType: "合股", ratio: "10:1", startTime: "2026/06/12 10:00", endTime: "2026/06/15 10:00", status: "pending" },
-    ];
   const { t } = useTranslation()
-  const account = useAccount()
-  const chainId = useChainId()
+
   const [activeTab, setActiveTab] = useState<TabKey>("held");
   const [page, setPage] = useState(1);
 
-  const visibleEvents = activeTab === "held"
-    ? EVENTS.filter((e) => e.isHeld)
-    : EVENTS;
+  const [isSignatureValid, _, validSignature] = useSignatureValidStatus()
+  const account = useAccount()
+  const chainId = useAppStore(state => state.currentChainId)
+
+  const afterRef = useRef<number | undefined>(undefined)
+  const [eventList, setEventList] = useState<IStockActionEvent[]>([])
+
+  const handleGetStockAction = useCallback(async () => {
+    if (!account || !validSignature() || !chainId) {
+      return null
+    }
+
+    const res = await eventApi.getStockAction(chainId, afterRef.current)
+    if (res?.code === RESPONSE_CODE.SUCCESS) {
+      const data = res?.data || []
+      afterRef.current = data[0].id
+      setEventList(data)
+    }
+
+  }, [chainId, account, isSignatureValid])
+
+  useEffect(() => {
+    if (chainId && account) {
+      handleGetStockAction()
+    }
+  }, [chainId, account, handleGetStockAction])
+
+
+  const setTokenWithPriceByWebSocketData = useBaseStore(
+    state => state.setTokenWithPriceByWebSocketData
+  )
+  const setStockWithPriceByWebSocketData = useBaseStore(
+    state => state.setStockWithPriceByWebSocketData
+  )
+  const stableTokenWithPrice = useWssStore(state => state.setStableTokenWithPrice)
+  const updateOriginSummary = useWssStore(state => state.updateOriginSummary)
+
+  useWssOn('aggregate', (data: any) => {
+    const _data = data?.items || []
+    setTokenWithPriceByWebSocketData(_data)
+    setStockWithPriceByWebSocketData(_data)
+    stableTokenWithPrice(_data)
+    updateOriginSummary(_data)
+  })
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
@@ -53,7 +81,7 @@ export default function RecordsSection() {
             (activeTab === 'held' || activeTab === 'all') && (
               <>
                 <div className="grid grid-cols-3 gap-5 mt-6">
-                  {visibleEvents.map((event, i) => (
+                  {eventList.map((event, i) => (
                     <EventCard key={i} data={event} />
                   ))}
                 </div>

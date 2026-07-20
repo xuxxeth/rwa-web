@@ -6,7 +6,6 @@ import { useEffect, useState, useMemo } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
 import { useRegulateAssets, type RegulateAssetItem } from 'ca-common-web'
-import { useContractAddr } from '@/hooks/useContractAddr'
 import { useAppStore } from '@/stores/appStore'
 
 export interface IRiskControlAsset {

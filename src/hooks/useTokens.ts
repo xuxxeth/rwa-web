@@ -54,3 +54,12 @@ export function useUSDT() {
     return tokens.find(token => token.chainId === currentChainId && token.symbol === 'USDT')
   }, [tokens, currentChainId])
 }
+
+export function useGetRwaByAddress(address: string) {
+  const rwaList = useRwaTokens()
+
+  return useMemo(() => {
+    return rwaList.find(rwa => rwa.address === address)
+  }, [address, rwaList])
+
+}
