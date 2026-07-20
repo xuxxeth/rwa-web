@@ -82,7 +82,7 @@ done
 
 git ls-remote --tags --refs origin \
 | awk '{sub(/^refs\/tags\//,"",$2); print $2}' \
-| awk '$0!="0.1.76" && $0!="0.1.77" && $0!="0.1.78"' \
+| awk '$0!="0.3.3" && $0!="0.3.2" && $0!="0.3.0"' \
 | while read -r tag; do
   git push origin --delete "$tag"
 done
