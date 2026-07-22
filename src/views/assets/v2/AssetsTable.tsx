@@ -12,7 +12,7 @@ import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
 import { useRouter } from '@/hooks/useRouter'
 import { useCallback } from 'react'
-import { SessionType, TradeState } from '@/views/markets/MarketQuotes/shared'
+import { SessionType, SplitsStockState, TradeState } from '@/views/markets/MarketQuotes/shared'
 
 type SortableField = 'value'
 
@@ -59,13 +59,18 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
         tdClassName='h-[68px]'
         config={assetTableConfig}
         extra={{ rwaList } as { rwaList: IRwa[] }}
-        getKey={(item: IAssetItem) => item.symbol}
+        getKey={(item: IAssetItem) => item.address}
         className='hover:bg-white/10 border-none cursor-pointer'
         onClick={(item: IAssetItem) => {
           if (item.rwaId) {
-            const rwa = rwaList.find(rwa => rwa.id === item.rwaId)
+            const rwa = rwaList.find(rwa => rwa.address === item.address)
             if (rwa) {
-              router.push('/trade/' + item.symbol)
+              if (rwa?.splitMergeStatus === 1) {
+                router.push('/splits')
+              } else {
+                router.push('/trade/' + item.symbol)
+              }
+              
             }
           }
         }}
@@ -91,8 +96,12 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => (
       <>
         <TokenCell icon={item.icon} token={item.symbol} name={item.name} />
+        {
+          item.splitMergeStatus === 1 && <SplitsStockState rwa={item} />
+        }
         {item.rwaState !== undefined && <TradeState state={item.rwaState} />}
         {item.sessionMask !== undefined && <SessionType sessionMask={item.sessionMask} />}
+        
       </>
     ),
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
@@ -104,7 +113,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => {
       return (
         <TextCell
-          text={item.price ? textPrefix(truncate(item.price, item.precision), '$') : '--'}
+          text={item.price && item.splitMergeStatus === 0 ? textPrefix(truncate(item.price, item.precision), '$') : '--'}
         />
       )
     },
@@ -124,7 +133,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
             <TextCell
               className='text-gray-400'
               text={
-                item.value ? textPrefix(formatWithCommas(truncate(item.value, 2), 2), '$') : '--'
+                item.value && item.splitMergeStatus === 0 ? textPrefix(formatWithCommas(truncate(item.value, 2), 2), '$') : '--'
               }
             />
           </>
@@ -140,7 +149,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     key: 'action',
     sortable: false,
     render: (item: IAssetItem, { rwaList }) => {
-      const rwa = rwaList.find(rwa => rwa.symbol === item.symbol)
+      const rwa = rwaList.find(rwa => rwa.address === item.address)
       // return !rwa ? '--' : <RwaStateButton rwa={rwa} />
       return !rwa ? '--' : <BuyButton rwa={rwa} />
     },

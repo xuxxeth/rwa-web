@@ -204,7 +204,7 @@ const CTokenList = memo(
     const { isFavorite, favorites, toggleFavorite, toggleEnable, ...favoritesRest } = useFavorites()
 
     const _id = useId()
-    const rwaList = useRwas()
+    const rwaList = useRwas().filter(token => token.showState)
 
     const rwaMap = useMemo(() => {
       return new Map(rwaList.map(rwa => [rwa.stockId, rwa]))

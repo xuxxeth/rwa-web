@@ -107,7 +107,7 @@ export default function MarketQuotes() {
   const marketTradeState = useBaseStore(state => state.marketTradeState)
   const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
-  const rwaList = useRwaTokens(false)
+  const rwaList = useRwaTokens(false).filter(token => token.showState)
   const stockMap = useStockMap(false)
 
   const [isFavorites, setIsFavorites] = useState(false)

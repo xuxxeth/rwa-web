@@ -78,7 +78,7 @@ export function useAssetsList(chainId: number) {
         token.value = undefined
       }
       return token
-    })
+    }).filter(rwa => !(rwa.splitMergeStatus === 1 && Number(rwa.holdings) <= 0))
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
   const estimatedRwaTotalValue =
@@ -144,6 +144,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     sessionMask: rwa.sessionMask,
     weight: rwa.weight,
     precision: rwa.precision,
+    splitMergeStatus: rwa.splitMergeStatus
   }
 }
 
@@ -163,4 +164,6 @@ export interface IAssetItem {
   address: string
   weight?: number
   precision: number
+  showState?: boolean,
+  splitMergeStatus?: number
 }
