@@ -55,13 +55,13 @@ export function tagSession(item: any) {
 }
 
 export function getSymbol(symbolName: string) {
-  if (!symbolName.startsWith('__')) return symbolName
+  if (!symbolName?.startsWith('__')) return symbolName
   // 支持 "__BTC_USDT__123456" 这种带下划线的 symbol 包裹格式
-  const parts = symbolName.split('__')
+  const parts = symbolName?.split('__')
   if (parts.length >= 3 && parts[1]) {
     return parts[1]
   }
-  return symbolName
+  return symbolName || ''
 }
 function normalizeResolution(resolution: string) {
   return `${resolution}`.toUpperCase()
@@ -369,7 +369,7 @@ export function getDataFeed({
       resetCacheCallback = onResetCacheNeededCallback
       wsService.init({})
       
-      if (symbolInfo.name.startsWith('__empty__')) {
+      if (symbolInfo.name?.startsWith('__empty__')) {
         return
       }
       const sub = wsListeners.get(subscriberUID)
