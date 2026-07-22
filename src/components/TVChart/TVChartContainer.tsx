@@ -62,7 +62,7 @@ export const TVChartContainer = memo(
 
     const switchToCandle = useCallback((interval: ResolutionString = "1" as ResolutionString) => {
       const chart = tvWidgetRef.current?.activeChart()
-      if (!chart || !tvWidgetRef.current) return
+      if (!chart || !tvWidgetRef.current || !tokenSymbolRef.current) return
 
       setChartType(false)
       dataFeedRef.current?.setCurrentType(1)
@@ -70,21 +70,6 @@ export const TVChartContainer = memo(
       tvWidgetRef.current?.setSymbol(tokenSymbolRef.current, interval, () => {
 
       })
-
-      // const applyCandle = () => {
-      //   addOrRemoveMA(chart, 1)
-      //   wasAreaModeRef.current = false
-      //   ;(tvWidgetRef.current as any)?.resetCache?.()
-      //   chart.resetData()
-      // }
-
-      // const emptySymbol = `__empty__${Date.now()}`
-      // tvWidgetRef.current.setSymbol(emptySymbol, interval, () => {
-      //   const targetSymbol = `__${tokenSymbolRef.current}__${Date.now()}`
-      //   tvWidgetRef.current?.setSymbol(targetSymbol, interval, () => {
-      //     applyCandle()
-      //   })
-      // })
     }, [])
 
     useEffect(() => {
@@ -106,7 +91,7 @@ export const TVChartContainer = memo(
       initChart = (rwa?: IRwa) => {
         const elem = chartContainerRef.current;
         const language = storage.getItem(CA_LANGUAGE) || 'en'
-        if (!mounted || !elem) {
+        if (!mounted || !elem || !token?.symbol) {
           initTimer = window.setTimeout(initChart, 100);
           return;
         }
@@ -325,7 +310,7 @@ export const TVChartContainer = memo(
         }
         // X时间轴移到最右侧
         chart.getTimeScale().setRightOffset(0)  
-        const _symbol = _sessionType === 0 ? token.symbol : `__${token.symbol}__area__` + Date.now()
+        const _symbol = _sessionType === 0 && token.symbol ? token.symbol : `__${token.symbol}__area__` + Date.now()
         chart.setSymbol(_symbol)
         chart.setResolution(resolution)
 
@@ -389,10 +374,6 @@ export const TVChartContainer = memo(
           skipIntervalChangeRef.current = false
         })
         const resolution = ("1" as ResolutionString)
-        // const emptySymbol = `__empty__${Date.now()}`
-        // tvWidgetRef.current?.setSymbol(emptySymbol, resolution, () => {
-          
-        // })
         chart.setResolution(resolution)
         if (data.code !== '0') {
           const targetSymbol = `__${tokenSymbolRef.current}__area__` + Date.now()
@@ -404,11 +385,6 @@ export const TVChartContainer = memo(
         }
         // X时间轴移到最右侧
         chart.getTimeScale().setRightOffset(0)
-        // setTimeout(() => {
-        //   dataFeedRef.current?.resetCache()
-        //   chart.resetData();
-        // }, 1000)
-        
       }
       
     }, [token.symbol, notSupportBeforeOrAfter.notSupport, notSupportOvernight.notSupport])
