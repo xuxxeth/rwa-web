@@ -380,7 +380,7 @@ export function getDataFeed({
         }
 
       } catch (error) {
-        console.log(error)
+        console.log('getBars: ', error)
         // @ts-ignore
         // onErrorCallback(error);
         onErrorCallback(normalizeDatafeedError(error));
