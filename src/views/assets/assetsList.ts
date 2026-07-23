@@ -67,8 +67,9 @@ export function useAssetsList(chainId: number) {
   const assetsList = useMemo(() => {
     return allTokenList.map(token => {
       const symbolLowdered = symbolToLower(token.symbol)
+      const addressLowdered = symbolToLower(token.address)
       token.price = token.isStableToken ? 1 : tokenWithPrice[symbolLowdered]?.price
-      const balanceFromStore = tokenWithBalance[symbolLowdered]
+      const balanceFromStore = tokenWithBalance[addressLowdered]
       token.holdings =
         balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
       if (token.price && token.holdings) {

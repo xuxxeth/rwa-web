@@ -52,7 +52,7 @@ const TokenList = memo(
       return tokenList.map(rwa => {
         return {
           ...rwa,
-          ...tokenWithBalance[symbolToLower(rwa.symbol)]
+          ...tokenWithBalance[symbolToLower(rwa.address)]
         }
       })
     }, [tokenList, tokenWithBalance])

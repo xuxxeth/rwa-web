@@ -39,7 +39,7 @@
   "Market Closed": "Market Closed",
   "Limit price": "Limit Price",
   "Quantity": "Quantity",
-  "Whole shares only": "Enter Number  Shares",
+  "Whole shares only": "Enter Number Shares",
   "Order Value": "Order Value",
   "Enter an amount": "Enter Number of Shares",
   "Insufficient": "Insufficient Balance",
@@ -917,13 +917,14 @@
     "t29": "Old Tokens Returned",
     "t30": "New Tokens Received",
     "t31": "Conversion opens at {{t1}}. Stay tuned for official updates.",
-    "t32": "For historical holdings or fractional share compensation, contact support via <r1>[{{t1}}]</r1>: {{t2}}",
+    "t32": "For historical holdings or fractional share compensation, contact support via <r1>[Contact Template]</r1>: <r2>{{t2}</r2>}",
     "t33": "Check official announcements for updates.",
     "t34": "This address has not completed identity verification. Please complete verification before proceeding.",
     "t35": "Stock Asset",
     "t36": "Conversion Time",
     "t37": "Fractional Shares Settlement Price",
     "tx": "Tx Hash",
-    "t38": "Convert Now"
+    "t38": "Convert Now",
+    "t39": "Share"
   }
 }

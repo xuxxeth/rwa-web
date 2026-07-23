@@ -18,10 +18,19 @@ import { useRiskControlAssets } from '@/views/assets/assetsList'
 import { useBaseStore } from '@/stores/baseStore'
 import { useWssStore } from '@/stores/wssStore'
 import { useWssOn } from '@/hooks/useWssOn'
+import { DialogController, useShowDialog } from '@/components/dialog/DialogController'
+import { ExchangeStock } from './Exchange'
+import { KycTip } from './KycTip'
+import { useKycStatus } from '@/hooks/useKycStatus'
+import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
+import { useGetRwaByAddress, useGetTokenByAddress } from '@/hooks/useTokens'
 
 export default function RecordsSection() {
   
   const { t } = useTranslation()
+
+  const exchangeDialog = useShowDialog()
+  const kycTipDialog = useShowDialog()
 
   const [activeTab, setActiveTab] = useState<TabKey>("held");
   const [page, setPage] = useState(1);
@@ -70,6 +79,20 @@ export default function RecordsSection() {
     stableTokenWithPrice(_data)
     updateOriginSummary(_data)
   })
+  const [currentEvent, setCurrentEvent] = useState<IStockActionEvent | null>(null)
+  const { kycStatus } = useKycStatus()
+
+  const handleExchange = useCallback(async (data: IStockActionEvent) => {
+    setCurrentEvent(data)
+    // 进行中，且kyc未通过，则弹起kyc认证提示弹窗
+    if (data?.showStatus === 1 && kycStatus !== KYC_OVERALL_STATUS.VERIFIED) {
+      kycTipDialog.show()
+      return
+    }
+    exchangeDialog.show()
+  }, [kycStatus])
+
+  const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
@@ -80,9 +103,11 @@ export default function RecordsSection() {
           {
             (activeTab === 'held' || activeTab === 'all') && (
               <>
-                <div className="grid grid-cols-3 gap-5 mt-6">
+                <div className="grid grid-cols-3 gap-5 mt-6 items-start min-h-[500px]">
                   {eventList.map((event, i) => (
-                    <EventCard key={i} data={event} />
+                    <EventCard key={i} data={event} 
+                      onClick={handleExchange}
+                    />
                   ))}
                 </div>
                 {/* Note */}
@@ -97,6 +122,33 @@ export default function RecordsSection() {
           {activeTab === 'history' && <ExchangeHistoryTable chainId={chainId} account={account} />}
         </div>
       </div>
+      <DialogController
+          className="p-0 "
+          headerClassName="px-4 pt-4 border-b border-[#232427] pb-4"
+          overlayClassName='z-[49]'
+          title={
+            <div className="flex items-center gap-1">
+              <span className="text-white text-[16px] font-semibold">{payinToken?.symbol || '--'}</span>
+              <span className="text-[#737a87] text-[16px] font-semibold ml-1">{payinToken?.name || '--'}</span>
+            </div>
+          }
+          open={exchangeDialog.open}
+          openChange={exchangeDialog.setOpen}
+        >
+          <ExchangeStock 
+            currentEvent={currentEvent}
+          />
+        </DialogController>
+        <DialogController
+          className="p-0 "
+          headerClassName="px-4 pt-4 pb-4"
+          overlayClassName='z-[49]'
+          title={''}
+          open={kycTipDialog.open}
+          openChange={kycTipDialog.setOpen}
+        >
+          <KycTip />
+        </DialogController>
     </div>
   )
 }

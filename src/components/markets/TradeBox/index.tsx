@@ -80,8 +80,8 @@ export function TradeBox({
     [action, inputToken?.address, outputToken?.address]
   )
 
-  const inputTokenBalance = useTokenBalance(inputToken?.symbol || '')
-  const outputTokenBalance = useTokenBalance(outputToken?.symbol || '')
+  const inputTokenBalance = useTokenBalance(inputToken?.address || '')
+  const outputTokenBalance = useTokenBalance(outputToken?.address || '')
   const { inputTokenPrice, handlePriceInput, handleChangePrice } = useRealtimePriceSync({
     inputToken,
     rwaPrice: inputTokenBalance,

@@ -21,7 +21,7 @@ export interface EventData {
 }
 
 
-function CornerRibbon({ status }: { status: EventStatus }) {
+function CornerRibbon({ status }: { status: EventStatus}) {
   const { t } = useTranslation();
 
   const statusConfig: Record<EventStatus, { label: string; ribbonBg: string; textColor: string }> = {
@@ -53,7 +53,7 @@ function CornerRibbon({ status }: { status: EventStatus }) {
   );
 }
 
-export function EventCard({ data }: { data: IStockActionEvent }) {
+export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?: (data: IStockActionEvent) => void  }) {
   const { t } = useTranslation();
 
   const status = useMemo(() => {
@@ -76,7 +76,6 @@ export function EventCard({ data }: { data: IStockActionEvent }) {
   const isActive = status === 'active'
 
   const rwaData = useGetRwaByAddress(data.payinAddress)
-  console.log(rwaData)
 
   return (
     <div className="bg-[#1a1b1e] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
@@ -86,13 +85,16 @@ export function EventCard({ data }: { data: IStockActionEvent }) {
       
       {/* Header */}
       <div className="flex gap-2 items-center">
-        <img src={'/images/tokens/AAPL.png'} alt={''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+        <div className="w-8 h-8">
+          { rwaData?.icon && <img src={rwaData?.icon} alt={''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />}
+        </div>
+        
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5">
-            {/* <span className="text-white text-[16px] font-semibold leading-none">{data.symbol}</span> */}
+            <span className="text-white text-[16px] font-semibold leading-none">{rwaData?.symbol}</span>
             {/* {data.isHeld && <Badge variant="held">{t("events.t16")}</Badge>} */}
           </div>
-          {/* <span className="text-[#737a87] text-[12px] leading-none font-normal">{data.company}</span> */}
+          <span className="text-[#737a87] text-[12px] leading-none font-normal">{rwaData?.name}</span>
         </div>
       </div>
 
@@ -105,7 +107,7 @@ export function EventCard({ data }: { data: IStockActionEvent }) {
             <span className="text-[#848e9c] text-[12px]">{t("events.t19")}</span>
           </div>
           <div className="flex-1 flex flex-col gap-1.5 items-end">
-            <span className="text-white text-[14px] font-semibold">{data.payinAmount} : 1</span>
+            <span className="text-white text-[14px] font-semibold">{data.payinAmount} : {data.payoutAmount}</span>
             <span className="text-[#848e9c] text-[12px]">{t("events.t10")}</span>
           </div>
         </div>
@@ -117,11 +119,11 @@ export function EventCard({ data }: { data: IStockActionEvent }) {
         <div className="flex flex-col gap-2 text-[12px]">
           <div className="flex justify-between items-center">
             <span className="text-[#848e9c]">{t("events.t11")}</span>
-            <span className="text-white font-semibold">{formatTimestamp(data.exchangeStartTime / 1000, true)}</span>
+            <span className="text-white font-semibold">{formatTimestamp(data.exchangeStartTime, true)}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-[#848e9c]">{t("events.t12")}</span>
-            <span className="text-white font-semibold">{formatTimestamp(data.exchangeEndTime / 1000, true)}</span>
+            <span className="text-white font-semibold">{formatTimestamp(data.exchangeEndTime, true)}</span>
           </div>
         </div>
       </div>
@@ -129,11 +131,16 @@ export function EventCard({ data }: { data: IStockActionEvent }) {
       {/* Action */}
       <Button 
         className={cn(
-          "h-10 rounded-full",
-          !isActive && "disabled:bg-[#232427] text-[#4D5562]",
+          "h-10 rounded-full ",
+          !isActive && "disabled:bg-[#232427] ",
         )}
-        disabled={!isActive}
-        variant={isActive ? "primary" : "secondary"}
+        // disabled={!isActive}
+        variant={isActive ? "primary" : "secondary2"}
+
+        onClick={e => {
+          e.stopPropagation();
+          onClick && onClick(data)
+        }}
       >
         {isActive ? t("events.t15") : t("events.t14")}
       </Button>

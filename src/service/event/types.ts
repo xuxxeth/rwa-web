@@ -12,5 +12,6 @@ export interface IStockActionEvent {
   payoutAmount: number,
   payoutAddress: string,
   fractionalSharesAvgPrice: number,
+  paymentAddress: string,
   exchangeStatus: number // 合约兑换状态：0-关闭，1-开启
 }

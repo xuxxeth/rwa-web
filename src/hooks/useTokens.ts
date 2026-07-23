@@ -55,11 +55,20 @@ export function useUSDT() {
   }, [tokens, currentChainId])
 }
 
-export function useGetRwaByAddress(address: string) {
+export function useGetRwaByAddress(address?: string) {
   const rwaList = useRwaTokens()
 
   return useMemo(() => {
-    return rwaList.find(rwa => rwa.address === address)
+    return rwaList.find(rwa => rwa.address?.toLowerCase() === address?.toLowerCase())
   }, [address, rwaList])
+
+}
+
+export function useGetTokenByAddress(address?: string) {
+  const tokenList = useTokens()
+
+  return useMemo(() => {
+    return tokenList.find(token => token.address?.toLowerCase() === address?.toLowerCase())
+  }, [address, tokenList])
 
 }

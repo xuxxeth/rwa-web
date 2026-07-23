@@ -56,7 +56,7 @@ export function useTokenBalances() {
       balancesRes.forEach((balance, index) => {
         const token = tokens[index]
 
-        tokenWithBalance[symbolToLower(token.symbol)] = {
+        tokenWithBalance[symbolToLower(token.address)] = {
           origin: String(balance.balance),
           balance: formatAmount(
             String(balance.balance),
@@ -138,7 +138,7 @@ export function useGetTokenBalances() {
         balancesRes.forEach((balance, index) => {
           const token = tokensToFetch[index]
           // 更新tokenWithBalance中对应的token余额信息
-          const tokenKey = symbolToLower(token.symbol)
+          const tokenKey = symbolToLower(token.address)
           newTokenWithBalance[tokenKey] = {
             origin: String(balance.balance),
             balance: formatAmount(String(balance.balance), token.decimals, token.precision),
