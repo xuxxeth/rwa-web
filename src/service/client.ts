@@ -70,7 +70,7 @@ const axiosInstance: AxiosInstance = axios.create({
 })
 // /v1/base/public/stock/indicators?stockId=1
 const AUTH_URL_PREFIX = ['/scan/api/', '/kyc/api/', '/uc/api', '/risk/api/', '/ref/api/'] // 需要授权的接口前缀列表
-const NO_CHAIN_ID_HEADER_URL_SUFFIX = ['/base/public/chains', '/base/public/tokens']
+const NO_CHAIN_ID_HEADER_URL_SUFFIX = ['/base/public/chains', '/base/public/tokens', '/v1/quote/public/candles', '/v1/quote/public/tick']
 const NO_SUPPORTED_CHAIN_URL_SUFFIX = ['/v1/uc/api/agreements/accept'] // 不支持的链的接口后缀列表
 
 function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortController, account: string) {
@@ -78,9 +78,15 @@ function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortCo
   const needAuth = AUTH_URL_PREFIX.some(prefix => url.includes(prefix))
   const localSignature = account ? storage.getItem(`signature_${account.toLowerCase()}`) : null
   if (
-    (needAuth && (!localSignature || !localSignature?.account || !localSignature?.expires)) ||
-    Number(localSignature?.expires) < Math.floor(Date.now() / 1000)
+    needAuth &&
+    (
+      !localSignature ||
+      !localSignature.account ||
+      !localSignature.expires ||
+      Number(localSignature.expires) < Math.floor(Date.now() / 1000)
+    )
   ) {
+    console.log('controller.abort: 1', url, needAuth)
     controller.abort()
     // 抛出一个自定义错误让上层能识别
     return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))
@@ -123,6 +129,7 @@ axiosInstance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
   // 拦截住不支持的 chain 的请求
   // 签署协议，不区分链，不需要拦截
   if (chainId && !isChainSupported && !NO_SUPPORTED_CHAIN_URL_SUFFIX.some(suffix => url.includes(suffix))) {
+    console.log('controller.abort: 2')
     controller.abort()
     return Promise.reject(new axios.Cancel(`Chain ID ${chainId} is not supported`))
   }
@@ -183,6 +190,7 @@ const client = {
   },
   cancelAllRequest() {
     for (const [_, controller] of abortControllerMap) {
+      console.log('controller.abort: 3')
       controller.abort()
     }
     abortControllerMap.clear()

@@ -64,7 +64,7 @@ export function getSymbol(symbolName: string) {
   return symbolName || ''
 }
 function normalizeResolution(resolution: string) {
-  return `${resolution}`.toUpperCase()
+  return `${resolution || '1'}`.toUpperCase()
 }
 
 function buildBarsCacheKey({
@@ -79,6 +79,20 @@ function buildBarsCacheKey({
   resolution: string
 }) {
   return `${symbolName}|${chartType}|${sessionTypeValue}|${normalizeResolution(resolution)}`
+}
+
+function normalizeDatafeedError(error: unknown) {
+  if (typeof error === 'string') return error
+  if (error instanceof Error) return error.message || error.name || 'Datafeed error'
+  if (error && typeof error === 'object') {
+    const maybeMessage = (error as { message?: unknown }).message
+    if (typeof maybeMessage === 'string' && maybeMessage) return maybeMessage
+  }
+  return 'Datafeed error'
+}
+
+function toArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? value : []
 }
 
 const lastBarsCache = new Map<string, Bar>();
@@ -234,30 +248,43 @@ export function getDataFeed({
       onHistoryCallback,
       onErrorCallback
     ) => {
-      
-      const rawSymbolName = `${symbolInfo?.name || ''}`
-      
-      if (rawSymbolName.startsWith('__empty__')) {
-        onHistoryCallback([], { noData: true })
-        return
-      }
-      const symbolName = getSymbol(rawSymbolName)
-      // 获取缓存的key
-      const cacheKey = buildBarsCacheKey({ symbolName, chartType: currentChartType, sessionTypeValue: sessionType, resolution: resolution })
-      // Use customPeriodParams if needed
-      const { from, to, firstDataRequest, countBack } = periodParams
-      // area 模式下仅首次加载，后续拖拽/缩放不再请求
-      if (currentChartType === 3 && !firstDataRequest && sessionType !== 0) {
-        onHistoryCallback([], { noData: true })
-        return
-      }
-
-      if (firstDataRequest) {
-        preLastBarTime = 0
-        lastBarsCache.delete(cacheKey)
-      }
-      // 如果是Kline
       try {
+        const rawSymbolName = `${symbolInfo?.name || ''}`
+
+        if (rawSymbolName.startsWith('__empty__')) {
+          onHistoryCallback([], { noData: true })
+          return
+        }
+
+        const symbolName = getSymbol(rawSymbolName)
+        if (!symbolName) {
+          onHistoryCallback([], { noData: true })
+          return
+        }
+
+        if (!periodParams) {
+          onHistoryCallback([], { noData: false })
+          return
+        }
+
+        // 获取缓存的key
+        const cacheKey = buildBarsCacheKey({ symbolName, chartType: currentChartType, sessionTypeValue: sessionType, resolution: resolution })
+        // Use customPeriodParams if needed
+        console.log('[getBars] before params', { symbolInfo, resolution, periodParams, currentToken })
+        const { from, to, firstDataRequest, countBack } = periodParams
+        console.log('[getBars] after destructure', { from, to, firstDataRequest, countBack })
+        console.log('[getBars] before request', { stockId: currentToken?.stockId, interval: resolution })
+        // area 模式下仅首次加载，后续拖拽/缩放不再请求
+        if (currentChartType === 3 && !firstDataRequest && sessionType !== 0) {
+          onHistoryCallback([], { noData: true })
+          return
+        }
+
+        if (firstDataRequest) {
+          preLastBarTime = 0
+          lastBarsCache.delete(cacheKey)
+        }
+
         if (currentChartType !== 3 || sessionType === 0) {
           // 防止过于频繁的请求
           // const currentTime = Date.now();
@@ -277,13 +304,13 @@ export function getDataFeed({
           const _limit = firstDataRequest ? (Math.floor(Math.random() * 201) + 300) : (Math.floor(Math.random() * 201) + 200)
           console.log('_endTime: ', _endTime, to, lastBarsCache.get(cacheKey))
           const res = await klineApi.getCandles({ 
-            stock: currentToken.stockId, 
+            stock: currentToken?.stockId, 
             interval: keyToMinutes(resolution as any || '15'), 
             endTime: _endTime ? (_endTime - 10) : to, 
             limit: _limit 
           })
-          const _data = res?.data || []
-          if (res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
+          const _data = toArray<any>(res?.data)
+          if (!res || res.code !== RESPONSE_CODE.SUCCESS || _data.length <= 0) {
             onHistoryCallback([], { noData: true });
             return;
           }
@@ -320,7 +347,7 @@ export function getDataFeed({
           
           const fetchPromise = (async () => {
             const res = await klineApi.getMinute({ stock: currentToken.stockId, sessionType })
-            const _data = res?.data?.items || []
+            const _data = toArray<any>(res?.data?.items)
             let bars = _data
               .sort((a, b) => a.startTime - b.startTime)
               .map((bar: any) => {
@@ -334,7 +361,7 @@ export function getDataFeed({
                 }
               })
 
-            if (res.code !== RESPONSE_CODE.SUCCESS || bars.length === 0) {
+            if (res?.code !== RESPONSE_CODE.SUCCESS || bars.length === 0) {
               return []
             }
 
@@ -353,9 +380,11 @@ export function getDataFeed({
         }
 
       } catch (error) {
-        console.log(error)
+        console.log('getBars: ', error)
         // @ts-ignore
-        onErrorCallback(error);
+        // onErrorCallback(error);
+        onErrorCallback(normalizeDatafeedError(error));
+        // onHistoryCallback([], { noData: false });
       }
     },
 
