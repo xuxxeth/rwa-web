@@ -29,6 +29,7 @@ import { CircleLoading } from '@/components/loading'
 import { useRwas } from '@/hooks/useRwaBalances'
 import NoRecord from '@/components/no-record'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
+import { usePageContentState } from '@/hooks/usePageContentState'
 
 export default function RecordsSection() {
   
@@ -118,54 +119,23 @@ export default function RecordsSection() {
   }, [currentChainId, account, isRwaBalanceReady, rwaListWithBalanceKey, rwaListWithBalanceSorted, validSignature])
 
   const initRef = useRef<string>('')
-  const viewState = useMemo(() => {
-    if (!initialized || isWalletConnecting) {
-      return 'booting'
-    }
-
-    if (activeTab !== 'held' && activeTab !== 'all') {
-      return 'hidden'
-    }
-
-    if (!account) {
-      return 'disconnected'
-    }
-
-    if (isSwitchingChain) {
-      return 'switching'
-    }
-
-    if (!currentChainId) {
-      return 'switching'
-    }
-
-    if (!isRwaBalanceReady) {
-      return 'balances-loading'
-    }
-
-    if (!hasLoadedCurrentKey || isLoading) {
-      return 'loading'
-    }
-
-    if (eventList.length <= 0) {
-      return 'empty'
-    }
-
-    return 'ready'
-  }, [
-    activeTab,
-    account,
-    currentChainId,
-    eventList.length,
+  const {
+    viewState,
+    shouldShowWalletNotConnected,
+    shouldShowLoading,
+    shouldShowEmpty,
+  } = usePageContentState({
+    active: activeTab === 'held' || activeTab === 'all',
     initialized,
-    isLoading,
-    isRwaBalanceReady,
-    isSwitchingChain,
     isWalletConnecting,
+    account,
+    chainId: currentChainId,
+    isSwitchingChain,
+    isDataReady: isRwaBalanceReady,
+    isLoading,
     hasLoadedCurrentKey,
-  ])
-  const shouldShowWalletNotConnected = viewState === 'disconnected'
-  const shouldShowLoading = viewState === 'booting' || viewState === 'switching' || viewState === 'balances-loading' || viewState === 'loading'
+    hasData: eventList.length > 0,
+  })
 
   useEffect(() => {
     if (!isSwitchingChain) {
@@ -286,7 +256,7 @@ export default function RecordsSection() {
                     ) 
                   }
                   {
-                    viewState === 'empty' && <NoRecord />
+                    shouldShowEmpty && <NoRecord />
                   }
                 </>
 
