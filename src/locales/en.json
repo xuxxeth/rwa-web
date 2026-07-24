@@ -925,6 +925,8 @@
     "t37": "Fractional Shares Settlement Price",
     "tx": "Tx Hash",
     "t38": "Convert Now",
-    "t39": "Share"
+    "t39": "Share",
+    "t40": "Not Holding",
+    "t42": "This token has an unprocessed stock split. Go to [Stock Split] to convert."
   }
 }

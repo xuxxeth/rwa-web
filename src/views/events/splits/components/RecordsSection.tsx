@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { OrderTable } from '@/views/assets/v2/shared'
 import { TextCell, TxHashCell, AddressCell } from '@/views/assets/Shared'
@@ -6,7 +6,7 @@ import type { IRebate, IRebateFilter, IClaim } from '@/service/scan/types'
 import { scanApi } from '@/service/scan/api'
 import { type ITableConfig } from '@/components/table-header'
 import { useAccount, useChainId } from 'ca-common-web'
-import { formatTimestamp, multiply, textSuffix,  sum } from '@/utils'
+import { formatTimestamp, multiply, textSuffix,  sum, symbolToLower } from '@/utils'
 import { TabNav, type TabKey } from './TabNav'
 import { EventCard, type EventData } from './EventCard'
 import type { IStockActionEvent } from '@/service/event/types'
@@ -23,8 +23,13 @@ import { ExchangeStock } from './Exchange'
 import { KycTip } from './KycTip'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
-import { useGetRwaByAddress, useGetTokenByAddress } from '@/hooks/useTokens'
-import { useGetTokenBalances, useTokenBalances } from '@/hooks/useTokenBalances'
+import { useGetRwaByAddress } from '@/hooks/useTokens'
+import { useGetTokenBalances } from '@/hooks/useTokenBalances'
+import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
+import { CircleLoading } from '@/components/loading'
+import { useRwas } from '@/hooks/useRwaBalances'
+import { NoDataReason } from '@/views/markets/MarketQuotes/shared'
+import NoRecord from '@/components/no-record'
 
 export default function RecordsSection() {
   
@@ -33,8 +38,12 @@ export default function RecordsSection() {
   const kycTipDialog = useShowDialog()
   const { getTokensDataByAddress } = useGetTokenBalances()
 
+  const [currentEvent, setCurrentEvent] = useState<IStockActionEvent | null>(null)
+  const { kycStatus } = useKycStatus()
+
+  const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
+  const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
   const [activeTab, setActiveTab] = useState<TabKey>("held");
-  const [page, setPage] = useState(1);
 
   const [isSignatureValid, _, validSignature] = useSignatureValidStatus()
   const account = useAccount()
@@ -42,26 +51,45 @@ export default function RecordsSection() {
 
   const afterRef = useRef<number | undefined>(undefined)
   const [eventList, setEventList] = useState<IStockActionEvent[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleGetStockAction = useCallback(async () => {
+  const rwaList = useRwas()
+  const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
+  const rwaListWithBalance = useMemo(() => {
+    return rwaList.filter(rwa => {
+      const balance = tokenWithBalance[symbolToLower(rwa.address)]
+      return Number(balance?.balance) > 0
+    }).map(rwa => rwa.address)
+
+  }, [rwaList, tokenWithBalance])
+
+  const handleGetStockAction = useCallback(async (t?: TabKey) => {
     if (!account || !validSignature() || !chainId) {
       return null
     }
-
-    const res = await eventApi.getStockAction(chainId, afterRef.current)
+    if (t === 'held' && rwaListWithBalance.length <= 0) {
+      setEventList([])
+      setIsLoading(false)
+      return
+    }
+    const res = await eventApi.getStockAction(chainId, afterRef.current, t === 'held' ? rwaListWithBalance.join(',') : undefined)
     if (res?.code === RESPONSE_CODE.SUCCESS) {
       const data = res?.data || []
       afterRef.current = data[0].id
       setEventList(data)
     }
+    setIsLoading(false)
 
-  }, [chainId, account, isSignatureValid])
+  }, [chainId, account, rwaListWithBalance])
 
   useEffect(() => {
-    if (chainId && account) {
-      handleGetStockAction()
+    if (chainId && account && rwaListWithBalance.length > 0) {
+      setIsLoading(true)
+      handleGetStockAction('held')
+    } else {
+      setIsLoading(false)
     }
-  }, [chainId, account, handleGetStockAction])
+  }, [chainId, account, rwaListWithBalance, handleGetStockAction])
 
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
@@ -80,8 +108,6 @@ export default function RecordsSection() {
     stableTokenWithPrice(_data)
     updateOriginSummary(_data)
   })
-  const [currentEvent, setCurrentEvent] = useState<IStockActionEvent | null>(null)
-  const { kycStatus } = useKycStatus()
 
   const handleExchange = useCallback(async (data: IStockActionEvent) => {
     setCurrentEvent(data)
@@ -93,31 +119,63 @@ export default function RecordsSection() {
     exchangeDialog.show()
   }, [kycStatus])
 
-  const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
+  const handleTabChange = useCallback(async (t: TabKey) => {
+    setActiveTab(t);
+    setIsLoading(true)
+    afterRef.current = undefined
+    handleGetStockAction(t)
+  }, [handleGetStockAction])
+
+
+  if (isSwitchingChain) {
+    return (
+      <div className='min-h-[680px] rounded-[16px] w-full text-white'>
+        <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+      </div>
+    )
+  }
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
       <div className='flex flex-col gap-[16px] h-full'>
           {/* Tabs */}
-        <TabNav active={activeTab} onChange={(t) => { setActiveTab(t); setPage(1); }} />
+        <TabNav active={activeTab} onChange={handleTabChange} />
         <div>
           {
             (activeTab === 'held' || activeTab === 'all') && (
-              <>
-                <div className="grid grid-cols-3 gap-5 mt-6 items-start min-h-[500px]">
-                  {eventList.map((event, i) => (
-                    <EventCard key={i} data={event} 
-                      onClick={handleExchange}
-                    />
-                  ))}
-                </div>
-                {/* Note */}
-                <p className="text-[#737a87] text-[14px] flex items-start gap-2 mt-5">
-                  <span className="text-[#ffb219] mt-px">⚠</span>
-                  {t("events.t24")}
-                </p>
-              </>
-              
+              (!chainId || !account) && activeTab === 'held' ? 
+                (
+                  <WalletNotConnectedSmallVersion />
+                ) : (
+                <>
+                  {
+                    eventList.length > 0 && !isLoading && (
+                      <>
+                        <div className="grid grid-cols-3 gap-5 mt-1 items-start min-h-[500px]">
+                          {eventList.map((event, i) => (
+                            <EventCard key={i} data={event} 
+                              onClick={handleExchange}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-[#737a87] text-[14px] flex items-start gap-2 mt-5">
+                          <span className="text-[#ffb219] mt-px">⚠</span>
+                          {t("events.t24")}
+                        </p>
+                      </>
+                    ) 
+                  }
+                  {
+                    eventList.length <= 0 && !isLoading && <NoRecord />
+                  }
+                  {
+                    isLoading && <div className='min-h-[680px] rounded-[16px] w-full text-white'>
+                      <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+                    </div>
+                  }
+                </>
+
+              )
             )
           }
           {activeTab === 'history' && <ExchangeHistoryTable chainId={chainId} account={account} />}

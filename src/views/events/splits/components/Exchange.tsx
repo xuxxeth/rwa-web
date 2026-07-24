@@ -2,6 +2,7 @@ import CopyButton from "@/components/button/copyButton";
 import { TooltipWithBorder } from "@/components/icon-tooltip";
 import { Trans } from "@/components/trans";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/hooks/useRouter";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useGetRwaByAddress, useGetTokenByAddress } from "@/hooks/useTokens";
 import { useSplit } from "@/hooks/useTrading";
@@ -11,6 +12,7 @@ import { formatTimestamp, parseAmount, shortenAddress } from "@/utils";
 import BigNumber from "bignumber.js";
 import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 function calcFractionalShares(
   eventData: IStockActionEvent | null,
@@ -135,6 +137,7 @@ export function ExchangeStock({
   onSuccess?: () => void
 }) {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
   const payoutToken = useGetRwaByAddress(currentEvent?.payoutAddress)
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
@@ -150,9 +153,10 @@ export function ExchangeStock({
     setLoading(true)
     try {
       if (!currentEvent?.payinAddress) return
+      const amount = searchParams.get('amount') || 2
       const params = {
         payinToken: currentEvent?.payinAddress,
-        payinAmount: parseAmount(2, 6).toString()
+        payinAmount: parseAmount(amount, 6).toString()
       }
       // onSuccess?.()
       const res = await exchangeToken(params)
@@ -253,7 +257,7 @@ export function ExchangeStock({
             <TooltipWithBorder tooltip={t('events.t281')} className="cursor-pointer text-[14px]">
               {t('events.t28')}
             </TooltipWithBorder>
-          } value={`${currentEvent?.fractionalSharesAvgPrice} ${paymentToken?.symbol}/` + t('events.t39')} valueColor="text-[#9cff3a]" />
+          } value={currentEvent?.fractionalSharesAvgPrice ? `${currentEvent?.fractionalSharesAvgPrice} ${paymentToken?.symbol}/` + t('events.t39') : '--'} valueColor="text-[#9cff3a]" />
           <InfoRow label={t('events.t11')} value={currentEvent?.exchangeStartTime ? formatTimestamp(currentEvent?.exchangeStartTime, true) : '--'} />
           <InfoRow label={t('events.t12')} value={currentEvent?.exchangeEndTime ? formatTimestamp(currentEvent?.exchangeEndTime, true) : '--'}/>
         </div>

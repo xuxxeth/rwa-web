@@ -29,6 +29,7 @@ import { useTradeStore } from "@/stores/tradeStore";
 import { DialogController, useShowDialog } from "@/components/dialog/DialogController";
 import { Slippage } from "@/components/slippage";
 import { useCurrentChain } from "@/hooks/useChain";
+import { SplitTip } from "../SplitTip";
 
 type TradeBoxProps = {
   action?: string
@@ -272,6 +273,7 @@ export function TradeBox({
           networkFeeInNative={marketInfo.networkFeeInNative}
         />
         <MarketCloseTip />
+        <SplitTip />
 
         {Number(orderValue) > 0 && (
           <EstimatedInfo

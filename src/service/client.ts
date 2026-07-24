@@ -86,7 +86,6 @@ function handleReqSignature(req: InternalAxiosRequestConfig, controller: AbortCo
       Number(localSignature.expires) < Math.floor(Date.now() / 1000)
     )
   ) {
-    console.log('controller.abort: 1', url, needAuth)
     controller.abort()
     // 抛出一个自定义错误让上层能识别
     return Promise.reject(new axios.Cancel(`Missing signature for account ${account}`))
