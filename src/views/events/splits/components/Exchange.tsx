@@ -154,11 +154,12 @@ export function ExchangeStock({
     setLoading(true)
     try {
       if (!currentEvent?.payinAddress) return
-      const amount = searchParams.get('amount') || 2
+      const amount = searchParams.get('amount') || (payinTokenBalance?.balance || 0)
       const params = {
         payinToken: currentEvent?.payinAddress,
-        payinAmount: parseAmount(amount, 6).toString()
+        payinAmount: parseAmount(amount, payinToken?.decimals || 6).toString()
       }
+      console.log(params)
       // onSuccess?.()
       const res = await exchangeToken(params)
       console.log(res)
@@ -167,14 +168,18 @@ export function ExchangeStock({
         await onSuccess?.()
         return
       }
-      toastSuccess({title: t('events.t44')})
+      // @ts-ignore
+      const errorMessage = res?.data?.message
+      toastError({title: errorMessage ? t(`appErr.${errorMessage}`) : t('events.t44')})
     } catch (error) {
       console.log(error)
-      toastSuccess({title: t('events.t44')})
+      // @ts-ignore
+      const errorMessage = result?.data?.message
+      toastError({title: errorMessage ? t(`appErr.${errorMessage}`) : t('events.t44')})
     } finally {
       setLoading(false)
     }
-  }, [exchangeToken, currentEvent, t])
+  }, [exchangeToken, currentEvent,payinToken, payinTokenBalance, t])
 
   return (
     <div className="w-[480px] ">
