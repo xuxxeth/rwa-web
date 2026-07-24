@@ -5,7 +5,6 @@ import { TextCell, TxHashCell, AddressCell } from '@/views/assets/Shared'
 import type { IRebate, IRebateFilter, IClaim } from '@/service/scan/types'
 import { scanApi } from '@/service/scan/api'
 import { type ITableConfig } from '@/components/table-header'
-import { useAccount, useChainId } from 'ca-common-web'
 import { formatTimestamp, multiply, textSuffix,  sum, symbolToLower } from '@/utils'
 import { TabNav, type TabKey } from './TabNav'
 import { EventCard, type EventData } from './EventCard'
@@ -29,6 +28,7 @@ import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connecte
 import { CircleLoading } from '@/components/loading'
 import { useRwas } from '@/hooks/useRwaBalances'
 import NoRecord from '@/components/no-record'
+import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 
 export default function RecordsSection() {
   
@@ -42,53 +42,169 @@ export default function RecordsSection() {
 
   const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
   const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
+  const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
   const [activeTab, setActiveTab] = useState<TabKey>("held");
 
   const [isSignatureValid, _, validSignature] = useSignatureValidStatus()
-  const account = useAccount()
-  const chainId = useAppStore(state => state.currentChainId)
+  const { account, initialized } = useActiveWeb3()
+  const currentChainId = useAppStore(state => state.currentChainId)
 
   const afterRef = useRef<number | undefined>(undefined)
   const [eventList, setEventList] = useState<IStockActionEvent[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [hasLoadedCurrentKey, setHasLoadedCurrentKey] = useState(false)
 
   const rwaList = useRwas()
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
-  const rwaListWithBalance = useMemo(() => {
-    return rwaList.filter(rwa => {
+  const currentChainRwaList = useMemo(() => {
+    if (!currentChainId) {
+      return []
+    }
+
+    return rwaList.filter(rwa => rwa.chainId === currentChainId)
+  }, [currentChainId, rwaList])
+  const isRwaBalanceReady = useMemo(() => {
+    if (!account || !currentChainId) {
+      return false
+    }
+
+    if (currentChainRwaList.length === 0) {
+      return true
+    }
+
+    return currentChainRwaList.every(rwa => tokenWithBalance[symbolToLower(rwa.address)] !== undefined)
+  }, [account, currentChainId, currentChainRwaList, tokenWithBalance])
+  const rwaListWithBalanceSorted = useMemo(() => {
+    if (!isRwaBalanceReady) {
+      return []
+    }
+
+    return [...new Set(currentChainRwaList.filter(rwa => {
       const balance = tokenWithBalance[symbolToLower(rwa.address)]
       return Number(balance?.balance) > 0
-    }).map(rwa => rwa.address)
-
-  }, [rwaList, tokenWithBalance])
+    }).map(rwa => rwa.address))].sort()
+  }, [isRwaBalanceReady, currentChainRwaList, tokenWithBalance])
+  const rwaListWithBalanceKey = useMemo(() => {
+    return rwaListWithBalanceSorted.join(',')
+  }, [rwaListWithBalanceSorted])
+  const currentRequestKey = useMemo(() => {
+    if (!initialized || !account || !currentChainId) {
+      return ''
+    }
+    return `${currentChainId}:${account}:${rwaListWithBalanceKey}`
+  }, [account, currentChainId, initialized, rwaListWithBalanceKey])
 
   const handleGetStockAction = useCallback(async (t?: TabKey) => {
-    if (!account || !validSignature() || !chainId) {
+    if (!account || !validSignature() || !currentChainId) {
       return null
     }
-    if (t === 'held' && rwaListWithBalance.length <= 0) {
+    if (t === 'held' && isRwaBalanceReady && rwaListWithBalanceSorted.length <= 0) {
       setEventList([])
+      setHasLoadedCurrentKey(true)
       setIsLoading(false)
       return
     }
-    const res = await eventApi.getStockAction(chainId, afterRef.current, t === 'held' ? rwaListWithBalance.join(',') : undefined)
+    const res = await eventApi.getStockAction(currentChainId, afterRef.current, t === 'held' ? rwaListWithBalanceKey : undefined)
     if (res?.code === RESPONSE_CODE.SUCCESS) {
       const data = res?.data || []
       afterRef.current = data[0].id
       setEventList(data)
+      setHasLoadedCurrentKey(true)
     }
-    setIsLoading(false)
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 500)
 
-  }, [chainId, account, rwaListWithBalance])
+  }, [currentChainId, account, isRwaBalanceReady, rwaListWithBalanceKey, rwaListWithBalanceSorted, validSignature])
+
+  const initRef = useRef<string>('')
+  const viewState = useMemo(() => {
+    if (!initialized || isWalletConnecting) {
+      return 'booting'
+    }
+
+    if (activeTab !== 'held' && activeTab !== 'all') {
+      return 'hidden'
+    }
+
+    if (!account) {
+      return 'disconnected'
+    }
+
+    if (isSwitchingChain) {
+      return 'switching'
+    }
+
+    if (!currentChainId) {
+      return 'switching'
+    }
+
+    if (!isRwaBalanceReady) {
+      return 'balances-loading'
+    }
+
+    if (!hasLoadedCurrentKey || isLoading) {
+      return 'loading'
+    }
+
+    if (eventList.length <= 0) {
+      return 'empty'
+    }
+
+    return 'ready'
+  }, [
+    activeTab,
+    account,
+    currentChainId,
+    eventList.length,
+    initialized,
+    isLoading,
+    isRwaBalanceReady,
+    isSwitchingChain,
+    isWalletConnecting,
+    hasLoadedCurrentKey,
+  ])
+  const shouldShowWalletNotConnected = viewState === 'disconnected'
+  const shouldShowLoading = viewState === 'booting' || viewState === 'switching' || viewState === 'balances-loading' || viewState === 'loading'
 
   useEffect(() => {
-    if (chainId && account && rwaListWithBalance.length > 0) {
-      setIsLoading(true)
-      handleGetStockAction('held')
-    } else {
-      setIsLoading(false)
+    if (!isSwitchingChain) {
+      return
     }
-  }, [chainId, account, rwaListWithBalance.length])
+
+    setEventList([])
+    setIsLoading(true)
+    afterRef.current = undefined
+  }, [isSwitchingChain])
+
+  useEffect(() => {
+    if (!initialized || !account || !currentChainId) {
+      initRef.current = ''
+      afterRef.current = undefined
+      setEventList([])
+      setHasLoadedCurrentKey(false)
+      setIsLoading(false)
+      return
+    }
+
+    if (!isRwaBalanceReady) {
+      setEventList([])
+      setHasLoadedCurrentKey(false)
+      setIsLoading(true)
+      return
+    }
+
+    if (initRef.current === currentRequestKey) {
+      return
+    }
+
+    initRef.current = currentRequestKey
+    afterRef.current = undefined
+    setEventList([])
+    setHasLoadedCurrentKey(false)
+    setIsLoading(true)
+    handleGetStockAction('held')
+  }, [currentChainId, account, initialized, isRwaBalanceReady, currentRequestKey, handleGetStockAction])
 
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
@@ -126,13 +242,13 @@ export default function RecordsSection() {
   }, [handleGetStockAction])
 
 
-  if (isSwitchingChain) {
-    return (
-      <div className='min-h-[680px] rounded-[16px] w-full text-white'>
-        <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
-      </div>
-    )
-  }
+  // if (isSwitchingChain) {
+  //   return (
+  //     <div className='min-h-[680px] rounded-[16px] w-full text-white'>
+  //       <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
@@ -142,13 +258,18 @@ export default function RecordsSection() {
         <div>
           {
             (activeTab === 'held' || activeTab === 'all') && (
-              (!chainId || !account) && activeTab === 'held' ? 
+              shouldShowWalletNotConnected ? 
                 (
                   <WalletNotConnectedSmallVersion />
                 ) : (
                 <>
                   {
-                    eventList.length > 0 && !isLoading && (
+                    shouldShowLoading && <div className='min-h-[680px] rounded-[16px] w-full text-white'>
+                      <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+                    </div>
+                  }
+                  {
+                    viewState === 'ready' && eventList.length > 0 && (
                       <>
                         <div className="grid grid-cols-3 gap-5 mt-1 items-start min-h-[500px]">
                           {eventList.map((event, i) => (
@@ -165,19 +286,14 @@ export default function RecordsSection() {
                     ) 
                   }
                   {
-                    eventList.length <= 0 && !isLoading && <NoRecord />
-                  }
-                  {
-                    isLoading && <div className='min-h-[680px] rounded-[16px] w-full text-white'>
-                      <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
-                    </div>
+                    viewState === 'empty' && <NoRecord />
                   }
                 </>
 
               )
             )
           }
-          {activeTab === 'history' && <ExchangeHistoryTable chainId={chainId} account={account} />}
+          {activeTab === 'history' && <ExchangeHistoryTable chainId={currentChainId} account={account} />}
         </div>
       </div>
       <DialogController
@@ -197,7 +313,7 @@ export default function RecordsSection() {
             currentEvent={currentEvent}
             onSuccess={async () => {
               if (currentEvent?.payinAddress && currentEvent?.payoutAddress && currentEvent?.paymentAddress) {
-                getTokensDataByAddress([currentEvent?.payinAddress, currentEvent?.payoutAddress, currentEvent?.paymentAddress], chainId)
+                getTokensDataByAddress([currentEvent?.payinAddress, currentEvent?.payoutAddress, currentEvent?.paymentAddress], currentChainId)
               }
 
               exchangeDialog.hide()
@@ -313,4 +429,3 @@ const exchangeTableConfig: ITableConfig<IClaim, {}> = [
     render: (item: IClaim) => <TxHashCell hash={item.txHash} />,
   },
 ]
-
