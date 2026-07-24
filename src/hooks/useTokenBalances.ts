@@ -117,7 +117,7 @@ export function useGetTokenBalances() {
       if (!account || !contractAddr) return
       // 先通过stockId找到对应的token地址
       const stockIdToTokenMap: Record<number, IToken> = {}
-      const filteredRwaList = rwaRwaList.filter(rwa => rwa.chainId === chainId)
+      const filteredRwaList = rwaRwaList.filter(rwa => rwa.chainId === chainId && rwa.showState)
       if (filteredRwaList.length > 0) {
         // 生成一条全新的 rwaRwaList, 后面要更新它，然后再setTokenWithBalance
         let newRwaList = filteredRwaList.map(rwa => ({ ...rwa }))
@@ -159,7 +159,7 @@ export function useGetTokenBalances() {
         balancesRes.forEach((balance, index) => {
           const token = filteredTokenList[index]
           // 更新tokenWithBalance中对应的token余额信息
-          const tokenKey = symbolToLower(token.symbol)
+          const tokenKey = symbolToLower(token.address)
           newTokenWithBalance[tokenKey] = {
             origin: String(balance.balance),
             balance: formatAmount(String(balance.balance), token.decimals, token.precision),
@@ -171,9 +171,80 @@ export function useGetTokenBalances() {
     },
     [account, tokenList, rwaRwaList, tokenWithBalance, contractAddr, setTokenWithBalance]
   )
+  const getTokensDataByAddress = useCallback(
+    async (adressList: string[], chainId?: number | null) => {
+      const newTokenWithBalance = Object.entries(tokenWithBalance).reduce<
+        Record<string, ITokenWithBalance>
+      >((acc, [key, token]) => {
+        acc[key] = token
+        return acc
+      }, {})
+      if (!account || !contractAddr) return
+      // 先通过stockId找到对应的token地址
+      const stockAddressToTokenMap: Record<string, IToken> = {}
+      const filteredRwaList = rwaRwaList.filter(rwa => rwa.chainId === chainId)
+      if (filteredRwaList.length > 0) {
+        // 生成一条全新的 rwaRwaList, 后面要更新它，然后再setTokenWithBalance
+        let newRwaList = filteredRwaList.map(rwa => ({ ...rwa }))
+
+        newRwaList.forEach(token => {
+          if (token.address) {
+            stockAddressToTokenMap[symbolToLower(token.address)] = token
+          }
+        })
+
+        const tokensToFetch = adressList.map(address => stockAddressToTokenMap[symbolToLower(address)]).filter(Boolean)
+        const balancesRes = await getTokenBalances(
+          contractAddr,
+          account as `0x${string}`,
+          tokensToFetch.map(token => token.address as `0x${string}`)
+        )
+        // const balancesRes: any[] = []
+        balancesRes.forEach((balance, index) => {
+          const token = tokensToFetch[index]
+          // 更新tokenWithBalance中对应的token余额信息
+          const tokenKey = symbolToLower(token.address)
+          newTokenWithBalance[tokenKey] = {
+            origin: String(balance.balance),
+            balance: formatAmount(String(balance.balance), token.decimals, token.precision),
+          }
+        })
+
+        console.log(adressList, balancesRes, 1111)
+      }
+      // 处理稳定币余额获取更新
+      const filteredTokenList = tokenList.filter(token => token.chainId === chainId)
+      if (filteredTokenList.length > 0) {
+        const balancesRes = await getTokenBalances(
+          contractAddr,
+          account as `0x${string}`,
+          filteredTokenList.map(token => token.address as `0x${string}`)
+        )
+        // const balancesRes: any[] = []
+
+        balancesRes.forEach((balance, index) => {
+          const token = filteredTokenList[index]
+          // 更新tokenWithBalance中对应的token余额信息
+          const tokenKey = symbolToLower(token.address)
+          newTokenWithBalance[tokenKey] = {
+            origin: String(balance.balance),
+            balance: formatAmount(String(balance.balance), token.decimals, token.precision),
+          }
+        })
+
+        console.log(filteredTokenList, balancesRes, 2222)
+      }
+
+      console.log(tokenWithBalance, newTokenWithBalance, 3333)
+
+      setTokenWithBalance(newTokenWithBalance)
+    },
+    [account, tokenList, rwaRwaList, tokenWithBalance, contractAddr, setTokenWithBalance]
+  )
 
   return {
     getTokensDataByStockId,
+    getTokensDataByAddress
   }
 }
 

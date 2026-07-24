@@ -24,13 +24,14 @@ import { KycTip } from './KycTip'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
 import { useGetRwaByAddress, useGetTokenByAddress } from '@/hooks/useTokens'
+import { useGetTokenBalances, useTokenBalances } from '@/hooks/useTokenBalances'
 
 export default function RecordsSection() {
   
   const { t } = useTranslation()
-
   const exchangeDialog = useShowDialog()
   const kycTipDialog = useShowDialog()
+  const { getTokensDataByAddress } = useGetTokenBalances()
 
   const [activeTab, setActiveTab] = useState<TabKey>("held");
   const [page, setPage] = useState(1);
@@ -137,6 +138,13 @@ export default function RecordsSection() {
         >
           <ExchangeStock 
             currentEvent={currentEvent}
+            onSuccess={async () => {
+              if (currentEvent?.payinAddress && currentEvent?.payoutAddress && currentEvent?.paymentAddress) {
+                getTokensDataByAddress([currentEvent?.payinAddress, currentEvent?.payoutAddress, currentEvent?.paymentAddress], chainId)
+              }
+              
+              exchangeDialog.hide()
+            }}
           />
         </DialogController>
         <DialogController

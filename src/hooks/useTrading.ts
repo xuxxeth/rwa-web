@@ -1,5 +1,5 @@
 import type { Address } from "@/config/constants";
-import { useTradingV2, useTradeUtilsV2 as useTradeUtilsCommon } from "@/hooks/useCaCommon";
+import { useTradingV2, useTradeUtilsV2 as useTradeUtilsCommon , useSplit as useSplitCommon} from "@/hooks/useCaCommon";
 import { useActiveWeb3 } from "./useActiveWe3";
 import { useBaseStore } from "@/stores/baseStore";
 import { useMemo } from "react";
@@ -41,3 +41,22 @@ export function useTradeUtils() {
   }
 }
 
+
+export function useSplit(token: Address, amount: BigInt) {
+  const currentChainId = useAppStore(state => state.currentChainId)
+  const chainList = useBaseStore(state => state.chainList)
+  const trading = useMemo(() => {
+    const chain = chainList.find(chain => chain.id === currentChainId)
+    return chain?.contract as Address
+  }, [currentChainId, chainList.length])
+
+  const { exchangeToken, refetchAllowance, txStep, approvalState, allowance } = useSplitCommon(token, trading, amount)
+
+  return {
+    exchangeToken,
+    refetchAllowance,
+    txStep,
+    approvalState,
+    allowance
+  }
+}

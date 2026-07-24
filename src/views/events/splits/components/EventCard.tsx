@@ -6,6 +6,7 @@ import type { IStockActionEvent } from "@/service/event/types";
 import { useMemo } from "react";
 import { formatTimestamp } from "@/utils/format";
 import { useGetRwaByAddress } from "@/hooks/useTokens";
+import { useTokenBalance } from "@/hooks/useTokenBalances";
 
 export type EventStatus = "active" | "ended" | "suspended" | "pending";
 
@@ -76,6 +77,9 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
   const isActive = status === 'active'
 
   const rwaData = useGetRwaByAddress(data.payinAddress)
+  const payinTokenBalance = useTokenBalance(data?.payinAddress || '')
+
+  const isHold = Number(payinTokenBalance?.balance) > 0
 
   return (
     <div className="bg-[#1a1b1e] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
@@ -92,7 +96,7 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5">
             <span className="text-white text-[16px] font-semibold leading-none">{rwaData?.symbol}</span>
-            {/* {data.isHeld && <Badge variant="held">{t("events.t16")}</Badge>} */}
+            {isHold && <Badge variant="held">{t("events.t16")}</Badge>}
           </div>
           <span className="text-[#737a87] text-[12px] leading-none font-normal">{rwaData?.name}</span>
         </div>
@@ -134,7 +138,7 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
           "h-10 rounded-full ",
           !isActive && "disabled:bg-[#232427] ",
         )}
-        // disabled={!isActive}
+        disabled={isActive && !isHold}
         variant={isActive ? "primary" : "secondary2"}
 
         onClick={e => {
