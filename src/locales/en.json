@@ -928,7 +928,7 @@
     "t39": "Share",
     "t40": "Not Holding",
     "t42": "This token has an unprocessed stock split. Go to [Stock Split] to convert.",
-    "t43": "Exchange Success",
-    "t44": "Exchange Failed"
+    "t43": "Conversion Successful",
+    "t44": "Conversion Failed"
   }
 }

@@ -2,7 +2,6 @@ import CopyButton from "@/components/button/copyButton";
 import { TooltipWithBorder } from "@/components/icon-tooltip";
 import { Trans } from "@/components/trans";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/hooks/useRouter";
 import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useGetRwaByAddress, useGetTokenByAddress } from "@/hooks/useTokens";
