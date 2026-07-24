@@ -209,8 +209,6 @@ export function useGetTokenBalances() {
             balance: formatAmount(String(balance.balance), token.decimals, token.precision),
           }
         })
-
-        console.log(adressList, balancesRes, 1111)
       }
       // 处理稳定币余额获取更新
       const filteredTokenList = tokenList.filter(token => token.chainId === chainId)
@@ -232,10 +230,7 @@ export function useGetTokenBalances() {
           }
         })
 
-        console.log(filteredTokenList, balancesRes, 2222)
       }
-
-      console.log(tokenWithBalance, newTokenWithBalance, 3333)
 
       setTokenWithBalance(newTokenWithBalance)
     },

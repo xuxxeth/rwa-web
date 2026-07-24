@@ -28,7 +28,6 @@ import { useGetTokenBalances } from '@/hooks/useTokenBalances'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
 import { CircleLoading } from '@/components/loading'
 import { useRwas } from '@/hooks/useRwaBalances'
-import { NoDataReason } from '@/views/markets/MarketQuotes/shared'
 import NoRecord from '@/components/no-record'
 
 export default function RecordsSection() {
@@ -89,7 +88,7 @@ export default function RecordsSection() {
     } else {
       setIsLoading(false)
     }
-  }, [chainId, account, rwaListWithBalance, handleGetStockAction])
+  }, [chainId, account, rwaListWithBalance.length])
 
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
@@ -200,7 +199,7 @@ export default function RecordsSection() {
               if (currentEvent?.payinAddress && currentEvent?.payoutAddress && currentEvent?.paymentAddress) {
                 getTokensDataByAddress([currentEvent?.payinAddress, currentEvent?.payoutAddress, currentEvent?.paymentAddress], chainId)
               }
-              
+
               exchangeDialog.hide()
             }}
           />

@@ -3,6 +3,7 @@ import { TooltipWithBorder } from "@/components/icon-tooltip";
 import { Trans } from "@/components/trans";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/hooks/useRouter";
+import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useGetRwaByAddress, useGetTokenByAddress } from "@/hooks/useTokens";
 import { useSplit } from "@/hooks/useTrading";
@@ -138,6 +139,7 @@ export function ExchangeStock({
 }) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const { toastSuccess, toastError } = useToast()
   const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
   const payoutToken = useGetRwaByAddress(currentEvent?.payoutAddress)
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
@@ -162,14 +164,18 @@ export function ExchangeStock({
       const res = await exchangeToken(params)
       console.log(res)
       if (res?.code === 9200) {
-        onSuccess?.()
+        toastSuccess({title: t('events.t43')})
+        await onSuccess?.()
+        return
       }
+      toastSuccess({title: t('events.t44')})
     } catch (error) {
-
+      console.log(error)
+      toastSuccess({title: t('events.t44')})
     } finally {
       setLoading(false)
     }
-  }, [exchangeToken, currentEvent])
+  }, [exchangeToken, currentEvent, t])
 
   return (
     <div className="w-[480px] ">
@@ -265,8 +271,6 @@ export function ExchangeStock({
         {/* Warning + disabled button */}
         <div className="flex flex-col gap-3">
           {/* Warning banner */}
-
-          
             {
               (currentEvent?.showStatus !== undefined && currentEvent?.showStatus !== 1 && currentEvent?.exchangeStartTime) && (
                 <div className="bg-[rgba(255,178,25,0.1)] rounded-[6px] px-4 py-3 flex items-start gap-2.5">
