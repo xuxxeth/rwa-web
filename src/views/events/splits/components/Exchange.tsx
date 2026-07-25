@@ -144,7 +144,7 @@ export function ExchangeStock({
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
   const payinTokenBalance = useTokenBalance(currentEvent?.payinAddress || '')
   const isHold = Number(payinTokenBalance?.balance) > 0
-  const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance.balance ?? '0')
+  const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance?.balance ?? '0')
   const [loading, setLoading] = useState(false)
 
   const { exchangeToken } = useSplit(currentEvent?.payinAddress as `0x${string}`, BigInt(parseAmount(2, 6)))

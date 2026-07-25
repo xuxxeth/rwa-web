@@ -11,6 +11,7 @@ export type PageContentViewState =
 
 type UsePageContentStateParams = {
   active?: boolean
+  requiresWallet?: boolean
   initialized: boolean
   isWalletConnecting?: boolean
   account?: string | null
@@ -25,6 +26,7 @@ type UsePageContentStateParams = {
 export function usePageContentState(params: UsePageContentStateParams) {
   const {
     active = true,
+    requiresWallet = true,
     initialized,
     isWalletConnecting = false,
     account,
@@ -39,7 +41,7 @@ export function usePageContentState(params: UsePageContentStateParams) {
   const viewState: PageContentViewState = useMemo(() => {
     if (!active) return 'hidden'
     if (!initialized || isWalletConnecting) return 'booting'
-    if (!account) return 'disconnected'
+    if (requiresWallet && !account) return 'disconnected'
     if (isSwitchingChain || !chainId) return 'switching'
     if (!isDataReady) return 'loading'
     if (isLoading || !hasLoadedCurrentKey) return 'loading'
@@ -54,6 +56,7 @@ export function usePageContentState(params: UsePageContentStateParams) {
     initialized,
     isDataReady,
     isLoading,
+    requiresWallet,
     isSwitchingChain,
     isWalletConnecting,
   ])

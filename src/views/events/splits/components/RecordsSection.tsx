@@ -64,7 +64,12 @@ export default function RecordsSection() {
 
     return rwaList.filter(rwa => rwa.chainId === currentChainId)
   }, [currentChainId, rwaList])
+  const isHeldTab = activeTab === 'held'
   const isRwaBalanceReady = useMemo(() => {
+    if (!isHeldTab) {
+      return true
+    }
+
     if (!account || !currentChainId) {
       return false
     }
@@ -74,7 +79,7 @@ export default function RecordsSection() {
     }
 
     return currentChainRwaList.every(rwa => tokenWithBalance[symbolToLower(rwa.address)] !== undefined)
-  }, [account, currentChainId, currentChainRwaList, tokenWithBalance])
+  }, [account, currentChainId, currentChainRwaList, isHeldTab, tokenWithBalance])
   const rwaListWithBalanceSorted = useMemo(() => {
     if (!isRwaBalanceReady) {
       return []
@@ -89,14 +94,14 @@ export default function RecordsSection() {
     return rwaListWithBalanceSorted.join(',')
   }, [rwaListWithBalanceSorted])
   const currentRequestKey = useMemo(() => {
-    if (!initialized || !account || !currentChainId) {
+    if (!initialized || !currentChainId || (isHeldTab && !account)) {
       return ''
     }
-    return `${currentChainId}:${account}:${rwaListWithBalanceKey}`
-  }, [account, currentChainId, initialized, rwaListWithBalanceKey])
+    return `${currentChainId}:${isHeldTab ? account : activeTab}:${isHeldTab ? rwaListWithBalanceKey : 'all'}`
+  }, [account, activeTab, currentChainId, initialized, isHeldTab, rwaListWithBalanceKey])
 
   const handleGetStockAction = useCallback(async (t?: TabKey) => {
-    if (!account || !validSignature() || !currentChainId) {
+    if (!currentChainId || (t !== 'all' && (!account || !validSignature()))) {
       return null
     }
     if (t === 'held' && isRwaBalanceReady && rwaListWithBalanceSorted.length <= 0) {
@@ -126,12 +131,13 @@ export default function RecordsSection() {
     shouldShowEmpty,
   } = usePageContentState({
     active: activeTab === 'held' || activeTab === 'all',
+    requiresWallet: isHeldTab,
     initialized,
     isWalletConnecting,
     account,
     chainId: currentChainId,
     isSwitchingChain,
-    isDataReady: isRwaBalanceReady,
+    isDataReady: isHeldTab ? isRwaBalanceReady : true,
     isLoading,
     hasLoadedCurrentKey,
     hasData: eventList.length > 0,
@@ -148,7 +154,7 @@ export default function RecordsSection() {
   }, [isSwitchingChain])
 
   useEffect(() => {
-    if (!initialized || !account || !currentChainId) {
+    if (!initialized || !currentChainId || (isHeldTab && !account)) {
       initRef.current = ''
       afterRef.current = undefined
       setEventList([])
@@ -157,7 +163,7 @@ export default function RecordsSection() {
       return
     }
 
-    if (!isRwaBalanceReady) {
+    if (isHeldTab && !isRwaBalanceReady) {
       setEventList([])
       setHasLoadedCurrentKey(false)
       setIsLoading(true)
@@ -173,8 +179,8 @@ export default function RecordsSection() {
     setEventList([])
     setHasLoadedCurrentKey(false)
     setIsLoading(true)
-    handleGetStockAction('held')
-  }, [currentChainId, account, initialized, isRwaBalanceReady, currentRequestKey, handleGetStockAction])
+    handleGetStockAction(activeTab)
+  }, [activeTab, currentChainId, account, initialized, isHeldTab, isRwaBalanceReady, currentRequestKey, handleGetStockAction])
 
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
@@ -194,7 +200,14 @@ export default function RecordsSection() {
     updateOriginSummary(_data)
   })
 
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
+
   const handleExchange = useCallback(async (data: IStockActionEvent) => {
+    // 如果没有连接钱包，则拉起钱包弹窗
+    if (!account) {
+      setShowConnect(true)
+      return
+    }
     setCurrentEvent(data)
     // 进行中，且kyc未通过，则弹起kyc认证提示弹窗
     if (data?.showStatus === 1 && kycStatus !== KYC_OVERALL_STATUS.VERIFIED) {
@@ -202,7 +215,7 @@ export default function RecordsSection() {
       return
     }
     exchangeDialog.show()
-  }, [kycStatus])
+  }, [kycStatus, account])
 
   const handleTabChange = useCallback(async (t: TabKey) => {
     setActiveTab(t);

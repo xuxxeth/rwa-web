@@ -82,7 +82,7 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
   const isHold = Number(payinTokenBalance?.balance) > 0
 
   return (
-    <div className="bg-[#1a1b1e] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
+    <div className="bg-[#1A1B1E] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
       {
         status && <CornerRibbon status={status as EventStatus} />
       }
@@ -135,8 +135,7 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
       {/* Action */}
       <Button 
         className={cn(
-          "h-10 rounded-full ",
-          !isActive && "disabled:bg-[#232427] ",
+          "h-10 rounded-full disabled:bg-[#232427] ",
         )}
         disabled={isActive && !isHold}
         variant={isActive ? "primary" : "secondary2"}
