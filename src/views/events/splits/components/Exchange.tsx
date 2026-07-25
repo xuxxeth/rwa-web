@@ -14,6 +14,40 @@ import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+function formatAmountForDisplay(value?: string | number | BigNumber.Value) {
+  if (value === undefined || value === null || value === '' || Number(value) === 0) {
+    return '0'
+  }
+
+  const amount = new BigNumber(value)
+  if (!amount.isFinite()) {
+    return '--'
+  }
+
+  if (amount.gt(0) && amount.lt(0.01)) {
+    return '<0.01'
+  }
+
+  return amount.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed().replace(/\.0+$/, '').replace(/\.?0+$/, '')
+}
+
+function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {
+  if (value === undefined || value === null || value === '' || Number(value) === 0) {
+    return '0'
+  }
+
+  const amount = new BigNumber(value)
+  if (!amount.isFinite()) {
+    return '0'
+  }
+
+  if (amount.gt(0) && amount.lt(0.01)) {
+    return '<0.01'
+  }
+
+  return amount.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed().replace(/\.0+$/, '').replace(/\.?0+$/, '')
+}
+
 function calcFractionalShares(
   eventData: IStockActionEvent | null,
   balance: string
@@ -40,14 +74,12 @@ function calcFractionalShares(
   // 小数部分 * 均价，保留 6 位小数（截断），去掉末尾 0
   const fractionalValue = fractionalPart
     .multipliedBy(eventData.fractionalSharesAvgPrice)
-    .decimalPlaces(2, BigNumber.ROUND_DOWN)
-    .toFixed()
-    .replace(/\.?0+$/, "");
+    .toFixed();
 
   return {
     integerPart,
     fractionalValue,
-    fractionalPart: fractionalPart.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed().replace(/\.?0+$/, "")
+    fractionalPart: fractionalPart.toFixed()
   };
 }
 
@@ -145,6 +177,7 @@ export function ExchangeStock({
   const payinTokenBalance = useTokenBalance(currentEvent?.payinAddress || '')
   const isHold = Number(payinTokenBalance?.balance) > 0
   const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance?.balance ?? '0')
+
   const [loading, setLoading] = useState(false)
 
   const { exchangeToken } = useSplit(currentEvent?.payinAddress as `0x${string}`, BigInt(parseAmount(2, 6)))
@@ -229,7 +262,7 @@ export function ExchangeStock({
               {
                 isHold && (
                   <div className="flex flex-col items-end">
-                    <span className="text-[#9cff3a] text-[20px] font-semibold">{integerPart || 0}</span>
+                    <span className="text-[#9cff3a] text-[20px] font-semibold">{formatQuantityForDisplay(integerPart)}</span>
                     <span className="text-[#9da3af] text-[12px]">{t("events.t25")}</span>
                   </div>
                 )
@@ -249,8 +282,8 @@ export function ExchangeStock({
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[#9cff3a] text-[20px] font-semibold">{fractionalValue || 0}</span>
-                    <span className="text-[#9da3af] text-[12px]">{t("events.t27")} {`${fractionalPart || 0} ${payinToken?.symbol}`}</span>
+                    <span className="text-[#9cff3a] text-[20px] font-semibold">{formatAmountForDisplay(fractionalValue)}</span>
+                    <span className="text-[#9da3af] text-[12px]">{t("events.t27")} {`${formatQuantityForDisplay(fractionalPart)} ${payinToken?.symbol}`}</span>
                   </div>
                 </div>
               )
@@ -262,12 +295,12 @@ export function ExchangeStock({
         {/* Info rows */}
         <div className="px-1 flex flex-col gap-2">
           <InfoRow label={t('events.t19')} value={currentEvent?.businessType === 1 ? t('events.t17') : t('events.t18')} />
-          <InfoRow label={t('events.t15') + t('events.t10')} value={`${currentEvent?.payinAmount} : ${currentEvent?.payoutAmount}`} />
+          <InfoRow label={t('events.t15') + t('events.t10')} value={`${formatAmountForDisplay(currentEvent?.payinAmount)} : ${formatAmountForDisplay(currentEvent?.payoutAmount)}`} />
           <InfoRow label={
             <TooltipWithBorder tooltip={t('events.t281')} className="cursor-pointer text-[14px]">
               {t('events.t28')}
             </TooltipWithBorder>
-          } value={currentEvent?.fractionalSharesAvgPrice ? `${currentEvent?.fractionalSharesAvgPrice} ${paymentToken?.symbol}/` + t('events.t39') : '--'} valueColor="text-[#9cff3a]" />
+          } value={currentEvent?.fractionalSharesAvgPrice ? `${formatAmountForDisplay(currentEvent?.fractionalSharesAvgPrice)} ${paymentToken?.symbol}/` + t('events.t39') : '--'} valueColor="text-[#9cff3a]" />
           <InfoRow label={t('events.t11')} value={currentEvent?.exchangeStartTime ? formatTimestamp(currentEvent?.exchangeStartTime, true) : '--'} />
           <InfoRow label={t('events.t12')} value={currentEvent?.exchangeEndTime ? formatTimestamp(currentEvent?.exchangeEndTime, true) : '--'}/>
         </div>

@@ -54,7 +54,7 @@ function CornerRibbon({ status }: { status: EventStatus}) {
   );
 }
 
-export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?: (data: IStockActionEvent) => void  }) {
+export function EventCard({ data, account, onClick }: { data: IStockActionEvent, account?: string, onClick?: (data: IStockActionEvent) => void  }) {
   const { t } = useTranslation();
 
   const status = useMemo(() => {
@@ -138,14 +138,14 @@ export function EventCard({ data, onClick }: { data: IStockActionEvent, onClick?
           "h-10 rounded-full disabled:bg-[#232427] ",
         )}
         disabled={isActive && !isHold}
-        variant={isActive ? "primary" : "secondary2"}
+        variant={isActive && account ? "primary" : "secondary2"}
 
         onClick={e => {
           e.stopPropagation();
           onClick && onClick(data)
         }}
       >
-        {isActive ? t("events.t15") : t("events.t14")}
+        {isActive && account ? t("events.t15") : t("events.t14")}
       </Button>
     </div>
   );

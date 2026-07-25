@@ -256,7 +256,9 @@ export default function RecordsSection() {
                       <>
                         <div className="grid grid-cols-3 gap-5 mt-1 items-start min-h-[500px]">
                           {eventList.map((event, i) => (
-                            <EventCard key={i} data={event} 
+                            <EventCard key={i} 
+                              data={event} 
+                              account={account}
                               onClick={handleExchange}
                             />
                           ))}
