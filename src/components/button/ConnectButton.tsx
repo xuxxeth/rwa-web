@@ -422,8 +422,9 @@ export function ConnectButton(props: { connectBtnClassName?: string }) {
       )}
 
       <DialogController
-        className='pr-0 pl-0'
+        className='z-[60] pr-0 pl-0'
         headerClassName='px-4'
+        overlayClassName='z-[59]'
         open={showConnect}
         openChange={open => {
           setShowConnect(open)

@@ -147,8 +147,14 @@ export function ExchangeTip({status, startTime}: {status: number, startTime: num
                 r1: (
                   <span
                     className="text-[#009DFF] cursor-pointer"
-                    onClick={() => {
-                      console.log("点击了 r1");
+                    onClick={(ev) => {
+                      ev.stopPropagation()
+                      try {
+                        navigator.clipboard.writeText('props.copyText')
+                      } catch (error) {
+
+                      }
+                      
                     }}
                   />
                 ),
@@ -321,7 +327,7 @@ export function ExchangeStock({
 
               )
               }
-            
+           <ExchangeTip status={3} startTime={currentEvent?.exchangeStartTime || 0} /> 
 
           {
             !account ? (
