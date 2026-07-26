@@ -2,12 +2,14 @@ import CopyButton from "@/components/button/copyButton";
 import { TooltipWithBorder } from "@/components/icon-tooltip";
 import { Trans } from "@/components/trans";
 import { Button } from "@/components/ui/button";
+import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useToast } from "@/hooks/useToast";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
 import { useGetRwaByAddress, useGetTokenByAddress } from "@/hooks/useTokens";
 import { useSplit } from "@/hooks/useTrading";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { IStockActionEvent } from "@/service/event/types";
+import { useBaseStore } from "@/stores/baseStore";
 import { formatTimestamp, parseAmount, shortenAddress } from "@/utils";
 import BigNumber from "bignumber.js";
 import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
@@ -169,8 +171,10 @@ export function ExchangeStock({
   onSuccess?: () => void
 }) {
   const { t } = useTranslation();
+  const { account } = useActiveWeb3()
   const [searchParams] = useSearchParams();
   const { toastSuccess, toastError } = useToast()
+  const setShowConnect = useBaseStore(state => state.setShowConnect)
   const payinToken = useGetRwaByAddress(currentEvent?.payinAddress)
   const payoutToken = useGetRwaByAddress(currentEvent?.payoutAddress)
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
@@ -320,6 +324,14 @@ export function ExchangeStock({
             
 
           {
+            !account ? (
+              <button
+                onClick={() => setShowConnect(true)}
+                className='bg-white m-auto text-black text-sm/4.5 font-medium px-6 py-2 rounded-[8px] w-full h-11'
+              >
+                {t('Connect Wallet')}
+              </button>
+            ) :
             (currentEvent?.showStatus === 1 || currentEvent?.showStatus === 3) && (
               <Button
                 className="w-full h-11 rounded-[8px] bg-white text-black hover:bg-white"

@@ -30,6 +30,7 @@ import { useRwas } from '@/hooks/useRwaBalances'
 import NoRecord from '@/components/no-record'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import { usePageContentState } from '@/hooks/usePageContentState'
+import { sortEventsByStatusAndTime } from './eventSort'
 
 export default function RecordsSection() {
   
@@ -142,6 +143,9 @@ export default function RecordsSection() {
     hasLoadedCurrentKey,
     hasData: eventList.length > 0,
   })
+  const displayEventList = useMemo(() => {
+    return sortEventsByStatusAndTime(eventList)
+  }, [activeTab, eventList])
 
   useEffect(() => {
     if (!isSwitchingChain) {
@@ -200,17 +204,11 @@ export default function RecordsSection() {
     updateOriginSummary(_data)
   })
 
-  const setShowConnect = useBaseStore(state => state.setShowConnect)
-
   const handleExchange = useCallback(async (data: IStockActionEvent) => {
-    // 如果没有连接钱包，则拉起钱包弹窗
-    if (!account) {
-      setShowConnect(true)
-      return
-    }
+    
     setCurrentEvent(data)
     // 进行中，且kyc未通过，则弹起kyc认证提示弹窗
-    if (data?.showStatus === 1 && kycStatus !== KYC_OVERALL_STATUS.VERIFIED) {
+    if (account && data?.showStatus === 1 && kycStatus !== KYC_OVERALL_STATUS.VERIFIED) {
       kycTipDialog.show()
       return
     }
@@ -252,10 +250,10 @@ export default function RecordsSection() {
                     </div>
                   }
                   {
-                    viewState === 'ready' && eventList.length > 0 && (
+                    viewState === 'ready' && displayEventList.length > 0 && (
                       <>
                         <div className="grid grid-cols-3 gap-5 mt-1 items-start min-h-[500px]">
-                          {eventList.map((event, i) => (
+                          {displayEventList.map((event, i) => (
                             <EventCard key={i} 
                               data={event} 
                               account={account}

@@ -26,8 +26,10 @@ export function WalletNotConnectedSmallVersion(props: { className?: string }) {
 
   return (
     <div className={cn('flex flex-col gap-2 mt-10', props.className)}>
-      <LazyImage src='/images/v2/icons/connect-wallet.svg' className='w-[65px] m-auto' />
-      <div className='text-sm/4.5 font-medium text-center'>{t('walletNotConnected')}</div>
+      <div className='w-[65px] h-[53px] m-auto'>
+        <LazyImage src='/images/v2/icons/connect-wallet.svg' className='w-full' />
+      </div>
+      <div className='text-sm/4.5 font-medium text-center text-gray-400'>{t('walletNotConnected')}</div>
       <div className='text-xs/[15px] font-normal text-center text-gray-400'>
         {t('connectWalletToView')}
       </div>
