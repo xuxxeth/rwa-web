@@ -8,6 +8,8 @@ import type {
   IRebateFilter,
   ITokenExchangedFilter,
   IClaim,
+  IRiskAssetsFilter,
+  IRiskAsset,
 } from './types'
 import type {
   IOpenOrderFilter,
@@ -54,6 +56,13 @@ export const scanApi = {
   getClaims: (filters?: IRebateFilter, errorHandlers?: ErrorHandlers) => {
     return client.get<ApiResponse<IClaim[]>>(
       '/v1/scan/api/ref/claims',
+      { ...filters },
+      { errorHandlers }
+    )
+  },
+  getRiskAssets: (filters?: IRiskAssetsFilter, errorHandlers?: ErrorHandlers) => {
+    return client.get<ApiResponse<IRiskAsset[]>>(
+      '/v1/scan/api/risk-assets',
       { ...filters },
       { errorHandlers }
     )

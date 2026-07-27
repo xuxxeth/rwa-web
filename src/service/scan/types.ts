@@ -140,3 +140,17 @@ export interface ITokenExchanged{
   txHash: string
   txTime: number
 }
+
+export interface IRiskAssetsFilter {
+  after?: string
+  before?: string
+  limit?: number
+}
+
+export interface IRiskAsset {
+  id: string,
+  account: string,
+  chainId: number
+  token: string
+  amount: string
+}

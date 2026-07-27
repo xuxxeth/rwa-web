@@ -11,7 +11,7 @@ import type { IRwa } from '@/service/base/types'
 import { useBaseStore } from '@/stores/baseStore'
 import type { ITableConfig } from '@/components/table-header'
 import { useRouter } from '@/hooks/useRouter'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { SessionType, SplitsStockState, TradeState } from '@/views/markets/MarketQuotes/shared'
 
 type SortableField = 'value'
@@ -32,8 +32,8 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
     if (isItem1Stable && !isItem2Stable) return -1
     if (isItem1Stable && isItem2Stable) return advancedSort(item1.symbol, item2.symbol, 'asc')
 
-    if (item1.value !== item2.value) {
-      return advancedSort(item1.value, item2.value, 'desc')
+    if (item1.holdings !== item2.holdings) {
+      return advancedSort(item1.holdings, item2.holdings, 'desc')
     } else if (item1.weight !== item2.weight) {
       return advancedSort(item1.weight, item2.weight, 'desc')
     } else {
@@ -41,8 +41,14 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
     }
   }, [])
 
-  const { paginatedData, currentPage, totalPage, onPrevClick, onNextClick } =
+  const { paginatedData, currentPage, setPage, totalPage, onPrevClick, onNextClick } =
     usePaginationData<IAssetItem>(10, assetTableConfig, assetsList, sort, defaultSorter)
+
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setPage(1)
+    }
+  }, [props.account, props.chainId])
 
   return (
     <>
@@ -70,7 +76,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
               } else {
                 router.push('/trade/' + item.symbol)
               }
-              
             }
           }
         }}
@@ -96,12 +101,9 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => (
       <>
         <TokenCell icon={item.icon} token={item.symbol} name={item.name} />
-        {
-          item.splitMergeStatus === 1 && <SplitsStockState rwa={item} />
-        }
+        {!item.isStableToken && item.splitMergeStatus !== 0 && <SplitsStockState rwa={item} />}
         {item.rwaState !== undefined && <TradeState state={item.rwaState} />}
         {item.sessionMask !== undefined && <SessionType sessionMask={item.sessionMask} />}
-        
       </>
     ),
     sorter: (a: IAssetItem, b: IAssetItem) => (order: Order) =>
@@ -113,7 +115,11 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => {
       return (
         <TextCell
-          text={item.price && item.splitMergeStatus === 0 ? textPrefix(truncate(item.price, item.precision), '$') : '--'}
+          text={
+            (item.isStableToken || item.splitMergeStatus == 0) && item.price
+              ? textPrefix(truncate(item.price, item.precision), '$')
+              : '--'
+          }
         />
       )
     },
@@ -133,7 +139,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
             <TextCell
               className='text-gray-400'
               text={
-                item.value && item.splitMergeStatus === 0 ? textPrefix(formatWithCommas(truncate(item.value, 2), 2), '$') : '--'
+                item.value ? textPrefix(formatWithCommas(truncate(item.value, 2), 2), '$') : '--'
               }
             />
           </>

@@ -3,9 +3,16 @@ import { OrderTable } from '@/views/assets/v2/shared'
 import { scanApi } from '@/service/scan/api'
 import { type ITableConfig } from '@/components/table-header'
 import { TokenCell, TextCellWithTranslation, TextCell, TxHashCell } from '@/views/assets/Shared'
-import { useRwaTokens } from '@/hooks/useTokens'
 import { type IRwa } from '@/service/base/types'
-import { cn, formatTimestamp, truncate, checkAddressEqual, isLess } from '@/utils'
+import {
+  cn,
+  formatTimestamp,
+  truncate,
+  checkAddressEqual,
+  isGreater,
+  isLess,
+  isEqual,
+} from '@/utils'
 import BigNumber from 'bignumber.js'
 
 function calcFractionalShares(
@@ -32,7 +39,8 @@ function calcFractionalShares(
 }
 
 function amountToDisplay(amount: number | string): string {
-  if (isLess(amount, '0.01')) return '<0.01'
+  if (isEqual(amount, '0')) return '0'
+  if (isGreater(amount, '0') && isLess(amount, '0.01')) return '<0.01'
   return truncate(amount, 2)
 }
 

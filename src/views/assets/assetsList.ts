@@ -7,6 +7,7 @@ import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
 import { useRegulateAssets, type RegulateAssetItem } from 'ca-common-web'
 import { useAppStore } from '@/stores/appStore'
+import { isGreater } from '@/utils'
 
 export interface IRiskControlAsset {
   token: string
@@ -65,21 +66,27 @@ export function useAssetsList(chainId: number) {
   }, [rwaList, tokenList, chainId])
 
   const assetsList = useMemo(() => {
-    return allTokenList.map(token => {
-      const symbolLowdered = symbolToLower(token.symbol)
-      const addressLowdered = symbolToLower(token.address)
-      token.price = token.isStableToken ? 1 : tokenWithPrice[symbolLowdered]?.price
-      const balanceFromStore = tokenWithBalance[addressLowdered]
-      token.holdings =
-        balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
-      if (token.price && token.holdings) {
-        token.value = multiply(token.holdings, token.price)
-      }
-      if (!token.holdings || !token.price) {
-        token.value = undefined
-      }
-      return token
-    }).filter(rwa => !(rwa.splitMergeStatus === 1 && Number(rwa.holdings) <= 0))
+    return allTokenList
+      .map(token => {
+        const symbolLowdered = symbolToLower(token.symbol)
+        const addressLowdered = symbolToLower(token.address)
+        token.price = token.isStableToken
+          ? 1
+          : token.splitMergeStatus == 0
+            ? tokenWithPrice[symbolLowdered]?.price
+            : undefined
+        const balanceFromStore = tokenWithBalance[addressLowdered]
+        token.holdings =
+          balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
+        if (token.price && token.holdings) {
+          token.value = multiply(token.holdings, token.price)
+        }
+        if (!token.holdings || !token.price) {
+          token.value = undefined
+        }
+        return token
+      })
+      .filter(token => token.holdings !== undefined && isGreater(token.holdings, '0'))
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
   const estimatedRwaTotalValue =
@@ -145,7 +152,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     sessionMask: rwa.sessionMask,
     weight: rwa.weight,
     precision: rwa.precision,
-    splitMergeStatus: rwa.splitMergeStatus
+    splitMergeStatus: rwa.splitMergeStatus,
   }
 }
 
@@ -165,6 +172,6 @@ export interface IAssetItem {
   address: string
   weight?: number
   precision: number
-  showState?: boolean,
+  showState?: boolean
   splitMergeStatus?: number
 }

@@ -4,8 +4,10 @@ import { useRouter } from '@/hooks/useRouter'
 import { useAppStore } from '@/stores/appStore'
 import { useAccount } from 'ca-common-web'
 import WalletNotConnected from '@/components/wallet-not-connected'
-import Assets from './Assets'
+import { AssetsEntry } from './Assets'
 import Order from './Order'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
+import SignatureVerify from '@/components/signature-verify'
 
 import AssetsSVG from '@/assets/portfolio/assets.svg?react'
 import OrderSVG from '@/assets/portfolio/order.svg?react'
@@ -82,7 +84,7 @@ function MainContent({ chainId, account }: { chainId: number; account: string })
         </div>
       </div>
       <div className='flex-1 flex flex-col relative'>
-        {activeTab === 'assets' && <Assets chainId={chainId} account={account} />}
+        {activeTab === 'assets' && <AssetsEntry chainId={chainId} account={account} />}
         {activeTab === 'order' && (
           <div className='h-full py-4'>
             <Order
