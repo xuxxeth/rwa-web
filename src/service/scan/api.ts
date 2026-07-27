@@ -1,5 +1,14 @@
 import client, { type ApiResponse } from '../client'
-import type { IOrder, ITrade, IOpenOrder, IRebate, IClaim, IRebateFilter } from './types'
+import type {
+  IOrder,
+  ITrade,
+  IOpenOrder,
+  IRebate,
+  ITokenExchanged,
+  IRebateFilter,
+  ITokenExchangedFilter,
+  IClaim,
+} from './types'
 import type {
   IOpenOrderFilter,
   IOrderHistoryFilter,
@@ -45,6 +54,13 @@ export const scanApi = {
   getClaims: (filters?: IRebateFilter, errorHandlers?: ErrorHandlers) => {
     return client.get<ApiResponse<IClaim[]>>(
       '/v1/scan/api/ref/claims',
+      { ...filters },
+      { errorHandlers }
+    )
+  },
+  getTokenExchangedList: (filters?: ITokenExchangedFilter, errorHandlers?: ErrorHandlers) => {
+    return client.get<ApiResponse<ITokenExchanged[]>>(
+      '/v1/scan/api/token-exchange/list',
       { ...filters },
       { errorHandlers }
     )

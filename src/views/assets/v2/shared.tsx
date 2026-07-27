@@ -303,7 +303,7 @@ function WithTableHeader<T extends { orderId?: string }>({
   )
 }
 
-export type TableType = 'open' | 'history' | 'trade' | 'invitee' | 'rebate' | 'claim'
+export type TableType = 'open' | 'history' | 'trade' | 'invitee' | 'rebate' | 'claim' | 'tokenExchanged'
 
 export function OrderContentByScroll<
   T extends { orderId?: string; id: string },
@@ -333,7 +333,7 @@ export function OrderContentByScroll<
   type: TableType
 }) {
   const router = useRouter()
-  const rwaTokens = useRwaTokens()
+  const rwaTokens = useRwaTokens(true)
 
   const {
     data,

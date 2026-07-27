@@ -117,3 +117,26 @@ export interface IClaim {
   data: string
   claimTime: number
 }
+
+export interface ITokenExchangedFilter {
+  after?: string
+  before?: string
+  limit?: number
+}
+
+export interface ITokenExchanged{
+  id: string
+  chainId: number
+  rate: string
+  price: number
+  type: number
+  payinToken: string
+  payinAmount: number
+  payoutToken: string
+  payoutAmount: number
+  paymentToken: string
+  paymentAmount: string
+  riskType: number
+  txHash: string
+  txTime: number
+}

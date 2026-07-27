@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
-import { OrderTable } from '@/views/assets/v2/shared'
-import { TextCell, TxHashCell, AddressCell } from '@/views/assets/Shared'
-import type { IRebate, IRebateFilter, IClaim } from '@/service/scan/types'
-import { scanApi } from '@/service/scan/api'
-import { type ITableConfig } from '@/components/table-header'
-import { formatTimestamp, multiply, textSuffix,  sum, symbolToLower } from '@/utils'
+import { symbolToLower } from '@/utils'
 import { TabNav, type TabKey } from './TabNav'
 import { EventCard, type EventData } from './EventCard'
 import type { IStockActionEvent } from '@/service/event/types'
@@ -31,6 +26,7 @@ import NoRecord from '@/components/no-record'
 import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import { usePageContentState } from '@/hooks/usePageContentState'
 import { sortEventsByStatusAndTime } from './eventSort'
+import { ExchangeHistoryTable } from './HistoryTable'
 
 export default function RecordsSection() {
   
@@ -316,99 +312,3 @@ export default function RecordsSection() {
     </div>
   )
 }
-
-const PAGE_LIMIT = 10
-const EMPTY_FILTER = {}
-
-
-function ExchangeHistoryTable(props: { chainId: number | null; account: string | undefined }) {
-  return (
-    <OrderTable<IClaim, IRebateFilter>
-      chainId={props.chainId}
-      account={props.account}
-      PAGE_LIMIT={PAGE_LIMIT}
-      dataMode={'pagination'}
-      api={scanApi.getClaims}
-      scrollId={(item: IClaim) => item.id}
-      filter={EMPTY_FILTER}
-      tableConfig={exchangeTableConfig}
-      type={'claim'}
-      lngPrefix='events'
-      signatureSubTitle='rebate.sigSubTitle'
-      scrollToTopWhenPagination={false}
-      paginationClassName='justify-end px-4 pt-2 pb-4'
-    />
-  )
-}
-
-const exchangeTableConfig: ITableConfig<IClaim, {}> = [
-  {
-    key: 't35',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't19',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't10',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't36',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't11',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't37',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't29',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't30',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 't26',
-    sortable: false,
-    render: (item: IClaim) => (
-      <TextCell className='text-xs/4' text={formatTimestamp(item.claimTime)} />
-    ),
-  },
-  {
-    key: 'tx',
-    width: 140,
-    sortable: false,
-    render: (item: IClaim) => <TxHashCell hash={item.txHash} />,
-  },
-]

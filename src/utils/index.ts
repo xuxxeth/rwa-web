@@ -278,3 +278,7 @@ export function validateInviteCode(code: string): boolean {
 export function hasPermission(value: number, bit: number) {
   return (value & (1 << bit)) !== 0
 }
+
+export function checkAddressEqual(address1: string, address2: string) {
+  return address1.toLowerCase() === address2.toLowerCase()
+}
