@@ -15,6 +15,7 @@ import BigNumber from "bignumber.js";
 import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ExchangeTip } from "./ExchangeTip";
 
 function formatAmountForDisplay(value?: string | number | BigNumber.Value) {
   if (value === undefined || value === null || value === '' || Number(value) === 0) {
@@ -118,56 +119,6 @@ function InfoRow({
   );
 }
 
-export function ExchangeTip({status, startTime}: {status: number, startTime: number}) {
-  const { t } = useTranslation();
-
-  return (
-    <>
-      {
-        status === 0 && (
-          <span className="text-[#c7ccd6] text-[12px] leading-normal">
-            {t('events.t31', {t1: formatTimestamp(startTime, true)})}
-          </span>
-        )
-      }
-      {
-        status === 2 && (
-          <span className="text-[#c7ccd6] text-[12px] leading-normal">
-            {t('events.t33')}
-          </span>
-        )
-      }
-      {
-        status === 3 && (
-          <span className="text-[#c7ccd6] text-[12px] leading-normal">
-            <Trans 
-              i18nKey="events.t32" 
-              values={{ }} 
-              components={{
-                r1: (
-                  <span
-                    className="text-[#009DFF] cursor-pointer"
-                    onClick={(ev) => {
-                      ev.stopPropagation()
-                      try {
-                        navigator.clipboard.writeText('props.copyText')
-                      } catch (error) {
-
-                      }
-                      
-                    }}
-                  />
-                ),
-                r2: <span className=" text-[#009DFF]" />,
-              }}
-            />
-          </span>
-        )
-      }
-    </>
-
-  )
-}
 
 export function ExchangeStock({
   currentEvent,
@@ -190,14 +141,16 @@ export function ExchangeStock({
 
   const [loading, setLoading] = useState(false)
 
-  const { exchangeToken } = useSplit(currentEvent?.payinAddress as `0x${string}`, BigInt(parseAmount(2, 6)))
+  const amount = searchParams.get('amount') || (payinTokenBalance?.balance || 0)
+
+  const { exchangeToken } = useSplit(currentEvent?.payinAddress as `0x${string}`, BigInt(parseAmount(amount, 6)))
 
   const handleExchangeToken = useCallback(async () => {
 
     setLoading(true)
     try {
       if (!currentEvent?.payinAddress) return
-      const amount = searchParams.get('amount') || (payinTokenBalance?.balance || 0)
+      
       const params = {
         payinToken: currentEvent?.payinAddress,
         payinAmount: parseAmount(amount, payinToken?.decimals || 6).toString()
@@ -211,14 +164,14 @@ export function ExchangeStock({
         await onSuccess?.()
         return
       }
+      const errorList = ["userReject", "apIns"]
       // @ts-ignore
       const errorMessage = res?.data?.message
-      toastError({title: errorMessage ? t(`appErr.${errorMessage}`) : t('events.t44')})
+      toastError({title:  errorList.includes(errorMessage) ? t(`appErr.${errorMessage}`) : t('events.t44')})
     } catch (error) {
       console.log(error)
       // @ts-ignore
-      const errorMessage = result?.data?.message
-      toastError({title: errorMessage ? t(`appErr.${errorMessage}`) : t('events.t44')})
+      toastError({title:  t('events.t44')})
     } finally {
       setLoading(false)
     }
@@ -326,9 +279,7 @@ export function ExchangeStock({
                 </div>
 
               )
-              }
-           <ExchangeTip status={3} startTime={currentEvent?.exchangeStartTime || 0} /> 
-
+            }
           {
             !account ? (
               <button

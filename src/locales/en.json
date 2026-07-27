@@ -917,7 +917,7 @@
     "t29": "Old Tokens Returned",
     "t30": "New Tokens Received",
     "t31": "Conversion opens at {{t1}}. Stay tuned for official updates.",
-    "t32": "For historical holdings or fractional share compensation, contact support via <r1>[Contact Template]</r1>: <r2>{{t2}</r2>}",
+    "t32": "For historical holdings or fractional share compensation, contact support via <r1>[Contact Template]</r1>: <r2>contact@tiko.cc</r2>",
     "t33": "Check official announcements for updates.",
     "t34": "This address has not completed identity verification. Please complete verification before proceeding.",
     "t35": "Stock Asset",
@@ -929,6 +929,7 @@
     "t40": "Not Holding",
     "t42": "This token has an unprocessed stock split. Go to [Stock Split] to convert.",
     "t43": "Conversion Successful",
-    "t44": "Conversion Failed"
+    "t44": "Conversion Failed",
+    "t45": "The template has been copied to the clipboard"
   }
 }
