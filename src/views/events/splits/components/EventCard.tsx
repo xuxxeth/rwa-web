@@ -79,7 +79,7 @@ export function EventCard({ data, account, onClick }: { data: IStockActionEvent,
   const rwaData = useGetRwaByAddress(data.payinAddress)
   const payinTokenBalance = useTokenBalance(data?.payinAddress || '')
 
-  const isHold = Number(payinTokenBalance?.balance) > 0
+  const isHold = Number(payinTokenBalance?.balance) > 0 && account
 
   return (
     <div className="bg-[#1A1B1E] rounded-[16px] flex flex-col gap-5 p-6 relative overflow-hidden">
@@ -137,7 +137,7 @@ export function EventCard({ data, account, onClick }: { data: IStockActionEvent,
         className={cn(
           "h-10 rounded-full disabled:bg-[#232427] ",
         )}
-        disabled={isActive && !isHold}
+        disabled={isActive && !isHold && !!account}
         variant={isActive && account ? "primary" : "secondary2"}
 
         onClick={e => {

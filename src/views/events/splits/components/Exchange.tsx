@@ -12,7 +12,7 @@ import type { IStockActionEvent } from "@/service/event/types";
 import { useBaseStore } from "@/stores/baseStore";
 import { formatTimestamp, parseAmount, shortenAddress } from "@/utils";
 import BigNumber from "bignumber.js";
-import { ChevronDown, Copy, AlertTriangle } from "lucide-react";
+import { ChevronDown, Copy, AlertTriangle, SpaceIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ExchangeTip } from "./ExchangeTip";
@@ -136,7 +136,7 @@ export function ExchangeStock({
   const payoutToken = useGetRwaByAddress(currentEvent?.payoutAddress)
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
   const payinTokenBalance = useTokenBalance(currentEvent?.payinAddress || '')
-  const isHold = Number(payinTokenBalance?.balance) > 0
+  const isHold = Number(payinTokenBalance?.balance) > 0 && account
   const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance?.balance ?? '0')
 
   const [loading, setLoading] = useState(false)
@@ -195,8 +195,8 @@ export function ExchangeStock({
                 </div>
               </div>
               {
-                isHold ? <span className="text-white text-[20px] font-semibold">{payinTokenBalance.balance || '--'}</span>
-                       : <span className="text-[#737A87] text-[20px] font-semibold">{'未持有'}</span>
+                isHold && account ? <span className="text-white text-[20px] font-semibold">{payinTokenBalance.balance || '--'}</span>
+                       : <span className="text-[#737A87] text-[20px] font-semibold">{ account ? t('events.t40') : '--'}</span>
               }
               
             </div>
@@ -223,12 +223,12 @@ export function ExchangeStock({
                 </div>
               </div>
               {
-                isHold && (
+                isHold ? (
                   <div className="flex flex-col items-end">
                     <span className="text-[#9cff3a] text-[20px] font-semibold">{formatQuantityForDisplay(integerPart)}</span>
                     <span className="text-[#9da3af] text-[12px]">{t("events.t25")}</span>
                   </div>
-                )
+                ) : <span className="text-[20px] text-[#737A87] font-semibold">--</span> 
               }
               
             </div>
@@ -280,6 +280,7 @@ export function ExchangeStock({
 
               )
             }
+            <ExchangeTip status={3} startTime={0} />
           {
             !account ? (
               <button
