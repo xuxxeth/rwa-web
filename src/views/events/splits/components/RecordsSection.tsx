@@ -8,7 +8,6 @@ import { useSignatureValidStatus } from '@/hooks/useSignature'
 import { useAppStore } from '@/stores/appStore'
 import { eventApi } from '@/service/event/api'
 import { RESPONSE_CODE } from '@/config/constants'
-import { useRiskControlAssets } from '@/views/assets/assetsList'
 import { useBaseStore } from '@/stores/baseStore'
 import { useWssStore } from '@/stores/wssStore'
 import { useWssOn } from '@/hooks/useWssOn'
@@ -27,6 +26,9 @@ import { useActiveWeb3 } from '@/hooks/useActiveWe3'
 import { usePageContentState } from '@/hooks/usePageContentState'
 import { sortEventsByStatusAndTime } from './eventSort'
 import { ExchangeHistoryTable } from './HistoryTable'
+import Pagination from '@/components/pagination'
+
+const PAGE_LIMIT = 3
 
 export default function RecordsSection() {
   
@@ -47,6 +49,7 @@ export default function RecordsSection() {
   const { account, initialized } = useActiveWeb3()
   const currentChainId = useAppStore(state => state.currentChainId)
 
+  const beforeRef = useRef<number | undefined>(undefined)
   const afterRef = useRef<number | undefined>(undefined)
   const [eventList, setEventList] = useState<IStockActionEvent[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -97,22 +100,59 @@ export default function RecordsSection() {
     return `${currentChainId}:${isHeldTab ? account : activeTab}:${isHeldTab ? rwaListWithBalanceKey : 'all'}`
   }, [account, activeTab, currentChainId, initialized, isHeldTab, rwaListWithBalanceKey])
 
-  const handleGetStockAction = useCallback(async (t?: TabKey) => {
-    if (!currentChainId || (t !== 'all' && (!account || !validSignature()))) {
+  const [isPrevEnabled, setIsPrevEnabled] = useState(false)
+  const [isNextEnabled, setIsNextEnabled] = useState(false)
+  // next: true，执行下一页，false，执行上一页
+  const handleGetStockAction = useCallback(async (t?: TabKey, next: boolean = true) => {
+    if (!currentChainId || (t === 'history' && (!account || !validSignature()))) {
+      setIsPrevEnabled(false)
+      setIsNextEnabled(false)
+      setEventList([])
+      setHasLoadedCurrentKey(true)
+      setIsLoading(false)
       return null
     }
+
     if (t === 'held' && isRwaBalanceReady && rwaListWithBalanceSorted.length <= 0) {
+      setIsPrevEnabled(false)
+      setIsNextEnabled(false)
       setEventList([])
       setHasLoadedCurrentKey(true)
       setIsLoading(false)
       return
     }
-    const res = await eventApi.getStockAction(currentChainId, afterRef.current, t === 'held' ? rwaListWithBalanceKey : undefined)
+
+    const res = await eventApi.getStockAction(
+      currentChainId, 
+      !next ? beforeRef.current : undefined,
+      next? afterRef.current : undefined, 
+      t === 'held' ? rwaListWithBalanceKey : undefined, 
+      PAGE_LIMIT
+    )
+    
     if (res?.code === RESPONSE_CODE.SUCCESS) {
       const data = res?.data || []
-      afterRef.current = data[0].id
-      setEventList(data)
-      setHasLoadedCurrentKey(true)
+      if (data.length > 0) {
+        if (next && afterRef.current) {
+          setIsPrevEnabled(true)
+        }
+        
+        beforeRef.current = data[0].id
+        afterRef.current = data[data.length - 1].id
+        setEventList(data)
+        setHasLoadedCurrentKey(true)
+        setIsNextEnabled(data.length >= PAGE_LIMIT)
+       
+      } else {
+        if (next) {
+          setIsPrevEnabled(true)
+          setIsNextEnabled(false)
+        }
+        if (!next) {
+          setIsPrevEnabled(false)
+          setIsNextEnabled(true)
+        }
+      }
     }
     setTimeout(() => {
       setIsLoading(false)
@@ -214,25 +254,19 @@ export default function RecordsSection() {
   const handleTabChange = useCallback(async (t: TabKey) => {
     setActiveTab(t);
     setIsLoading(true)
+    setIsPrevEnabled(false)
+    setIsNextEnabled(false)
     afterRef.current = undefined
+    beforeRef.current = undefined
     handleGetStockAction(t)
   }, [handleGetStockAction])
-
-
-  // if (isSwitchingChain) {
-  //   return (
-  //     <div className='min-h-[680px] rounded-[16px] w-full text-white'>
-  //       <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
       <div className='flex flex-col gap-[16px] h-full'>
           {/* Tabs */}
         <TabNav active={activeTab} onChange={handleTabChange} />
-        <div>
+        <div className=' relative'>
           {
             (activeTab === 'held' || activeTab === 'all') && (
               shouldShowWalletNotConnected ? 
@@ -241,12 +275,12 @@ export default function RecordsSection() {
                 ) : (
                 <>
                   {
-                    shouldShowLoading && <div className='min-h-[680px] rounded-[16px] w-full text-white'>
-                      <CircleLoading className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+                    shouldShowLoading && <div className=' bg-[rgba(0,0,0,0.4)] h-full min-h-[600px] rounded-[16px] w-full text-white absolute z-20 left-0 top-0 right-0 bottom-0 flex justify-center'>
+                      <CircleLoading className='absolute top-[50px] left-1/2 -translate-x-1/2 -translate-y-1/2' />
                     </div>
                   }
                   {
-                    viewState === 'ready' && displayEventList.length > 0 && (
+                    displayEventList.length > 0 && (
                       <>
                         <div className="grid grid-cols-3 gap-5 mt-1 items-start min-h-[500px]">
                           {displayEventList.map((event, i) => (
@@ -267,6 +301,25 @@ export default function RecordsSection() {
                   {
                     shouldShowEmpty && <NoRecord />
                   }
+                  <div className='mt-6'>
+                    {(viewState === 'ready' && (eventList.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled)) && (
+                        <div className='mt-2'>
+                          <Pagination
+                            prevDisabled={!isPrevEnabled}
+                            nextDisabled={!isNextEnabled}
+                            onPrevClick={() => {
+                              setIsLoading(true)
+                              handleGetStockAction(activeTab, false)
+                            }}
+                            className={''}
+                            onNextClick={() => {
+                              setIsLoading(true)
+                              handleGetStockAction(activeTab, true)
+                            }}
+                          />
+                        </div>
+                      )}
+                  </div>
                 </>
 
               )
