@@ -14,6 +14,8 @@ import {
   isEqual,
 } from '@/utils'
 import BigNumber from 'bignumber.js'
+import IconWithTooltip from '@/components/icon-tooltip'
+import { Trans } from 'react-i18next'
 
 function calcFractionalShares(
   payinAmount: number | string | bigint,
@@ -78,14 +80,34 @@ const exchangeTableConfig: ITableConfig<ITokenExchanged, { rwaTokens: IRwa[] }> 
     render: (item: ITokenExchanged, { rwaTokens }) => {
       const rwa = rwaTokens.find(token => token.address === item.payinToken)
       if (!rwa) return '--'
+      console.log('riskType', item.riskType)
       return (
-        <TokenCell
-          token={rwa.symbol}
-          name={rwa.name}
-          icon={rwa.icon}
-          iconClassName={cn('w-7 h-7')}
-          tokenClassName='font-medium'
-        />
+        <div className='flex flex-row'>
+          <TokenCell
+            token={rwa.symbol}
+            name={rwa.name}
+            icon={rwa.icon}
+            iconClassName={cn('w-7 h-7')}
+            tokenClassName='font-medium'
+            tokenExtraTag={
+              item.riskType === 1 ? (
+                <IconWithTooltip
+                  icon={'/images/v2/events/info.svg'}
+                  iconOrTextClassName={cn('w-3 h-3 self-start')}
+                  tooltip={
+                    <div className='text-xs/4 text-gray-300 font-normal'>
+                      <Trans
+                        i18nKey='events.t46'
+                        values={{ email: 'contact@tiko.cc' }}
+                        components={[<a key='0' href='mailto:contact@tiko.cc' />]}
+                      />
+                    </div>
+                  }
+                />
+              ) : null
+            }
+          />
+        </div>
       )
     },
   },

@@ -100,7 +100,9 @@ export function TradingFees(props: {
 
 export function TextCellWithTranslation(props: { text: string; className?: string }) {
   const { t } = useTranslation()
-  return <div className={cn('text-xs/4 font-normal text-white', props.className)}>{t(props.text)}</div>
+  return (
+    <div className={cn('text-xs/4 font-normal text-white', props.className)}>{t(props.text)}</div>
+  )
 }
 
 export function AmountCell(props: { amount: string; className?: string }) {
@@ -202,15 +204,26 @@ export function TokenCell(props: {
   tokenClassName?: string
   nameClassName?: string
   onClick?: () => void
+  tokenExtraTag?: ReactNode
 }) {
   return (
     <div
       className={'flex flex-row gap-2 font-normal cursor-pointer overflow-hidden'}
       onClick={() => props.onClick?.()}
     >
-      {props.icon && <LazyImage className={cn('w-8 h-8 rounded-[50%]', props.iconClassName)} src={props.icon} />}
+      {props.icon && (
+        <LazyImage className={cn('w-8 h-8 rounded-[50%]', props.iconClassName)} src={props.icon} />
+      )}
       <div className='flex flex-col overflow-hidden'>
-        <div className={cn('text-sm/4.5 text-white', props.tokenClassName)}>{props.token}</div>
+        <div
+          className={cn(
+            'text-sm/4.5 text-white flex flex-row gap-1 items-center',
+            props.tokenClassName
+          )}
+        >
+          {props.token}
+          {props.tokenExtraTag}
+        </div>
         <IconWithTooltip tooltip={props.name} triggerClassName='justify-start'>
           <div className={cn('text-gray-400 text-xs/[15px] truncate', props.nameClassName)}>
             {props.name}

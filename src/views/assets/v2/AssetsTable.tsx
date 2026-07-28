@@ -30,7 +30,6 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
 
     if (!isItem1Stable && isItem2Stable) return 1
     if (isItem1Stable && !isItem2Stable) return -1
-    if (isItem1Stable && isItem2Stable) return advancedSort(item1.symbol, item2.symbol, 'asc')
 
     if (item1.holdings !== item2.holdings) {
       return advancedSort(item1.holdings, item2.holdings, 'desc')
