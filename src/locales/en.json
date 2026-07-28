@@ -931,6 +931,7 @@
     "t42": "This token has an unprocessed stock split. Go to [Stock Split] to convert.",
     "t43": "Conversion Successful",
     "t44": "Conversion Failed",
-    "t45": "The template has been copied to the clipboard"
+    "t45": "The template has been copied to the clipboard",
+    "t46": "Suspicious activity detected on this address. Swapped tokens are frozen. Contact <0>{{email}}</0> for more info or to appeal."
   }
 }
