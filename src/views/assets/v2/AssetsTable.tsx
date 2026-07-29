@@ -70,7 +70,7 @@ function AssetsTable(props: { chainId: number; account: string; assetsList: IAss
           if (item.rwaId) {
             const rwa = rwaList.find(rwa => rwa.address === item.address)
             if (rwa) {
-              if (rwa?.splitMergeStatus === 1) {
+              if (rwa?.splitStatus === 1) {
                 router.push('/splits')
               } else {
                 router.push('/trade/' + item.symbol)
@@ -100,7 +100,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
     render: (item: IAssetItem) => (
       <>
         <TokenCell icon={item.icon} token={item.symbol} name={item.name} />
-        {!item.isStableToken && item.splitMergeStatus !== 0 && <SplitsStockState rwa={item} />}
+        {!item.isStableToken && item.splitStatus !== 0 && <SplitsStockState rwa={item} />}
         {item.rwaState !== undefined && <TradeState state={item.rwaState} />}
         {item.sessionMask !== undefined && <SessionType sessionMask={item.sessionMask} />}
       </>
@@ -115,7 +115,7 @@ const assetTableConfig: ITableConfig<IAssetItem, { rwaList: IRwa[] }> = [
       return (
         <TextCell
           text={
-            (item.isStableToken || item.splitMergeStatus == 0) && item.price
+            (item.isStableToken || item.splitStatus == 0) && item.price
               ? textPrefix(truncate(item.price, item.precision), '$')
               : '--'
           }

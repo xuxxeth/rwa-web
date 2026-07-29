@@ -21,7 +21,7 @@ export function BuyButton({ rwa, className }: { rwa: IRwa; className?: string })
   return (
     <button
       onClick={() => {
-        if (rwa.splitMergeStatus === 1) {
+        if (rwa.splitStatus === 1) {
           router.push('/splits')
         } else {
           updateInputToken(rwa)
@@ -31,11 +31,11 @@ export function BuyButton({ rwa, className }: { rwa: IRwa; className?: string })
       }}
       className={cn(
         'text-sm/4.5 flex flex-row hover:bg-green-50 text-green-50 hover:text-white items-center font-medium px-3 py-2  bg-[rgba(37,167,80,0.1)] rounded-[5px] cursor-pointer',
-        rwa.splitMergeStatus === 1 ? 'text-[#9CFF3A]' : '',
+        rwa.splitStatus === 1 ? 'text-[#9CFF3A]' : '',
         className
       )}
     >
-      <span>{ rwa.splitMergeStatus === 1 ? t('events.t38') : t('Trade')}</span>
+      <span>{ rwa.splitStatus === 1 ? t('events.t38') : t('Trade')}</span>
       <ArrowRight2SVG className='w-4 h-4 ml-2' />
     </button>
   )

@@ -72,7 +72,7 @@ export function useAssetsList(chainId: number) {
         const addressLowdered = symbolToLower(token.address)
         token.price = token.isStableToken
           ? 1
-          : token.splitMergeStatus == 0
+          : token.splitStatus == 0
             ? tokenWithPrice[symbolLowdered]?.price
             : undefined
         const balanceFromStore = tokenWithBalance[addressLowdered]
@@ -152,7 +152,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     sessionMask: rwa.sessionMask,
     weight: rwa.weight,
     precision: rwa.precision,
-    splitMergeStatus: rwa.splitMergeStatus,
+    splitStatus: rwa.splitStatus,
   }
 }
 
@@ -173,5 +173,5 @@ export interface IAssetItem {
   weight?: number
   precision: number
   showState?: boolean
-  splitMergeStatus?: number
+  splitStatus?: number
 }

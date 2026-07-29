@@ -7,7 +7,7 @@ const SplitTip = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const inputToken = useTradeStore(state => state.inputToken)
-  if (inputToken?.prevId) {
+  if (inputToken?.splitStatus === 1) {
     return (
       <div className="p-3 bg-[rgba(255,178,25,0.08)] rounded-[8px] text-[12px] text-[#FFB219] flex mt-3 border border-[rgba(255,178,25,0.1)]">
         <div className="w-[18px] h-[18px] shrink-0 mr-2">
