@@ -264,7 +264,7 @@ export default function RecordsSection() {
     afterRef.current = undefined
     beforeRef.current = undefined
     handleGetStockAction(t)
-  }, [handleGetStockAction])
+  }, [])
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
