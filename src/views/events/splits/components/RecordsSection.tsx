@@ -131,6 +131,7 @@ export default function RecordsSection() {
     )
     
     if (res?.code === RESPONSE_CODE.SUCCESS) {
+      setHasLoadedCurrentKey(true)
       const data = res?.data || []
       if (data.length > 0) {
         if (next && afterRef.current) {
@@ -140,7 +141,6 @@ export default function RecordsSection() {
         beforeRef.current = data[0].id
         afterRef.current = data[data.length - 1].id
         setEventList(data)
-        setHasLoadedCurrentKey(true)
         setIsNextEnabled(data.length >= PAGE_LIMIT)
        
       } else {
@@ -187,7 +187,6 @@ export default function RecordsSection() {
     if (!isSwitchingChain) {
       return
     }
-
     setEventList([])
     setIsLoading(true)
     afterRef.current = undefined
