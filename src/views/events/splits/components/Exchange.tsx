@@ -17,11 +17,10 @@ import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ExchangeTip } from "./ExchangeTip";
 
-function formatAmountForDisplay(value?: string | number | BigNumber.Value) {
+export function formatAmountForDisplay(value?: string | number | BigNumber.Value) {
   if (value === undefined || value === null || value === '' || Number(value) === 0) {
     return '0'
   }
-
   const amount = new BigNumber(value)
   if (!amount.isFinite()) {
     return '--'
@@ -30,8 +29,13 @@ function formatAmountForDisplay(value?: string | number | BigNumber.Value) {
   if (amount.gt(0) && amount.lt(0.01)) {
     return '<0.01'
   }
+  const formatted = amount
+  .decimalPlaces(2, BigNumber.ROUND_DOWN)
+  .toFixed()
 
-  return amount.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed().replace(/\.0+$/, '').replace(/\.?0+$/, '')
+  return formatted.includes('.')
+    ? formatted.replace(/\.?0+$/, '')
+    : formatted
 }
 
 function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {

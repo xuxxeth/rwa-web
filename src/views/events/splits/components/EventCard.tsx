@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { formatTimestamp } from "@/utils/format";
 import { useGetRwaByAddress } from "@/hooks/useTokens";
 import { useTokenBalance } from "@/hooks/useTokenBalances";
+import { formatAmountForDisplay } from "./Exchange";
 
 export type EventStatus = "active" | "ended" | "suspended" | "pending";
 
@@ -111,7 +112,7 @@ export function EventCard({ data, account, onClick }: { data: IStockActionEvent,
             <span className="text-[#848e9c] text-[12px]">{t("events.t19")}</span>
           </div>
           <div className="flex-1 flex flex-col gap-1.5 items-end">
-            <span className="text-white text-[14px] font-semibold">{data.payinAmount} : {data.payoutAmount}</span>
+            <span className="text-white text-[14px] font-semibold">{formatAmountForDisplay(data.payinAmount)} : {formatAmountForDisplay(data.payoutAmount)}</span>
             <span className="text-[#848e9c] text-[12px]">{t("events.t10")}</span>
           </div>
         </div>

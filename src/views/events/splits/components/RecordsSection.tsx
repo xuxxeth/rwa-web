@@ -28,7 +28,7 @@ import { sortEventsByStatusAndTime } from './eventSort'
 import { ExchangeHistoryTable } from './HistoryTable'
 import Pagination from '@/components/pagination'
 
-const PAGE_LIMIT = 3
+const PAGE_LIMIT = 9
 
 export default function RecordsSection() {
   
