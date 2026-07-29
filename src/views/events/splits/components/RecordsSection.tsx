@@ -144,14 +144,20 @@ export default function RecordsSection() {
         setIsNextEnabled(data.length >= PAGE_LIMIT)
        
       } else {
-        if (next) {
-          setIsPrevEnabled(true)
+        if (beforeRef.current) {
+          if (next) {
+            setIsPrevEnabled(true)
+            setIsNextEnabled(false)
+          }
+          if (!next) {
+            setIsPrevEnabled(false)
+            setIsNextEnabled(true)
+          }
+        } else {
+          setIsPrevEnabled(false)
           setIsNextEnabled(false)
         }
-        if (!next) {
-          setIsPrevEnabled(false)
-          setIsNextEnabled(true)
-        }
+        
       }
     }
     setTimeout(() => {
@@ -274,7 +280,7 @@ export default function RecordsSection() {
                 ) : (
                 <>
                   {
-                    shouldShowLoading && <div className=' bg-[rgba(0,0,0,0.4)] h-full min-h-[600px] rounded-[16px] w-full text-white absolute z-20 left-0 top-0 right-0 bottom-0 flex justify-center'>
+                    shouldShowLoading && <div className=' bg-[rgba(0,0,0,0)] h-full min-h-[600px] rounded-[16px] w-full text-white absolute z-20 left-0 top-0 right-0 bottom-0 flex justify-center'>
                       <CircleLoading className='absolute top-[50px] left-1/2 -translate-x-1/2 -translate-y-1/2' />
                     </div>
                   }
@@ -301,7 +307,7 @@ export default function RecordsSection() {
                     shouldShowEmpty && <NoRecord />
                   }
                   <div className='mt-6'>
-                    {(viewState === 'ready' && (eventList.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled)) && (
+                    {((isPrevEnabled || isNextEnabled)) && (
                         <div className='mt-2'>
                           <Pagination
                             prevDisabled={!isPrevEnabled}
