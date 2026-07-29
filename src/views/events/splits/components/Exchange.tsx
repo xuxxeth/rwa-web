@@ -273,14 +273,13 @@ export function ExchangeStock({
           {/* Warning banner */}
             {
               (currentEvent?.showStatus !== undefined && currentEvent?.showStatus !== 1 && currentEvent?.exchangeStartTime) && (
-                <div className="bg-[rgba(255,178,25,0.1)] rounded-[6px] px-4 py-3 flex items-start gap-2.5">
-                  <AlertTriangle size={12} className="text-[#ffb219] flex-shrink-0 mt-0.5" />
+                <div className="bg-[rgba(255,178,25,0.1)] rounded-[6px] px-4 py-3 flex items-start gap-1">
+                  <img src="/images/icons/annouce.png" className="w-3 h-3 mt-1" alt="" />
                   <ExchangeTip status={currentEvent.showStatus} startTime={currentEvent.exchangeStartTime} />
                 </div>
 
               )
             }
-            <ExchangeTip status={3} startTime={0} />
           {
             !account ? (
               <button
