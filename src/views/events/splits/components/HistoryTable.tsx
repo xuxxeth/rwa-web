@@ -46,7 +46,7 @@ function amountToDisplay(amount: number | string): string {
   return truncate(amount, 2)
 }
 
-const PAGE_LIMIT = 20
+const PAGE_LIMIT = 5
 const EMPTY_FILTER = {}
 
 export function ExchangeHistoryTable(props: {

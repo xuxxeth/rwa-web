@@ -15,3 +15,10 @@ export interface IStockActionEvent {
   paymentAddress: string,
   exchangeStatus: number // 合约兑换状态：0-关闭，1-开启
 }
+
+export interface IStockActionEventData {
+  list: IStockActionEvent[],
+  pageNum: number,
+  pageSize: number,
+  total: number
+}

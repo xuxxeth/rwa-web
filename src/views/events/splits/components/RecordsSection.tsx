@@ -49,8 +49,6 @@ export default function RecordsSection() {
   const { account, initialized } = useActiveWeb3()
   const currentChainId = useAppStore(state => state.currentChainId)
 
-  const beforeRef = useRef<number | undefined>(undefined)
-  const afterRef = useRef<number | undefined>(undefined)
   const [eventList, setEventList] = useState<IStockActionEvent[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasLoadedCurrentKey, setHasLoadedCurrentKey] = useState(false)
@@ -100,13 +98,13 @@ export default function RecordsSection() {
     return `${currentChainId}:${isHeldTab ? account : activeTab}:${isHeldTab ? rwaListWithBalanceKey : 'all'}`
   }, [account, activeTab, currentChainId, initialized, isHeldTab, rwaListWithBalanceKey])
 
-  const [isPrevEnabled, setIsPrevEnabled] = useState(false)
-  const [isNextEnabled, setIsNextEnabled] = useState(false)
+
+  const [pageNum, setPageNum] = useState(1)
+  const [total, setTotal] = useState(0)
+
   // next: true，执行下一页，false，执行上一页
-  const handleGetStockAction = useCallback(async (t?: TabKey, next: boolean = true) => {
+  const handleGetStockAction = useCallback(async (t?: TabKey, _pageNum: number = 1) => {
     if (!currentChainId || (t === 'history' && (!account || !validSignature()))) {
-      setIsPrevEnabled(false)
-      setIsNextEnabled(false)
       setEventList([])
       setHasLoadedCurrentKey(true)
       setIsLoading(false)
@@ -114,8 +112,6 @@ export default function RecordsSection() {
     }
 
     if (t === 'held' && isRwaBalanceReady && rwaListWithBalanceSorted.length <= 0) {
-      setIsPrevEnabled(false)
-      setIsNextEnabled(false)
       setEventList([])
       setHasLoadedCurrentKey(true)
       setIsLoading(false)
@@ -124,47 +120,27 @@ export default function RecordsSection() {
 
     const res = await eventApi.getStockAction(
       currentChainId, 
-      !next ? beforeRef.current : undefined,
-      next? afterRef.current : undefined, 
+      _pageNum,
       t === 'held' ? rwaListWithBalanceKey : undefined, 
       PAGE_LIMIT
     )
     
     if (res?.code === RESPONSE_CODE.SUCCESS) {
       setHasLoadedCurrentKey(true)
-      const data = res?.data || []
+      const data = res?.data?.list || []
+      if (total === 0) {
+        setTotal(res?.data?.total || 0)
+      }
       if (data.length > 0) {
-        if (next && afterRef.current) {
-          setIsPrevEnabled(true)
-        }
-        
-        beforeRef.current = data[0].id
-        afterRef.current = data[data.length - 1].id
         setEventList(data)
-        setIsNextEnabled(data.length >= PAGE_LIMIT)
-       
-      } else {
-        if (beforeRef.current) {
-          if (next) {
-            setIsPrevEnabled(true)
-            setIsNextEnabled(false)
-          }
-          if (!next) {
-            setIsPrevEnabled(false)
-            setIsNextEnabled(true)
-          }
-        } else {
-          setIsPrevEnabled(false)
-          setIsNextEnabled(false)
-        }
-        
+        setPageNum(_pageNum)
       }
     }
     setTimeout(() => {
       setIsLoading(false)
-    }, 500)
+    }, 300)
 
-  }, [currentChainId, account, isRwaBalanceReady, rwaListWithBalanceKey, rwaListWithBalanceSorted, validSignature])
+  }, [currentChainId, account, isRwaBalanceReady, rwaListWithBalanceKey, rwaListWithBalanceSorted, validSignature, pageNum, total])
 
   const initRef = useRef<string>('')
   const {
@@ -195,13 +171,11 @@ export default function RecordsSection() {
     }
     setEventList([])
     setIsLoading(true)
-    afterRef.current = undefined
   }, [isSwitchingChain])
 
   useEffect(() => {
     if (!initialized || !currentChainId || (isHeldTab && !account)) {
       initRef.current = ''
-      afterRef.current = undefined
       setEventList([])
       setHasLoadedCurrentKey(false)
       setIsLoading(false)
@@ -220,12 +194,11 @@ export default function RecordsSection() {
     }
 
     initRef.current = currentRequestKey
-    afterRef.current = undefined
     setEventList([])
     setHasLoadedCurrentKey(false)
     setIsLoading(true)
-    handleGetStockAction(activeTab)
-  }, [activeTab, currentChainId, account, initialized, isHeldTab, isRwaBalanceReady, currentRequestKey, handleGetStockAction])
+    handleGetStockAction(activeTab, 1)
+  }, [activeTab, currentChainId, account, initialized, isHeldTab, isRwaBalanceReady, currentRequestKey])
 
 
   const setTokenWithPriceByWebSocketData = useBaseStore(
@@ -260,11 +233,10 @@ export default function RecordsSection() {
     if (isLoading) return
     setActiveTab(t);
     setIsLoading(true)
-    setIsPrevEnabled(false)
-    setIsNextEnabled(false)
-    afterRef.current = undefined
-    beforeRef.current = undefined
-    handleGetStockAction(t)
+    setTotal(0)
+    setPageNum(1)
+
+    // handleGetStockAction(t, 1)
   }, [isLoading])
 
   return (
@@ -308,19 +280,19 @@ export default function RecordsSection() {
                     shouldShowEmpty && <NoRecord />
                   }
                   <div className='mt-6'>
-                    {((isPrevEnabled || isNextEnabled)) && (
+                    {total >= PAGE_LIMIT && (
                         <div className='mt-2'>
                           <Pagination
-                            prevDisabled={!isPrevEnabled}
-                            nextDisabled={!isNextEnabled}
+                            prevDisabled={pageNum <= 1}
+                            nextDisabled={displayEventList.length < PAGE_LIMIT}
                             onPrevClick={() => {
                               setIsLoading(true)
-                              handleGetStockAction(activeTab, false)
+                              handleGetStockAction(activeTab, pageNum - 1)
                             }}
                             className={''}
                             onNextClick={() => {
                               setIsLoading(true)
-                              handleGetStockAction(activeTab, true)
+                              handleGetStockAction(activeTab, pageNum + 1)
                             }}
                           />
                         </div>
