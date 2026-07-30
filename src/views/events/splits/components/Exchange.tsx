@@ -1,6 +1,5 @@
 import CopyButton from "@/components/button/copyButton";
 import { TooltipWithBorder } from "@/components/icon-tooltip";
-import { Trans } from "@/components/trans";
 import { Button } from "@/components/ui/button";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useToast } from "@/hooks/useToast";
@@ -10,7 +9,7 @@ import { useSplit } from "@/hooks/useTrading";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { IStockActionEvent } from "@/service/event/types";
 import { useBaseStore } from "@/stores/baseStore";
-import { formatTimestamp, parseAmount, shortenAddress } from "@/utils";
+import { formatAmount, formatTimestamp, parseAmount, shortenAddress } from "@/utils";
 import BigNumber from "bignumber.js";
 import { ChevronDown, Copy, AlertTriangle, SpaceIcon } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -30,7 +29,7 @@ export function formatAmountForDisplay(value?: string | number | BigNumber.Value
     return '<0.01'
   }
   const formatted = amount
-  .decimalPlaces(2, BigNumber.ROUND_DOWN)
+  .decimalPlaces(6, BigNumber.ROUND_DOWN)
   .toFixed()
 
   return formatted.includes('.')
@@ -53,7 +52,7 @@ function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {
   }
 
   const formatted = amount
-  .decimalPlaces(2, BigNumber.ROUND_DOWN)
+  .decimalPlaces(6, BigNumber.ROUND_DOWN)
   .toFixed()
 
   return formatted.includes('.')
@@ -63,7 +62,8 @@ function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {
 
 function calcFractionalShares(
   eventData: IStockActionEvent | null,
-  balance: string
+  balance: string,
+  decimals: number
 ) {
   if (!eventData) {
     return {
@@ -76,6 +76,7 @@ function calcFractionalShares(
   const shares = new BigNumber(balance)
     .multipliedBy(eventData.payoutAmount ?? '0')
     .dividedBy(eventData.payinAmount ?? '1')
+    .dividedBy(10 ** decimals)
 
   // 整数部分
   const integerPart = shares
@@ -85,14 +86,14 @@ function calcFractionalShares(
   // 小数部分（截断保留 2 位）
   const fractionalPart = shares
     .minus(integerPart)
-    .decimalPlaces(2, BigNumber.ROUND_DOWN)
-    .toFixed(2)
+    .decimalPlaces(6, BigNumber.ROUND_DOWN)
+    .toFixed(6)
 
   // 小数部分价值
   const fractionalValue = new BigNumber(fractionalPart)
     .multipliedBy(eventData.fractionalSharesAvgPrice ?? '0')
-    .decimalPlaces(2, BigNumber.ROUND_DOWN)
-    .toFixed(2)
+    .decimalPlaces(6, BigNumber.ROUND_DOWN)
+    .toFixed(6)
 
   return {
     integerPart,
@@ -152,7 +153,7 @@ export function ExchangeStock({
   const paymentToken = useGetTokenByAddress(currentEvent?.paymentAddress)
   const payinTokenBalance = useTokenBalance(currentEvent?.payinAddress || '')
   const isHold = Number(payinTokenBalance?.balance) > 0 && account
-  const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance?.balance ?? '0')
+  const { integerPart, fractionalValue, fractionalPart } = calcFractionalShares(currentEvent, payinTokenBalance?.origin ?? '0', payinToken?.decimals || 6)
 
   const [loading, setLoading] = useState(false)
 
@@ -210,8 +211,12 @@ export function ExchangeStock({
                 </div>
               </div>
               {
-                isHold && account ? <span className="text-white text-[20px] font-semibold">{payinTokenBalance.balance || '--'}</span>
-                       : <span className="text-[#737A87] text-[20px] font-semibold">{ account ? t('events.t40') : '--'}</span>
+                isHold && account 
+                  ? <TooltipWithBorder tooltip={payinTokenBalance?.origin ? formatAmount(payinTokenBalance?.origin ?? 0, payinToken?.decimals) : '--'} className="cursor-pointer text-white text-[20px] font-semibold">
+                      {payinTokenBalance.balance || '--'}
+                    </TooltipWithBorder>
+                  // <span className="text-white text-[20px] font-semibold">{payinTokenBalance.balance || '--'}</span>
+                  : <span className="text-[#737A87] text-[20px] font-semibold">{ account ? t('events.t40') : '--'}</span>
               }
               
             </div>
@@ -260,8 +265,17 @@ export function ExchangeStock({
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[#9cff3a] text-[20px] font-semibold">{formatAmountForDisplay(fractionalValue)}</span>
-                    <span className="text-[#9da3af] text-[12px]">{t("events.t27")} {`${formatQuantityForDisplay(fractionalPart)} ${payinToken?.symbol}`}</span>
+                    <span className="text-[#9cff3a] text-[20px] font-semibold">
+                      <TooltipWithBorder tooltip={fractionalValue} className="cursor-pointer text-[#9cff3a] text-[20px] font-semibold">
+                        {formatAmountForDisplay(fractionalValue)}
+                      </TooltipWithBorder>
+                    </span>
+                    <span className="text-[#9da3af] text-[12px] inline-flex items-center gap-x-[4px] mt-[2px]">{t("events.t27")} 
+                      <TooltipWithBorder tooltip={fractionalPart} className="cursor-pointer ">
+                        {formatQuantityForDisplay(fractionalPart)}
+                      </TooltipWithBorder>
+                      {`${payinToken?.symbol}`}
+                    </span>
                   </div>
                 </div>
               )
