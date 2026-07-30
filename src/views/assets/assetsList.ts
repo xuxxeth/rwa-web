@@ -86,7 +86,10 @@ export function useAssetsList(chainId: number) {
         }
         return token
       })
-      .filter(token => token.holdings !== undefined && isGreater(token.holdings, '0'))
+      .filter(
+        token =>
+          token.isStableToken || (token.holdings !== undefined && isGreater(token.holdings, '0'))
+      )
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
   const estimatedRwaTotalValue =
