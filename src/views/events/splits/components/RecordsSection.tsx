@@ -257,6 +257,7 @@ export default function RecordsSection() {
   }, [kycStatus, account])
 
   const handleTabChange = useCallback(async (t: TabKey) => {
+    if (isLoading) return
     setActiveTab(t);
     setIsLoading(true)
     setIsPrevEnabled(false)
@@ -264,7 +265,7 @@ export default function RecordsSection() {
     afterRef.current = undefined
     beforeRef.current = undefined
     handleGetStockAction(t)
-  }, [])
+  }, [isLoading])
 
   return (
     <div className='min-h-[680px] rounded-[16px] w-full'>
