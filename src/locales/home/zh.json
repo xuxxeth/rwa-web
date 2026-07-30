@@ -72,9 +72,9 @@
       },
       {
         "subLabel": "FEE MODEL",
-        "value": "0.2%",
-        "title": "透明的费用模型",
-        "description": "費用透明、鏈上可驗證，無滑點博弈，「成本即規則」。"
+        "value": "0.05%",
+        "title": "原始成本，零加价",
+        "description": "直接向经纪人执行，真正的直通定价和零隐藏费用。"
       },
       {
         "subLabel": "LIQUIDITY",

@@ -72,9 +72,9 @@
       },
       {
         "subLabel": "FEE MODEL",
-        "value": "0.2%",
-        "title": "Transparent Fee Model",
-        "description": "Fully verifiable on-chain fees with zero slippage gaming. \"The code is the rule.\""
+        "value": "0.05%",
+        "title": "Raw Costs, Zero Markups",
+        "description": "Direct-to-broker execution with true pass-through pricing and zero hidden fees."
       },
       {
         "subLabel": "LIQUIDITY",
