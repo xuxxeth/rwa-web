@@ -52,7 +52,13 @@ function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {
     return '<0.01'
   }
 
-  return amount.decimalPlaces(2, BigNumber.ROUND_DOWN).toFixed().replace(/\.0+$/, '').replace(/\.?0+$/, '')
+  const formatted = amount
+  .decimalPlaces(2, BigNumber.ROUND_DOWN)
+  .toFixed()
+
+  return formatted.includes('.')
+    ? formatted.replace(/\.?0+$/, '')
+    : formatted
 }
 
 function calcFractionalShares(
@@ -63,31 +69,36 @@ function calcFractionalShares(
     return {
       integerPart: '0',
       fractionalValue: '0',
-      fractionalPart: '0'
+      fractionalPart: '0',
     }
   }
-  const shares = new BigNumber(balance || "0")
-    .multipliedBy(eventData.payoutAmount ?? "0")
-    .dividedBy(eventData.payinAmount ?? "1");
+
+  const shares = new BigNumber(balance)
+    .multipliedBy(eventData.payoutAmount ?? '0')
+    .dividedBy(eventData.payinAmount ?? '1')
 
   // 整数部分
   const integerPart = shares
     .integerValue(BigNumber.ROUND_DOWN)
-    .toFixed(0);
+    .toFixed(0)
 
-  // 小数部分
-  const fractionalPart = shares.minus(integerPart);
+  // 小数部分（截断保留 2 位）
+  const fractionalPart = shares
+    .minus(integerPart)
+    .decimalPlaces(2, BigNumber.ROUND_DOWN)
+    .toFixed(2)
 
-  // 小数部分 * 均价，保留 6 位小数（截断），去掉末尾 0
-  const fractionalValue = fractionalPart
-    .multipliedBy(eventData.fractionalSharesAvgPrice)
-    .toFixed();
+  // 小数部分价值
+  const fractionalValue = new BigNumber(fractionalPart)
+    .multipliedBy(eventData.fractionalSharesAvgPrice ?? '0')
+    .decimalPlaces(2, BigNumber.ROUND_DOWN)
+    .toFixed(2)
 
   return {
     integerPart,
+    fractionalPart,
     fractionalValue,
-    fractionalPart: fractionalPart.toFixed()
-  };
+  }
 }
 
 function AddressLabel({ address }: { address: string }) {
