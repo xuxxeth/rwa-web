@@ -99,4 +99,39 @@ export function TooltipWithBorder({
   )
 }
 
+export function NumberWithTooltip({
+  text,
+  tooltip,
+  children,
+  className,
+  triggerClassName
+}: {
+  text?: string
+  tooltip?: string
+  children?: React.ReactNode
+  className?: string
+  triggerClassName?: string
+}) {
+  if (parseFloat(tooltip || '') === 0) {
+    return (
+      <span className={cn(
+        "text-[12px] font-medium text-[#9DA3AF]",
+        className
+      )}>
+        { text || children}
+      </span>
+    )
+  }
+
+  return (
+    <TooltipWithBorder
+      tooltip={tooltip}
+      className={className}
+      triggerClassName={triggerClassName}
+    >
+      { text || children }
+    </TooltipWithBorder>
+  )
+}
+
 export default IconWithTooltip

@@ -14,7 +14,7 @@ import {
   isEqual,
 } from '@/utils'
 import BigNumber from 'bignumber.js'
-import IconWithTooltip, { TooltipWithBorder } from '@/components/icon-tooltip'
+import IconWithTooltip, { NumberWithTooltip, TooltipWithBorder } from '@/components/icon-tooltip'
 import { Trans } from 'react-i18next'
 
 function calcFractionalShares(
@@ -80,7 +80,6 @@ const exchangeTableConfig: ITableConfig<ITokenExchanged, { rwaTokens: IRwa[] }> 
     render: (item: ITokenExchanged, { rwaTokens }) => {
       const rwa = rwaTokens.find(token => token.address === item.payinToken)
       if (!rwa) return '--'
-      console.log('riskType', item.riskType)
       return (
         <div className='flex flex-row'>
           <TokenCell
@@ -156,10 +155,7 @@ const exchangeTableConfig: ITableConfig<ITokenExchanged, { rwaTokens: IRwa[] }> 
     key: 't30',
     sortable: false,
     render: (item: ITokenExchanged, { rwaTokens }) => {
-      console.log(
-        'rwaTokens',
-        rwaTokens.filter(item => item.stockId === 17)
-      )
+      
       const rwa = rwaTokens.find(token => checkAddressEqual(token.address, item.payoutToken))
       if (!rwa) return <TextCell className='text-sm/4.5' text='--none--' />
       const text = `+${item.payoutAmount} ${rwa.symbol}`
@@ -178,16 +174,16 @@ const exchangeTableConfig: ITableConfig<ITokenExchanged, { rwaTokens: IRwa[] }> 
       const fractionalText = `${amountToDisplay(fractionalShares)} ${rwa.symbol}`
       return (
         <div className='flex flex-col gap-[2px]'>
-          <TooltipWithBorder tooltip={item.paymentAmount} triggerClassName="justify-start" className="cursor-pointer text-sm/4.5 font-normal text-white">
+          <NumberWithTooltip tooltip={item.paymentAmount} triggerClassName="justify-start" className="cursor-pointer text-sm/4.5 font-normal text-white">
             {payoutText}
-          </TooltipWithBorder>
+          </NumberWithTooltip>
           
           <div className='flex flex-row gap-1 mt-[2px]'>
             <TextCellWithTranslation className='text-gray-500' text='events.t27' />
             {/* <TextCell className='text-gray-500' text={fractionalText} /> */}
-            <TooltipWithBorder tooltip={fractionalShares} triggerClassName="justify-start" className="cursor-pointer text-gray-500">
+            <NumberWithTooltip tooltip={fractionalShares} triggerClassName="justify-start" className="cursor-pointer text-gray-500">
               {fractionalText}
-            </TooltipWithBorder>
+            </NumberWithTooltip>
           </div>
         </div>
       )

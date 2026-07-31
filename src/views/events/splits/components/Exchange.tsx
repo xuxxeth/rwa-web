@@ -1,5 +1,5 @@
 import CopyButton from "@/components/button/copyButton";
-import { TooltipWithBorder } from "@/components/icon-tooltip";
+import { NumberWithTooltip, TooltipWithBorder } from "@/components/icon-tooltip";
 import { Button } from "@/components/ui/button";
 import { useActiveWeb3 } from "@/hooks/useActiveWe3";
 import { useToast } from "@/hooks/useToast";
@@ -29,7 +29,7 @@ export function formatAmountForDisplay(value?: string | number | BigNumber.Value
     return '<0.01'
   }
   const formatted = amount
-  .decimalPlaces(6, BigNumber.ROUND_DOWN)
+  .decimalPlaces(2, BigNumber.ROUND_DOWN)
   .toFixed()
 
   return formatted.includes('.')
@@ -52,7 +52,7 @@ function formatQuantityForDisplay(value?: string | number | BigNumber.Value) {
   }
 
   const formatted = amount
-  .decimalPlaces(6, BigNumber.ROUND_DOWN)
+  .decimalPlaces(2, BigNumber.ROUND_DOWN)
   .toFixed()
 
   return formatted.includes('.')
@@ -212,10 +212,9 @@ export function ExchangeStock({
               </div>
               {
                 isHold && account 
-                  ? <TooltipWithBorder tooltip={payinTokenBalance?.origin ? formatAmount(payinTokenBalance?.origin ?? 0, payinToken?.decimals) : '--'} className="cursor-pointer text-white text-[20px] font-semibold">
+                  ? <NumberWithTooltip tooltip={payinTokenBalance?.origin ? formatAmount(payinTokenBalance?.origin ?? 0, payinToken?.decimals) : '--'} className="cursor-pointer text-white text-[20px] font-semibold">
                       {payinTokenBalance.balance || '--'}
-                    </TooltipWithBorder>
-                  // <span className="text-white text-[20px] font-semibold">{payinTokenBalance.balance || '--'}</span>
+                    </NumberWithTooltip>
                   : <span className="text-[#737A87] text-[20px] font-semibold">{ account ? t('events.t40') : '--'}</span>
               }
               
@@ -266,14 +265,14 @@ export function ExchangeStock({
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[#9cff3a] text-[20px] font-semibold">
-                      <TooltipWithBorder tooltip={fractionalValue} className="cursor-pointer text-[#9cff3a] text-[20px] font-semibold">
+                      <NumberWithTooltip tooltip={fractionalValue} className="cursor-pointer text-[#9cff3a] text-[20px] font-semibold">
                         {formatAmountForDisplay(fractionalValue)}
-                      </TooltipWithBorder>
+                      </NumberWithTooltip>
                     </span>
                     <span className="text-[#9da3af] text-[12px] inline-flex items-center gap-x-[4px] mt-[2px]">{t("events.t27")} 
-                      <TooltipWithBorder tooltip={fractionalPart} className="cursor-pointer ">
+                      <NumberWithTooltip tooltip={fractionalPart} className="cursor-pointer ">
                         {formatQuantityForDisplay(fractionalPart)}
-                      </TooltipWithBorder>
+                      </NumberWithTooltip>
                       {`${payinToken?.symbol}`}
                     </span>
                   </div>
