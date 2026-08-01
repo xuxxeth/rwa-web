@@ -56,7 +56,7 @@ export function useRiskControlAssets(chainId: number, account: string): IRiskCon
 
 export function useAssetsList(chainId: number) {
   const tokenList = useTokens()
-  const rwaList = useRwaTokens(false)
+  const rwaList = useRwaTokens(true)
 
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
   const [tokenWithPrice, setTokenWithPrice] = useState<Record<string, { price: number }>>({})

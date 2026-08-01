@@ -31,7 +31,7 @@ export function useRwaTokens(includeDelisted: boolean = true) {
     if (includeDelisted) {
       return rwaList.filter(rwa => rwa.chainId === currentChainId)
     }
-    return rwaList.filter(rwa => rwa.state !== 2 && rwa.chainId === currentChainId)
+    return rwaList.filter(rwa => rwa.showState).filter(rwa => rwa.state !== 2 && rwa.chainId === currentChainId)
   }, [rwaList, includeDelisted, currentChainId])
 }
 
