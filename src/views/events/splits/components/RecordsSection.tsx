@@ -16,7 +16,7 @@ import { ExchangeStock } from './Exchange'
 import { KycTip } from './KycTip'
 import { useKycStatus } from '@/hooks/useKycStatus'
 import { KYC_OVERALL_STATUS } from '@/service/kyc/types'
-import { useGetRwaByAddress } from '@/hooks/useTokens'
+import { useGetRwaByAddress, useRwaTokens } from '@/hooks/useTokens'
 import { useGetTokenBalances } from '@/hooks/useTokenBalances'
 import { WalletNotConnectedSmallVersion } from '@/components/wallet-not-connected'
 import { CircleLoading } from '@/components/loading'
@@ -53,13 +53,12 @@ export default function RecordsSection() {
   const [isLoading, setIsLoading] = useState(false)
   const [hasLoadedCurrentKey, setHasLoadedCurrentKey] = useState(false)
 
-  const rwaList = useRwas()
+  const rwaList = useRwaTokens(true)
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
   const currentChainRwaList = useMemo(() => {
     if (!currentChainId) {
       return []
     }
-
     return rwaList.filter(rwa => rwa.chainId === currentChainId)
   }, [currentChainId, rwaList])
   const isHeldTab = activeTab === 'held'
