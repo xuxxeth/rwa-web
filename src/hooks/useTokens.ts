@@ -29,7 +29,7 @@ export function useRwaTokens(includeDelisted: boolean = true) {
 
   return useMemo(() => {
     if (includeDelisted) {
-      return rwaList
+      return rwaList.filter(rwa => rwa.chainId === currentChainId)
     }
     return rwaList.filter(rwa => rwa.state !== 2 && rwa.chainId === currentChainId)
   }, [rwaList, includeDelisted, currentChainId])

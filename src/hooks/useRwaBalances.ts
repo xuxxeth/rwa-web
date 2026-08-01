@@ -43,12 +43,12 @@ export function useRwaBalances() {
 export function useRwas() {
   const rwaList = useBaseStore(state => state.rwaList)
   
-  return rwaList
+  return rwaList.filter(token => token.showState)
 }
 
 export function useRwaByStockId(stockId?: number) {
   const rwaList = useBaseStore(state => state.rwaList)
   return useMemo(() => {
-    return rwaList.find(token => token.stockId === stockId)
+    return rwaList.filter(token => token.showState).find(token => token.stockId === stockId)
   }, [rwaList])
 }
