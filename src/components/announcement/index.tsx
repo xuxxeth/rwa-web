@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { cn } from '@/utils'
 import { LazyImage } from '../image/LazyImage'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useAppStore } from '@/stores/appStore'
 
 type AnnouncementItem = {
   id: string
@@ -56,29 +57,6 @@ const mockAnnouncementsList: Record<string, AnnouncementItem[]> = {
   ]
 }
 
-const mockAnnouncements: AnnouncementItem[] = [
-  {
-    id: '1',
-    title: 'NVDA于2026年6月80日进行拆股',
-    content:
-      '这里是更长的公告内容用于模拟内容不足时后续公告补位展示效果。一一一一一一一一一一一一一一一一一一',
-    link: 'https://example.com/announcement-1',
-  },
-  {
-    id: '2',
-    title: 'AAPL于2026年6月80日进行拆股',
-    content:
-      '这里是更长的公告内容用于模拟内容不足时后续公告补位展示效果。二二二二二二二二二二二二二',
-    link: 'https://example.com/announcement-2',
-  },
-  {
-    id: '3',
-    title: '微软于2026年6月80日进行拆股',
-    content:
-      '这里是更长的公告内容用于模拟内容不足时后续公告补位展示效果。三三三三三三三三三三',
-    link: 'https://example.com/announcement-3',
-  },
-]
 
 export type AnnouncementBannerProps = {
   className?: string
@@ -106,6 +84,8 @@ export function AnnouncementBanner({
     return Math.max(announcements.length, 1) * 20
   }, [announcements.length])
 
+  const setShowAnnouncement = useAppStore(state => state.setShowAnnouncement)
+
   useEffect(() => {
     const updateScrollDistance = () => {
       setScrollDistance(
@@ -113,7 +93,11 @@ export function AnnouncementBanner({
       )
     }
 
+    if (announcements.length >= 0) {
+      setShowAnnouncement(true)
+    }
     updateScrollDistance()
+
 
     if (!firstGroupRef.current || typeof ResizeObserver === 'undefined') {
       return
@@ -201,6 +185,7 @@ export function AnnouncementBanner({
           type="button"
           onClick={() => {
             announcementDismissed.current = true
+            setShowAnnouncement(false)
             setIsVisible(false)
           }}
           className="

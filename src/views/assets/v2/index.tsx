@@ -12,6 +12,7 @@ import SignatureVerify from '@/components/signature-verify'
 import AssetsSVG from '@/assets/portfolio/assets.svg?react'
 import OrderSVG from '@/assets/portfolio/order.svg?react'
 import { useEffect, useRef } from 'react'
+import { cn } from '@/utils/tw'
 
 function Portfolio() {
   const isWalletConnecting = useAppStore(state => state.isWalletConnecting)
@@ -43,11 +44,15 @@ function Portfolio() {
 function MainContent({ chainId, account }: { chainId: number; account: string }) {
   const { t } = useTranslation()
   const router = useRouter()
+  const showAnnouncement = useAppStore(state => state.showAnnouncement)
 
   const activeTab = router.location.pathname.includes('/order') ? 'order' : 'assets'
 
   return (
-    <div className='flex flex-row border-gray-900 border-y-4 text-white min-h-[calc(100vh-64px)] font-normal'>
+    <div className={cn(
+      'flex flex-row border-gray-900 border-y-4 text-white min-h-[calc(100vh-64px)] font-normal',
+      showAnnouncement ? 'border-t-0' : 'border-t-4'
+    )}>
       <div className='flex-none px-4 pt-4 border-gray-900 border-r-4 w-[224px]'>
         <div className='flex flex-row items-center px-3 py-2.5 gap-2.5 bg-gray-900 rounded-sm border border-gray-850 text-gray-500'>
           <LazyImage className='w-4 h-4' src='/images/v2/portfolio/my.svg' />
