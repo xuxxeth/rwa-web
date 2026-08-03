@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/utils'
 import { LazyImage } from '../image/LazyImage'
+import { useTranslation } from '@/hooks/useTranslation'
 
 type AnnouncementItem = {
   id: string
@@ -11,6 +12,49 @@ type AnnouncementItem = {
 }
 
 const announcementDismissed = { current: false }
+
+const mockAnnouncementsList: Record<string, AnnouncementItem[]> = {
+  "zh": [
+    {
+      "id": "1",
+      "title": "NVDA於2026年6月80日進行拆股",
+      "content": "這裡是更長的公告內容，用於模擬內容不足時後續公告補位展示效果。一一一一一一一一一一一一一一一一一一",
+      "link": "https://example.com/announcement-1"
+    },
+    {
+      "id": "2",
+      "title": "AAPL於2026年6月80日進行拆股",
+      "content": "這裡是更長的公告內容，用於模擬內容不足時後續公告補位展示效果。二二二二二二二二二二二二二",
+      "link": "https://example.com/announcement-2"
+    },
+    {
+      "id": "3",
+      "title": "微軟於2026年6月80日進行拆股",
+      "content": "這裡是更長的公告內容，用於模擬內容不足時後續公告補位展示效果。三三三三三三三三三三",
+      "link": "https://example.com/announcement-3"
+    }
+  ],
+  "en": [
+    {
+      "id": "1",
+      "title": "NVDA will conduct a stock split on June 80, 2026",
+      "content": "This is longer announcement content used to simulate the display effect when additional announcements are needed to fill insufficient content. One one one one one one one one one",
+      "link": "https://example.com/announcement-1"
+    },
+    {
+      "id": "2",
+      "title": "AAPL will conduct a stock split on June 80, 2026",
+      "content": "This is longer announcement content used to simulate the display effect when additional announcements are needed to fill insufficient content. Two two two two two two two two two",
+      "link": "https://example.com/announcement-2"
+    },
+    {
+      "id": "3",
+      "title": "Microsoft will conduct a stock split on June 80, 2026",
+      "content": "This is longer announcement content used to simulate the display effect when additional announcements are needed to fill insufficient content. Three three three three three three three",
+      "link": "https://example.com/announcement-3"
+    }
+  ]
+}
 
 const mockAnnouncements: AnnouncementItem[] = [
   {
@@ -45,6 +89,7 @@ export function AnnouncementBanner({
   className,
   top = 60,
 }: AnnouncementBannerProps) {
+  const { t, i18n } = useTranslation()
   const [isVisible, setIsVisible] = useState(
     !announcementDismissed.current
   )
@@ -52,8 +97,9 @@ export function AnnouncementBanner({
 
   const announcements = useMemo(() => {
     // 复制一份实现无缝循环
-    return [...mockAnnouncements, ...mockAnnouncements]
-  }, [])
+    const language = i18n.language || 'en'
+    return [...mockAnnouncementsList[language]]
+  }, [i18n.language])
 
   if (!isVisible) return null
 
