@@ -72,7 +72,7 @@ export function Menus() {
           <SettingSubMenus />
         </div>
       </div>
-      {/* <AnnouncementBanner /> */}
+      <AnnouncementBanner />
     </>
   );
 }
