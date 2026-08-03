@@ -48,6 +48,7 @@ export function AnnouncementBanner({
   const [isVisible, setIsVisible] = useState(
     !announcementDismissed.current
   )
+  const [isPaused, setIsPaused] = useState(false)
 
   const announcements = useMemo(() => {
     // 复制一份实现无缝循环
@@ -61,16 +62,20 @@ export function AnnouncementBanner({
       className={cn('w-full pointer-events-none bg-[#131416]', className)}
       style={{ top }}
     >
-      <div className="pointer-events-auto overflow-hidden bg-[rgba(243,161,63,0.1)]">
+      <div
+        className="pointer-events-auto overflow-hidden bg-[rgba(243,161,63,0.1)] pr-[50px] relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
 
-        <div className="relative flex h-[40px] items-center overflow-hidden px-4 pr-12 text-[#E9E9E9]">
+        <div className="relative flex h-[40px] items-center overflow-hidden px-4 pr-20 text-[#E9E9E9]">
 
-          <div
+            <div
             className="
               flex whitespace-nowrap
               animate-announcement-scroll
-              hover:[animation-play-state:paused]
             "
+            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
           >
             {announcements.map((announcement, index) => (
               <button
@@ -112,32 +117,33 @@ export function AnnouncementBanner({
           </div>
 
 
-          <button
-            type="button"
-            onClick={() => {
-              announcementDismissed.current = true
-              setIsVisible(false)
-            }}
-            className="
-              absolute
-              right-2
-              top-1/2
-              flex
-              h-8
-              w-8
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              text-[#D8AE45]
-              hover:bg-white/5
-              hover:text-white
-            "
-          >
-            <X size={16} strokeWidth={2.5} />
-          </button>
+          
 
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            announcementDismissed.current = true
+            setIsVisible(false)
+          }}
+          className="
+            absolute
+            right-2
+            top-1/2
+            flex
+            h-8
+            w-8
+            -translate-y-1/2
+            items-center
+            justify-center
+            rounded-full
+            text-white
+            hover:bg-white/5
+            hover:text-white
+          "
+        >
+          <X size={16} strokeWidth={2.5} />
+        </button>
 
       </div>
     </div>
