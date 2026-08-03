@@ -529,10 +529,10 @@ body {
   }
 
   to {
-    transform: translateX(-50%);
+    transform: translateX(calc(-1 * var(--announcement-distance, 0px)));
   }
 }
 
 .animate-announcement-scroll {
-  animation: announcement-scroll 25s linear infinite;
+  animation: announcement-scroll var(--announcement-duration, 25s) linear infinite;
 }

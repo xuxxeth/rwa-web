@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/utils'
 import { LazyImage } from '../image/LazyImage'
@@ -89,17 +89,41 @@ export function AnnouncementBanner({
   className,
   top = 60,
 }: AnnouncementBannerProps) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const [isVisible, setIsVisible] = useState(
     !announcementDismissed.current
   )
   const [isPaused, setIsPaused] = useState(false)
+  const firstGroupRef = useRef<HTMLDivElement | null>(null)
+  const [scrollDistance, setScrollDistance] = useState(0)
 
   const announcements = useMemo(() => {
-    // 复制一份实现无缝循环
     const language = i18n.language || 'en'
     return [...mockAnnouncementsList[language]]
   }, [i18n.language])
+
+  const scrollDuration = useMemo(() => {
+    return Math.max(announcements.length, 1) * 20
+  }, [announcements.length])
+
+  useEffect(() => {
+    const updateScrollDistance = () => {
+      setScrollDistance(
+        firstGroupRef.current?.getBoundingClientRect().width ?? 0
+      )
+    }
+
+    updateScrollDistance()
+
+    if (!firstGroupRef.current || typeof ResizeObserver === 'undefined') {
+      return
+    }
+
+    const observer = new ResizeObserver(updateScrollDistance)
+    observer.observe(firstGroupRef.current)
+
+    return () => observer.disconnect()
+  }, [announcements])
 
   if (!isVisible) return null
 
@@ -116,54 +140,61 @@ export function AnnouncementBanner({
 
         <div className="relative flex h-[40px] items-center overflow-hidden px-4 pr-20 text-[#E9E9E9]">
 
-            <div
-            className="
-              flex whitespace-nowrap
-              animate-announcement-scroll
-            "
-            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
+          <div
+            className="flex w-max items-center whitespace-nowrap animate-announcement-scroll"
+            style={{
+              animationPlayState: isPaused ? 'paused' : 'running',
+              ['--announcement-duration' as string]: `${scrollDuration}s`,
+              ['--announcement-distance' as string]: `${scrollDistance}px`,
+            }}
           >
-            {announcements.map((announcement, index) => (
-              <button
-                key={`${announcement.id}-${index}`}
-                type="button"
-                onClick={() =>
-                  window.open(
-                    announcement.link,
-                    '_blank',
-                    'noopener,noreferrer'
-                  )
-                }
-                className="
-                  inline-flex
-                  shrink-0
-                  items-center
-                  gap-2
-                  mr-8
-                  max-w-[42vw]
-                  text-left
-                  cursor-pointer
-                  hover:opacity-90
-                "
+            {[0, 1].map((groupIndex) => (
+              <div
+                key={groupIndex}
+                ref={groupIndex === 0 ? firstGroupRef : undefined}
+                className="flex shrink-0 items-center gap-8 pr-8"
+                aria-hidden={groupIndex === 1}
               >
-                <LazyImage
-                  src="/images/icons/annouce.png"
-                  className="h-[14px] w-[14px] max-w-none"
-                />
+                {announcements.map((announcement) => (
+                  <button
+                    key={`${groupIndex}-${announcement.id}`}
+                    type="button"
+                    onClick={() =>
+                      window.open(
+                        announcement.link,
+                        '_blank',
+                        'noopener,noreferrer'
+                      )
+                    }
+                    className="
+                      inline-flex
+                      shrink-0
+                      items-center
+                      gap-2
+                      max-w-[42vw]
+                      text-left
+                      cursor-pointer
+                      hover:opacity-90
+                    "
+                  >
+                    <div className="h-[14px] w-[14px]" >
+                      <LazyImage
+                        src="/images/icons/annouce.png"
+                        className="h-[14px] w-[14px] max-w-none"
+                      />
+                    </div>
+                    <span className="shrink-0 text-[14px] font-semibold">
+                      {announcement.title}
+                    </span>
 
-                <span className="shrink-0 text-[14px] font-semibold">
-                  {announcement.title}
-                </span>
-
-                <span className="truncate text-[14px] font-normal">
-                  {announcement.content}
-                </span>
-              </button>
+                    <span className="truncate text-[14px] font-normal">
+                      {announcement.content}
+                    </span>
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
-
-
-          
 
         </div>
         <button

@@ -291,7 +291,7 @@ export function ExchangeStock({
             <TooltipWithBorder tooltip={t('events.t281')} className="cursor-pointer text-[14px]">
               {t('events.t28')}
             </TooltipWithBorder>
-          } value={currentEvent?.fractionalSharesAvgPrice ? `${formatAmountForDisplay(currentEvent?.fractionalSharesAvgPrice)} ${paymentToken?.symbol}/` + t('events.t39') : '--'} valueColor="text-[#9cff3a]" />
+          } value={currentEvent?.fractionalSharesAvgPrice ? `${formatAmountForDisplay(currentEvent?.fractionalSharesAvgPrice)} ${paymentToken?.symbol ?? '--'}/` + t('events.t39') : '--'} valueColor="text-[#9cff3a]" />
           <InfoRow label={t('events.t11')} value={currentEvent?.exchangeStartTime ? formatTimestamp(currentEvent?.exchangeStartTime, true) : '--'} />
           <InfoRow label={t('events.t12')} value={currentEvent?.exchangeEndTime ? formatTimestamp(currentEvent?.exchangeEndTime, true) : '--'}/>
         </div>
