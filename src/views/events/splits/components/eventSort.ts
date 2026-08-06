@@ -8,8 +8,8 @@ export const EVENT_STATUS_ORDER: Record<number, number> = {
 }
 
 export function getEventSortTime(event: IStockActionEvent) {
-  const extendedEvent = event as IStockActionEvent & { createTime?: number; createdTime?: number }
-  return extendedEvent.createTime ?? extendedEvent.createdTime ?? event.exchangeStartTime ?? event.id
+  const extendedEvent = event as IStockActionEvent & { createTime?: number; createdTime?: number;  }
+  return extendedEvent.exchangeStartTime ?? extendedEvent.exchangeStartTime ?? event.id
 }
 
 export function sortEventsByStatusAndTime(events: IStockActionEvent[]) {
@@ -21,6 +21,6 @@ export function sortEventsByStatusAndTime(events: IStockActionEvent[]) {
       return leftStatus - rightStatus
     }
 
-    return getEventSortTime(right) - getEventSortTime(left)
+    return getEventSortTime(left) - getEventSortTime(right)
   })
 }
