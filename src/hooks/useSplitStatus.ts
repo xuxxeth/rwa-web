@@ -15,7 +15,7 @@ export function useSplitStatus(token?: IRwa | null) {
 
   const filterListBalance = useMemo(() => {
     if (filterList.length <= 0) return []
-    return filterList.filter(rwa => tokenWithBalance[symbolToLower(rwa.address)])
+    return filterList.filter(rwa => Number(tokenWithBalance[symbolToLower(rwa.address)]?.origin) > 0)
   }, [filterList, tokenWithBalance])
 
   return filterListBalance
