@@ -259,7 +259,7 @@ export function ExchangeStock({
                   <div className="flex items-center gap-2">
                     <img src={'/images/tokens/usdt.png'} alt="USDT" className="w-6 h-6 rounded-full object-cover" />
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-white text-[14px] font-semibold">USDT</span>
+                      <span className="text-white text-[14px] font-semibold">{paymentToken?.symbol ?? '--'}</span>
                       <span className="text-[#9da3af] text-[12px]">{t("events.t26")}</span>
                     </div>
                   </div>
