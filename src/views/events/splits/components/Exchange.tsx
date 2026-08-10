@@ -235,7 +235,7 @@ export function ExchangeStock({
             {/* AMZNt row */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img src={payoutToken?.icon} alt="AMZNt" className="w-6 h-6 rounded-full object-cover" />
+                <img src={payoutToken?.icon ?? payinToken?.icon} alt="AMZNt" className="w-6 h-6 rounded-full object-cover" />
                 <div className="flex flex-col gap-0.5">
                   <span className="text-white text-[14px] font-semibold">{payoutToken?.symbol || '--'}</span>
                   <AddressLabel address={payoutToken?.address || ''} />
@@ -257,7 +257,7 @@ export function ExchangeStock({
               isHold && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <img src={'/images/tokens/usdt.png'} alt="USDT" className="w-6 h-6 rounded-full object-cover" />
+                    <img src={paymentToken?.icon} alt="USDT" className="w-6 h-6 rounded-full object-cover" />
                     <div className="flex flex-col gap-0.5">
                       <span className="text-white text-[14px] font-semibold">{paymentToken?.symbol ?? '--'}</span>
                       <span className="text-[#9da3af] text-[12px]">{t("events.t26")}</span>

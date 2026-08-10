@@ -4,49 +4,36 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { formatTimestamp } from "@/utils/format";
 
 const template = {
-  zh: `郵件主題： 【資產置換人工處理申請】[股票代碼] - [您的帳戶地址後4位]
+  zh: `郵件主題： 【拆並股資產置換人工處理申請】[股票代碼] - [持倉錢包地址前4位...後4位]
 郵件正文：
-帳戶持有人身份驗證（Account Verification）
---------------------------------------------------
-* 持倉錢包地址：
-* 綁定的 KYC 姓名：
-* 綁定的 KYC 出生日期： (年/月/日)
+帳戶與資產详情（Account & Asset Details）
+ 
+- 持倉錢包地址（完整地址）：
+ 
+- 需置換的舊資產代碼（例如 NVDA.t）：
+ 
+免責聲明與授權確認（Acknowledgment & Authorization）
+ 
+1. 本人確認上述所提供之錢包地址及資產資訊均真實、完整且無誤。
+ 
+2. 本人已知悉並理解：因錯過平台規定的鏈上自主置換窗口期，現主動申請由平台客服與技術團隊進行後台人工核對及資產折算/置換。
+ 
+3. 本人理解並同意，人工數據核驗與鏈上處理需要一定的作業時間，置換結果將以鏈上最終核驗數據為準。
+ 
+安全提示（Security Notice）
+⚠️ 官方提醒：平台客服人員在任何情況下都「絕不會」向您索取錢包私鑰（Private Key）或助記詞（Mnemonic Phrase）。請勿向任何人透露您的私鑰資訊。`,        
 
-
-置換資產明細（Asset & Action Details）
---------------------------------------------------
-* 需置換的資產代碼： （例如：NVDA.t）
-* 申請置換的資產數量：
-* 申請置換的特定期數： （例如：共3期中的第1期，或填寫具體執行日期）
-
-
-免責與確認（Acknowledgment）
---------------------------------------------------
-本人確認上述提供的信息真實有效。由於錯過了平台規定的鏈上自主置換截止時間，現申請由客服後台協助進行人工核對及資產折算。
-
-本人已知悉人工處理需要一定的鏈上數據核驗時間。`,        
-
-  en: `Subject: [Manual Asset Replacement Application] [Asset Code] - [Last 4 Digits of Account Address]
-Body：
-Account Verification
---------------------------------------------------
-* Holding Wallet Address: 
-* Bound KYC Full Name: 
-* Bound KYC Date of Birth: (YYYY/MM/DD)
-    
-    
-Asset & Action Details
---------------------------------------------------
-* Asset Code for Replacement: (e.g., NVDA.t)
-* Asset Quantity for Replacement: 
-* Specific Batch/Tranche for Replacement: (e.g., Batch 1 of 3, or specify the execution date)
-    
-    
-Acknowledgment
---------------------------------------------------
-I hereby confirm that the information provided above is true and valid. As I have missed the platform's deadline for self-service on-chain asset replacement, I am requesting the customer service team to assist with manual verification and asset conversion on the backend.
-
-I acknowledge and understand that this manual process requires time for on-chain data verification.`
+  en: `Subject: [Manual Processing Request for Stock Split/Reverse Split Asset Swap] [Stock Ticker] - [First 4 & Last 4 Digits of Wallet Address]
+Email Body:
+Account & Asset Details
+- Wallet Address (Full Address):
+- Old Asset Ticker to Swap (e.g., NVDA.t):
+Acknowledgment & Authorization
+1. I confirm that all wallet address and asset information provided above is true, complete, and accurate.
+2. I acknowledge and understand that due to missing the platform's designated period for on-chain self-service swapping, I am hereby requesting the support and technical teams to conduct manual verification and execute asset conversion/swapping based on the corporate action (stock split/reverse split) ratio.
+3. I understand and agree that manual data verification and on-chain processing require administrative time, and the final swapped amount will be subject to the verified on-chain data and the official split ratio.
+Security Notice
+⚠️ Official Warning: Platform support staff will NEVER, under any circumstances, ask for your Wallet Private Key or Mnemonic Seed Phrase. Never share your private key or seed phrase with anyone.`
 }
 
 export function ExchangeTip({status, startTime}: {status: number, startTime: number}) {
