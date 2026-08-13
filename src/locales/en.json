@@ -932,6 +932,19 @@
     "t43": "Conversion Successful",
     "t44": "Conversion Failed",
     "t45": "The template has been copied to the clipboard",
-    "t46": "Suspicious activity detected on this address. Swapped tokens are frozen. Contact <0>{{email}}</0> for more info or to appeal."
+    "t46": "Suspicious activity detected on this address. Swapped tokens are frozen. Contact <0>{{email}}</0> for more info or to appeal.",
+    "t51": "股息分红",
+    "t52": "查看近期发生的上市公司股息事件，并一键领取股息奖励。",
+    "t53": "我的股息",
+    "t54": "全部派息",
+    "t55": "领取记录",
+    "t56": "股票名称/代码",
+    "t57": "派息时间",
+    "t58": "快照时间",
+    "t59": "每股股息",
+    "t60": "权益股数",
+    "t61": "待领取股息",
+    "t62": "操作",
+    "t63": "领取"
   }
 }

@@ -166,7 +166,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
             </div>
           </div>
           <div>
-            <h3 className='text-7xl font-bold md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-4 tracking-tighter'>
+            <h3 className='text-7xl font-bold md:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 mb-4 tracking-tighter'>
               {value}
               <span className='text-4xl text-[#9CFF3A] align-top ml-1'>{valueSuffix}</span>
             </h3>

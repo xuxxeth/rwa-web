@@ -24,6 +24,7 @@ export function EventsSubMenus({
   const router = useRouter();
   
   const isSplits = useMemo(() => router.location.pathname === "/splits", [router.location.pathname])
+  const isDividend = useMemo(() => router.location.pathname === "/dividend", [router.location.pathname])
 
   return (
     <HoverCard
@@ -62,13 +63,13 @@ export function EventsSubMenus({
               }}
               selected={isSplits}
             />
-            {/* <SubMenuItem title={t('Lite Trade')}
+            <SubMenuItem title={'Dividend'}
               onClick={() => {
-                router.push('/lite-trade')
+                router.push('/dividend')
                 setOpen(false)
               }}
-              selected={isLite}
-            /> */}
+              selected={isDividend}
+            />
             
           </div>
           

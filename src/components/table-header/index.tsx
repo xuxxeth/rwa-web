@@ -14,6 +14,7 @@ export type ITableConfig<T, U> = Array<{
   width?: number
   // 是否在空格处换行
   breakOnSpace?: boolean
+  className?: string
 }>
 
 export function TableBody<T, Extra>(props: {
@@ -47,12 +48,12 @@ export function TableBody<T, Extra>(props: {
               }
             }}
           >
-            {config.map(({ render, width, key }) => {
+            {config.map(({ render, width, key, className }) => {
               const style = width ? { flexBasis: width } : { flex: 1 }
               return (
                 <div
                   key={key}
-                  className={cn('flex flex-row items-center h-20 overflow-hidden', tdClassName)}
+                  className={cn('flex flex-row items-center h-20 overflow-hidden', tdClassName, className)}
                   style={style}
                 >
                   {render(item, extra)}
@@ -93,7 +94,7 @@ export function TableHeader<SortableField extends string, Item, Extra>({
         className
       )}
     >
-      {config.map(({ key, sortable, headerDirection, width, breakOnSpace }) => {
+      {config.map(({ key, sortable, headerDirection, width, breakOnSpace, className }) => {
         const style = width ? { flexBasis: width } : { flex: 1 }
         const order = sort?.field === key ? sort.order : undefined
         const text = t(`${lngPrefix}.${key}`)

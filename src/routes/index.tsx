@@ -25,6 +25,7 @@ const LivenessComplete = lazy(() => import('../views/identity/LivenessComplete')
 const Portfolio = lazy(() => import('../views/assets/v2'))
 const Referral = lazy(() => import('../views/referral'))
 const Splits = lazy(() => import('../views/events/splits'))
+const Dividend = lazy(() => import('../views/events/dividend'))
 
 
 // 路由表
@@ -82,6 +83,10 @@ const routes: RouteObject[] = [
   {
     path: '/splits',
     element: <Splits />,
+  },
+  {
+    path: '/dividend',
+    element: <Dividend />,
   },
   {
     path: '/kyc/liveness-complete',
