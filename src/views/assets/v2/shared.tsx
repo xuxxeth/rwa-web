@@ -619,20 +619,22 @@ export function OrderContentByPagination<
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const currentPageKeys = useMemo(() => data.map(item => String(scrollId(item))), [data, scrollId])
   const currentPageKeySignature = currentPageKeys.join('|')
-  const prevPageKeyRef = useRef<string>('')
+  const pageSelectionMapRef = useRef(new Map<string, string[]>())
 
   const emitSelection = useCallback((nextKeys: string[]) => {
     const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => nextKeys.includes(key))
+    pageSelectionMapRef.current.set(currentPageKeySignature, nextKeys)
     setSelectedRowKeys(nextKeys)
     onSelectRows?.(nextKeys, isAllSelected)
-  }, [currentPageKeys, onSelectRows])
+  }, [currentPageKeys, currentPageKeySignature, onSelectRows])
 
   useEffect(() => {
-    if (prevPageKeyRef.current && prevPageKeyRef.current !== currentPageKeySignature) {
-      emitSelection([])
-    }
-    prevPageKeyRef.current = currentPageKeySignature
-  }, [currentPageKeySignature, emitSelection])
+    const persistedSelection = pageSelectionMapRef.current.get(currentPageKeySignature) ?? []
+    setSelectedRowKeys(persistedSelection)
+
+    const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => persistedSelection.includes(key))
+    onSelectRows?.(persistedSelection, isAllSelected)
+  }, [currentPageKeySignature, currentPageKeys, onSelectRows])
 
   useEffect(() => {
     if (!showChecked || !selectedAll) return
