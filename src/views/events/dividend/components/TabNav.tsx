@@ -1,6 +1,7 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
+import { MultiWithdraw } from "./MultiWithdraw";
 
 export type TabKey = "held" | "all" | "history";
 
@@ -17,7 +18,7 @@ export function TabNav({ active, onChange }: TabNavProps) {
       { key: "history", label: t("events.t55") },
     ];
   return (
-    <div className="flex flex-col gap-5 pb-5 border-b border-[#282a2f] w-full mt-10">
+    <div className="flex items-center justify-between gap-5 pb-5 border-b border-[#282a2f] w-full mt-10">
       <div className="flex gap-8 items-end">
         {tabs.map((tab) => (
           <button
@@ -34,6 +35,7 @@ export function TabNav({ active, onChange }: TabNavProps) {
           </button>
         ))}
       </div>
+      <MultiWithdraw />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TabNav, type TabKey } from './TabNav'
 import type { IStockActionEvent } from '@/service/event/types'
 import { useAppStore } from '@/stores/appStore'
@@ -11,11 +11,13 @@ import { RecordHistoryTable } from './HistoryTable'
 import { MyRecordTable } from './MyRecordTable'
 import { AllRecordTable } from './AllRecordTable'
 import { KycTip } from '../../splits/components/KycTip'
+import { WithdrawContent } from './WithdrawContent'
+import { MultiWithdraw } from './MultiWithdraw'
 
 export default function RecordsSection() {
   
-  const exchangeDialog = useShowDialog()
   const kycTipDialog = useShowDialog()
+  const withdrawDialog = useShowDialog()
 
   const { kycStatus } = useKycStatus()
 
@@ -32,12 +34,17 @@ export default function RecordsSection() {
       kycTipDialog.show()
       return
     }
-    exchangeDialog.show()
   }, [kycStatus, account])
 
   const handleTabChange = useCallback(async (t: TabKey) => {
     setActiveTab(t);
 
+  }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      withdrawDialog.setOpen(true)
+    }, 1000)
   }, [])
 
   return (
@@ -46,32 +53,32 @@ export default function RecordsSection() {
           {/* Tabs */}
         <TabNav active={activeTab} onChange={handleTabChange} />
         <div className=' relative'>
-          
           {activeTab === 'held' && <MyRecordTable chainId={currentChainId} account={account} />}
           {activeTab === 'all' && <AllRecordTable chainId={currentChainId} account={account} />}
           {activeTab === 'history' && <RecordHistoryTable chainId={currentChainId} account={account} />}
         </div>
       </div>
+
       <DialogController
           className="p-0 "
           headerClassName="px-4 pt-4 border-b border-[#232427] pb-4"
           overlayClassName='z-[49]'
-          title={''}
-          open={exchangeDialog.open}
-          openChange={exchangeDialog.setOpen}
+          title={' 1111'}
+          open={withdrawDialog.open}
+          openChange={withdrawDialog.setOpen}
         >
-          
-        </DialogController>
-        <DialogController
-          className="p-0 "
-          headerClassName="px-4 pt-4 pb-4"
-          overlayClassName='z-[49]'
-          title={''}
-          open={kycTipDialog.open}
-          openChange={kycTipDialog.setOpen}
-        >
-          <KycTip />
-        </DialogController>
+          <WithdrawContent />
+      </DialogController>
+      <DialogController
+        className="p-0 "
+        headerClassName="px-4 pt-4 pb-4"
+        overlayClassName='z-[49]'
+        title={''}
+        open={kycTipDialog.open}
+        openChange={kycTipDialog.setOpen}
+      >
+        <KycTip />
+      </DialogController>
     </div>
   )
 }

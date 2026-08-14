@@ -1,6 +1,7 @@
 import { Footer } from '../../home/v2/Footer'
 import { useTranslation } from "@/hooks/useTranslation";
 import RecordsSection from './components/RecordsSection';
+import { DividendTotal } from './components/DividendTotal';
 
 export function Splits() {
   const { t } = useTranslation();
@@ -14,9 +15,10 @@ export function Splits() {
             <h1 className="text-white text-[48px] font-bold leading-tight">{t("events.t51")}</h1>
             <p className="text-[14px] text-[#9DA3AF]">
               {t("events.t52")}
-              <span className="text-[#9cff3a] cursor-pointer ml-1">{t("v3.t9")}</span>
+              <span className="text-[#9cff3a] cursor-pointer ml-1">{t("v3.t9")}&gt;</span>
             </p>
           </div>
+          <DividendTotal />
           <RecordsSection />
 
           <div className='mt-20'></div>
