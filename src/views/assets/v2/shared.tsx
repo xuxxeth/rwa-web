@@ -1,5 +1,5 @@
 import { useSignatureValidStatus } from '@/hooks/useSignature'
-import { useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import SignatureVerify from '@/components/signature-verify'
 import NoRecord from '@/components/no-record'
 import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
@@ -203,7 +203,8 @@ export function OrderTable<
   bodyClassName,
   paginationSorter,
   showChecked,
-  onSelectRows
+  onSelectRows,
+  MULTI_LIMIT
 }: {
   chainId?: number | null
   account?: string
@@ -272,11 +273,11 @@ export function OrderTable<
       dataMode={dataMode}
       lngPrefix={lngPrefix}
       className={headerClassName}
-      showChecked={showChecked}
-      isAllSelected={selectedAllRows}
-      onSelectAll={(checked) => {
-        setSelectedAll(checked)
-      }}
+        showChecked={showChecked}
+        isAllSelected={selectedAllRows}
+        onSelectAll={(checked) => {
+          setSelectedAll(checked)
+        }}
     >
       {dataMode === 'pagination' && (
         <OrderContentByPagination<T, F>
@@ -294,6 +295,10 @@ export function OrderTable<
           paginationSorter={paginationSorter}
           showChecked={showChecked}
           selectedAll={selectedAll}
+          MULTI_LIMIT={MULTI_LIMIT}
+          onSelectAllConsumed={() => {
+            setSelectedAll(false)
+          }}
           onSelectRows={(keys: string[], isSelectedAll: boolean) => {
             setSelectedAllRows(isSelectedAll)
             onSelectRows?.(keys)
@@ -557,6 +562,8 @@ export function OrderContentByPagination<
   paginationSorter,
   showChecked,
   selectedAll,
+  MULTI_LIMIT,
+  onSelectAllConsumed,
   onSelectRows
 }: {
   chainId: number
@@ -581,6 +588,8 @@ export function OrderContentByPagination<
   paginationSorter?: (a: T, b: T) => number
   showChecked?: boolean
   selectedAll?: boolean
+  MULTI_LIMIT?: number
+  onSelectAllConsumed?: () => void
   onSelectRows?: (keys: string[], isAllSelected: boolean) => void
 }) {
   const stableTokens = useTokens()
@@ -608,15 +617,31 @@ export function OrderContentByPagination<
 
   const isOrder = ['open', 'history', 'trade'].includes(type)
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const currentPageKeys = useMemo(() => data.map(item => String(scrollId(item))), [data, scrollId])
+  const currentPageKeySignature = currentPageKeys.join('|')
+  const prevPageKeyRef = useRef<string>('')
 
-  // 监测selectedAll变化
+  const emitSelection = useCallback((nextKeys: string[]) => {
+    const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => nextKeys.includes(key))
+    setSelectedRowKeys(nextKeys)
+    onSelectRows?.(nextKeys, isAllSelected)
+  }, [currentPageKeys, onSelectRows])
+
   useEffect(() => {
-    if (showChecked) {
-      const keys = selectedAll ? data.map(item => item.id) : []
-      setSelectedRowKeys(keys)
-      onSelectRows?.(keys, !!selectedAll)
+    if (prevPageKeyRef.current && prevPageKeyRef.current !== currentPageKeySignature) {
+      emitSelection([])
     }
-  }, [selectedAll, data])
+    prevPageKeyRef.current = currentPageKeySignature
+  }, [currentPageKeySignature, emitSelection])
+
+  useEffect(() => {
+    if (!showChecked || !selectedAll) return
+
+    const limit = MULTI_LIMIT ?? currentPageKeys.length
+    const keys = currentPageKeys.slice(0, limit)
+    emitSelection(keys)
+    onSelectAllConsumed?.()
+  }, [selectedAll, showChecked, currentPageKeys, MULTI_LIMIT, emitSelection, onSelectAllConsumed])
 
 
   if (isListEmpty) {
@@ -644,14 +669,21 @@ export function OrderContentByPagination<
         showChecked={showChecked}
         selectedRowKeys={selectedRowKeys}
         onSelectRow={(key: string, checked: boolean) => {
-          const _selectedRowKeys = [...selectedRowKeys]
-          const _index = _selectedRowKeys.findIndex(_key => _key === key)
-          if (_index > -1) {
-            _selectedRowKeys.splice(_index, 1)
+          const nextKeys = [...selectedRowKeys]
+          const currentIndex = nextKeys.findIndex(_key => _key === key)
+
+          if (checked) {
+            if (currentIndex === -1 && nextKeys.length >= (MULTI_LIMIT ?? currentPageKeys.length)) {
+              return
+            }
+            if (currentIndex === -1) {
+              nextKeys.push(key)
+            }
+          } else if (currentIndex > -1) {
+            nextKeys.splice(currentIndex, 1)
           }
-          checked && _selectedRowKeys.push(key)
-          setSelectedRowKeys(_selectedRowKeys)
-          onSelectRows?.(_selectedRowKeys, _selectedRowKeys.length === data.length)
+
+          emitSelection(nextKeys)
         }}
       />
       {(data.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled) && (

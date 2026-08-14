@@ -34,12 +34,13 @@ export function TableBody<T, Extra>(props: {
   onSelectRow?: (key: string, checked: boolean) => void
 }) {
   const { data, config, isLoading, extra, getKey, tdClassName, ExtraComponent, onClick, showChecked, selectedRowKeys, onSelectRow } = props
+  const selectedKeySet = new Set((selectedRowKeys ?? []).map(key => String(key)))
 
   return (
     <div className={cn('relative', isLoading ? 'opacity-40 min-h-[150px] text-white' : '')}>
       {data.map((item: T, index: number) => {
-        // @ts-ignore
-        const isChecked = !!selectedRowKeys?.find(key => key === item.id)
+        const rowKey = String(getKey(item))
+        const isChecked = selectedKeySet.has(rowKey)
         return (
           <div
             key={getKey(item)}
@@ -66,8 +67,7 @@ export function TableBody<T, Extra>(props: {
                     <CheckBox
                       checked={isChecked}
                       onChange={checked => {
-                        // @ts-ignore
-                        onSelectRow?.(item.id, checked)
+                        onSelectRow?.(rowKey, checked)
                       }}
                     />
                   )}
@@ -135,7 +135,7 @@ export function TableHeader<SortableField extends string, Item, Extra>({
                   onSelectAll?.(checked)
                 }}
               />
-              全选
+              {t('events.t84')}
             </div>
           )
         }
