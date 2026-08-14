@@ -7,7 +7,7 @@ import { type IRwa, type IToken } from '@/service/base/types'
 import Pagination from '@/components/pagination'
 import { useRwaTokens, useTokens } from '@/hooks/useTokens'
 import { noop, cn } from '@/utils'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { dataTagSymbol, useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteOrderOptions } from '@/queries'
 import { ScrollLoadMore } from '../Shared'
 import { useWssStore } from '@/stores/wssStore'
@@ -202,6 +202,8 @@ export function OrderTable<
   headerClassName,
   bodyClassName,
   paginationSorter,
+  showChecked,
+  onSelectRows
 }: {
   chainId?: number | null
   account?: string
@@ -227,9 +229,16 @@ export function OrderTable<
   headerClassName?: string
   bodyClassName?: string
   paginationSorter?: (a: T, b: T) => number
+  showChecked?: boolean,
+  onSelectRows?: (keys: string[]) => void
+  MULTI_LIMIT?: number
 }) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const isOrder = ['open', 'history', 'trade'].includes(type)
+
+  const [selectedAll, setSelectedAll] = useState(false)
+  const [selectedAllRows, setSelectedAllRows] = useState(false)
+
 
   if (!chainId || !account) {
     return (
@@ -263,6 +272,11 @@ export function OrderTable<
       dataMode={dataMode}
       lngPrefix={lngPrefix}
       className={headerClassName}
+      showChecked={showChecked}
+      isAllSelected={selectedAllRows}
+      onSelectAll={(checked) => {
+        setSelectedAll(checked)
+      }}
     >
       {dataMode === 'pagination' && (
         <OrderContentByPagination<T, F>
@@ -278,6 +292,12 @@ export function OrderTable<
           paginationClassName={paginationClassName}
           bodyClassName={bodyClassName}
           paginationSorter={paginationSorter}
+          showChecked={showChecked}
+          selectedAll={selectedAll}
+          onSelectRows={(keys: string[], isSelectedAll: boolean) => {
+            setSelectedAllRows(isSelectedAll)
+            onSelectRows?.(keys)
+          }}
         />
       )}
       {dataMode === 'scroll' && (
@@ -302,6 +322,9 @@ function WithTableHeader<T extends { orderId?: string }>({
   tableConfig,
   lngPrefix,
   className,
+  showChecked,
+  onSelectAll,
+  isAllSelected
 }: {
   children: React.ReactNode
   tableConfig: ITableConfig<
@@ -316,6 +339,9 @@ function WithTableHeader<T extends { orderId?: string }>({
   dataMode: 'pagination' | 'scroll'
   lngPrefix: string
   className?: string
+  showChecked?: boolean
+  onSelectAll?: (checked: boolean) => void
+  isAllSelected?: boolean
 }) {
   return (
     <>
@@ -335,6 +361,9 @@ function WithTableHeader<T extends { orderId?: string }>({
         className={cn('border-none h-7 px-4', 'bg-gray-900', className)}
         thClassName={cn('text-gray-400 text-xs/[15px] font-normal')}
         onSortChange={noop}
+        showChecked={showChecked}
+        onSelectAll={onSelectAll}
+        isAllSelected={isAllSelected}
       />
       {children}
     </>
@@ -526,6 +555,9 @@ export function OrderContentByPagination<
   paginationClassName,
   bodyClassName,
   paginationSorter,
+  showChecked,
+  selectedAll,
+  onSelectRows
 }: {
   chainId: number
   account: string
@@ -547,6 +579,9 @@ export function OrderContentByPagination<
   paginationClassName?: string
   bodyClassName?: string
   paginationSorter?: (a: T, b: T) => number
+  showChecked?: boolean
+  selectedAll?: boolean
+  onSelectRows?: (keys: string[], isAllSelected: boolean) => void
 }) {
   const stableTokens = useTokens()
   const rwaTokens = useRwaTokens()
@@ -572,6 +607,17 @@ export function OrderContentByPagination<
   }
 
   const isOrder = ['open', 'history', 'trade'].includes(type)
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+
+  // 监测selectedAll变化
+  useEffect(() => {
+    if (showChecked) {
+      const keys = selectedAll ? data.map(item => item.id) : []
+      setSelectedRowKeys(keys)
+      onSelectRows?.(keys, !!selectedAll)
+    }
+  }, [selectedAll, data])
+
 
   if (isListEmpty) {
     return <NoRecord className={isOrder ? '' : 'mt-14'} />
@@ -595,6 +641,18 @@ export function OrderContentByPagination<
         getKey={(item: T) => scrollId(item)}
         className={cn('hover:bg-opacity-01 px-4 group', bodyClassName)}
         tdClassName='h-[56px] text-xs/4'
+        showChecked={showChecked}
+        selectedRowKeys={selectedRowKeys}
+        onSelectRow={(key: string, checked: boolean) => {
+          const _selectedRowKeys = [...selectedRowKeys]
+          const _index = _selectedRowKeys.findIndex(_key => _key === key)
+          if (_index > -1) {
+            _selectedRowKeys.splice(_index, 1)
+          }
+          checked && _selectedRowKeys.push(key)
+          setSelectedRowKeys(_selectedRowKeys)
+          onSelectRows?.(_selectedRowKeys, _selectedRowKeys.length === data.length)
+        }}
       />
       {(data.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled) && (
         <div className='mt-2'>

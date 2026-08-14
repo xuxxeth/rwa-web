@@ -12,7 +12,6 @@ import { MyRecordTable } from './MyRecordTable'
 import { AllRecordTable } from './AllRecordTable'
 import { KycTip } from '../../splits/components/KycTip'
 import { WithdrawContent } from './WithdrawContent'
-import { MultiWithdraw } from './MultiWithdraw'
 
 export default function RecordsSection() {
   
@@ -25,7 +24,6 @@ export default function RecordsSection() {
 
   const { account } = useActiveWeb3()
   const currentChainId = useAppStore(state => state.currentChainId)
-
 
   const handleExchange = useCallback(async (data: IStockActionEvent) => {
     
@@ -52,6 +50,7 @@ export default function RecordsSection() {
       <div className='flex flex-col gap-[16px] h-full'>
           {/* Tabs */}
         <TabNav active={activeTab} onChange={handleTabChange} />
+
         <div className=' relative'>
           {activeTab === 'held' && <MyRecordTable chainId={currentChainId} account={account} />}
           {activeTab === 'all' && <AllRecordTable chainId={currentChainId} account={account} />}

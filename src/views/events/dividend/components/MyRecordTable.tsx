@@ -70,6 +70,11 @@ export function MyRecordTable(props: {
       signatureSubTitle='rebate.sigSubTitle'
       scrollToTopWhenPagination={false}
       paginationClassName='justify-center px-4 pt-2 pb-4'
+      showChecked={true}
+      onSelectRows={keys => {
+        console.log(keys)
+      }}
+      MULTI_LIMIT={10}
     />
   )
 }
