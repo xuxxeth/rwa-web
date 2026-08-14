@@ -144,7 +144,7 @@ export const useBaseStore = create<BaseStore>()(
       getBaseRwas: async (chainId?: number) => {
         const res = await baseApi.getBaseRwas(chainId)
         if (res.code === RESPONSE_CODE.SUCCESS) {
-          const rwaList = (res.data || []).filter(token => token.showState).map(rwa => ({
+          const rwaList = (res.data || []).map(rwa => ({
             ...rwa,
             is24H: rwa.sessionMask === 15,
             sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),
@@ -168,7 +168,7 @@ export const useBaseStore = create<BaseStore>()(
         }
         if (rwaTokenRes.code === RESPONSE_CODE.SUCCESS) {
           // @ts-ignore
-          newRwaList = (rwaTokenRes.data || []).filter(token => token.showState).map(rwa => ({
+          newRwaList = (rwaTokenRes.data || []).map(rwa => ({
             ...rwa,
             is24H: rwa.sessionMask === 15,
             sessionMaskList: numberToBinaryArray(rwa.sessionMask ?? 0),

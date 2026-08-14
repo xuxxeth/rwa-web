@@ -1,17 +1,16 @@
 import { useTranslation, Trans } from 'react-i18next'
-import { memo, useState, useMemo } from 'react'
+import { memo, useState, useMemo, useEffect } from 'react'
 import { formatWithCommas } from '@/utils/format'
 import AssetsTable from './AssetsTable'
-import {
-  useAssetsList,
-  useRiskControlAssets,
-  type IRiskControlAsset,
-  type IAssetItem,
-} from '../assetsList'
+import { useAssetsList, type IAssetItem } from '../assetsList'
 import { useRwaTokens, useTokens } from '@/hooks/useTokens'
 import { LazyImage } from '@/components/image/LazyImage'
 import { DialogController } from '@/components/dialog/DialogController'
 import AssetsPieChart, { type ChartData, COLORS } from './pieChart'
+import { OrderTable } from '@/views/assets/v2/shared'
+import { type ITableConfig } from '@/components/table-header'
+import { TokenCell, TextCell } from '@/views/assets/Shared'
+import { useSignatureValidStatus } from '@/hooks/useSignature'
 import {
   advancedSort,
   cn,
@@ -23,9 +22,35 @@ import {
   sum,
   truncate,
   isLess,
+  checkAddressEqual,
 } from '@/utils'
 import { useAppStore } from '@/stores/appStore'
 import { CircleLoading } from '@/components/loading'
+import { scanApi } from '@/service/scan/api'
+import { type IRiskAsset, type IRiskAssetsFilter } from '@/service/scan/types'
+import { type IRwa, type IToken } from '@/service/base/types'
+import SignatureVerify from '@/components/signature-verify'
+
+const EMPTY_FILTER = {}
+const RISK_ASSET_LIMIT = 6
+
+export function AssetsEntry({ chainId, account }: { chainId: number; account: string }) {
+  const [, refreshIsSignatureValid, validateSignature] = useSignatureValidStatus()
+
+  if (!validateSignature()) {
+    return (
+      <SignatureVerify
+        desc='signatureVerifyDescTop'
+        subDesc={'sigAssetsDescBottom'}
+        className='mt-20'
+        refreshIsSignatureValid={refreshIsSignatureValid}
+        buttonClassName='mt-5'
+      />
+    )
+  }
+
+  return <Assets chainId={chainId} account={account} />
+}
 
 function Assets({ chainId, account }: { chainId: number; account: string }) {
   const { t } = useTranslation()
@@ -33,9 +58,18 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
     useAssetsList(chainId)
   const isSwitchingChain = useAppStore(state => state.isSwitchingChain)
 
-  const riskControlledAssets = useRiskControlAssets(chainId, account)
+  const [firstPageRiskAssets, setFirstPageRiskAssets] = useState<IRiskAsset[]>([])
 
-  const isRiskControlled = riskControlledAssets.length > 0
+  useEffect(() => {
+    if (!account || !chainId) {
+      return
+    }
+    fetchFirstPageRiskAssets(RISK_ASSET_LIMIT).then(res => {
+      setFirstPageRiskAssets(res)
+    })
+  }, [account, chainId])
+
+  const isRiskControlled = firstPageRiskAssets.length > 0
 
   const assetsClassName = isRiskControlled ? '' : 'flex-1'
 
@@ -79,7 +113,8 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
               {isRiskControlled && (
                 <div className={assetsClassName}>
                   <RiskControlAssets
-                    riskControlledAssets={riskControlledAssets}
+                    riskAssets={firstPageRiskAssets}
+                    // riskControlledAssets={riskControlledAssets}
                     chainId={chainId}
                     account={account}
                   />
@@ -100,6 +135,18 @@ function Assets({ chainId, account }: { chainId: number; account: string }) {
       </div>
     </div>
   )
+}
+
+export async function fetchFirstPageRiskAssets(limit: number) {
+  try {
+    const res = await scanApi.getRiskAssets({ limit })
+    if (res.code === 9200) {
+      return res.data.sort((a, b) => advancedSort(a.amount, b.amount, 'desc')) || []
+    }
+    return []
+  } catch (error) {
+    return []
+  }
 }
 
 function AssetsRatio({
@@ -256,14 +303,16 @@ function AssetsRatio({
 
 const RiskControlAssets = memo(
   ({
-    riskControlledAssets,
+    riskAssets,
+    chainId,
+    account,
   }: {
     chainId: number
     account: string
-    riskControlledAssets: IRiskControlAsset[]
+    riskAssets: IRiskAsset[]
   }) => {
     const { t } = useTranslation()
-    const rwaList = useRwaTokens(false)
+    const rwaList = useRwaTokens(true)
     const tokenList = useTokens()
 
     const [open, setOpen] = useState(false)
@@ -272,7 +321,7 @@ const RiskControlAssets = memo(
       <>
         <div className='text-gray-400 text-sm'>
           {t('portfolio.risk')}
-          {riskControlledAssets.length > 0 && (
+          {riskAssets.length > 0 && (
             <span
               onClick={() => setOpen(true)}
               className='cursor-pointer ml-2 text-xs text-[#2962FF]'
@@ -282,14 +331,16 @@ const RiskControlAssets = memo(
           )}
         </div>
         <div className='mt-2 text-lg/[23px] font-medium relative h-[23px] py-[2px]'>
-          {riskControlledAssets.length > 0
-            ? riskControlledAssets.slice(0, 7).map((item, idx) => {
-                const rwa = [...rwaList, ...tokenList].find(rwa => rwa.address === item.token)
+          {riskAssets.length > 0
+            ? riskAssets.map((item, idx) => {
+                const rwa = [...rwaList, ...tokenList].find(rwa =>
+                  checkAddressEqual(rwa.address, item.token)
+                )
                 if (!rwa) return null
                 const left = idx * 18 - idx * 5
                 return (
                   <LazyImage
-                    key={rwa.symbol}
+                    key={item.id}
                     style={{
                       left: `${left}px`,
                     }}
@@ -299,7 +350,7 @@ const RiskControlAssets = memo(
                 )
               })
             : '--'}
-          {riskControlledAssets.length > 7 && (
+          {riskAssets.length > RISK_ASSET_LIMIT && (
             <LazyImage
               src='/images/v2/portfolio/more.svg'
               className='absolute w-[11px] h-[15px] left-[96px] mt-[5px] ml-[3px]'
@@ -318,33 +369,47 @@ const RiskControlAssets = memo(
           overlayClassName='bg-gray-900/60'
           className='w-[420px] top-[10vh] [@media(min-height:900px)]:top-[197px] bg-gray-950 border border-gray-850 rounded-2xl p-0 gap-0'
         >
-          <div className='px-6 pt-4 pb-6 gap-4 flex flex-col font-normal'>
-            <div className='bg-gray-900 p-3 rounded-[4px]'>
-              <div className='text-yellow-50 text-sm/4.5'>{t('portfolio.riskTitle')}</div>
+          <div className='min-h-[300px]'>
+            <div className='py-2 px-6 flex flex-row gap-2 font-normal bg-[#FFB2191A]'>
+              <LazyImage className='w-3 h-3 mt-[2px]' src='/images/v2/portfolio/warn.svg' />
+              <div className='text-white text-xs/4.5'>
+                {
+                  <Trans
+                    i18nKey='portfolio.riskTitle'
+                    values={{ email: 'contact@tiko.cc' }}
+                    components={[<span className='text-blue-50 font-normal' key='email' />]}
+                  />
+                }
+              </div>
+              {/* <div className='text-yellow-50 text-sm/4.5'>{t('portfolio.riskTitle')}</div>
               <div className='text-yellow-50 text-sm/4.5 mt-4.5'>
                 <Trans
                   i18nKey='portfolio.email'
                   values={{ email: 'contact@tiko.cc' }}
                   components={[<span className='text-blue-50 font-normal' key='email' />]}
                 />
-              </div>
+              </div> */}
             </div>
-            <div className='bg-gray-900 p-3 rounded-[4px]'>
-              <div className='flex flex-row justify-between text-sm/4.5 mb-2 text-gray-400'>
-                <span>{t('portfolio.name')}</span>
-                <span>{t('portfolio.frozen')}</span>
-              </div>
-              {riskControlledAssets.map(item => {
-                return (
-                  <div
-                    className='flex flex-row justify-between text-sm/4.5 py-2 [@media(min-height:900px)]:py-4'
-                    key={item.token}
-                  >
-                    <span>{item.symbol}</span>
-                    <span>{formatWithCommas(truncate(item.quantity, 2), 2)}</span>
-                  </div>
-                )
-              })}
+
+            <div className='mx-6'>
+              <OrderTable<IRiskAsset, IRiskAssetsFilter>
+                chainId={chainId}
+                account={account}
+                PAGE_LIMIT={RISK_ASSET_LIMIT}
+                dataMode={'pagination'}
+                api={scanApi.getRiskAssets}
+                scrollId={(item: IRiskAsset) => item.id}
+                filter={EMPTY_FILTER}
+                tableConfig={riskAssetsTableConfig}
+                type={'riskAssets'}
+                lngPrefix='portfolio'
+                signatureSubTitle='rebate.sigSubTitle'
+                scrollToTopWhenPagination={false}
+                paginationClassName='justify-center mb-2'
+                headerClassName='bg-gray-950 px-0'
+                bodyClassName='px-0 border-none'
+                paginationSorter={(a, b) => advancedSort(a.amount, b.amount, 'desc')}
+              />
             </div>
           </div>
         </DialogController>
@@ -353,4 +418,47 @@ const RiskControlAssets = memo(
   }
 )
 
-export default Assets
+const riskAssetsTableConfig: ITableConfig<
+  IRiskAsset,
+  {
+    rwaTokens: IRwa[]
+    stableTokens: IToken[]
+    refetch: () => void
+    onTokenClick?: ((token: IRwa | IToken) => void) | undefined
+  }
+> = [
+  {
+    key: 'name',
+    sortable: false,
+    render: (item: IRiskAsset, { rwaTokens, stableTokens }) => {
+      const allTokens = [...stableTokens, ...rwaTokens]
+      const token = allTokens.find(token => checkAddressEqual(token.address, item.token))
+      if (!token) return '--'
+      return (
+        <TokenCell
+          token={token.symbol}
+          name={token.name}
+          icon={token.icon}
+          iconClassName={cn('w-6 h-6')}
+          tokenClassName='font-medium'
+        />
+      )
+    },
+  },
+  {
+    key: 'frozen',
+    headerDirection: 'end',
+    sortable: false,
+    width: 90,
+    render: (item: IRiskAsset) => {
+      return (
+        <div className='w-full text-right'>
+          <TextCell
+            className='text-sm/4.5 font-medium'
+            text={formatWithCommas(truncate(item.amount, 2), 2)}
+          />
+        </div>
+      )
+    },
+  },
+]

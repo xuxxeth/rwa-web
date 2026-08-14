@@ -7,6 +7,18 @@ import { LazyImage } from '@/components/image/LazyImage'
 import { cn, type Change, symbolToLower } from '@/utils'
 import IconWithTooltip from '@/components/icon-tooltip'
 import { useBaseStore } from '@/stores/baseStore'
+import type { IAssetItem } from '@/views/assets/assetsList'
+
+export function SplitsStockState({ rwa }: { rwa: IAssetItem }) {
+  const { t } = useTranslation()
+  return (
+    <IconWithTooltip tooltip={t('events.t41')}>
+      <div className='min-h-[23px] py-1 rounded-[4px] flex items-center text-center px-1 bg-[rgba(156,255,58,0.1)] text-[#9CFF3A] text-[12px] ml-2'>
+        {t('events.t4')}
+      </div>
+    </IconWithTooltip>
+  )
+}
 
 export function TradeState({ state }: { state: number }) {
   switch (state) {

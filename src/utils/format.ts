@@ -214,7 +214,7 @@ export function formatNumberWithCommas(value: number | string, decimal = 2): str
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',') // 千分位
 }
 
-export function formatTimestamp(seconds: number): string {
+export function formatTimestamp(seconds: number, noSec?: boolean): string {
   const formatter = new Intl.DateTimeFormat('en', {
     year: 'numeric',
     month: '2-digit',
@@ -259,7 +259,7 @@ export function formatTimestamp(seconds: number): string {
         break
     }
   })
-
+  if (noSec) return `${year}/${month}/${day} ${hour}:${minute}`
   return `${year}/${month}/${day} ${hour}:${minute}:${second}`
 }
 

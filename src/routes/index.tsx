@@ -24,6 +24,8 @@ const LivenessComplete = lazy(() => import('../views/identity/LivenessComplete')
 // const Assets = lazy(() => import('../views/assets'))
 const Portfolio = lazy(() => import('../views/assets/v2'))
 const Referral = lazy(() => import('../views/referral'))
+const Splits = lazy(() => import('../views/events/splits'))
+
 
 // 路由表
 const routes: RouteObject[] = [
@@ -76,6 +78,10 @@ const routes: RouteObject[] = [
   {
     path: '/referral/:inviteCode?',
     element: <Referral />,
+  },
+  {
+    path: '/splits',
+    element: <Splits />,
   },
   {
     path: '/kyc/liveness-complete',

@@ -530,7 +530,7 @@ function FinishKycDialog(props: {
       <div className='flex flex-col items-center justify-center px-6'>
         <LazyImage src='/images/v2/icons/big-warn.svg' className='w-16 h-16' />
         <h3 className='mt-4 text-xl/7.5 font-medium text-white'>{t('rebate.kycTitle')}</h3>
-        <p className='mt-2 text-base/6 text-gray-400 font-normal mt-2 text-center'>
+        <p className='text-base/6 text-gray-400 font-normal mt-2 text-center'>
           {t('rebate.kycSubTitle')}
         </p>
         <button

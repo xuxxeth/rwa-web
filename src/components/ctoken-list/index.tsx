@@ -222,7 +222,7 @@ const CTokenList = memo(
       const rwaListWithBalanceList = newRwaList.filter(rwa => rwa.state !== 2).map(rwa => {
         const newRwa = {
           ...rwa,
-          ...tokenWithBalance[symbolToLower(rwa.symbol)],
+          ...tokenWithBalance[symbolToLower(rwa.address)],
           ...tokenWithPrice[symbolToLower(rwa.symbol)],
         }
         newRwa.balanceValue = multiply(newRwa?.balance ?? '0', tokenWithPrice[symbolToLower(rwa.symbol)]?.price ?? '0')

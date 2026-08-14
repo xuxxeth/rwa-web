@@ -11,6 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-[#FFFFFF] text-black",
         secondary: "bg-[#9CFF3A] text-black shadow-sm hover:bg-[#9CFF3A]/80",
+        secondary2: "bg-[#383A40] text-white shadow-sm hover:bg-[#383A40]/80",
         primary: "bg-[#25A750] text-black shadow-sm hover:bg-[#25A750]/80",
         warning: "bg-[#CA3F64] text-black shadow-sm hover:bg-[#CA3F64]/90",
         ghost: "hover:bg-accent hover:text-accent-foreground",

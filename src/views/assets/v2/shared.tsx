@@ -3,9 +3,9 @@ import { useEffect, useState, useRef } from 'react'
 import SignatureVerify from '@/components/signature-verify'
 import NoRecord from '@/components/no-record'
 import { TableHeader, TableBody, type ITableConfig } from '@/components/table-header'
-import { type IRwa } from '@/service/base/types'
+import { type IRwa, type IToken } from '@/service/base/types'
 import Pagination from '@/components/pagination'
-import { useRwaTokens } from '@/hooks/useTokens'
+import { useRwaTokens, useTokens } from '@/hooks/useTokens'
 import { noop, cn } from '@/utils'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { infiniteOrderOptions } from '@/queries'
@@ -50,7 +50,8 @@ export function useOrderList<
   PAGE_LIMIT: number,
   scrollId: (item: T) => string,
   api: (filter: F) => Promise<{ data: T[] }>,
-  filter: F
+  filter: F,
+  sorter?: (a: T, b: T) => number
 ) {
   const [data, setData] = useState<T[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -166,8 +167,10 @@ export function useOrderList<
     fetchFirstPage()
   }, [chainId, account, isSignatureValid, filter])
 
+  const dataToDisplay = sorter ? [...data].sort(sorter) : data
+
   return {
-    data,
+    data: dataToDisplay,
     isLoading,
     isPrevEnabled,
     isNextEnabled,
@@ -196,6 +199,9 @@ export function OrderTable<
   scrollToTopWhenPagination,
   signatureSubTitle,
   paginationClassName,
+  headerClassName,
+  bodyClassName,
+  paginationSorter,
 }: {
   chainId?: number | null
   account?: string
@@ -204,7 +210,12 @@ export function OrderTable<
   filter: F
   tableConfig: ITableConfig<
     T,
-    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+    {
+      rwaTokens: IRwa[]
+      stableTokens: IToken[]
+      refetch: () => void
+      onTokenClick?: (rwa: IRwa | IToken) => void
+    }
   >
   dataMode: 'pagination' | 'scroll'
   scrollId: (item: T) => string
@@ -213,13 +224,21 @@ export function OrderTable<
   scrollToTopWhenPagination?: boolean
   signatureSubTitle: string
   paginationClassName?: string
+  headerClassName?: string
+  bodyClassName?: string
+  paginationSorter?: (a: T, b: T) => number
 }) {
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const isOrder = ['open', 'history', 'trade'].includes(type)
 
   if (!chainId || !account) {
     return (
-      <WithTableHeader tableConfig={tableConfig} dataMode={dataMode} lngPrefix={lngPrefix}>
+      <WithTableHeader
+        tableConfig={tableConfig}
+        dataMode={dataMode}
+        lngPrefix={lngPrefix}
+        className={headerClassName}
+      >
         <WalletNotConnectedSmallVersion />
       </WithTableHeader>
     )
@@ -231,7 +250,7 @@ export function OrderTable<
         <SignatureVerify
           desc='signatureVerifyDescTop'
           subDesc={signatureSubTitle}
-          className={isOrder ? 'mt-9' : 'mt-14'}
+          className={cn(isOrder ? 'mt-9' : 'mt-14', headerClassName)}
           refreshIsSignatureValid={refreshIsSignatureValid}
         />
       </WithTableHeader>
@@ -239,7 +258,12 @@ export function OrderTable<
   }
 
   return (
-    <WithTableHeader tableConfig={tableConfig} dataMode={dataMode} lngPrefix={lngPrefix}>
+    <WithTableHeader
+      tableConfig={tableConfig}
+      dataMode={dataMode}
+      lngPrefix={lngPrefix}
+      className={headerClassName}
+    >
       {dataMode === 'pagination' && (
         <OrderContentByPagination<T, F>
           chainId={chainId}
@@ -252,6 +276,8 @@ export function OrderTable<
           tableConfig={tableConfig}
           type={type}
           paginationClassName={paginationClassName}
+          bodyClassName={bodyClassName}
+          paginationSorter={paginationSorter}
         />
       )}
       {dataMode === 'scroll' && (
@@ -275,26 +301,38 @@ function WithTableHeader<T extends { orderId?: string }>({
   children,
   tableConfig,
   lngPrefix,
+  className,
 }: {
   children: React.ReactNode
   tableConfig: ITableConfig<
     T,
-    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+    {
+      rwaTokens: IRwa[]
+      stableTokens: IToken[]
+      refetch: () => void
+      onTokenClick?: (rwa: IRwa | IToken) => void
+    }
   >
   dataMode: 'pagination' | 'scroll'
   lngPrefix: string
+  className?: string
 }) {
   return (
     <>
       <TableHeader<
         '',
         T,
-        { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+        {
+          rwaTokens: IRwa[]
+          stableTokens: IToken[]
+          refetch: () => void
+          onTokenClick?: (rwa: IRwa | IToken) => void
+        }
       >
         lngPrefix={lngPrefix}
         config={tableConfig}
         sort={null}
-        className={cn('border-none h-7 px-4', 'bg-gray-900')}
+        className={cn('border-none h-7 px-4', 'bg-gray-900', className)}
         thClassName={cn('text-gray-400 text-xs/[15px] font-normal')}
         onSortChange={noop}
       />
@@ -303,7 +341,15 @@ function WithTableHeader<T extends { orderId?: string }>({
   )
 }
 
-export type TableType = 'open' | 'history' | 'trade' | 'invitee' | 'rebate' | 'claim'
+export type TableType =
+  | 'open'
+  | 'history'
+  | 'trade'
+  | 'invitee'
+  | 'rebate'
+  | 'claim'
+  | 'tokenExchanged'
+  | 'riskAssets'
 
 export function OrderContentByScroll<
   T extends { orderId?: string; id: string },
@@ -325,7 +371,12 @@ export function OrderContentByScroll<
   api: (filter: F) => Promise<{ data: T[] }>
   tableConfig: ITableConfig<
     T,
-    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+    {
+      rwaTokens: IRwa[]
+      stableTokens: IToken[]
+      refetch: () => void
+      onTokenClick?: (rwa: IRwa | IToken) => void
+    }
   >
   isSignatureValid: boolean
   refreshIsSignatureValid: (_isValid: boolean) => void
@@ -333,7 +384,8 @@ export function OrderContentByScroll<
   type: TableType
 }) {
   const router = useRouter()
-  const rwaTokens = useRwaTokens()
+  const stableTokens = useTokens()
+  const rwaTokens = useRwaTokens(true)
 
   const {
     data,
@@ -379,17 +431,24 @@ export function OrderContentByScroll<
     }
   }, [hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
-  const onTokenClick = (rwa: IRwa) => {
-    console.log('rwa', rwa)
+  const onTokenClick = (rwa: IRwa | IToken) => {
     router.push(`/trade/${rwa.symbol}`)
   }
 
   return (
     <div className='flex-1 overflow-auto scrollbar-hide cursor-pointer'>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }>
+      <TableBody<
+        T,
+        {
+          rwaTokens: IRwa[]
+          stableTokens: IToken[]
+          refetch: () => void
+          onTokenClick?: (rwa: IRwa | IToken) => void
+        }
+      >
         data={allOrders}
         config={tableConfig}
-        extra={{ rwaTokens, refetch, onTokenClick }}
+        extra={{ rwaTokens, stableTokens, refetch, onTokenClick }}
         getKey={(item: T) => item.id}
         isLoading={isLoading}
         className={cn('hover:bg-opacity-01 px-4 group')}
@@ -465,6 +524,8 @@ export function OrderContentByPagination<
   scrollToTopWhenPagination,
   type,
   paginationClassName,
+  bodyClassName,
+  paginationSorter,
 }: {
   chainId: number
   account: string
@@ -474,12 +535,20 @@ export function OrderContentByPagination<
   filter: F
   tableConfig: ITableConfig<
     T,
-    { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }
+    {
+      rwaTokens: IRwa[]
+      stableTokens: IToken[]
+      refetch: () => void
+      onTokenClick?: (rwa: IRwa | IToken) => void
+    }
   >
   scrollToTopWhenPagination?: boolean
   type: TableType
   paginationClassName?: string
+  bodyClassName?: string
+  paginationSorter?: (a: T, b: T) => number
 }) {
+  const stableTokens = useTokens()
   const rwaTokens = useRwaTokens()
 
   const {
@@ -492,13 +561,13 @@ export function OrderContentByPagination<
     tryFetchPrevPage,
     tryFetchNextPage,
     isFirstLoadDone,
-  } = useOrderList<T, F>(chainId, account, PAGE_LIMIT, scrollId, api, filter)
+  } = useOrderList<T, F>(chainId, account, PAGE_LIMIT, scrollId, api, filter, paginationSorter)
 
   const needRefreshedWhenOrderChanged = ['open', 'history', 'trade'].includes(type)
   const isRefetchEnable = isFirstLoadDone && needRefreshedWhenOrderChanged
   useOrderChangedV2(fetchFirstPage, isRefetchEnable)
 
-  const onTokenClick = (rwa: IRwa) => {
+  const onTokenClick = (rwa: IRwa | IToken) => {
     window.open(`/trade/${rwa.symbol}`, '_blank')
   }
 
@@ -510,13 +579,21 @@ export function OrderContentByPagination<
 
   return (
     <>
-      <TableBody<T, { rwaTokens: IRwa[]; refetch: () => void; onTokenClick?: (rwa: IRwa) => void }>
+      <TableBody<
+        T,
+        {
+          rwaTokens: IRwa[]
+          stableTokens: IToken[]
+          refetch: () => void
+          onTokenClick?: (rwa: IRwa | IToken) => void
+        }
+      >
         data={data}
         isLoading={isLoading}
         config={tableConfig}
-        extra={{ rwaTokens, refetch: fetchFirstPage, onTokenClick }}
+        extra={{ rwaTokens, stableTokens: stableTokens, refetch: fetchFirstPage, onTokenClick }}
         getKey={(item: T) => scrollId(item)}
-        className={cn('hover:bg-opacity-01 px-4 group')}
+        className={cn('hover:bg-opacity-01 px-4 group', bodyClassName)}
         tdClassName='h-[56px] text-xs/4'
       />
       {(data.length === PAGE_LIMIT || isPrevEnabled || isNextEnabled) && (

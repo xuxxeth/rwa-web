@@ -16,7 +16,7 @@ export function useRwaBalances() {
   const getRwaData = async (chainId: number, account: `0x${string}`) => {
     const res = await baseApi.getBaseRwas(chainId)
     if (res.code === RESPONSE_CODE.SUCCESS) {
-      const rwaList = (res.data || []).filter(token => token.showState);
+      const rwaList = (res.data || []);
       const balancesRes = await getTokenBalances(account, rwaList.map(token => token.address as `0x${string}`))
       const rwaListWithBalances = rwaList.map((token, index) => {
         return {
@@ -43,12 +43,12 @@ export function useRwaBalances() {
 export function useRwas() {
   const rwaList = useBaseStore(state => state.rwaList)
   
-  return rwaList
+  return rwaList.filter(token => token.showState)
 }
 
 export function useRwaByStockId(stockId?: number) {
   const rwaList = useBaseStore(state => state.rwaList)
   return useMemo(() => {
-    return rwaList.find(token => token.stockId === stockId)
+    return rwaList.filter(token => token.showState).find(token => token.stockId === stockId)
   }, [rwaList])
 }

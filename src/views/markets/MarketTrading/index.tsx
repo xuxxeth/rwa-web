@@ -8,15 +8,20 @@ import { DialogController, useShowDialog } from '@/components/dialog/DialogContr
 import { OrderList } from '@/components/markets/OrderList'
 import { TradeTypeSwitch } from './TradeTypeSwitch'
 import { RwaSessionStatus } from '@/components/markets/RwaSessionStatus'
+import { useAppStore } from '@/stores/appStore'
 
 function Markets() {
   const { t } = useTranslation()
   const orderDialog = useShowDialog()
+  const showAnnouncement = useAppStore(state => state.showAnnouncement)
   return (
     <>
       <div className='w-full'>
         <div className=' bg-[#1A1B1E] min-h-[100vh] text-white '>
-          <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
+          {
+            !showAnnouncement && <div className='w-full bg-[#1A1B1E] h-[4px] shrink-0'>&nbsp;</div>
+          }
+          
           <div className='flex'>
             <div className='flex-1'>
               <KlineBody from='market' />

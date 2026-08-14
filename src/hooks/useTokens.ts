@@ -29,9 +29,9 @@ export function useRwaTokens(includeDelisted: boolean = true) {
 
   return useMemo(() => {
     if (includeDelisted) {
-      return rwaList
+      return rwaList.filter(rwa => rwa.chainId === currentChainId)
     }
-    return rwaList.filter(rwa => rwa.state !== 2 && rwa.chainId === currentChainId)
+    return rwaList.filter(rwa => rwa.showState).filter(rwa => rwa.state !== 2 && rwa.chainId === currentChainId)
   }, [rwaList, includeDelisted, currentChainId])
 }
 
@@ -53,4 +53,22 @@ export function useUSDT() {
   return useMemo(() => {
     return tokens.find(token => token.chainId === currentChainId && token.symbol === 'USDT')
   }, [tokens, currentChainId])
+}
+
+export function useGetRwaByAddress(address?: string) {
+  const rwaList = useRwaTokens()
+
+  return useMemo(() => {
+    return rwaList.find(rwa => rwa.address?.toLowerCase() === address?.toLowerCase())
+  }, [address, rwaList])
+
+}
+
+export function useGetTokenByAddress(address?: string) {
+  const tokenList = useTokens()
+
+  return useMemo(() => {
+    return tokenList.find(token => token.address?.toLowerCase() === address?.toLowerCase())
+  }, [address, tokenList])
+
 }

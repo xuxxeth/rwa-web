@@ -1,8 +1,5 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/hooks/useTranslation";
-import { languages } from "@/i18n";
 import { cn } from "@/utils";
-import storage from "@/utils/storage";
 import { lazy, useMemo, useState } from "react";
 import { IconArrowDown } from "../icons/ArrowDown";
 import { useRouter } from "@/hooks/useRouter";
@@ -60,12 +57,12 @@ export function SubMenus({
       <HoverCardTrigger asChild>
         <div className={cn(
           "text-[14px] font-medium text-[#9DA3AF] cursor-pointer h-[36px] flex items-center leading-[36px] ",
-          isPro || isLite ? "" : ""
+          isPro || isLite ? "" : "",
+          active ? "text-white" : ""
         )}
           onClick={e => {
             e.stopPropagation()
             e.preventDefault()
-            console.log(open)
           }}
         >
           { title }

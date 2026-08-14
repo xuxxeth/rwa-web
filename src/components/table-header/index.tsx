@@ -8,6 +8,7 @@ import { CircleLoading } from '@/components/loading'
 export type ITableConfig<T, U> = Array<{
   key: string
   sortable: boolean
+  headerDirection?: 'start' | 'end'
   sorter?: (a: T, b: T) => (order: Order) => number
   render: (item: T, extra: U) => ReactNode
   width?: number
@@ -92,14 +93,22 @@ export function TableHeader<SortableField extends string, Item, Extra>({
         className
       )}
     >
-      {config.map(({ key, sortable, width, breakOnSpace }) => {
+      {config.map(({ key, sortable, headerDirection, width, breakOnSpace }) => {
         const style = width ? { flexBasis: width } : { flex: 1 }
         const order = sort?.field === key ? sort.order : undefined
         const text = t(`${lngPrefix}.${key}`)
         return (
-          <div key={key} className={cn('flex flex-row items-center')} style={style}>
+          <div
+            key={key}
+            className={cn(
+              'flex flex-row items-center',
+              headerDirection === 'end' ? 'justify-end' : 'justify-start'
+            )}
+            style={style}
+          >
             <button
-              className='cursor-pointer flex flex-row items-center'
+              type='button'
+              className='cursor-pointer flex flex-row items-center border-none bg-transparent p-0 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 appearance-none'
               onClick={() => {
                 onSortChange(key as SortableField)
               }}

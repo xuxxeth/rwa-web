@@ -6,8 +6,8 @@ import { useEffect, useState, useMemo } from 'react'
 import wsService from '@/service/webSocket/service'
 import type { IAggregateData } from '@/service/webSocket/types'
 import { useRegulateAssets, type RegulateAssetItem } from 'ca-common-web'
-import { useContractAddr } from '@/hooks/useContractAddr'
 import { useAppStore } from '@/stores/appStore'
+import { isGreater } from '@/utils'
 
 export interface IRiskControlAsset {
   token: string
@@ -56,7 +56,7 @@ export function useRiskControlAssets(chainId: number, account: string): IRiskCon
 
 export function useAssetsList(chainId: number) {
   const tokenList = useTokens()
-  const rwaList = useRwaTokens(false)
+  const rwaList = useRwaTokens(true)
 
   const tokenWithBalance = useBaseStore(state => state.tokenWithBalance)
   const [tokenWithPrice, setTokenWithPrice] = useState<Record<string, { price: number }>>({})
@@ -66,20 +66,30 @@ export function useAssetsList(chainId: number) {
   }, [rwaList, tokenList, chainId])
 
   const assetsList = useMemo(() => {
-    return allTokenList.map(token => {
-      const symbolLowdered = symbolToLower(token.symbol)
-      token.price = token.isStableToken ? 1 : tokenWithPrice[symbolLowdered]?.price
-      const balanceFromStore = tokenWithBalance[symbolLowdered]
-      token.holdings =
-        balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
-      if (token.price && token.holdings) {
-        token.value = multiply(token.holdings, token.price)
-      }
-      if (!token.holdings || !token.price) {
-        token.value = undefined
-      }
-      return token
-    })
+    return allTokenList
+      .map(token => {
+        const symbolLowdered = symbolToLower(token.symbol)
+        const addressLowdered = symbolToLower(token.address)
+        token.price = token.isStableToken
+          ? 1
+          : token.splitStatus == 0
+            ? tokenWithPrice[symbolLowdered]?.price
+            : undefined
+        const balanceFromStore = tokenWithBalance[addressLowdered]
+        token.holdings =
+          balanceFromStore && balanceFromStore.origin != '0' ? balanceFromStore.balance : undefined
+        if (token.price && token.holdings) {
+          token.value = multiply(token.holdings, token.price)
+        }
+        if (!token.holdings || !token.price) {
+          token.value = undefined
+        }
+        return token
+      })
+      .filter(
+        token =>
+          token.isStableToken || (token.holdings !== undefined && isGreater(token.holdings, '0'))
+      )
   }, [tokenWithBalance, allTokenList, tokenWithPrice])
 
   const estimatedRwaTotalValue =
@@ -145,6 +155,7 @@ function getAssetItemFromRwa(rwa: IRwa): IAssetItem {
     sessionMask: rwa.sessionMask,
     weight: rwa.weight,
     precision: rwa.precision,
+    splitStatus: rwa.splitStatus,
   }
 }
 
@@ -164,4 +175,6 @@ export interface IAssetItem {
   address: string
   weight?: number
   precision: number
+  showState?: boolean
+  splitStatus?: number
 }

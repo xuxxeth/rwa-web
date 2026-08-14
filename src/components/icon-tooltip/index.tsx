@@ -77,14 +77,16 @@ export function TooltipWithBorder({
   tooltip,
   children,
   className,
+  triggerClassName
 }: {
   text?: string
   tooltip?: string
   children?: React.ReactNode
   className?: string
+  triggerClassName?: string
 }) {
   return (
-    <IconWithTooltip tooltip={tooltip}>
+    <IconWithTooltip tooltip={tooltip} triggerClassName={triggerClassName}>
       <div
         className={cn(
           'border-b border-dashed border-[#9DA3AF] text-[#9DA3AF] text-[12px]',
@@ -94,6 +96,41 @@ export function TooltipWithBorder({
         {text || children}
       </div>
     </IconWithTooltip>
+  )
+}
+
+export function NumberWithTooltip({
+  text,
+  tooltip,
+  children,
+  className,
+  triggerClassName
+}: {
+  text?: string
+  tooltip?: string
+  children?: React.ReactNode
+  className?: string
+  triggerClassName?: string
+}) {
+  if (parseFloat(tooltip || '') === 0) {
+    return (
+      <span className={cn(
+        "text-[12px] font-medium text-[#9DA3AF]",
+        className
+      )}>
+        { text || children}
+      </span>
+    )
+  }
+
+  return (
+    <TooltipWithBorder
+      tooltip={tooltip}
+      className={className}
+      triggerClassName={triggerClassName}
+    >
+      { text || children }
+    </TooltipWithBorder>
   )
 }
 

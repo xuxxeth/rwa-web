@@ -9,6 +9,8 @@ export interface AppStore {
   setCurrentChainId: (chainId: number | null) => void
   isSwitchingChain: boolean
   setIsSwitchingChain: (isSwitching: boolean) => void
+  showAnnouncement: boolean
+  setShowAnnouncement: (show: boolean) => void
 }
 
 export const useAppStore = create<AppStore>()((set, get) => ({
@@ -27,5 +29,9 @@ export const useAppStore = create<AppStore>()((set, get) => ({
   isSwitchingChain: false,
   setIsSwitchingChain: (isSwitching: boolean) => {
     set({ isSwitchingChain: isSwitching })
+  },
+  showAnnouncement: false,
+  setShowAnnouncement: (show: boolean) => {
+    set({ showAnnouncement: show })
   },
 }))

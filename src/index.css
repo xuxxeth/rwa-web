@@ -522,3 +522,17 @@ body {
   position: relative;
   z-index: 1;
 }
+
+@keyframes announcement-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-1 * var(--announcement-distance, 0px)));
+  }
+}
+
+.animate-announcement-scroll {
+  animation: announcement-scroll var(--announcement-duration, 25s) linear infinite;
+}
