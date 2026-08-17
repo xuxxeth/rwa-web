@@ -237,7 +237,7 @@ export function OrderTable<
   const [isSignatureValid, refreshIsSignatureValid] = useSignatureValidStatus()
   const isOrder = ['open', 'history', 'trade'].includes(type)
 
-  const [selectedAll, setSelectedAll] = useState(false)
+  const [selectAllAction, setSelectAllAction] = useState<{ checked: boolean; seq: number } | null>(null)
   const [selectedAllRows, setSelectedAllRows] = useState(false)
 
 
@@ -276,7 +276,10 @@ export function OrderTable<
         showChecked={showChecked}
         isAllSelected={selectedAllRows}
         onSelectAll={(checked) => {
-          setSelectedAll(checked)
+          setSelectAllAction(prev => ({
+            checked,
+            seq: (prev?.seq ?? 0) + 1,
+          }))
         }}
     >
       {dataMode === 'pagination' && (
@@ -294,11 +297,8 @@ export function OrderTable<
           bodyClassName={bodyClassName}
           paginationSorter={paginationSorter}
           showChecked={showChecked}
-          selectedAll={selectedAll}
+          selectAllAction={selectAllAction}
           MULTI_LIMIT={MULTI_LIMIT}
-          onSelectAllConsumed={() => {
-            setSelectedAll(false)
-          }}
           onSelectRows={(keys: string[], isSelectedAll: boolean) => {
             setSelectedAllRows(isSelectedAll)
             onSelectRows?.(keys)
@@ -561,9 +561,8 @@ export function OrderContentByPagination<
   bodyClassName,
   paginationSorter,
   showChecked,
-  selectedAll,
+  selectAllAction,
   MULTI_LIMIT,
-  onSelectAllConsumed,
   onSelectRows
 }: {
   chainId: number
@@ -587,9 +586,8 @@ export function OrderContentByPagination<
   bodyClassName?: string
   paginationSorter?: (a: T, b: T) => number
   showChecked?: boolean
-  selectedAll?: boolean
+  selectAllAction?: { checked: boolean; seq: number } | null
   MULTI_LIMIT?: number
-  onSelectAllConsumed?: () => void
   onSelectRows?: (keys: string[], isAllSelected: boolean) => void
 }) {
   const stableTokens = useTokens()
@@ -620,16 +618,24 @@ export function OrderContentByPagination<
   const currentPageKeys = useMemo(() => data.map(item => String(scrollId(item))), [data, scrollId])
   const currentPageKeySignature = currentPageKeys.join('|')
   const pageSelectionMapRef = useRef(new Map<string, string[]>())
+  const totalSelectedCount = Array.from(pageSelectionMapRef.current.values()).reduce((count, keys) => count + keys.length, 0)
 
-  const emitSelection = useCallback((nextKeys: string[]) => {
-    const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => nextKeys.includes(key))
-    pageSelectionMapRef.current.set(currentPageKeySignature, nextKeys)
-    setSelectedRowKeys(nextKeys)
-    onSelectRows?.(nextKeys, isAllSelected)
+  const emitSelection = useCallback((nextKeys: string[], options?: { replaceAllPages?: boolean }) => {
+    const normalizedKeys = Array.from(new Set(nextKeys))
+    const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => normalizedKeys.includes(key))
+
+    if (options?.replaceAllPages) {
+      pageSelectionMapRef.current = new Map([[currentPageKeySignature, normalizedKeys]])
+    } else {
+      pageSelectionMapRef.current.set(currentPageKeySignature, normalizedKeys)
+    }
+
+    setSelectedRowKeys(normalizedKeys)
+    onSelectRows?.(normalizedKeys, isAllSelected)
   }, [currentPageKeys, currentPageKeySignature, onSelectRows])
 
   useEffect(() => {
-    const persistedSelection = pageSelectionMapRef.current.get(currentPageKeySignature) ?? []
+    const persistedSelection = Array.from(new Set(pageSelectionMapRef.current.get(currentPageKeySignature) ?? []))
     setSelectedRowKeys(persistedSelection)
 
     const isAllSelected = currentPageKeys.length > 0 && currentPageKeys.every(key => persistedSelection.includes(key))
@@ -637,13 +643,19 @@ export function OrderContentByPagination<
   }, [currentPageKeySignature, currentPageKeys, onSelectRows])
 
   useEffect(() => {
-    if (!showChecked || !selectedAll) return
+    if (!showChecked || !selectAllAction) return
 
-    const limit = MULTI_LIMIT ?? currentPageKeys.length
-    const keys = currentPageKeys.slice(0, limit)
-    emitSelection(keys)
-    onSelectAllConsumed?.()
-  }, [selectedAll, showChecked, currentPageKeys, MULTI_LIMIT, emitSelection, onSelectAllConsumed])
+    if (selectAllAction.checked) {
+      const limit = MULTI_LIMIT ?? currentPageKeys.length
+      const keys = currentPageKeys.slice(0, limit)
+      emitSelection(keys, { replaceAllPages: true })
+      return
+    }
+
+    pageSelectionMapRef.current.set(currentPageKeySignature, [])
+    setSelectedRowKeys([])
+    onSelectRows?.([], false)
+  }, [selectAllAction?.seq, showChecked, currentPageKeys, MULTI_LIMIT, emitSelection, currentPageKeySignature, onSelectRows])
 
 
   if (isListEmpty) {
@@ -670,12 +682,17 @@ export function OrderContentByPagination<
         tdClassName='h-[56px] text-xs/4'
         showChecked={showChecked}
         selectedRowKeys={selectedRowKeys}
+        shouldDisableCheckbox={(_, checked) => {
+          if (!MULTI_LIMIT) return false
+          if (checked) return false
+          return totalSelectedCount >= MULTI_LIMIT
+        }}
         onSelectRow={(key: string, checked: boolean) => {
           const nextKeys = [...selectedRowKeys]
           const currentIndex = nextKeys.findIndex(_key => _key === key)
 
           if (checked) {
-            if (currentIndex === -1 && nextKeys.length >= (MULTI_LIMIT ?? currentPageKeys.length)) {
+            if (MULTI_LIMIT && totalSelectedCount >= MULTI_LIMIT && currentIndex === -1) {
               return
             }
             if (currentIndex === -1) {

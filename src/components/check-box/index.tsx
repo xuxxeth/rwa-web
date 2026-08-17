@@ -6,9 +6,10 @@ import { cn } from '@/utils'
 type CheckBoxProps = {
   checked?: boolean
   onChange?: (checked: boolean) => void
+  disabled?: boolean
 }
 
-const CheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
+const CheckBox = memo(({ checked, onChange, disabled }: CheckBoxProps) => {
   const [check, setCheck] = useState(checked)
   useEffect(() => {
     setCheck(checked)
@@ -16,8 +17,10 @@ const CheckBox = memo(({ checked, onChange }: CheckBoxProps) => {
   return (
     <button
       type='button'
-      className=' cursor-pointer outline-none'
+      className={cn('outline-none', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer')}
+      disabled={disabled}
       onClick={() => {
+        if (disabled) return
         setCheck(!check)
         onChange && onChange(!check)
       }}

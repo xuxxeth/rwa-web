@@ -32,8 +32,9 @@ export function TableBody<T, Extra>(props: {
   showChecked?: boolean
   selectedRowKeys?: string[]
   onSelectRow?: (key: string, checked: boolean) => void
+  shouldDisableCheckbox?: (item: T, checked: boolean) => boolean
 }) {
-  const { data, config, isLoading, extra, getKey, tdClassName, ExtraComponent, onClick, showChecked, selectedRowKeys, onSelectRow } = props
+  const { data, config, isLoading, extra, getKey, tdClassName, ExtraComponent, onClick, showChecked, selectedRowKeys, onSelectRow, shouldDisableCheckbox } = props
   const selectedKeySet = new Set((selectedRowKeys ?? []).map(key => String(key)))
 
   return (
@@ -66,6 +67,7 @@ export function TableBody<T, Extra>(props: {
                   {index === 0 && showChecked && (
                     <CheckBox
                       checked={isChecked}
+                      disabled={shouldDisableCheckbox?.(item, isChecked)}
                       onChange={checked => {
                         onSelectRow?.(rowKey, checked)
                       }}
